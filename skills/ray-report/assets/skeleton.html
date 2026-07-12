@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<!--
+  Editorial Report skeleton — starter template.
+  Copy this file, replace content placeholders, keep CSS / print CSS / scripts as-is.
+
+  Placeholder markers to find and replace:
+    {{TITLE}}              — article title (also <title>, <h1>, masthead h1)
+    {{KICKER}}             — small caps above h1 (e.g. "2026 · AI 与就业 · 深度观察")
+    {{SUB}}                — subtitle under h1
+    {{DATE}}               — date in byline (e.g. "2026 年 5 月")
+    {{READ_TIME}}          — read time (e.g. "阅读时间约 15 分钟")
+    {{AUTHOR}}             — author/handle (e.g. "Ray Wang @wangray")
+    {{SERIES}}             — series name for cover footer (e.g. "AI 与就业 · 深度观察")
+
+  Then build the article body inside <article> by composing sections.
+  See references/components.md for each component snippet.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #262421;
+    --paper: #fafaf7;
+    --cream: #f4ede0;
+    --cream-soft: #f7f3ea;
+    --line: #e7e5e0;
+    --line-strong: #d4cfc4;
+    --mute: #6b6760;
+    --accent: #b8553a;
+    --accent-soft: #f0d9cf;
+    --positive: #2d6a4f;
+    --negative: #9c2a25;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink-soft);
+    line-height: 1.8;
+    font-size: 17px;
+    font-feature-settings: "palt", "tnum";
+    margin: 0;
+    position: relative;
+  }
+
+  /* Paper grain overlay — fixed, non-interactive */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(106,92,56,0.06), transparent 45%),
+      radial-gradient(circle at 88% 72%, rgba(106,92,56,0.05), transparent 50%),
+      radial-gradient(circle at 45% 90%, rgba(184,85,58,0.025), transparent 40%);
+  }
+
+  .serif { font-family: 'Noto Serif SC', Georgia, 'Songti SC', 'STSong', serif; }
+  .mono { font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace; }
+  .num { font-feature-settings: 'tnum' 1; font-variant-numeric: tabular-nums; }
+
+  .container-narrow {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .container-wide {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Heading family */
+  h1, h2, h3, h4, h5 {
+    font-family: 'Noto Serif SC', Georgia, 'Songti SC', serif;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  /* Masthead */
+  .masthead {
+    padding: 5.5rem 0 3rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .masthead .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+  .masthead h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.08;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.03em;
+  }
+  .masthead .sub {
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--mute);
+    max-width: 600px;
+    margin: 0 0 2.5rem 0;
+    font-weight: 400;
+  }
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.78rem;
+    color: var(--mute);
+    flex-wrap: wrap;
+    letter-spacing: 0.05em;
+  }
+  .byline-divider { width: 1px; height: 12px; background: var(--line-strong); }
+
+  /* H2 — section title with kicker */
+  h2 {
+    font-size: clamp(1.8rem, 4.2vw, 2.4rem);
+    font-weight: 700;
+    margin: 5rem 0 1.8rem;
+    line-height: 1.2;
+  }
+  h2 .h2-num {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.9rem;
+  }
+
+  /* H3 */
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 2.8rem 0 1rem;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  h4 { font-weight: 700; }
+
+  /* Body */
+  p {
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    margin: 1.1em 0;
+    color: var(--ink-soft);
+  }
+  p strong { font-weight: 700; color: var(--ink); }
+
+  /* Drop cap on first content paragraph (class="lead") */
+  .lead::first-letter {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-size: 4em;
+    font-weight: 900;
+    float: left;
+    line-height: 0.85;
+    margin: 0.08em 0.14em 0 0;
+    color: var(--accent);
+  }
+
+  /* Pull quote — italic serif, rust border-left, no color box */
+  .pullquote {
+    margin: 3rem 0;
+    padding: 1.5rem 0 1.5rem 2rem;
+    border-left: 3px solid var(--accent);
+    font-family: 'Noto Serif SC', Georgia, serif;
+    font-style: italic;
+    font-size: 1.35rem;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .pullquote .author {
+    display: block;
+    margin-top: 1.2rem;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: 0.85rem;
+    color: var(--mute);
+    font-weight: 400;
+  }
+
+  /* Ornament divider — use between every major section */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 5rem auto;
+    color: var(--mute);
+    max-width: 720px;
+    padding: 0 24px;
+  }
+  .ornament::before, .ornament::after {
+    content: "";
+    flex: 1;
+    max-width: 80px;
+    height: 1px;
+    background: var(--line-strong);
+  }
+  .ornament span {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: var(--mute);
+  }
+
+  /* Stat cards — top section, 2-4 cards in a row */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    margin: 3rem 0;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .stat-card {
+    padding: 2rem 1.8rem;
+    background: white;
+    position: relative;
+  }
+  .stat-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mute);
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+  }
+  .stat-card .number {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.04em;
+  }
+  .stat-card .number small {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    margin-left: 6px;
+    letter-spacing: 0;
+  }
+  .stat-card .unit {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+    font-family: 'Noto Serif SC', serif;
+  }
+  .stat-card .note {
+    font-size: 0.85rem;
+    color: var(--mute);
+    margin-top: 0.5rem;
+    line-height: 1.65;
+  }
+
+  /* Timeline — historical events */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin: 3rem 0;
+    border-left: 1px solid var(--line-strong);
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 3.5rem;
+  }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -2.3rem;
+    top: 0.5em;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--paper);
+  }
+  .timeline-item .date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+  .timeline-item .title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .timeline-item .lesson {
+    margin-top: 1.2rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--cream-soft);
+    border-left: 2px solid var(--accent);
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .timeline-item ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+    color: var(--mute);
+    list-style: disc;
+  }
+  .timeline-item ul li { margin: 0.4rem 0; }
+
+  /* Chart container */
+  .chart-box {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 2rem 2rem 1.5rem;
+    margin: 3rem 0;
+  }
+  .chart-box .chart-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+  }
+  .chart-box .chart-subtitle {
+    font-size: 0.85rem;
+    color: var(--mute);
+    margin-bottom: 1.5rem;
+  }
+  .chart-box .caption {
+    font-size: 0.8rem;
+    color: var(--mute);
+    text-align: left;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-style: italic;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 3rem 0 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tab-btn {
+    padding: 0.9rem 1.4rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--mute);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font-family: inherit;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-panel {
+    display: none;
+    padding: 2.5rem 2rem;
+    background: white;
+    border: 1px solid var(--line);
+    border-top: none;
+  }
+  .tab-panel.active { display: block; }
+  .tab-panel h4 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.8rem 0;
+    color: var(--ink);
+  }
+  .tab-panel .panel-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--mute);
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--line);
+    letter-spacing: 0.05em;
+  }
+  .tab-panel p { font-size: 1rem; margin: 0.8rem 0; }
+
+  /* Quiz */
+  .quiz {
+    background: var(--cream);
+    padding: 3rem 2.5rem;
+    margin: 3rem 0;
+    border: 1px solid var(--line-strong);
+    position: relative;
+  }
+  .quiz::before {
+    content: "自测 · QUIZ";
+    position: absolute;
+    top: -0.6rem;
+    left: 2rem;
+    background: var(--paper);
+    padding: 0 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .quiz h3 { margin: 0 0 1rem 0; font-size: 1.5rem; line-height: 1.3; }
+  .quiz .question { font-size: 1.05rem; margin-bottom: 1.8rem; line-height: 1.7; color: var(--ink-soft); }
+  .quiz-options { display: grid; gap: 0.6rem; }
+  .quiz-option {
+    background: white;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 1.1rem 1.5rem;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.15s;
+    line-height: 1.5;
+  }
+  .quiz-option:hover { border-color: var(--accent); }
+  .quiz-result {
+    display: none;
+    margin-top: 2rem;
+    padding: 1.8rem;
+    background: white;
+    border-left: 3px solid var(--accent);
+  }
+  .quiz-result.show { display: block; }
+  .quiz-result .level {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .quiz-result p { margin: 0; font-size: 0.98rem; line-height: 1.7; }
+
+  /* Layer grid — 3-5 parallel cards */
+  .layer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+  }
+  .layer-card {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 2rem 1.8rem;
+    position: relative;
+  }
+  .layer-card .layer-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .layer-card h4 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 1.2rem 0;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .layer-card p {
+    font-size: 0.92rem;
+    color: var(--mute);
+    margin: 0.6rem 0;
+    line-height: 1.7;
+  }
+  .layer-card p strong { color: var(--ink); }
+
+  /* Accordion — details/summary */
+  details {
+    border-bottom: 1px solid var(--line);
+    margin: 0;
+    background: transparent;
+  }
+  summary {
+    padding: 1.4rem 0;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    list-style: none;
+    position: relative;
+    padding-right: 3rem;
+    color: var(--ink);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: var(--accent);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    transition: transform 0.3s;
+  }
+  details[open] summary::after { content: "−"; }
+  details > div { padding: 0 0 1.5rem; }
+  details > div p:first-child { margin-top: 0; }
+  details > div p { font-size: 0.98rem; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2.5rem 0;
+    font-size: 0.95rem;
+    background: white;
+    border: 1px solid var(--line);
+  }
+  th {
+    text-align: left;
+    padding: 0.9rem 1.2rem;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mute);
+    border-bottom: 2px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--cream-soft);
+  }
+  td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--cream-soft); }
+  td strong { color: var(--ink); }
+
+  /* Danger / Safe callout boxes */
+  .danger-box, .safe-box {
+    padding: 1.5rem 1.8rem;
+    margin: 2rem 0;
+    border-left: 3px solid;
+    background: white;
+    border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .danger-box { border-left-color: var(--negative); }
+  .safe-box { border-left-color: var(--positive); }
+  .danger-box h4, .safe-box h4 {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    font-size: 1.05rem;
+    font-family: 'Noto Serif SC', serif;
+  }
+  .danger-box h4 { color: var(--negative); }
+  .safe-box h4 { color: var(--positive); }
+  .danger-box p, .safe-box p { font-size: 0.95rem; margin: 0.6rem 0; }
+
+  /* Closing — year boxes + final */
+  .closing { margin: 4rem 0 2rem; text-align: center; }
+  .closing .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-bottom: 2.5rem;
+  }
+  .closing .years {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+  .closing .year-box {
+    padding: 1.5rem 1.2rem;
+    min-width: 180px;
+    border-top: 1px solid var(--line-strong);
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .closing .year-box.highlight {
+    border-top-color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--cream-soft);
+  }
+  .closing .year-box .y {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .closing .year-box .desc {
+    font-size: 0.85rem;
+    color: var(--mute);
+    margin-top: 0.7rem;
+    line-height: 1.5;
+  }
+  .closing .final {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .closing .final em { color: var(--accent); font-style: normal; }
+
+  /* Epilogue — italic serif centered conclusion */
+  .epilogue {
+    font-family: 'Noto Serif SC', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--mute);
+    text-align: center;
+    margin: 4rem auto 0;
+    padding-top: 3rem;
+    border-top: 1px solid var(--line);
+    max-width: 580px;
+  }
+  .epilogue strong { color: var(--ink); font-style: normal; }
+
+  /* Article footer */
+  .article-footer {
+    text-align: center;
+    padding: 4rem 0 6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .masthead { padding: 4rem 0 2.5rem; }
+    .lead::first-letter { font-size: 3.5em; }
+    .timeline-item .title { font-size: 1.15rem; }
+    .stat-card .number { font-size: 2.6rem; }
+    h2 { margin-top: 4rem; }
+    .ornament { margin: 3.5rem auto; }
+    .pullquote { font-size: 1.15rem; padding: 1rem 0 1rem 1.5rem; }
+    .quiz { padding: 2.5rem 1.5rem; }
+  }
+
+  /* ============= 打印 / PDF 报告样式 ============= */
+  @media print {
+    @page {
+      size: A4;
+      margin: 18mm 16mm 20mm 16mm;
+    }
+    @page :first { margin: 0; }
+
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      background: var(--paper);
+      font-size: 10.5pt;
+      line-height: 1.7;
+    }
+    body::before { display: none; }
+
+    /* AOS in headless mode doesn't trigger — force visible */
+    [data-aos] { opacity: 1 !important; transform: none !important; }
+
+    .container-narrow, .container-wide { max-width: 100%; padding: 0; }
+
+    /* Cover page */
+    .masthead {
+      padding: 0; margin: 0; border-bottom: none;
+      height: 100vh;
+      page-break-after: always;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+      background: var(--paper);
+    }
+    .masthead .container-narrow { max-width: 100%; padding: 0 24mm; }
+    .masthead .kicker { font-size: 9pt; margin-bottom: 2rem; }
+    .masthead h1 {
+      font-size: 42pt; line-height: 1.05; margin-bottom: 2rem;
+      letter-spacing: -0.035em;
+    }
+    .masthead .sub { font-size: 14pt; max-width: 75%; margin-bottom: 5rem; }
+    .masthead .byline {
+      font-size: 9pt;
+      border-top: 1px solid var(--line-strong);
+      padding-top: 1.5rem;
+      max-width: 75%;
+    }
+    .masthead::after {
+      content: "{{SERIES}} · 2026";
+      position: absolute;
+      bottom: 20mm; left: 24mm;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+
+    /* H2 / H3 */
+    h2 {
+      font-size: 22pt; margin: 1.5rem 0 1rem;
+      page-break-after: avoid; page-break-inside: avoid;
+    }
+    h2 .h2-num { font-size: 8pt; margin-bottom: 0.6rem; }
+    h3 { font-size: 13pt; margin: 1.5rem 0 0.8rem; page-break-after: avoid; }
+    p { orphans: 3; widows: 3; }
+
+    .ornament { margin: 1.5rem auto; }
+
+    .pullquote {
+      font-size: 13pt; margin: 1.8rem 0;
+      padding: 1rem 0 1rem 1.5rem;
+      page-break-inside: avoid;
+    }
+
+    .stat-row { page-break-inside: avoid; margin: 1.5rem 0; }
+    .stat-card { padding: 1.2rem 1rem; }
+    .stat-card .number { font-size: 28pt; }
+    .stat-card .note { font-size: 9pt; line-height: 1.5; }
+
+    .timeline-item { page-break-inside: avoid; padding-bottom: 1.5rem; }
+    .timeline-item .title { font-size: 13pt; }
+    .timeline-item .lesson { font-size: 9.5pt; padding: 0.6rem 1rem; }
+
+    /* Tabs → expanded static cards */
+    .tabs { display: none !important; }
+    .tab-panel {
+      display: block !important;
+      border: 1px solid var(--line) !important;
+      border-top: 1px solid var(--line) !important;
+      margin: 0.8rem 0;
+      padding: 1.5rem;
+      page-break-inside: avoid;
+      background: white;
+    }
+    .tab-panel h4 { font-size: 12pt; }
+    .tab-panel .panel-meta { font-size: 8pt; margin-bottom: 1rem; padding-bottom: 0.8rem; }
+    .tab-panel p { font-size: 10pt; }
+
+    /* Tab panel labels: add #ID::before { content: "案例 N" } per panel */
+    .tab-panel::before {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    /* Example labels — adapt to your tab IDs:
+    #case1::before { content: "案例 1"; }
+    #case2::before { content: "案例 2"; }
+    */
+
+    /* Quiz → four scenarios */
+    .quiz { padding: 1.5rem; margin: 1.5rem 0; page-break-inside: avoid; }
+    .quiz::before { display: none; }
+    .quiz h3 { font-size: 14pt; }
+    .quiz .question { font-size: 10pt; }
+    .quiz-options { display: block !important; height: auto; }
+    .quiz-options::after {
+      content: "根据你的回答，对照下面四种情境：";
+      display: block;
+      font-style: italic;
+      color: var(--mute);
+      margin-bottom: 1rem;
+      font-size: 9.5pt;
+    }
+    .quiz-option { display: none !important; }
+    .quiz-result {
+      display: block !important;
+      margin-top: 1rem;
+      page-break-inside: avoid;
+      padding: 1rem 1.2rem;
+    }
+    .quiz-result .level { font-size: 8pt; }
+    .quiz-result p { font-size: 9.5pt; }
+
+    .layer-grid { page-break-inside: avoid; gap: 0.8rem; }
+    .layer-card { padding: 1.2rem; page-break-inside: avoid; }
+    .layer-card h4 { font-size: 11pt; }
+    .layer-card p { font-size: 9.5pt; }
+
+    /* Details: force open */
+    details { page-break-inside: avoid; }
+    details > div { display: block !important; }
+    details:not([open]) > div { display: block !important; }
+    summary::after { display: none; }
+
+    table { page-break-inside: avoid; font-size: 9.5pt; }
+    th { font-size: 8pt; padding: 0.6rem 0.8rem; }
+    td { padding: 0.7rem 0.8rem; }
+
+    .chart-box {
+      page-break-inside: avoid;
+      padding: 1.2rem;
+      margin: 1.5rem 0;
+    }
+    canvas {
+      max-width: 100% !important;
+      max-height: 280px !important;
+      height: auto !important;
+    }
+
+    .danger-box, .safe-box {
+      page-break-inside: avoid;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+    }
+    .danger-box h4, .safe-box h4 { font-size: 10pt; }
+    .danger-box p, .safe-box p { font-size: 9.5pt; }
+
+    .closing { margin: 2rem 0 1rem; page-break-inside: avoid; }
+    .closing .year-box { padding: 1rem; min-width: 140px; }
+    .closing .year-box .y { font-size: 18pt; }
+    .closing .final { font-size: 13pt; margin-top: 2rem; }
+    .epilogue { font-size: 10.5pt; padding-top: 2rem; margin-top: 2rem; }
+
+    .article-footer {
+      padding: 2rem 0 1rem;
+      font-size: 8pt;
+      border-top: 1px solid var(--line);
+      margin-top: 2rem;
+    }
+
+    section { page-break-inside: auto; }
+  }
+</style>
+</head>
+<body>
+
+<article>
+
+<!-- ============ MASTHEAD ============ -->
+<header class="masthead">
+  <div class="container-narrow">
+    <div class="kicker">{{KICKER}}</div>
+    <h1>{{TITLE}}</h1>
+    <p class="sub">{{SUB}}</p>
+    <div class="byline">
+      <span>{{DATE}}</span>
+      <span class="byline-divider"></span>
+      <span>{{READ_TIME}}</span>
+      <span class="byline-divider"></span>
+      <span>{{AUTHOR}}</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ OPENING (lead paragraph with drop cap) ============ -->
+<section class="container-narrow" style="padding-top: 4rem;">
+  <p class="lead">First paragraph of the article — gets a drop cap on the first character. Make this paragraph concrete and immediate. Open with a scene, a number, or a striking observation. Don't open with abstractions like "Recently I have been thinking about..."</p>
+
+  <p>Second paragraph builds on the first. Explain what's happening and why it matters. Keep paragraphs flowing — don't break into bullets here.</p>
+
+  <p>Third paragraph (optional) — set up the thesis or central question that the article will address. Then a pull quote often makes sense here, especially if you have a pivotal voice to cite.</p>
+
+  <div class="pullquote">
+    "Pull quote text — make this italic serif. Use for one or two pivotal quotes per article."
+    <span class="author">—— 出处来源（可选）</span>
+  </div>
+
+  <p>Paragraph after pull quote — pick up the thread, transition to the body.</p>
+</section>
+
+<!-- ============ ORNAMENT — use between every major section ============ -->
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 1 — example with stat row ============ -->
+<section class="container-wide">
+  <div class="container-narrow" style="padding:0;">
+    <h2 id="section-1"><span class="h2-num">01 · 标签</span>Section title goes here</h2>
+    <p>Section intro paragraph. Explain what this section is about and why it matters. Keep it tight — 1-2 short paragraphs before the data visualization.</p>
+  </div>
+
+  <!-- Stat card row — 3 comparable numbers -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="label">Label 1</div>
+      <div class="number num">100<small>年</small></div>
+      <div class="unit">单位说明</div>
+      <div class="note">简短说明这个数字代表什么。1-2 句话。</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Label 2</div>
+      <div class="number num">12<small>年</small></div>
+      <div class="unit">单位说明</div>
+      <div class="note">简短说明这个数字代表什么。1-2 句话。</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Label 3</div>
+      <div class="number num">12<small>个月</small></div>
+      <div class="unit">单位说明</div>
+      <div class="note">简短说明这个数字代表什么。1-2 句话。</div>
+    </div>
+  </div>
+
+  <div class="container-narrow" style="padding:0;">
+    <p>Conclude this section with a paragraph that interprets the data above. Don't just leave the numbers — tell the reader what they mean.</p>
+  </div>
+</section>
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 2 — example with timeline ============ -->
+<section class="container-narrow">
+  <h2 id="section-2"><span class="h2-num">02 · 标签</span>Section title with timeline</h2>
+  <p>Timelines work well for historical sequences. 3-6 items max.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="date">YYYY – YYYY　Period name</div>
+      <div class="title">Event title — what happened</div>
+      <p>Body paragraph explaining the event. Cite specific data, names, dates.</p>
+      <p>Second paragraph for depth (optional). Add a list if there are 3-5 sub-points:</p>
+      <ul>
+        <li>Sub-point 1 with <strong>specific data</strong></li>
+        <li>Sub-point 2</li>
+        <li>Sub-point 3</li>
+      </ul>
+      <div class="lesson">教训 / 启示：一句话点题。</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="date">YYYY – YYYY　Period name</div>
+      <div class="title">Second event title</div>
+      <p>Body paragraph...</p>
+      <div class="lesson">教训：一句话点题。</div>
+    </div>
+  </div>
+
+  <!-- Optional callout after timeline -->
+  <div class="safe-box">
+    <h4>共同规律</h4>
+    <p>Summary observation tying the timeline items together.</p>
+  </div>
+</section>
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 3 — example with chart ============ -->
+<section class="container-wide">
+  <div class="container-narrow" style="padding:0;">
+    <h2 id="section-3"><span class="h2-num">03 · 标签</span>Section with data chart</h2>
+    <p>Intro paragraph setting up the chart.</p>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-title">Chart title — what is being shown</div>
+    <div class="chart-subtitle">Subtitle / axis description</div>
+    <canvas id="chart-example" height="200"></canvas>
+    <div class="caption">Caption explaining methodology, sources, or interpretation notes.</div>
+  </div>
+
+  <div class="container-narrow" style="padding:0;">
+    <p>Follow-up paragraph interpreting the chart. The chart shows data, the prose tells the reader what to think about it.</p>
+
+    <div class="danger-box">
+      <h4>Warning / 高风险提醒</h4>
+      <p>Use the danger box for "watch out for X" callouts within a section.</p>
+    </div>
+
+    <div class="safe-box">
+      <h4>Reassurance / 安全建议</h4>
+      <p>Use the safe box for "here's what to do" callouts.</p>
+    </div>
+  </div>
+</section>
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 4 — example with tabs (parallel cases) ============ -->
+<section class="container-wide">
+  <div class="container-narrow" style="padding:0;">
+    <h2 id="section-4"><span class="h2-num">04 · 案例</span>Section with parallel cases</h2>
+    <p>Intro explaining what cases will be shown. Tabs work well for 4-8 parallel items where the reader will only want to read one or two but should know they all exist.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-target="case1">Case 1</button>
+    <button class="tab-btn" data-target="case2">Case 2</button>
+    <button class="tab-btn" data-target="case3">Case 3</button>
+  </div>
+
+  <div class="tab-panel active" id="case1">
+    <h4>Case 1 — Title</h4>
+    <div class="panel-meta">
+      <span>Date / period</span>
+      <span>Key fact 1</span>
+      <span>Key fact 2</span>
+    </div>
+    <p>Case 1 body paragraph.</p>
+    <p>Optional second paragraph for depth.</p>
+  </div>
+
+  <div class="tab-panel" id="case2">
+    <h4>Case 2 — Title</h4>
+    <div class="panel-meta">
+      <span>Date / period</span>
+      <span>Key fact</span>
+    </div>
+    <p>Case 2 body paragraph.</p>
+  </div>
+
+  <div class="tab-panel" id="case3">
+    <h4>Case 3 — Title</h4>
+    <div class="panel-meta">
+      <span>Date / period</span>
+    </div>
+    <p>Case 3 body paragraph.</p>
+  </div>
+</section>
+
+<!--
+  IMPORTANT for PDF: Add labels in @media print so each panel shows "案例 N"
+  Replace the example placeholders in the print CSS @media block with your actual IDs:
+
+  #case1::before { content: "案例 1"; }
+  #case2::before { content: "案例 2"; }
+  #case3::before { content: "案例 3"; }
+-->
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 5 — example with quiz ============ -->
+<section class="container-narrow">
+  <h2 id="section-5"><span class="h2-num">05 · 自测</span>Section with self-assessment</h2>
+  <p>Intro explaining the quiz purpose.</p>
+
+  <div class="quiz">
+    <h3>Question title (one per article max)</h3>
+    <p class="question">Explanation of the question / context for the reader before choosing.</p>
+    <div class="quiz-options">
+      <button class="quiz-option" data-result="result-a">Option A</button>
+      <button class="quiz-option" data-result="result-b">Option B</button>
+      <button class="quiz-option" data-result="result-c">Option C</button>
+      <button class="quiz-option" data-result="result-d">Option D</button>
+    </div>
+    <div class="quiz-result" id="result-a">
+      <div class="level">Outcome A 标签</div>
+      <p>What this answer means for the reader. Be specific, actionable.</p>
+    </div>
+    <div class="quiz-result" id="result-b">
+      <div class="level">Outcome B 标签</div>
+      <p>What this answer means.</p>
+    </div>
+    <div class="quiz-result" id="result-c">
+      <div class="level">Outcome C 标签</div>
+      <p>What this answer means.</p>
+    </div>
+    <div class="quiz-result" id="result-d">
+      <div class="level">Outcome D 标签</div>
+      <p>What this answer means.</p>
+    </div>
+  </div>
+</section>
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ SECTION 6 — example with layer grid + accordion ============ -->
+<section class="container-wide">
+  <div class="container-narrow" style="padding:0;">
+    <h2 id="section-6"><span class="h2-num">06 · 应对</span>Section with parallel concepts</h2>
+    <p>Intro paragraph.</p>
+  </div>
+
+  <div class="layer-grid">
+    <div class="layer-card">
+      <div class="layer-num">概念 / Tier 1</div>
+      <h4>Concept 1 — Title</h4>
+      <p>Body text. <strong>Bold key phrase.</strong></p>
+      <p>Second sentence or actionable note.</p>
+    </div>
+    <div class="layer-card">
+      <div class="layer-num">概念 / Tier 2</div>
+      <h4>Concept 2 — Title</h4>
+      <p>Body text.</p>
+    </div>
+    <div class="layer-card">
+      <div class="layer-num">概念 / Tier 3</div>
+      <h4>Concept 3 — Title</h4>
+      <p>Body text.</p>
+    </div>
+  </div>
+
+  <div class="container-narrow" style="padding:0;">
+    <h3>Subsection title</h3>
+    <p>Lead into an accordion list — works well for "things to avoid" or "principles."</p>
+
+    <details>
+      <summary>Item 1 headline</summary>
+      <div>
+        <p>Body for item 1.</p>
+        <p>Additional paragraph if needed.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Item 2 headline</summary>
+      <div>
+        <p>Body for item 2.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Item 3 headline</summary>
+      <div>
+        <p>Body for item 3.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<div class="ornament"><span>· · ·</span></div>
+
+<!-- ============ CLOSING ============ -->
+<section class="container-narrow">
+  <h2 id="closing"><span class="h2-num">07 · 收尾</span>Closing observation</h2>
+  <p>Opening of the closing — set up the parallel or insight.</p>
+
+  <div class="closing">
+    <div class="label">三个时间窗口 / Three time windows</div>
+    <div class="years">
+      <div class="year-box">
+        <div class="y num">YEAR1</div>
+        <div class="desc">Description<br>second line</div>
+      </div>
+      <div class="year-box">
+        <div class="y num">YEAR2</div>
+        <div class="desc">Description<br>second line</div>
+      </div>
+      <div class="year-box highlight">
+        <div class="y num">YEAR3</div>
+        <div class="desc">Description<br>second line</div>
+      </div>
+    </div>
+    <p class="final">Final punchy statement.<br>The point of the whole article in one line. <em>Key word</em>.</p>
+  </div>
+
+  <div class="epilogue">
+    Epilogue in italic serif.<br>
+    Use to revisit a thread or twist the knife.<br>
+    Keep it short. <strong>Bold one phrase</strong> for emphasis.
+  </div>
+</section>
+
+<div class="article-footer">END · 2026</div>
+
+</article>
+
+<script>
+  AOS.init({ duration: 600, once: true, offset: 80 });
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+
+  // Quiz
+  document.querySelectorAll('.quiz-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const result = opt.dataset.result;
+      document.querySelectorAll('.quiz-result').forEach(r => r.classList.remove('show'));
+      const target = document.getElementById(result);
+      if (target) target.classList.add('show');
+      document.querySelectorAll('.quiz-option').forEach(o => {
+        o.style.opacity = o === opt ? '1' : '0.55';
+        o.style.borderColor = o === opt ? 'var(--accent)' : 'var(--line)';
+      });
+    });
+  });
+
+  // ============ Chart.js examples ============
+  // Bar chart with editorial styling
+  const barEl = document.getElementById('chart-example');
+  if (barEl) {
+    new Chart(barEl.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+        datasets: [{
+          label: 'Value',
+          data: [3.75, 3.0, 2.4, 0.78],
+          backgroundColor: ['#b8553a', '#c46d4f', '#d18464', '#b89473'],
+          borderColor: '#ffffff',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1a1a',
+            titleFont: { family: "'Inter', sans-serif", size: 13 },
+            bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
+            padding: 12
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: '#f0ece5' },
+            ticks: {
+              font: { family: "'JetBrains Mono', monospace", size: 11 },
+              color: '#6b6760'
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: {
+              font: { family: "'Inter', 'Noto Sans SC', sans-serif", size: 12 },
+              color: '#1a1a1a'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /* Line chart example — uncomment + adapt
+  new Chart(document.getElementById('line-chart-id').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+      datasets: [{
+        label: 'Trend',
+        data: [16.7, 21.3, 18.9, 16.5],
+        borderColor: '#b8553a',
+        backgroundColor: 'rgba(184,85,58,0.08)',
+        borderWidth: 2.5,
+        tension: 0.3,
+        fill: true,
+        pointRadius: 5,
+        pointBackgroundColor: '#b8553a',
+        pointBorderColor: '#fafaf7',
+        pointBorderWidth: 2,
+        spanGaps: true
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+  */
+</script>
+
+</body>
+</html>
