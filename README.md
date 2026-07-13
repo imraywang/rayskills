@@ -6,7 +6,7 @@
 
 网络环境 · 节点巡检 · thread 装配 · 数据周报 · 对标拆解 · 企业诊断 · 方案蓝图 · 产品概念 · 站点上线 · 周复盘
 
-![License](https://img.shields.io/badge/License-MIT-blue)
+![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-14%20%2B%20%2Fray%20路由-8b5cf6)](#-花名册14--路由)
 [![Evals](https://img.shields.io/badge/对照实测-14%2F14%20skill--helps-059669)](#-实测每个-skill-都真的有用)
 [![Validate](https://img.shields.io/badge/官方校验-14%2F14%20pass-3fb950)](#-架构与纪律)
