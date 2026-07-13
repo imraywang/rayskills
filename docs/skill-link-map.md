@@ -22,7 +22,7 @@ flowchart TD
         PROP["/ray-proposal 🔒\n方案蓝图"]
     end
     subgraph PRODUCT["📦 产品"]
-        ANVIL["/ray-anvil\n产品概念"]
+        ANVIL["/ray-idea\n产品概念"]
         LAUNCH["/ray-launch\n站上线"]
     end
     subgraph OPS["🧹 内务"]
@@ -50,6 +50,6 @@ flowchart TD
 - **咨询漏斗**:`ray-diagnose`(免费诊断,漏斗入口)→ `ray-proposal`(付费方案)。红灯诊断时,方案 Phase 0 = 补齐前提。
 - **实战 → 内容飞轮**:任何一段实战(开荒/巡检/上线/事故)完成后,`ray-thread` 或 `ray-tweet` 把它变成 IP 素材(守不代笔)。
 - **数据 → 决策**:`ray-metrics` 的规律喂 `ray-weekly` 的内容数据节,并指导 `ray-tweet` 下一批方向。
-- **对标 → 产品**:`ray-benchmark` 拆完可迁移点,`ray-anvil` 锻造差异化产品概念。
+- **对标 → 产品**:`ray-benchmark` 拆完可迁移点,`ray-idea` 锻造差异化产品概念。
 
 🔒 = 私有 skill,不随开源发布。
