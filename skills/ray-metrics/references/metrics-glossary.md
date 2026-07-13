@@ -52,7 +52,7 @@
 - `referenced_tweets` 用来区分推文类型:含 `type=retweeted` 是转推、`type=quoted` 是引用、`type=replied_to` 是回复。据此给推分类(声部/形态归因要用)。
 - `exclude="retweets,replies"` 可在拉取时过滤;但若要单独分析回复表现,就别 exclude replies,改在本地按 referenced_tweets 分类。
 - `max_results` 单页上限 100,下限 5。时间窗内推多于 100 条,用返回的 `pagination_token` / `next_token` 翻页,别只取第一页就当全量。
-- 时间参数 `start_time` / `end_time` 用 ISO 8601 UTC(如 `2026-07-04T00:00:00Z`)。注意 X 时间是 UTC,做"发布时段"归因时要按 Ray 实际所在时区(UTC+8)换算,否则时段结论整体偏 8 小时。
+- 时间参数 `start_time` / `end_time` 用 ISO 8601 UTC(如 `2026-07-04T00:00:00Z`)。注意 X 时间是 UTC,做"发布时段"归因时要按你实际所在时区(如 UTC+8)换算,否则时段结论整体偏若干小时。
 
 ## 4. X Analytics CSV 列名映射
 

@@ -19,7 +19,7 @@ Build the **content as HTML first**, then derive PDF and 公众号 Markdown from
 
 Generic AI-generated HTML defaults to SaaS dashboard aesthetics — dark hero with gradients, saturated neon accents, rounded card shadows, big CTA buttons. That look is wrong for long-form analysis.
 
-This skill enforces **editorial design language** — the look of a New Yorker article or NYT long-read. The opposite of slop. The reference repo is [nexu-io/html-anything](https://github.com/nexu-io/html-anything) (especially `article-magazine`, `data-report`, `doc-kami-parchment` templates).
+This skill enforces **editorial design language** — the look of a New Yorker article or NYT long-read. The opposite of slop. The reference aesthetic is a magazine-style long-read layout — think `article-magazine`, `data-report`, or `parchment-document` template families rather than any SaaS UI kit.
 
 ## Workflow
 
@@ -123,7 +123,7 @@ The skeleton already includes `@media print` CSS that:
 
 Generate:
 ```bash
-bash ~/.claude/skills/editorial-report/scripts/render-pdf.sh input.html [output.pdf]
+bash ~/.claude/skills/ray-report/scripts/render-pdf.sh input.html [output.pdf]
 ```
 
 The script uses headless Chrome with `--virtual-time-budget=12000` to ensure Chart.js renders before printing.
@@ -176,11 +176,11 @@ Key rules:
 
 - `scripts/render-pdf.sh` — Generate PDF from HTML via headless Chrome
 
-## Canonical example
+## Reference implementation
 
-The reference implementation built during this skill's creation:
-- `~/AI裁员浪潮-数据加强版.html` — HTML interactive version
-- `~/AI裁员浪潮-数据加强版.pdf` — PDF report version
-- `~/AI裁员浪潮-公众号版.md` — WeChat markdown version
+A complete example is three coordinated files for the same article — e.g. a data-heavy long-read on a topic like "the AI layoff wave":
+- `~/<topic-slug>.html` — HTML interactive version
+- `~/<topic-slug>.pdf` — PDF report version
+- `~/<topic-slug>-公众号版.md` — WeChat markdown version
 
-Read these for "how the final output looks" reference. Don't copy content — just structure and feel.
+If you have such a set on hand, read all three side-by-side for "how the final output looks" — study the structure and feel, don't copy the content.

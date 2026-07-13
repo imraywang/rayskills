@@ -35,7 +35,7 @@ Quick reference for each component. The full CSS for these lives in `assets/skel
       <span class="byline-divider"></span>
       <span>阅读时间约 15 分钟</span>
       <span class="byline-divider"></span>
-      <span>Ray Wang @wangray</span>
+      <span>作者署名 @handle</span>
     </div>
   </div>
 </header>

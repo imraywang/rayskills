@@ -1,6 +1,6 @@
 # references/static.md —— 纯静态站上线
 
-适用:落地页 / 营销单页 / 内容极少几乎不改的站。特征是一个(或几个)`index.html`,**无 build、无框架、无 config**,直接托管。FOHO 之外的交叉印证:`upthos/amparc-site`(单 `index.html` 22KB)、`upthos/site`(单 `index.html` + PWA `manifest.json` + 一组 favicon + `support.html`)。
+适用:落地页 / 营销单页 / 内容极少几乎不改的站。特征是一个(或几个)`index.html`,**无 build、无框架、无 config**,直接托管。几个交叉印证的例子:一个单 `index.html`(约 22KB)的营销页;一个单 `index.html` + PWA `manifest.json` + 一组 favicon + `support.html` 的落地站。
 
 ## 这条路的核心心法:少即是稳
 

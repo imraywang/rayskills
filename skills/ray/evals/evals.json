@@ -19,11 +19,11 @@
       "name": "eval-route-content-not-ghostwrite",
       "type": "happy-path",
       "prompt": "/ray 上周把被入侵的服务器矿马清干净了,挺有料的,想发出去。",
-      "expected_output": "应分发到 ray-thread(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给 Ray。不该分发到 ray-tweet(那是日常哲理声部,不是长实战叙事),也不该自己替 Ray 写成第一人称帖子。",
+      "expected_output": "应分发到 ray-thread(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给作者。不该分发到 ray-tweet(那是日常哲理声部,不是长实战叙事),也不该自己替作者写成第一人称帖子。",
       "expectations": [
         "分发到 ray-thread 而非 ray-tweet",
         "带出不代笔纪律(骨架+素材,观点留白)",
-        "不替 Ray 直接写成成品帖"
+        "不替作者直接写成成品帖"
       ]
     },
     {

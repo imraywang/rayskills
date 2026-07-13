@@ -165,7 +165,7 @@ Print sizes (10.5pt body) are smaller than screen (17px). The skeleton handles t
 Use `scripts/render-pdf.sh`:
 
 ```bash
-bash ~/.claude/skills/editorial-report/scripts/render-pdf.sh input.html output.pdf
+bash ~/.claude/skills/ray-report/scripts/render-pdf.sh input.html output.pdf
 ```
 
 Critical flags it uses:

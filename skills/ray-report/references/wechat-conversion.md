@@ -196,8 +196,8 @@ Save as `~/<topic-slug>-公众号版.md`.
 
 ## Sample reference
 
-The canonical conversion example:
-- Source: `~/AI裁员浪潮-数据加强版.html` (HTML interactive with all components)
-- Target: `~/AI裁员浪潮-公众号版.md` (long-sentence narrative version)
+A useful conversion pair is the same article in both forms:
+- Source: `~/<topic-slug>.html` (HTML interactive with all components)
+- Target: `~/<topic-slug>-公众号版.md` (long-sentence narrative version)
 
-Read both side-by-side to internalize the conversion patterns.
+If you have such a pair on hand, read both side-by-side to internalize the conversion patterns.

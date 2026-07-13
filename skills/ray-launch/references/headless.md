@@ -4,7 +4,7 @@
 - **headless + 前端**:Next(Vercel)当前台 + WordPress/CMS 当纯内容后台,GraphQL 取数,ISR 增量更新。
 - **全栈(CMS 内渲染)**:内容和渲染都在 CMS 里(WP + 可视化编辑器),客户所见即所得自维护。
 
-源料是 FOHO 袜业 B2B 询盘站:先上了 headless(Next 14 App Router + Vercel + WordPress on SiteGround + WPGraphQL + ACF Pro,已真实上线 fohosocks.com),后为了客户自维护把整套设计**复刻迁回** WP + 可视化编辑器,再把域名从 Vercel 切回 SiteGround。两段都在下面。
+源料是一个外贸制造业 B2B 询盘站的真实上线:先上了 headless(Next 14 App Router + Vercel + WordPress on 主机商 + WPGraphQL + ACF Pro,已真实上线到自有域名),后为了客户自维护把整套设计**复刻迁回** WP + 可视化编辑器,再把域名从 Vercel 切回 CMS 主机。两段都在下面。
 
 ## 目录
 
@@ -20,29 +20,29 @@
 
 **这是最阴的坑,因为它不报错。** Vercel 按 commit 的**作者邮箱**匹配已连接的 GitHub 账号,来决定归属和授权部署。如果 commit 作者邮箱不是 Vercel 所连 GitHub 账号能识别的身份,**push 上去部署根本不触发,也没有任何报错**——你以为发布了,线上纹丝不动。
 
-**FOHO 的实证**:同一个 owner 名下,静态站(`amparc-site` / `upthos/site`)用的是普通个人邮箱 `you@example.com`;唯独上 Vercel 的 `fohosocks-web` 仓库,把本地 git 身份**显式覆写**成 GitHub 的 noreply 身份:
+**一个实证**:同一个 owner 名下,几个静态站仓库用的是普通个人邮箱(全局 `git config` 里那个);唯独上 Vercel 的那个仓库,把本地 git 身份**显式覆写**成 GitHub 的 noreply 身份:
 
 ```bash
 # 只在这个仓库本地覆写,不动全局 config
-git config user.email "16276127+oaker-io@users.noreply.github.com"
-git config user.name  "Ray Wang"
+git config user.email "12345678+you@users.noreply.github.com"
+git config user.name  "Your Name"
 # 核对
 git config --local --get user.email
 git log -1 --format='%ae'   # 看最近一次 commit 的作者邮箱对不对
 ```
 
-那串 `16276127+oaker-io@users.noreply.github.com` = GitHub user id `16276127` / 用户名 `oaker-io` 的官方 noreply 邮箱。用它,Vercel 就能把 commit 认到已连接的 GitHub 账号。
+那串 `12345678+you@users.noreply.github.com` = 你的 GitHub user id + 用户名 组成的官方 noreply 邮箱(在 GitHub 的 Settings → Emails 里能查到自己那串)。用它,Vercel 就能把 commit 认到已连接的 GitHub 账号。
 
 **排查口诀**:push 了 Vercel 没反应、部署列表里根本没出现新记录 → 第一件事查 `git log -1 --format='%ae'`,不是查代码、不是查网络。
 
 ## 二、环境变量(上云前配全)
 
-本地 `.env` 不会自动上云,必须在托管平台(Vercel/主机商)手动配。FOHO 的 `.env.example` 关键项:
+本地 `.env` 不会自动上云,必须在托管平台(Vercel/主机商)手动配。一份典型 `.env.example` 的关键项:
 
 | 变量 | 作用 | 坑 |
 |---|---|---|
 | `RESEND_API_KEY` | 表单发信密钥 | **空则进 demo 模式**:提交成功、返回 ok,但只 server 端 log,一封信都不发。上线前必配 + 实测收信 |
-| `INQUIRY_TO` | 询盘收件邮箱 | 对准真实落地邮箱(FOHO 实测 MX 在网易企业邮,不在主机商) |
+| `INQUIRY_TO` | 询盘收件邮箱 | 对准真实落地邮箱(实测 MX 常落在企业邮箱服务商,不在主机商) |
 | `INQUIRY_FROM` | 发信显示地址 | 用已验证域名的发信地址,否则进垃圾箱 |
 | `NEXT_PUBLIC_WP_GRAPHQL` | CMS GraphQL endpoint | 数据接通阶段才设;不设则走 mock 兜底 |
 
@@ -52,7 +52,7 @@ git log -1 --format='%ae'   # 看最近一次 commit 的作者邮箱对不对
 
 前端从 CMS 取数,靠 ISR 做到"客户后台一改,前台几十秒后自动更新",不用每次重部署。
 
-**取数配置**(FOHO `lib/wp.ts` 实证):
+**取数配置**(`lib/wp.ts` 实证):
 - endpoint 走环境变量兜默认:`process.env.NEXT_PUBLIC_WP_GRAPHQL || "https://cms.<域名>/graphql"`
 - `fetch(..., { next: { revalidate: 60 } })` —— ISR 60 秒增量再验证
 - 用 React `cache()` 按请求去重:layout + 每个 page 随便调,一次渲染只发一次请求
@@ -86,7 +86,7 @@ git log -1 --format='%ae'   # 看最近一次 commit 的作者邮箱对不对
 - 纯**装饰性、结构复杂、客户永不碰**的(工艺 6 步连接线、认证墙)→ 才写死成 HTML 块
 - HTML 块只留给纯装饰性复杂结构;凡客户会改的一律原生组件。写死一处客户想改的东西 = 埋一张维护欠条。
 
-**产品数据别硬上重型电商组件**:FOHO 放弃 WooCommerce(对询盘站太臃肿),改用自注册 CPT(`foho_product`)+ 字段组。B2B 询盘站要的是"可维护的产品目录",不是购物车。
+**产品数据别硬上重型电商组件**:这个站放弃 WooCommerce(对询盘站太臃肿),改用自注册 CPT(如 `<prefix>_product`)+ 字段组。B2B 询盘站要的是"可维护的产品目录",不是购物车。
 
 **可视化编辑器迁移的实测坑(可迁移复用)**:
 1. **全局设置(kit)是"整体替换"语义**:通过 API 只想改个 logo,却可能洗掉全部全局设置(颜色/字体/CSS,几万字节)。教训:kit 只做**全量推送**(改本地真源文件 → 跑推送脚本),严禁后台局部改 kit。救援:编辑器的 kit 一般有 revision 快照可恢复。
@@ -94,9 +94,9 @@ git log -1 --format='%ae'   # 看最近一次 commit 的作者邮箱对不对
 3. **boxed 容器的子元素住在内层包裹里**:grid/flex 打在外层无效,要打到 `.e-con-inner` 这类内层。
 4. **自动包裹会撑开按钮**:构建工具可能给按钮自动包一个 50% 宽容器,把 Hero/CTA 按钮推歪。
 5. **字段引用缺键时取值失灵**:repeater/字段组缺引用键时 `get_field` 静默失灵,下划线 meta 批量导入可能被拒写。绕过:shortcode 直读原始 meta。
-6. **数据库表前缀不一定是 `wp_`**:FOHO 是 `avf_`。查错前缀静默返回空,先 `SHOW TABLES` 确认前缀。
+6. **数据库表前缀不一定是 `wp_`**:实测某站是 `avf_` 这类自定义前缀。查错前缀静默返回空,先 `SHOW TABLES` 确认前缀。
 7. **联系方式是分散的**:一个电话/邮箱可能散落 6 处(页头/页脚/Contact 卡/浮窗/产品页按钮/表单收件)。改一处不等于改全,单一真源没做全就是债——列全清单逐处改。
 
-**发信通道迁移**:headless 期表单走"前端 API + Resend";迁 CMS 后改用 CMS 的 SMTP 插件对接企业邮(FOHO:`smtp.qiye.163.com:465`,等企业邮授权码)。切换后**实测发一封**确认新通道通。
+**发信通道迁移**:headless 期表单走"前端 API + Resend";迁 CMS 后改用 CMS 的 SMTP 插件对接企业邮(如 `smtp.<你的邮件服务商>:465`,用企业邮的授权码而非登录密码)。切换后**实测发一封**确认新通道通。
 
 **迁移完成后的域名切换**(把域名从 Vercel 切回 CMS 主机)→ 走 `switch-runbook.md`,那是整个上线里最需要按序、最需要回滚预案的一段。

@@ -1,26 +1,24 @@
 # 项目分类地图 + 扫描命令
 
-执行 ray-weekly 时查这里,不要凭记忆敲仓路径。所有项目 2026-06 大整理后统一在 `~/projects/<类别>/<项目>/`。
+执行 ray-weekly 时查这里,不要凭记忆敲仓路径。约定所有项目统一放在 `~/projects/<类别>/<项目>/`(按你自己的实际目录结构调整占位)。
 
-## 分类地图
+## 分类地图(示例结构,按你的实际情况替换)
 
-| 类别目录 | 装什么 | 现金流线关联 |
+| 类别目录 | 装什么 | 业务线关联 |
 |---|---|---|
-| `~/projects/upthos/` | Relay 核心业务(`relay`)、Upthos 官网 | **Relay + 引流** 主仓 |
-| `~/projects/agent/` | media-toolkit、agentclaw、ai-ip-check 等 Agent 项目 | 引流工具(ai-ip-check)/ IP |
-| `~/projects/content/` | 内容结构化系统、x-pipeline | **IP 增长** 主阵地 |
-| `~/projects/net/` | surge-config、proxy-fleet、dmit-hawaii-relay | 基建(不直接对应现金流) |
-| `~/projects/apps/` | claude-cert-prep 等前端 app | 视项目而定 |
-| `~/projects/iot/` | tuya-agent、apk-publisher、alexa(多数已归档) | 多为归档,谨慎计入 |
-| `~/projects/quant/` | 量化相关(多已归档) | 多为归档 |
+| `~/projects/<产品>/` | 核心产品/变现项目、官网 | **产品 / 变现线** 主仓 |
+| `~/projects/<工具>/` | 引流工具、周边 Agent 项目 | 引流工具 / IP |
+| `~/projects/<内容>/` | 内容管线、内容结构化系统 | **影响力 / 内容线** 主阵地 |
+| `~/projects/<基建>/` | 网络/代理/部署配置 | 基建(不直接对应业务线) |
+| `~/projects/<前端>/` | 落地页 / 前端 app | 视项目而定 |
 | `~/projects/_archive/` | **已停用项目** | **排除,不计入本周动态** |
 
-现金流三条线到项目的映射:
-- **Upthos Relay + 引流工具** → `upthos/relay` + `agent/ai-ip-check` + 其它带量工具
-- **企业咨询** → `/ray-diagnose`·`/ray-proposal` 的实际交付使用 + Ray 口头报的咨询进展(不一定落在某个仓)
-- **IP 增长** → `content/x-pipeline` + X/公众号数据 + 飞书 IP 库
+业务线到项目的映射(示例,替换成你自己定义的线):
+- **产品 / 变现线** → 核心产品仓 + 引流工具仓 + 其它带量工具
+- **服务 / 咨询线** → `/ray-diagnose`·`/ray-proposal` 的实际交付使用 + 本人口头报的咨询进展(不一定落在某个仓)
+- **影响力 / 内容线** → 内容管线仓 + 社媒/公众号数据 + 知识库
 
-注:咨询这条线的推进常常不体现为 git commit(是线下交付/回款),必须结合 Ray 提供的信息判断,不能只看仓。
+注:咨询这条线的推进常常不体现为 git commit(是线下交付/回款),必须结合本人提供的信息判断,不能只看仓。
 
 ## 扫描命令
 
@@ -40,7 +38,7 @@ done | sort -rn
 
 ```bash
 SINCE="1 week ago"
-repo=~/projects/upthos/relay        # 换成 A 里冒出来的仓
+repo=~/projects/<类别>/<项目>        # 换成 A 里冒出来的仓
 git -C "$repo" log --since="$SINCE" --pretty=format:'%cd %s' --date=short
 ```
 
@@ -64,6 +62,6 @@ done | sort
 ## 常见坑
 
 - **非 git 目录 / 裸文件夹**:命令已用 `[ -d "$repo/.git" ]` 过滤,不会误报。
-- **dotfile 配置目录**(`~/.openclaw` `~/.wx-pod` 等)不在 `~/projects/` 下,不扫。
+- **dotfile 配置目录**(在 `~` 下但不在 `~/projects/` 里的隐藏目录)不扫。
 - **一个仓多分支**:`git log` 默认只看当前分支,若某项目在 feature 分支推进,当前分支会显示沉睡——存疑时 `git -C "$repo" log --all --since=...` 复核。
-- **归档判断**:除 `_archive/` 外,`iot/`、`quant/` 下很多项目实质已停(见记忆),计入动态前先确认是不是真在推。
+- **归档判断**:除 `_archive/` 外,某些类别目录下也可能有实质已停的项目,计入动态前先确认是不是真在推。

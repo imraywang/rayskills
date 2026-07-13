@@ -5,7 +5,7 @@
       "id": 1,
       "name": "eval-headless-b2b-launch",
       "type": "happy-path",
-      "prompt": "我做了一个袜业外贸的 B2B 询盘站,Next 14 + Vercel 前端,WordPress 当内容后台走 GraphQL 取数,产品和文案客户要自己在后台改。现在想正式上线到自己的域名,客户维护。帮我把上线全流程走一遍。",
+      "prompt": "我做了一个外贸制造业的 B2B 询盘站,Next 14 + Vercel 前端,WordPress 当内容后台走 GraphQL 取数,产品和文案客户要自己在后台改。现在想正式上线到自己的域名,客户维护。帮我把上线全流程走一遍。",
       "expected_output": "应判为 headless/全栈路线并走六步全流程。选型阶段要抓住'客户自己改'这条主轴,提示 headless(开发者维护)vs CMS 内渲染(客户所见即所得)的取舍,而不是默认技术更先进的 headless。必须点名:Vercel git-author 身份坑、ISR/revalidate 数据流 + mock 静默回落风险、上线前配全环境变量(发信密钥)、域名切换要备回滚且不动 MX、上线后 View Source 搜旧域名=0 + 表单实测真收信、交接三区 + 询盘双通道。应指路到 headless.md / switch-runbook.md / handoff.md。",
       "expectations": [
         "判定为 headless/全栈路线,走六步全流程(含数据流与域名切换)",
@@ -23,7 +23,7 @@
       "name": "eval-vercel-git-author-silent-fail",
       "type": "failure-mode",
       "prompt": "我把 Next 项目连到 Vercel 了,GitHub 仓库也接好了,刚 git push 上去,但 Vercel 那边一直没动静,部署列表里根本没出现新记录。代码本身能本地跑起来。我用的是我平时的 git 账号 you@example.com 提交的。怎么回事?",
-      "expected_output": "陷阱用例:典型 git-author 静默失败。合格行为是立刻怀疑 commit 作者邮箱不是 Vercel 连接的 GitHub 身份——Vercel 按作者邮箱匹配授权,不匹配则部署不触发且无报错。应让用户 git log -1 --format='%ae' 核对,并给对策:在该仓库本地覆写 user.email 为其 GitHub noreply 身份(如 16276127+oaker-io@users.noreply.github.com)再重新提交。不该瞎猜网络/构建/webhook 配置,也不该建议重装或改代码。",
+      "expected_output": "陷阱用例:典型 git-author 静默失败。合格行为是立刻怀疑 commit 作者邮箱不是 Vercel 连接的 GitHub 身份——Vercel 按作者邮箱匹配授权,不匹配则部署不触发且无报错。应让用户 git log -1 --format='%ae' 核对,并给对策:在该仓库本地覆写 user.email 为其 GitHub noreply 身份(如 12345678+you@users.noreply.github.com)再重新提交。不该瞎猜网络/构建/webhook 配置,也不该建议重装或改代码。",
       "expectations": [
         "第一时间指向 commit 作者邮箱与 Vercel 连接的 GitHub 身份不匹配",
         "解释为什么会静默:Vercel 按作者邮箱授权,不匹配则部署不触发也不报错",
@@ -36,7 +36,7 @@
       "id": 3,
       "name": "eval-isr-mock-silent-fallback",
       "type": "failure-mode",
-      "prompt": "上线后我在 WordPress 后台把产品的一个 ACF 字段重命名了,想让字段名更规范。前台 fohosocks.com 的产品页看着一切正常,产品卡都在。这样应该没问题吧?",
+      "prompt": "上线后我在 WordPress 后台把产品的一个 ACF 字段重命名了,想让字段名更规范。前台线上域名的产品页看着一切正常,产品卡都在。这样应该没问题吧?",
       "expected_output": "陷阱用例:'页面看着正常'恰恰是 mock 静默回落的假象。合格行为是警告改字段名可能导致前端取数失败 → 静默回落到 mock 数据,肉眼看到的'产品都在'其实是假数据不是真后台数据。应让用户去核对某条真实录入内容的具体值(具体产品名/数字)而非只看'有没有卡片',并提醒施工期别动 GraphQL/字段结构、前端字段映射要同步改。不该因为'页面正常'就判定没问题。",
       "expectations": [
         "识别'页面看着正常'是 mock 静默回落的假象,不等于真数据接通",

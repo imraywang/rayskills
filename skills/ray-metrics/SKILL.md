@@ -7,14 +7,14 @@ description: X(Twitter)账号数据周报:通过 xapi 拉近 7 天(可选 30 天
 
 拉推文表现数据,算增长,找规律,给下周可执行方向。**数据驱动,不拍脑袋。**
 
-源自 Ray 自己运营 X 账号的内容复盘实践——从「发了就发了、凭感觉猜哪条火」升级到「每周拉数据、找出可复现的规律、用规律定下周方向」。这个 skill 的价值不在漂亮的数字表,而在从数字里**读出下一步该干什么**。
+把个人 X 账号的内容复盘从「发了就发了、凭感觉猜哪条火」升级到「每周拉数据、找出可复现的规律、用规律定下周方向」。这个 skill 的价值不在漂亮的数字表,而在从数字里**读出下一步该干什么**。
 
 ## 用法
 
 ```
 /ray-metrics                    # 默认:本账号近 7 天周报
-/ray-metrics @imraywang         # 指定 handle
-/ray-metrics @imraywang 30d     # 近 30 天,含周环比对比
+/ray-metrics @youraccount       # 指定 handle
+/ray-metrics @youraccount 30d   # 近 30 天,含周环比对比
 /ray-metrics 6/28-7/4           # 指定时间窗
 ```
 
@@ -22,7 +22,7 @@ description: X(Twitter)账号数据周报:通过 xapi 拉近 7 天(可选 30 天
 
 ## 铁律:数据要么是真的,要么明说没有
 
-这条排在最前,因为它是这个 skill 唯一不能违背的。**xapi 不稳定(常见 transport error / 超时 / 空返回)。任何一步拉数失败,都不许用估计值、往期印象、或"合理推测"填坑冒充真实数据。** 拉不到就走 Step 1b 的 fallback,把缺口如实标在报告里。一份诚实的"半张表 + 缺口说明",比一份编圆了的"完整周报"值钱一百倍——后者会让 Ray 基于假数据定错方向。
+这条排在最前,因为它是这个 skill 唯一不能违背的。**xapi 不稳定(常见 transport error / 超时 / 空返回)。任何一步拉数失败,都不许用估计值、往期印象、或"合理推测"填坑冒充真实数据。** 拉不到就走 Step 1b 的 fallback,把缺口如实标在报告里。一份诚实的"半张表 + 缺口说明",比一份编圆了的"完整周报"值钱一百倍——后者会让你基于假数据定错方向。
 
 ## Step 1:拉数据
 
@@ -32,7 +32,7 @@ description: X(Twitter)账号数据周报:通过 xapi 拉近 7 天(可选 30 天
 
 ```
 mcp__xapi__get_users_by_username(
-  username="imraywang",
+  username="youraccount",
   user.fields="public_metrics,created_at,description"
 )
 → 拿到 id、followers_count、following_count、tweet_count
@@ -56,7 +56,7 @@ mcp__xapi__get_users_posts(
 - `exclude="retweets"`:转推不是自己的产出。**回复(replies)默认保留但单独归类**——纯回复的传播逻辑和原创推不同,混在一起算均值会污染归因。
 - 单账号推文时间线最多回溯约 3200 条;近期窗口够用。
 - 每条 `public_metrics` 含 impression_count / like_count / retweet_count / reply_count / quote_count / bookmark_count。**注意 impression_count 只在自己账号的推文上可得,且有时间窗限制**——口径细节见 references/metrics-glossary.md。
-- 用 `search_posts_all(query="from:imraywang")` 可作交叉校验或补历史,但全archive检索对权限敏感,失败很正常,别把它当主路径。
+- 用 `search_posts_all(query="from:youraccount")` 可作交叉校验或补历史,但全archive检索对权限敏感,失败很正常,别把它当主路径。
 
 ### 1b. Fallback(xapi 不可达)
 
@@ -103,7 +103,7 @@ mcp__xapi__get_users_posts(
 - **停**:把持续拉低的停掉或改造。例:"纯转发带一句评论的 4 条互动率全部垫底,下周停,想转就改写成自己的观点推。"
 - **测**:把"待验证"假设设计成可证伪实验。例:"疑似晚 9-11 点是高峰,下周固定这个时段发 3 条同类型推,与其他时段对比验证。"
 
-**边界——不代笔**:建议给到「方向 + 形式 + 该测的假设」这一层,这属于分析产出,可完整交付。但**别在这里替 Ray 写具体推文文案**——那是 ray-tweet 的活,且涉及 Ray 的对外声音。若建议里需要示范一条推,只给结构骨架和留空:`【你的话:____】`,血肉留给 Ray。
+**边界——不代笔**:建议给到「方向 + 形式 + 该测的假设」这一层,这属于分析产出,可完整交付。但**别在这里替作者写具体推文文案**——那是 ray-tweet 的活,且涉及作者的对外声音。若建议里需要示范一条推,只给结构骨架和留空:`【你的话:____】`,血肉留给作者。
 
 ## Step 5:输出——结构化周报
 
