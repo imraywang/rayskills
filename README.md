@@ -47,9 +47,9 @@ flowchart TD
     RAY(["/ray · 主路由"]):::hub
     RAY --> INFRA["🛠 基建<br/>vpsinit · nodecheck"]
     RAY --> CONTENT["✍️ 内容 / IP<br/>thread · tweet · metrics<br/>benchmark · report"]
-    RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal 🔒"]
+    RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal"]
     RAY --> PRODUCT["📦 产品<br/>idea · launch"]
-    RAY --> OPS["🧹 内务<br/>weekly 🔒 · cleanup 🔒"]
+    RAY --> OPS["🧹 内务<br/>weekly · cleanup"]
     classDef hub fill:#b8553a,stroke:#7a3320,color:#fff,font-weight:bold;
 ```
 
@@ -68,13 +68,13 @@ flowchart TD
 | | `/ray-benchmark` | 对标拆解，判可迁移性 |
 | | `/ray-report` | magazine 长文（HTML + PDF + 公众号） |
 | 🔍 咨询 | `/ray-diagnose` | 企业 AI 就绪度诊断（六维 + 红黄绿） |
-| | `/ray-proposal` 🔒 | 诊断结论 → 方案蓝图 |
+| | `/ray-proposal` | 诊断结论 → 方案蓝图 |
 | 📦 产品 | `/ray-idea` | 从消费社会批判框架锻造产品概念 |
 | | `/ray-launch` | 落地页 / B2B 站上线全流程 |
-| 🧹 内务 | `/ray-weekly` 🔒 | 每周复盘：项目 + 数据 + 业务线 |
-| | `/ray-cleanup` 🔒 | 归档沉睡项目、磁盘瘦身 |
+| 🧹 内务 | `/ray-weekly` | 每周复盘：项目 + 数据 + 业务线 |
+| | `/ray-cleanup` | 归档沉睡项目、磁盘瘦身 |
 
-> `/ray-post`（公众号全流程）见独立仓 **[wewrite](https://github.com/imraywang/wewrite)**。🔒 = 私有，不随开源发布。
+> `/ray-post`（公众号全流程）见独立仓 **[wewrite](https://github.com/imraywang/wewrite)**。
 
 ## 📊 实测：每个 skill 都真的有用
 

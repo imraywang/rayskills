@@ -19,15 +19,15 @@ flowchart TD
     end
     subgraph CONSULT["🔍 咨询"]
         DIAG["/ray-diagnose\n就绪度诊断"]
-        PROP["/ray-proposal 🔒\n方案蓝图"]
+        PROP["/ray-proposal\n方案蓝图"]
     end
     subgraph PRODUCT["📦 产品"]
         ANVIL["/ray-idea\n产品概念"]
         LAUNCH["/ray-launch\n站上线"]
     end
     subgraph OPS["🧹 内务"]
-        WEEKLY["/ray-weekly 🔒\n周复盘"]
-        CLEANUP["/ray-cleanup 🔒\n归档瘦身"]
+        WEEKLY["/ray-weekly\n周复盘"]
+        CLEANUP["/ray-cleanup\n归档瘦身"]
     end
 
     RAY --> INFRA & CONTENT & CONSULT & PRODUCT & OPS
@@ -52,4 +52,3 @@ flowchart TD
 - **数据 → 决策**:`ray-metrics` 的规律喂 `ray-weekly` 的内容数据节,并指导 `ray-tweet` 下一批方向。
 - **对标 → 产品**:`ray-benchmark` 拆完可迁移点,`ray-idea` 锻造差异化产品概念。
 
-🔒 = 私有 skill,不随开源发布。
