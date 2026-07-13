@@ -1,6 +1,6 @@
 ---
 name: ray-report
-description: Generate long-form editorial articles, deep-analysis reports, and data-rich content in three coordinated formats — interactive HTML (magazine layout with Tab/Quiz/Chart.js/Timeline components), A4 PDF reports (via headless Chrome), and WeChat 公众号 markdown (long-sentence narrative). Uses a refined editorial design language: serif Chinese headings, warm rust accent, paper grain texture, drop caps, ornament dividers, tabular numerals. Use this skill whenever the user wants to create a long-form analysis, white paper, deep report, multi-section data-rich essay, or asks for "a report version", "PDF report", "long article with charts", or wants HTML output that "feels like a real magazine article" not a SaaS dashboard. Trigger even when the format isn't named — default to HTML and offer PDF + 公众号 markdown after. Don't trigger for short articles, dashboards, UI components, or 公众号 auto-publish workflows (use wewrite for those). When the user says "做一个报告", "深度分析", "长文章", "html version", "pdf report", or shares an outline expecting polished output, this is the skill.
+description: 生成长文 / 深度报告 / 数据型内容,三格式协同产出——交互式 HTML(magazine 杂志排版,含 Tab/Quiz/Chart.js/Timeline 组件)、A4 PDF(headless Chrome 渲染)、公众号 markdown(长句叙事)。采用精修的编辑设计语言(衬线中文标题、锈红点缀、纸张颗粒、drop cap、装饰分隔、等宽数字),读起来像真正的杂志文章而非 SaaS dashboard。当用户要做长篇分析、白皮书、深度报告、多段数据型长文,或说「做一个报告」「深度分析」「长文章」「报告版」「PDF 报告」「html version」「pdf report」,或丢来一份提纲期待成品时使用;格式没点名也默认走 HTML,再 offer PDF+公众号。不用于短文、dashboard、UI 组件、或公众号自动发布流程(那用 wewrite)。触发 /ray-report
 ---
 
 # Editorial Report Builder

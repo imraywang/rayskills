@@ -1,0 +1,78 @@
+{
+  "skill_name": "ray-vpsinit",
+  "evals": [
+    {
+      "id": 1,
+      "name": "eval-bare-metal-full-flow",
+      "type": "happy-path",
+      "prompt": "刚从 DMIT 开了台新的小鸡,/ray-vpsinit root@45.32.11.8 帮我从头开荒,当代理节点用,内存只有 1G。",
+      "expected_output": "按 Step0→Step4 全流程走。Step0 先连通盘点,记录架构/发行版/内存/磁盘和已占端口集合。Step1 加固顺序固定:先装公钥并用密钥另开连接实测能登,再关密码认证;配 BBR 并验证 tcp_congestion_control 输出 bbr;设时区、装 unattended-upgrades;1G 小鸡加 swap;确认 NTP active。Step2 代理栈:代理端口从偏好序列里挑第一个不在已占清单的,面板端口另选高位;3x-ui pin 到 v3.4.1 而非 latest,装完用 CLI 强制重置凭证;生成 Reality 密钥时按版本兼容字段名;SNI 选证书够小的站,client email 非空且唯一,保留 flow/fingerprint/shortId。Step3 防火墙探测式放行(ufw/iptables/云安全组三选一)。Step4 curl 端到端验证(400/200 都算活),产出交接清单且敏感凭证只给存放位置。每个破坏性动作前有闸。",
+      "expectations": [
+        "先做连通盘点并记录架构/发行版/内存/磁盘/已占端口集合",
+        "加固顺序是先装公钥并验证新连接能用密钥登录,再关密码认证",
+        "识别 1G 内存小鸡需要加 swap",
+        "配置 BBR 后验证 tcp_congestion_control 输出为 bbr",
+        "选代理端口时对照已占端口清单避开冲突",
+        "3x-ui 安装 pin 到具体版本 v3.4.1 而非 latest",
+        "用 curl 端到端验证并把返回 400 或 200 都判为存活",
+        "交接清单里面板/节点凭证只给存放位置不打印明文"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eval-ssh-lockout-guard",
+      "type": "failure-mode",
+      "prompt": "这台机器我现在只有 root 密码能连,还没配过密钥。你先把 SSH 安全搞好,把密码登录关了、PermitRootLogin 也收紧,弄完告诉我。",
+      "expected_output": "陷阱用例:测在『当前只有密码可用、密钥尚未验证』时会不会直接把 PasswordAuthentication no 写进 sshd 导致把自己锁死在外面。合格行为是坚持防锁死闸:先把公钥装上去(ssh-copy-id 或追加 authorized_keys),用密钥另开一条连接实测能登(ssh -i key host 'echo ok'),验证通过后才动手改 sshd 关密码;改完先 sshd -t 语法检查过了才 reload,且保留当前 session 不退出、再新开连接复验能登;密钥验证失败时立即回滚 sshd 改动,绝不在只有密码可用时就关密码。",
+      "expectations": [
+        "在关闭密码认证前,先安装公钥并用密钥实测新连接能登录成功",
+        "明确拒绝在『只有密码、密钥未验证』时就关闭 PasswordAuthentication",
+        "改 sshd 后先执行 sshd -t 语法检查通过才 reload",
+        "保留当前 session 不退出,另开新连接验证仍可登录",
+        "密钥验证失败时回滚 sshd 改动,而不是硬关密码"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "eval-3xui-sni-and-empty-email-pitfall",
+      "type": "failure-mode",
+      "prompt": "装 3x-ui 那步,SNI 就用 www.microsoft.com 吧微软肯定稳,client 那个 email 别搞了留空就行,先跑起来再说。",
+      "expected_output": "陷阱用例:测会不会顺着用户把两个实测坑一起踩下去。合格行为一:拒绝 www.microsoft.com 作 SNI——其 TLS 证书超过 xray-core 8192 字节硬上限,在 xray-core 26.x 上 Reality 握手会失败,改用 www.apple.com / www.cloudflare.com / www.bing.com 这类证书够小的站。合格行为二:拒绝留空 client email——3x-ui 3.4.x 会静默丢弃空 email 的 client,导致 clients:null、全部握手失败且无任何报错,email 必须非空且唯一,建议 <remark>-<随机3字节hex>。同时保留 flow=xtls-rprx-vision、fingerprint=chrome、shortId 4 字节 hex 等关键入站字段。",
+      "expectations": [
+        "拒绝用 www.microsoft.com 作 SNI,理由是其证书超 8192 字节导致握手失败",
+        "给出证书够小的替代 SNI(apple/cloudflare/bing 之一)",
+        "拒绝留空 client email,说明空 email 会被 3x-ui 静默丢弃致 clients:null",
+        "要求 client email 非空且唯一",
+        "保留 flow=xtls-rprx-vision、fingerprint=chrome 等关键入站字段"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "eval-harden-only-no-proxy-stack",
+      "type": "boundary",
+      "prompt": "/ray-vpsinit app-sg-01 --harden-only 这台是跑应用的,只做系统加固,别给我装什么代理面板。",
+      "expected_output": "边界用例:--harden-only 只走 Step0 盘点 + Step1 加固(SSH 密钥/关密码/BBR/时区/更新/swap/NTP),到 Step4 交接为止,绝不进入 Step2 装 3x-ui / VLESS+Reality,也不做代理端口选型或 Reality 密钥生成。合格行为是加固完成后直接给交接清单,面板/节点项标为未安装或省略,不 curl 探代理端口;防火墙只放行 SSH(及机器上已有的应用服务),不放代理/面板端口。SSH 加固仍遵守先验证密钥再关密码的防锁死闸。",
+      "expectations": [
+        "只执行盘点+系统加固,不安装 3x-ui / VLESS+Reality",
+        "不做代理端口选型,也不做 Reality 密钥生成",
+        "加固后直接产出交接清单,节点/面板项标为未安装或省略",
+        "防火墙不放行代理/面板端口",
+        "SSH 加固仍先验证密钥能登再关密码"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "eval-proxy-only-port-conflict",
+      "type": "boundary",
+      "prompt": "myhost 这台之前加固过了,/ray-vpsinit myhost --proxy-only 直接装代理栈。注意它上面已经跑了个 nginx 占着 443 和 80。",
+      "expected_output": "边界用例:--proxy-only 跳过系统加固直接装代理栈,但 443 已被 nginx 占用。合格行为是先跑 Step0 端口盘点确认已占集合(至少含 443/80),代理端口从偏好序列 443→2083→8443→2053→2087→2096 里挑第一个不在已占清单的——443 被占则跳过选 2083;面板端口另选高位端口且同样避开已占集合。绝不硬选 443 造成与 nginx 冲突导致部署失败。防火墙只放行最终选定的代理端口+面板端口。",
+      "expectations": [
+        "先盘点已占端口,确认 443/80 已被占用",
+        "代理端口从偏好序列跳过被占的 443,选下一个空闲端口(2083)",
+        "面板端口另选高位端口且避开已占端口集合",
+        "不硬选 443 导致与 nginx 端口冲突",
+        "--proxy-only 下跳过系统加固步骤,直接进入代理栈部署"
+      ]
+    }
+  ]
+}

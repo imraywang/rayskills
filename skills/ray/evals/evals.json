@@ -1,0 +1,66 @@
+{
+  "skill_name": "ray",
+  "evals": [
+    {
+      "id": 1,
+      "name": "eval-route-clear-diagnose",
+      "type": "happy-path",
+      "prompt": "/ray 有个客户是做母婴用品的连锁,门店 200 家,老板想搞个 AI 让导购随时能查商品知识和话术,问我能不能做。",
+      "expected_output": "应识别这是企业能否上 AI 的就绪度问题,分发到 ray-diagnose,并说明为什么是它。只选一个 skill;可提示诊断出结论后通常接 ray-proposal。不该自己就地开始做诊断的全部工作而跳过 skill,也不该同时启动多个 skill。",
+      "expectations": [
+        "分发到 ray-diagnose",
+        "说明选择理由(就绪度评估)",
+        "只选一个 skill,不一次启动多个",
+        "可提示下一步常接 ray-proposal"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eval-route-content-not-ghostwrite",
+      "type": "happy-path",
+      "prompt": "/ray 上周把被入侵的服务器矿马清干净了,挺有料的,想发出去。",
+      "expected_output": "应分发到 ray-thread(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给 Ray。不该分发到 ray-tweet(那是日常哲理声部,不是长实战叙事),也不该自己替 Ray 写成第一人称帖子。",
+      "expectations": [
+        "分发到 ray-thread 而非 ray-tweet",
+        "带出不代笔纪律(骨架+素材,观点留白)",
+        "不替 Ray 直接写成成品帖"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "eval-ambiguous-ask-clarify",
+      "type": "boundary",
+      "prompt": "/ray 帮我看看这个",
+      "expected_output": "边界用例:信息严重不足,无法判断意图。合格行为是不硬猜、不随便分发,而是问一个最关键的澄清问题(你想处理的是什么——一个站/一家企业/一段经历/一台服务器/一批数据?)。不该凭空选一个 skill 硬跑。",
+      "expectations": [
+        "不硬猜、不随便分发到某个 skill",
+        "问一个最关键的澄清问题以定位意图",
+        "澄清问题围绕路由所需的最小信息"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "eval-route-not-do-itself",
+      "type": "failure-mode",
+      "prompt": "/ray 我要把一个 Next 14 + WordPress 的 B2B 站上线到 Vercel 和自己的域名,客户后面自己维护。",
+      "expected_output": "陷阱用例:测路由是否守边界。合格行为是分发到 ray-launch 并交给它的完整六步流程,而不是在 /ray 这里自己半路开始讲 Vercel 部署步骤。路由只做路由,选定后交给成员 skill 执行。",
+      "expectations": [
+        "分发到 ray-launch",
+        "不在 /ray 里自己就地执行上线步骤(只路由不代做)",
+        "把执行交给 ray-launch 的完整流程"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "eval-multi-line-pick-one",
+      "type": "failure-mode",
+      "prompt": "/ray 我刚把新节点部署好了,想顺便巡检一下所有节点健康,再把这次部署写成一条 thread,最好还能更新下我的项目周报。",
+      "expected_output": "陷阱用例:一个请求沾了三条线(基建巡检/内容/内务)。合格行为是选此刻最该做的一步(通常是 ray-nodecheck 先确认部署成功健康),把其余(ray-thread 写 thread、ray-weekly 周报)作为'下一步'提示,而不是一次性全启动。体现单步动态导航。",
+      "expectations": [
+        "只选一个当前最该做的 skill(如 ray-nodecheck)",
+        "把其余需求列为后续步骤,不一次全启动",
+        "体现单步动态导航的路由哲学"
+      ]
+    }
+  ]
+}

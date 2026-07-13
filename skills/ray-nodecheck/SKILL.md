@@ -1,6 +1,6 @@
 ---
 name: ray-nodecheck
-description: 代理节点/中转链健康巡检:逐节点探端口存活、延迟、出口 IP、流量,读中转链探针日志,核对订阅有效性,输出一张红黄绿健康表。只诊断不改动。触发:/ray-nodecheck 或 /ray-nodecheck <节点名>。
+description: 代理节点/中转链健康巡检:逐节点探端口存活、延迟、出口 IP、流量,读中转链探针日志,核对订阅有效性,输出一张红黄绿健康表。只诊断不改动。触发:/ray-nodecheck 或 /ray-nodecheck 「节点名」。
 ---
 
 # ray-nodecheck:节点健康巡检

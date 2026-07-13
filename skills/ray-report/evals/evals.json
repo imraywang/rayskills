@@ -1,0 +1,72 @@
+{
+  "skill_name": "ray-report",
+  "evals": [
+    {
+      "id": 1,
+      "name": "数据型深度长文默认出杂志风 HTML 并 offer 另两版",
+      "type": "happy-path",
+      "prompt": "我手头有一份中国新能源车出海的深度分析素材,大概四千字,里面有各家车企 2023-2025 的销量数据、比亚迪和几家新势力的对比、还有一条从政策到落地的时间线。帮我做成一篇看着像正经杂志长文、能直接发出去的报告。",
+      "expected_output": "识别为数据型长篇报告,默认先构建交互式杂志风 HTML(从 skeleton 起手),套用编辑设计系统,保存到 ~/<slug>.html,然后主动询问是否再出 PDF 报告版和公众号长句版。",
+      "expectations": [
+        "默认直接产出交互式 HTML 版本,而不是反问用户要哪种格式或先做 PDF/markdown",
+        "以 assets/skeleton.html 为起点填充内容,不从零手写整套 HTML/CSS 骨架",
+        "标题使用衬线中文字体(Noto Serif SC / Georgia serif),正文使用 sans-serif",
+        "强调色为锈红 #b8553a、底色为米白 #fafaf7,不使用深色渐变 hero 或霓虹饱和色",
+        "开篇 lead 段落带 drop cap,大节之间插入 · · · ornament 分隔",
+        "HTML 产物保存路径形如 ~/<topic-slug>.html",
+        "生成 HTML 之后主动询问是否还要生成 PDF 报告版和公众号长句版"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "显式要 A4 PDF 报告走 HTML 先行再 render-pdf",
+      "type": "happy-path",
+      "prompt": "帮我把这份行业白皮书做成能打印的 A4 PDF 报告,方便直接发给客户。大纲我贴在下面:一、市场规模与增速;二、三家头部厂商对比;三、价格战时间线;四、我们的判断。",
+      "expected_output": "先把内容做成 HTML,再由 HTML 派生 PDF——调用 scripts/render-pdf.sh 通过 headless Chrome 渲染出与 HTML 同目录的 .pdf,PDF 里交互组件被 @media print 展开为静态内容。",
+      "expectations": [
+        "先构建 HTML 内容,再从 HTML 派生 PDF,而不是直接生成 PDF 文件",
+        "通过 scripts/render-pdf.sh 以 headless Chrome 完成 PDF 渲染",
+        "PDF 产物与源 HTML 位于同一目录、同名 .pdf",
+        "PDF 中 Tab/Quiz/手风琴等交互组件被 @media print 展开为静态形态(Tab 变案例1/案例2、Quiz 展开四种情境、details 全部展开)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "陷阱:要求炫酷现代不能做成 SaaS dashboard 风",
+      "type": "failure-mode",
+      "prompt": "帮我做一篇讲 SaaS 行业获客成本连年飙升的数据长文,数字特别多,HTML 的,做得炫一点、现代一点、有科技感。",
+      "expected_output": "把炫酷/现代/科技感的诉求落实为编辑排版的精致度,坚持杂志编辑设计语言,而不是滑向 SaaS dashboard slop(深色渐变 hero、霓虹色、圆角投影卡片、大号 CTA)。",
+      "expectations": [
+        "不产出深色渐变 hero、霓虹饱和强调色、圆角+drop shadow 卡片或大号彩色 CTA 按钮",
+        "采用编辑设计语言:衬线中文标题、锈红 #b8553a 强调、米白 #fafaf7 底色叠加 grain 纹理",
+        "卡片为扁平样式、1px 边框、无投影",
+        "不使用通用 emoji 图标",
+        "把用户的 现代/炫/科技感 诉求解读为排版与数据呈现的精致度,而非 dashboard 视觉语言"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "陷阱:公众号自动发布应转 wewrite 不该误接",
+      "type": "failure-mode",
+      "prompt": "帮我写一篇公众号文章,主题是 AI 对自由职业者的冲击,写完直接发到我的公众号上。",
+      "expected_output": "识别出这是公众号自动发布场景,应交由 wewrite 处理,不启动 ray-report 的三格式编辑报告管线,也不谎称自己能自动发布。",
+      "expectations": [
+        "不启动 ray-report 的杂志风 HTML/PDF/公众号 三格式产出管线",
+        "识别 直接发到公众号 属于 wewrite 的自动发布场景并建议/转交给 wewrite",
+        "不声称本 skill 能自动发布到公众号(本 skill 至多产出可粘贴的 .md,不做发布)"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "边界:三百字群公告太短不触发本 skill",
+      "type": "boundary",
+      "prompt": "帮我写个三百字的产品更新说明,发在用户群里通知一下就行。",
+      "expected_output": "内容过短(远低于长文阈值)且非报告体裁,不触发 ray-report,直接产出简短纯文本说明,不套用杂志编辑设计系统。",
+      "expectations": [
+        "不触发 ray-report,不生成杂志风 HTML/PDF/公众号 三格式产物",
+        "不套用编辑设计系统(衬线标题、drop cap、ornament、锈红强调等)",
+        "直接给出一段简短的纯文本更新说明"
+      ]
+    }
+  ]
+}

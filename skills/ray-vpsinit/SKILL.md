@@ -1,6 +1,6 @@
 ---
 name: ray-vpsinit
-description: 新 VPS 开荒一条龙:连通盘点 → 系统加固(SSH/BBR/更新/时区/swap) → 代理栈部署(3x-ui + VLESS+Reality) → 防火墙 → 验证交接。带防锁死保护和实测过的版本坑位。触发:/ray-vpsinit <ssh 别名或 user@host>。
+description: 新 VPS 开荒一条龙:连通盘点 → 系统加固(SSH/BBR/更新/时区/swap) → 代理栈部署(3x-ui + VLESS+Reality) → 防火墙 → 验证交接。带防锁死保护和实测过的版本坑位。触发:/ray-vpsinit 「ssh 别名或 user@host」。
 ---
 
 # ray-vpsinit：新 VPS 开荒

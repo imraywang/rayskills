@@ -1,0 +1,77 @@
+{
+  "skill_name": "ray-launch",
+  "evals": [
+    {
+      "id": 1,
+      "name": "eval-headless-b2b-launch",
+      "type": "happy-path",
+      "prompt": "我做了一个袜业外贸的 B2B 询盘站,Next 14 + Vercel 前端,WordPress 当内容后台走 GraphQL 取数,产品和文案客户要自己在后台改。现在想正式上线到自己的域名,客户维护。帮我把上线全流程走一遍。",
+      "expected_output": "应判为 headless/全栈路线并走六步全流程。选型阶段要抓住'客户自己改'这条主轴,提示 headless(开发者维护)vs CMS 内渲染(客户所见即所得)的取舍,而不是默认技术更先进的 headless。必须点名:Vercel git-author 身份坑、ISR/revalidate 数据流 + mock 静默回落风险、上线前配全环境变量(发信密钥)、域名切换要备回滚且不动 MX、上线后 View Source 搜旧域名=0 + 表单实测真收信、交接三区 + 询盘双通道。应指路到 headless.md / switch-runbook.md / handoff.md。",
+      "expectations": [
+        "判定为 headless/全栈路线,走六步全流程(含数据流与域名切换)",
+        "选型以'谁长期维护'为轴,提示客户自维护可能该走 CMS 内渲染而非纯 headless",
+        "点明 Vercel git commit 作者邮箱必须匹配 Vercel 连接的 GitHub 身份",
+        "提到 ISR revalidate 数据流并警示 mock 静默回落难察觉",
+        "上线后验证包含 View Source 搜旧域名=0 与表单实测真收到一封信",
+        "域名切换配回滚预案且强调不动 MX/邮箱记录",
+        "交接含绿黄红三区 + 询盘双通道防漏单",
+        "把详细清单指路到对应 reference 文件"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "eval-vercel-git-author-silent-fail",
+      "type": "failure-mode",
+      "prompt": "我把 Next 项目连到 Vercel 了,GitHub 仓库也接好了,刚 git push 上去,但 Vercel 那边一直没动静,部署列表里根本没出现新记录。代码本身能本地跑起来。我用的是我平时的 git 账号 you@example.com 提交的。怎么回事?",
+      "expected_output": "陷阱用例:典型 git-author 静默失败。合格行为是立刻怀疑 commit 作者邮箱不是 Vercel 连接的 GitHub 身份——Vercel 按作者邮箱匹配授权,不匹配则部署不触发且无报错。应让用户 git log -1 --format='%ae' 核对,并给对策:在该仓库本地覆写 user.email 为其 GitHub noreply 身份(如 16276127+oaker-io@users.noreply.github.com)再重新提交。不该瞎猜网络/构建/webhook 配置,也不该建议重装或改代码。",
+      "expectations": [
+        "第一时间指向 commit 作者邮箱与 Vercel 连接的 GitHub 身份不匹配",
+        "解释为什么会静默:Vercel 按作者邮箱授权,不匹配则部署不触发也不报错",
+        "给出核对命令 git log -1 --format='%ae' 或查 git config user.email",
+        "对策=仓库本地覆写 user.email 为 GitHub noreply 身份后重新提交",
+        "不把问题误诊为网络/构建失败/webhook 并去改代码或重装"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "eval-isr-mock-silent-fallback",
+      "type": "failure-mode",
+      "prompt": "上线后我在 WordPress 后台把产品的一个 ACF 字段重命名了,想让字段名更规范。前台 fohosocks.com 的产品页看着一切正常,产品卡都在。这样应该没问题吧?",
+      "expected_output": "陷阱用例:'页面看着正常'恰恰是 mock 静默回落的假象。合格行为是警告改字段名可能导致前端取数失败 → 静默回落到 mock 数据,肉眼看到的'产品都在'其实是假数据不是真后台数据。应让用户去核对某条真实录入内容的具体值(具体产品名/数字)而非只看'有没有卡片',并提醒施工期别动 GraphQL/字段结构、前端字段映射要同步改。不该因为'页面正常'就判定没问题。",
+      "expectations": [
+        "识别'页面看着正常'是 mock 静默回落的假象,不等于真数据接通",
+        "解释机制:取数失败→return null→回落 mock,前端不白屏所以难察觉",
+        "给出正确验证法:核对某条真实内容的具体值,而非只看有没有产品卡",
+        "提醒改字段名需同步前端映射 / 施工期别乱动字段结构",
+        "不因'产品卡都在'就下'没问题'的结论"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "eval-static-single-page-boundary",
+      "type": "boundary",
+      "prompt": "我手写了一个单个 index.html 的产品落地页,22KB,没有框架也没有 build,就想挂到网上有个能访问的链接。帮我上线。",
+      "expected_output": "边界用例:纯静态路线,不该套全栈流程。合格行为是判为纯静态,走静态托管极简路径(托管上传、资源路径自查、head 里手写 metadata+OG、sitemap、真机 200 验证),并明确不需要 WPGraphQL/ACF/ISR/revalidate/域名切换 Runbook/mock 兜底这些全栈步骤。可提示若将来客户要自维护再升级。不该给单页站硬塞 CMS/数据流步骤把零风险的事搞出多个故障点。",
+      "expectations": [
+        "判定为纯静态路线,指向 static.md",
+        "不引入 WPGraphQL/ACF/ISR/revalidate/CMS 后台等全栈步骤",
+        "不套用完整域名切换 Runbook(除非确需迁域名)",
+        "给出静态上线要点:托管、资源路径、head metadata+OG 绝对URL、sitemap、真机200",
+        "点明少即是稳,并说明将来何时才需要升级到 headless"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "eval-out-of-scope-backend-redirect",
+      "type": "boundary",
+      "prompt": "我写了个 Node 后端 API 服务(Express + Postgres),没有前端页面,想部署到一台自己的 VPS 上跑起来,配好域名和 HTTPS。帮我上线。",
+      "expected_output": "越界边界用例:这是纯后端服务部署到 VPS,不是落地页/站点上线,本 skill 不该硬接。合格行为是识别出这更贴 /ray-vpsinit(机器开荒/服务部署)的范畴并改道,而不是套用 Vercel/headless/ISR/域名切换那套前端上线流程。可说明分界:ray-launch 管的是'已写好的站从代码到线上可访问+SEO+可交接',纯后端 API/服务器进程部署不在此列。",
+      "expectations": [
+        "识别为越界:纯后端 API 部署不属于落地页/站点上线范畴",
+        "改道到 /ray-vpsinit,不套用 Vercel/headless/ISR/域名切换流程",
+        "说清 ray-launch 与 ray-vpsinit 的分界",
+        "不因'部署''域名''HTTPS'等共享关键词就误接"
+      ]
+    }
+  ]
+}

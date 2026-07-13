@@ -1,6 +1,6 @@
 ---
 name: ray-thread
-description: 把一段真实的实战经历(项目、事故、生意决策)装配成 build-in-public thread 骨架——素材考古、结构选型、逐条排布、hook 候选。只交付骨架和素材,观点血肉由作者本人填。触发:/ray-thread <经历描述或素材路径>。
+description: 把一段真实的实战经历(项目、事故、生意决策)装配成 build-in-public thread 骨架——素材考古、结构选型、逐条排布、hook 候选。只交付骨架和素材,观点血肉由作者本人填。触发:/ray-thread 「经历描述或素材路径」。
 ---
 
 # ray-thread：实战经历 → Thread 装配骨架
