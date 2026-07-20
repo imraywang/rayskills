@@ -19,6 +19,7 @@ flowchart TD
         REPORT["/ray-report\n长文报告"]
         WRITER["/ray-writer\n长文生产"]
         COVER["/ray-cover\n平台封面"]
+        BROLL["/ray-broll\n拼贴 B-roll"]
         XARTICLE["/ray-x-article\nX 后台草稿"]
     end
     subgraph CONSULT["🔍 咨询"]
@@ -54,6 +55,7 @@ flowchart TD
     OBSIDIAN -->|知识库根目录与模板| WRITER
     WRITER -->|判断与正文通过检查| COVER
     COVER -->|5:2 Article 封面| XARTICLE
+    COVER -.-|共享编辑拼贴视觉体系| BROLL
 
     BENCH -.->|X / 网页补充调研| MULTI
     DIAG -.->|关键结论独立复核| MULTI

@@ -7,7 +7,7 @@
 本地知识库 · 基建运维 · 内容生产 · X 创作 · 企业咨询 · 产品落地 · 多模型协作 · 周期复盘
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-19%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录19)
+[![Skills](https://img.shields.io/badge/skills-20%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录20)
 [![Evals](https://img.shields.io/badge/eval%20cases-91-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-19%2F19%20pass-3fb950)](#-实测与验证)
@@ -47,6 +47,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、成稿包、草稿、发布与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 事实清单、情绪结构、Ray 语气、可浏览中文长文 | `/ray-writer` |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
+| 几句口播文稿或观点句 | 编辑隐喻拼贴组装动画 B-roll，单条或批量不同底色 | `/ray-broll` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-thread` |
 | 一周的 X 内容数据 | 周环比、top/bottom 内容、可复现规律与下周动作 | `/ray-metrics` |
@@ -67,7 +68,7 @@ flowchart TD
 
     RAY --> INFRA["🛠 基建<br/>vpsinit · nodecheck"]
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · x-article<br/>thread · tweet · metrics · benchmark · report"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · x-article<br/>thread · tweet · metrics · benchmark · report · broll"]
     RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal"]
     RAY --> PRODUCT["📦 产品<br/>idea · launch"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
@@ -97,7 +98,7 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（19）
+## 🗂 Skill 全目录（20）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -107,6 +108,7 @@ flowchart TD
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 有事实、有情绪、有网感的中文长文 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
+| | `/ray-broll` | 口播文稿 → 编辑隐喻拼贴组装动画 B-roll |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | | `/ray-thread` | 真实实践 → build-in-public thread 骨架，不代笔 |
 | | `/ray-tweet` | 当日 X 主题推文候选，不自动发布 |

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Broll"
+  short_description: "把口播文稿做成编辑隐喻拼贴风格的组装动画 B-roll"
+  default_prompt: "Use $ray-broll to turn this spoken line into an editorial paper-collage B-roll clip."
