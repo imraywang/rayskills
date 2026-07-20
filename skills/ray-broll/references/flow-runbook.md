@@ -1,6 +1,31 @@
-# 视频生成备用路线：L2 Flow 积分 + L3 HyperFrames 确定性动画
+# 视频生成备用路线：L2 Flow 积分 + L3 HyperFrames + 多厂商聚合
 
-本文件覆盖 API 之外的两条备用路线，均经同素材（beat「天平合题」）实测对比。
+本文件覆盖 Google API 之外的备用路线，均以同素材（beat「天平合题」）为对比基准。
+
+## L4：fal.ai 聚合（可灵 / Seedance 多厂商兼容，2026-07 接入）
+
+管线对视频模型的唯一硬性要求是**首尾帧插值**。`scripts/video_dispatch.py` 按
+jobs 里的 `provider` 字段分发：google 走原生 `generate_video.py`，`fal` 走
+`fal_driver.py`（`FAL_KEY` 认证，queue API 提交轮询，首尾帧 data URI 内联）。
+
+2026-07 确认支持尾帧的 fal 端点（写死在 MODEL_MAP，漂移时改表）：
+
+| model 名 | fal 端点 | 尾帧参数 | 时长 |
+|---|---|---|---|
+| kling-o3-standard / -pro | fal-ai/kling-video/o3/{standard,pro}/image-to-video | end_image_url | 3–15s，无 aspect_ratio 参数（随输入图） |
+| seedance-2.0 / -fast | bytedance/seedance-2.0[/fast]/image-to-video | end_image_url | 4–15s，默认带音频需显式关 |
+
+原则：**尾帧支持是准入门槛**——不支持的模型不进 MODEL_MAP，拒绝 job 而非静默
+降级单图生视频。新厂商 bake-off 用 beat 07 标准素材跑一遍，把尾帧对比图扩列，
+四个维度定优劣：组装感 / 尾帧还原 / 假字率 / 成本。
+
+2026-07-20 首轮 bake-off 结果（同首尾帧同 prompt，2/2 一次成功）：
+
+- **kling-o3-standard（$0.42/5s）**：首帧纯净、硬币逐枚空中落下（组装物理感
+  全场最佳）、尾帧比例最贴近确认静帧——进入常规轮换，物理质感镜头的 Omni 平替
+- **seedance-2.0（~$1.51/5s，token 计价）**：质量合格、首帧微露顶饰，
+  但同档最贵——留作对照不入常规轮换
+- 六方排序与完整判定见项目内 bakeoff/bakeoff-qa.md
 
 ## L3：HyperFrames 确定性动画（刚体动作零生成成本，2026-07-20 实测）
 

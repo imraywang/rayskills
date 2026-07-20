@@ -155,15 +155,17 @@ No scene cuts, no camera movement, no zoom, no morphing, no new objects, no text
 
 ### 3. 批量调用
 
-`omni-jobs.json` 每个 job：`{prompt, image: [first-frame, last-frame], output, aspect_ratio: "9:16", duration: 5}`。
+`video-jobs.json` 每个 job：`{prompt, image: [first-frame, last-frame], output, aspect_ratio: "9:16", duration: 5}`，可选 `provider`（缺省 `google`；`fal` 走聚合）与 `model`（fal 用：`kling-o3-standard` / `kling-o3-pro` / `seedance-2.0` / `seedance-2.0-fast`）。
 
 ```bash
 source ~/.zshrc 2>/dev/null
-~/hyperframes-projects/.omni-venv/bin/python <本skill目录>/scripts/generate_video.py \
-  --batch <project>/omni-jobs.json --concurrency 3
+~/hyperframes-projects/.omni-venv/bin/python <本skill目录>/scripts/video_dispatch.py \
+  --batch <project>/video-jobs.json --concurrency 3
 ```
 
-失败只重跑对应 job。出现 legacy Interactions API schema 错误说明用了旧 SDK，换共享 venv 的 python。
+dispatcher 按 provider 分组分发：google → `generate_video.py`（原有行为不变，旧 `omni-jobs.json` 直接兼容）；fal → `fal_driver.py`（需 `FAL_KEY`，首尾帧以 data URI 内联上传）。**只有显式支持尾帧参数的模型才进 `fal_driver.py` 的 MODEL_MAP**——不支持尾帧宁可拒绝 job，不静默降级成单图生视频。多模型同 beat 对比时，复用四方尾帧对比 harness 扩列即可。
+
+失败只重跑对应 job。google 侧出现 legacy Interactions API schema 错误说明用了旧 SDK，换共享 venv 的 python。
 
 ### 4. 强制无声交付 + QA 产物
 
