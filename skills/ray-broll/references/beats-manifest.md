@@ -53,6 +53,13 @@ tempo、路径散落在文档和脚本硬编码里。
 - **bg_hex**：`prepare_frames.sh` 实测回填，不手填。
 - **caption**：两行制字幕文本，`\\n` 分行；`assemble.py` 自动渲染缺失的
   字幕 PNG。
+- **headline**（可选）：画内标题卡纸文本（`render_headline.py` 确定性渲染，
+  零假字），配套可选 `headline_accent_line` / `headline_accent_hex` /
+  `headline_strip_hex` / `headline_y`（1920 基准 y 坐标，默认 150，
+  按各 beat 视频高度自动折算）。通常只给 hook 和 closing beat 上标题。
+- **defaults.theme**（可选）：视觉主题预设名（见 theme-presets.md，
+  缺省 editorial-halftone）。**Restyle 玩法**：复制 manifest 换 theme，
+  `assemble.py --manifest <变体文件>` 重跑 Gate 2/3——叙事与旁白零改动。
 - **vo_duration** 不入库：拼装时 ffprobe 实测，杜绝手抄。
 
 ## 生命周期

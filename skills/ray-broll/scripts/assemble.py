@@ -38,15 +38,26 @@ def probe_duration(path):
     return float(r.stdout.strip())
 
 
+def probe_wh(path):
+    r = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=width,height", "-of", "csv=p=0", path],
+        capture_output=True, text=True)
+    w, h = r.stdout.strip().split("\n")[0].split(",")[:2]
+    return int(w), int(h)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", required=True)
+    ap.add_argument("--manifest", default=None,
+                    help="覆盖默认的 <project>/beats.json(用于 restyle/变体)")
     ap.add_argument("--output", default=None)
     ap.add_argument("--force-captions", action="store_true")
     args = ap.parse_args()
 
     P = os.path.abspath(args.project)
-    mf_path = os.path.join(P, "beats.json")
+    mf_path = args.manifest or os.path.join(P, "beats.json")
     if not os.path.exists(mf_path):
         sys.exit(f"缺少 {mf_path}(schema 见 references/beats-manifest.md)")
     mf = json.load(open(mf_path))
@@ -83,11 +94,28 @@ def main():
                 capture_output=True, text=True)
             if r.returncode != 0:
                 sys.exit(f"字幕渲染失败 {b['id']}: {r.stderr[:200]}")
+
+        # 画内标题卡纸(可选):headline 文本 -> render_headline.py 确定性渲染
+        hl_png = os.path.join(caps_dir, f"{b['id']}-headline.png")
+        if b.get("headline") and (args.force_captions or not os.path.exists(hl_png)):
+            hl_args = [sys.executable, os.path.join(HERE, "render_headline.py"),
+                       "--text", b["headline"], "--output", hl_png]
+            for k, flag in (("headline_accent_line", "--accent-line"),
+                            ("headline_accent_hex", "--accent-hex"),
+                            ("headline_strip_hex", "--strip-hex")):
+                if b.get(k) is not None:
+                    hl_args += [flag, str(b[k])]
+            r = subprocess.run(hl_args, capture_output=True, text=True)
+            if r.returncode != 0:
+                sys.exit(f"标题渲染失败 {b['id']}: {r.stderr[:200]}")
+        vw, vh = probe_wh(video)
         plan.append({"id": b["id"], "role": role, "tempo": tempo,
                      "tail": tail, "video": video, "vo": vo,
                      "vo_len": round(volen, 2), "video_len": round(vlen, 2),
-                     "dur": dur, "tpad": tpad,
-                     "cap": cap_png if b.get("caption") else None})
+                     "dur": dur, "tpad": tpad, "vw": vw, "vh": vh,
+                     "cap": cap_png if b.get("caption") else None,
+                     "headline": hl_png if b.get("headline") else None,
+                     "headline_y": b.get("headline_y", 150)})
 
     n = len(plan)
     total = round(sum(p["dur"] for p in plan), 2)
@@ -115,12 +143,25 @@ def main():
     for p in cap_inputs:
         cmd += ["-loop", "1", "-i", p["cap"]]
     cap_pos = {p["id"]: 2 * n + j for j, p in enumerate(cap_inputs)}
+    hl_inputs = [p for p in plan if p["headline"]]
+    for p in hl_inputs:
+        cmd += ["-loop", "1", "-i", p["headline"]]
+    hl_pos = {p["id"]: 2 * n + len(cap_inputs) + j
+              for j, p in enumerate(hl_inputs)}
     for i, p in enumerate(plan):
+        cur = f"p{i}"
         if p["cap"]:
-            fc.append(f"[p{i}][{cap_pos[p['id']]}:v]"
-                      f"overlay=(W-w)/2:H-h-170:shortest=1[v{i}]")
+            fc.append(f"[{cur}][{cap_pos[p['id']]}:v]"
+                      f"overlay=(W-w)/2:H-h-170:shortest=1[c{i}]")
+            cur = f"c{i}"
+        if p["headline"]:
+            # 标题按视频实际宽度缩放(1080 基准素材适配 720 模型片)
+            hw = int(p["vw"] * 0.82)
+            hy = int(p["headline_y"] * p["vh"] / 1920)
+            fc.append(f"[{hl_pos[p['id']]}:v]scale={hw}:-1[hs{i}]")
+            fc.append(f"[{cur}][hs{i}]overlay=(W-w)/2:{hy}:shortest=1[v{i}]")
         else:
-            fc.append(f"[p{i}]null[v{i}]")
+            fc.append(f"[{cur}]null[v{i}]")
         fc.append(f"[{n + i}:a]atempo={p['tempo']},adelay={int(lead * 1000)},"
                   f"apad=whole_dur={p['dur']}[a{i}]")
     fc.append("".join(f"[v{i}][a{i}]" for i in range(n)) +
