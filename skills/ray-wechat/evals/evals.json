@@ -1,0 +1,98 @@
+{
+  "skill_name": "ray-wechat",
+  "evals": [
+    {
+      "id": 1,
+      "name": "定稿文章更新已有公众号草稿",
+      "type": "happy-path",
+      "prompt": "/ray-wechat 这篇文章和公众号封面都定了，更新到原来的草稿箱里。",
+      "expected_output": "先检查本地排版与 frontmatter，使用原 media ID 更新草稿，保留封面和作者，回读全文后记录状态，不发布。",
+      "expectations": [
+        "优先使用 wechat_draft_media_id 更新原草稿",
+        "更新前完成本地 HTML 与原文一致性检查",
+        "保留原封面、作者和评论设置",
+        "回读标题、摘要、正文、章节、空段落和署名",
+        "远端验收通过后才回写 frontmatter",
+        "不调用发布接口"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "排版探索阶段不写草稿",
+      "type": "boundary",
+      "prompt": "/ray-wechat 我觉得当前排版单调，先给我试试红白和石墨两套。",
+      "expected_output": "生成本地预览供选择，实际检查手机宽度；用户确认前不更新或创建公众号草稿。",
+      "expectations": [
+        "先推荐与文章题材最匹配的主题",
+        "只生成本地预览",
+        "检查手机宽度和横向溢出",
+        "不调用微信写接口"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "已有草稿时拒绝重复创建",
+      "type": "failure-mode",
+      "prompt": "/ray-wechat 再把这篇文章推一遍，之前好像已经存过。",
+      "expected_output": "读取文章 frontmatter 和远端原草稿；存在 media ID 时只更新原草稿，不创建第二份。",
+      "expectations": [
+        "读取 wechat_draft_media_id",
+        "先 draft/get 再 draft/update",
+        "不调用 draft/add",
+        "回读确认仍是同一 media ID"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "防止 UTF-8 乱码回写",
+      "type": "failure-mode",
+      "prompt": "/ray-wechat 接口返回成功，但草稿标题显示成 Ã¥ 和 å 这样的乱码。",
+      "expected_output": "把响应字节按 UTF-8 解码；用本地正确标题、摘要和 HTML 覆盖同一草稿，再回读核对首尾、封面和全部原文块。",
+      "expectations": [
+        "不依赖 HTTP 客户端自动推断中文编码",
+        "不只修标题，正文和摘要一起修复",
+        "保留原 media ID 和封面 ID",
+        "回读中出现乱码标记时不宣称成功"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "去掉自动署名与互动尾注",
+      "type": "boundary",
+      "prompt": "/ray-wechat 底部署名去掉，只保留文章结尾。",
+      "expected_output": "删除完整署名、作者占位和互动引导，重新生成正文与预览，检查无残留后再按授权更新草稿。",
+      "expectations": [
+        "整块移除作者占位和互动引导",
+        "不留下空段落",
+        "重新生成预览",
+        "远端回读确认署名不存在"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "排版重点不得拆开英文词",
+      "type": "failure-mode",
+      "prompt": "/ray-wechat 预览里 Instagram 和 YouTube 被下划线拆开了，修好再继续。",
+      "expected_output": "重新选择完整中文短语或完整英文 token 作为重点，运行本地拆词检查并重新查看手机预览。",
+      "expectations": [
+        "不按固定字符窗口截取重点",
+        "英文专名保持完整",
+        "重新运行本地交付门",
+        "未修复前不更新线上草稿"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "第三方排版器保持许可证边界",
+      "type": "boundary",
+      "prompt": "/ray-wechat 把 gzh-design 里好看的红白组件直接复制进 rayskills，以后离线用。",
+      "expected_output": "把 gzh-design 作为独立外部工具调用，不复制其 AGPL 组件代码；rayskills 只保留自有排版契约、交付门和草稿脚本。",
+      "expectations": [
+        "说明外部工具与本仓库的许可证边界",
+        "不复制第三方组件库和脚本",
+        "保留可替换的排版器接口",
+        "本地与远端验收仍由 ray-wechat 执行"
+      ]
+    }
+  ]
+}
