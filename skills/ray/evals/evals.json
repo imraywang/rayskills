@@ -75,6 +75,20 @@
         "正常交接不反复要求用户确认",
         "只保存 X Article 草稿，不点击 Publish"
       ]
+    },
+    {
+      "id": 7,
+      "name": "eval-route-wechat-draft",
+      "type": "happy-path",
+      "prompt": "/ray 文章和公众号封面都定稿了，把排版做好并更新到原来的微信公众号草稿箱。",
+      "expected_output": "应分发到 ray-wechat，先生成并检查本地手机预览；用户已明确授权更新后，使用文章记录的原 media ID 更新，强制 UTF-8 回读并验收，不发布。",
+      "expectations": [
+        "分发到 ray-wechat",
+        "先检查本地排版与手机预览",
+        "优先更新原公众号草稿而不是新建",
+        "回读标题、封面、正文、空段落、署名和编码",
+        "不发布文章"
+      ]
     }
   ]
 }

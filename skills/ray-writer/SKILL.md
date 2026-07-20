@@ -130,6 +130,8 @@ python3 scripts/article_check.py <文章路径>
 
 用户明确要求把成稿送入 X Articles 后台时，再把通过检查的文章与 5:2 `x-article-cover` 交给 `ray-x-article`。它只保存并验证草稿，不自动发布。
 
+用户明确要求公众号排版或保存草稿时，把通过检查的文章、公众号封面和署名偏好交给 `ray-wechat`。它先生成并验证本地预览，用户确认后才创建或更新公众号草稿；不要在 `ray-writer` 内临时拼 HTML 或直接调用微信接口。
+
 风格只从用户明确认可、亲自修改或正式发布的内容中学习。普通机器草稿不得自动成为新样本。
 
 ## 参考资料路由
@@ -140,6 +142,7 @@ python3 scripts/article_check.py <文章路径>
 - 终检时读 [quality-gates.md](references/quality-gates.md)。
 - 需要校准风格时读 [approved-examples.md](references/approved-examples.md)，并打开其中与当前原型最接近的原文。
 - 需要公众号或 X 封面时转交 `ray-cover`，不要在本 Skill 内临时拼提示词。
+- 需要公众号排版或草稿箱时转交 `ray-wechat`；写作阶段不承担排版主题和微信接口逻辑。
 
 ## 交付要求
 

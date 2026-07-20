@@ -31,6 +31,21 @@
       ]
     },
     {
+      "id": 4,
+      "name": "一个选题产出完整讲解片",
+      "type": "happy-path",
+      "prompt": "/ray-broll 把「AI 创业里的两种 PMF：短期场景验证与长期能力跃迁」做成一条 50 秒左右的拼贴讲解视频，带旁白和字幕。",
+      "expected_output": "先产出 beat map（8–10 个 beat，各含口播句、叙事角色、隐喻、语义化底色，相邻底色不同），逐 beat 走静帧与视频闸门，旁白 TTS 后按角色分级 atempo 变速，旁白做 master clock、尾帧定格补时，字幕用 Pillow 渲染 overlay，拼装后核查音量并交付成片与全片 contact sheet，QA 文档含成本账。",
+      "expectations": [
+        "beat map 给每个 beat 标叙事角色且相邻底色不同",
+        "抽象概念 beat 的提示词使用 ONLY these N groups 防堆料句式",
+        "语速按角色分级变速而不是全片一刀切，金句与收尾更慢且带停顿",
+        "beat 时长以旁白为 master clock，视频用尾帧定格补时",
+        "节奏修改只重拼不重生素材",
+        "gate3-qa.md 记录生成次数与成本账，失败只重跑失败 job"
+      ]
+    },
+    {
       "id": 3,
       "name": "需要精确图层控制时转出",
       "type": "boundary",

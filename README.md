@@ -2,15 +2,15 @@
 
 # rayskills · builder 实战工具箱
 
-**19 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
+**21 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
 本地知识库 · 基建运维 · 内容生产 · X 创作 · 企业咨询 · 产品落地 · 多模型协作 · 周期复盘
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-20%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录20)
-[![Evals](https://img.shields.io/badge/eval%20cases-91-2563eb)](#-实测与验证)
+[![Skills](https://img.shields.io/badge/skills-21%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录21)
+[![Evals](https://img.shields.io/badge/eval%20cases-102-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-19%2F19%20pass-3fb950)](#-实测与验证)
+[![Validate](https://img.shields.io/badge/结构校验-21%2F21%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 </div>
@@ -19,7 +19,7 @@
 
 rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用先记住 19 个名字。把处境交给 `/ray`：
+不用先记住 21 个名字。把处境交给 `/ray`：
 
 - 下一步还不稳定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
@@ -31,9 +31,10 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
   → 红黄绿评级 + 变绿条件
   → 条件清楚后再交给 /ray-proposal 出分期方案
 
-你：把这个 idea 写成文章，做公众号和 X 封面，再放进 X Articles 后台
+你：把这个 idea 写成文章，做公众号和 X 封面，再放进两个平台的草稿箱
   → /ray-writer 完成长文与质量检查
   → /ray-cover 生成各平台封面
+  → /ray-wechat 确认排版并更新公众号原草稿
   → /ray-x-article 保存并验证草稿
   → 停在草稿，不自动发布
 ```
@@ -47,7 +48,8 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、成稿包、草稿、发布与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 事实清单、情绪结构、Ray 语气、可浏览中文长文 | `/ray-writer` |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
-| 几句口播文稿或观点句 | 编辑隐喻拼贴组装动画 B-roll，单条或批量不同底色 | `/ray-broll` |
+| 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
+| 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-thread` |
 | 一周的 X 内容数据 | 周环比、top/bottom 内容、可复现规律与下周动作 | `/ray-metrics` |
@@ -68,7 +70,7 @@ flowchart TD
 
     RAY --> INFRA["🛠 基建<br/>vpsinit · nodecheck"]
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · x-article<br/>thread · tweet · metrics · benchmark · report · broll"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · wechat · x-article<br/>thread · tweet · metrics · benchmark · report · broll"]
     RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal"]
     RAY --> PRODUCT["📦 产品<br/>idea · launch"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
@@ -76,6 +78,7 @@ flowchart TD
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 成稿包"] --> WRITER["ray-writer<br/>事实 · 情绪 · 长文"]
     WRITER --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
+    COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
     COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
 
     classDef hub fill:#b8553a,stroke:#7a3320,color:#fff,font-weight:bold;
@@ -92,13 +95,14 @@ flowchart TD
 | `ray-obsidian`（按需） | 新建或适配用户自己的本地知识库 | 先预演；已有文件零覆盖、零移动；结构检查为 ready |
 | `ray-writer` | 从 idea、资料或草稿生成完整中文长文 | 事实可追溯；不虚构经历；有情绪曲线；长文有二级标题、关键句加粗和正常段距 |
 | `ray-cover` | 把文章判断压缩成一个视觉隐喻 | 图片模型只做无字底图；中文确定性排版；公众号、普通 X、5:2 Article 分别输出 |
+| `ray-wechat` | 把定稿与公众号封面送进微信草稿箱 | 先确认手机预览；优先更新原草稿；标题、摘要、封面、全文、署名和 UTF-8 回读通过 |
 | `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
 
 管线支持中断恢复。例如浏览器暂时不能读取本地封面时，会保留同一草稿并记录 `draft-needs-cover`；权限恢复后只补封面，不重新建稿，也不重复写正文。
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（20）
+## 🗂 Skill 全目录（21）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -108,7 +112,8 @@ flowchart TD
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 有事实、有情绪、有网感的中文长文 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
-| | `/ray-broll` | 口播文稿 → 编辑隐喻拼贴组装动画 B-roll |
+| | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
+| | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | | `/ray-thread` | 真实实践 → build-in-public thread 骨架，不代笔 |
 | | `/ray-tweet` | 当日 X 主题推文候选，不自动发布 |
@@ -123,7 +128,7 @@ flowchart TD
 | 🧹 内务 | `/ray-weekly` | 项目、内容和业务线周复盘 |
 | | `/ray-cleanup` | 项目归档与磁盘瘦身，删除前确认 |
 
-`/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文与 Ray 内容管线，两者不混用。
+`/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文，`ray-wechat` 只接收定稿并负责排版与草稿验收；三者不混用。
 
 ## 📊 实测与验证
 
@@ -131,14 +136,14 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **19** | 包含 `/ray` 主路由与 18 个成员 |
-| 场景测试 | **91** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **19 / 19 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| Skill 数量 | **21** | 包含 `/ray` 主路由与 20 个成员 |
+| 场景测试 | **102** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **21 / 21 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | 已纳入 v1 基准的 15 个 Skill 均明显优于裸模型 |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
-新增的 `ray-writer`、`ray-cover`、`ray-x-article`、`ray-obsidian` 已完成真实文章、错误反例、封面任务包、X 草稿恢复与知识库安全初始化验证，但尚未计入旧版 15 项 baseline 对照统计。因此这里分别展示 **19 项结构验证** 和 **15 项对照实测**，不把两种口径混在一起。
+新增的 `ray-writer`、`ray-cover`、`ray-broll`、`ray-wechat`、`ray-x-article`、`ray-obsidian` 已完成真实文章、错误反例、封面任务包、公众号草稿回读、X 草稿恢复与知识库安全初始化验证，但尚未计入旧版 15 项 baseline 对照统计。因此这里分别展示 **21 项结构验证** 和 **15 项对照实测**，不把两种口径混在一起。
 
 最能体现 Skill 价值的不是文风，而是防住真实损害：
 
@@ -149,6 +154,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | `/ray-report` | 不把深度报告做成霓虹 SaaS dashboard |
 | `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
 | `/ray-writer` | 不虚构作者经历，也不交付没有阅读锚点的长文 |
+| `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
 | `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
 
 完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)。
@@ -185,6 +191,7 @@ npx -y skills add imraywang/rayskills -g --all
 /ray-obsidian 在这个本地目录搭一套可以接写作管线的知识库
 /ray-writer 把这条剪藏发展成一篇公众号长文
 /ray-cover 给这篇定稿文章做公众号和 X Article 封面
+/ray-wechat 把定稿排版并更新到已有公众号草稿，先预览再写入
 /ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
 /ray-multimodel 让 Grok 和 Claude 独立给方案，由你验收
 /ray-vpsinit root@1.2.3.4
@@ -196,7 +203,7 @@ npx -y skills add imraywang/rayskills -g --all
 
 运行 `bash tools/build.sh` 后，`dist/workbuddy/` 会生成每个 Skill 的独立 ZIP。进入 WorkBuddy 的技能页，选择“添加技能 → 上传技能”，直接导入所需 ZIP；包内的 `SKILL.md`、参考资料、脚本和模板会一起保留。
 
-`ray-writer` 已在 WorkBuddy 5.2.3 完成真实导入、自动选择和调用验证；`ray-obsidian` 也已完成真实安装识别和独立旧库迁移验证。`ray-report` 不再绑定 Claude 的安装目录；`ray-x-article` 会选择当前宿主可用的浏览器或电脑控制能力，没有这类能力时会停在本地交付包，不冒充已经写入 X。
+`ray-writer` 已在 WorkBuddy 5.2.3 完成真实导入、自动选择和调用验证；`ray-obsidian` 也已完成真实安装识别和独立旧库迁移验证。`ray-wechat` 的本地检查和草稿脚本只依赖 Python 标准库，外部排版器按宿主实际安装状态调用；没有公众号凭证或网络权限时停在本地预览，不冒充已经写入草稿。`ray-report` 不再绑定 Claude 的安装目录；`ray-x-article` 会选择当前宿主可用的浏览器或电脑控制能力，没有这类能力时会停在本地交付包。
 
 ### 豆包
 
@@ -218,7 +225,8 @@ npx -y skills add imraywang/rayskills -g --all
 
 - [新手入门](docs/新手入门.md) — 第一次怎么用与完整目录
 - [Skill 关系图](docs/skill-link-map.md) — 成员之间的常见衔接
-- [长文生产管线](skills/ray/references/content-pipeline.md) — Writer → Cover → X Article 的交接与恢复
+- [长文生产管线](skills/ray/references/content-pipeline.md) — Writer → Cover → WeChat / X Article 的交接与恢复
+- [公众号排版契约](skills/ray-wechat/references/layout-contract.md) — 移动端层级、署名策略与外部排版器边界
 - [本地知识库结构](skills/ray-obsidian/references/vault-schema.md) — 资料、知识、创作、发布与回流的目录职责
 - [对照实测报告](docs/eval-report-v1.md) — 15 项带 / 不带 Skill 逐条记分卡
 
