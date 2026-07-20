@@ -6,14 +6,14 @@
       "name": "数据型深度长文默认出杂志风 HTML 并 offer 另两版",
       "type": "happy-path",
       "prompt": "我手头有一份中国新能源车出海的深度分析素材,大概四千字,里面有各家车企 2023-2025 的销量数据、比亚迪和几家新势力的对比、还有一条从政策到落地的时间线。帮我做成一篇看着像正经杂志长文、能直接发出去的报告。",
-      "expected_output": "识别为数据型长篇报告,默认先构建交互式杂志风 HTML(从 skeleton 起手),套用编辑设计系统,保存到 ~/<slug>.html,然后主动询问是否再出 PDF 报告版和公众号长句版。",
+      "expected_output": "识别为数据型长篇报告,默认先构建交互式杂志风 HTML(从 skeleton 起手),套用编辑设计系统,保存到用户指定目录或当前工作区,然后主动询问是否再出 PDF 报告版和公众号长句版。",
       "expectations": [
         "默认直接产出交互式 HTML 版本,而不是反问用户要哪种格式或先做 PDF/markdown",
         "以 assets/skeleton.html 为起点填充内容,不从零手写整套 HTML/CSS 骨架",
         "标题使用衬线中文字体(Noto Serif SC / Georgia serif),正文使用 sans-serif",
         "强调色为锈红 #b8553a、底色为米白 #fafaf7,不使用深色渐变 hero 或霓虹饱和色",
         "开篇 lead 段落带 drop cap,大节之间插入 · · · ornament 分隔",
-        "HTML 产物保存路径形如 ~/<topic-slug>.html",
+        "HTML 产物保存到用户指定目录；未指定时使用当前工作区并报告绝对路径",
         "生成 HTML 之后主动询问是否还要生成 PDF 报告版和公众号长句版"
       ]
     },

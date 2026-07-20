@@ -65,7 +65,7 @@ Start from `assets/skeleton.html` — it has all the CSS, fonts, scripts loaded.
 7. End with closing section + epilogue + article footer
 ```
 
-Save to `~/<topic-slug>.html` unless the user specified a different path.
+Save to the user-selected output directory. If none was specified, use the current workspace and report the absolute path; do not assume the home directory is writable.
 
 ### 4. Apply design system rigorously
 
@@ -95,11 +95,11 @@ Anti-slop checklist (read `references/design-system.md` for full list):
 ### 5. Ask about PDF + 公众号 markdown
 
 After saving HTML, ask:
-> "HTML 版生成好了，保存到 `~/<path>.html`。要不要也生成 PDF 报告版和公众号长句版？"
+> "HTML 版生成好了，保存到 `<absolute-path>.html`。要不要也生成 PDF 报告版和公众号长句版？"
 
-If PDF: run `scripts/render-pdf.sh <html-path>` — produces `<html-path>.pdf` next to it.
+If PDF: use the Skill loader's reported base directory and run `<skill-base>/scripts/render-pdf.sh <html-path>` — this produces `<html-path>.pdf` next to it. Never hardcode a Claude, Codex, WorkBuddy, or other host-specific Skill directory.
 
-If 公众号: follow `references/wechat-conversion.md` rules to rewrite as flowing narrative, save to `~/<topic-slug>-公众号版.md`.
+If 公众号: follow `references/wechat-conversion.md` rules to rewrite as flowing narrative. Save beside the HTML unless the user selected another output directory; do not assume the home directory is writable.
 
 ## Format-specific notes
 
@@ -123,7 +123,7 @@ The skeleton already includes `@media print` CSS that:
 
 Generate:
 ```bash
-bash ~/.claude/skills/ray-report/scripts/render-pdf.sh input.html [output.pdf]
+bash <skill-base>/scripts/render-pdf.sh input.html [output.pdf]
 ```
 
 The script uses headless Chrome with `--virtual-time-budget=12000` to ensure Chart.js renders before printing.
@@ -179,8 +179,8 @@ Key rules:
 ## Reference implementation
 
 A complete example is three coordinated files for the same article — e.g. a data-heavy long-read on a topic like "the AI layoff wave":
-- `~/<topic-slug>.html` — HTML interactive version
-- `~/<topic-slug>.pdf` — PDF report version
-- `~/<topic-slug>-公众号版.md` — WeChat markdown version
+- `<output-dir>/<topic-slug>.html` — HTML interactive version
+- `<output-dir>/<topic-slug>.pdf` — PDF report version
+- `<output-dir>/<topic-slug>-公众号版.md` — WeChat markdown version
 
 If you have such a set on hand, read all three side-by-side for "how the final output looks" — study the structure and feel, don't copy the content.

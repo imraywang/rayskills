@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Obsidian"
+  short_description: "安全搭建可持续写作与内容生产的本地 Obsidian 知识库"
+  default_prompt: "Use $ray-obsidian to create or adapt a local Obsidian knowledge base for the Ray content workflow."

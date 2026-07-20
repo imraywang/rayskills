@@ -2,7 +2,7 @@
 
 本报告覆盖纳入 v1 基准的 15 个 Skill。每个 Skill 取一个旗舰 **failure-mode 用例**（测试“Skill 是否防住裸模型会犯的错”），进行 **带 Skill vs 裸模型 baseline** 双跑，再由独立评分 Agent 逐条判分。
 
-当前仓库共有 18 个 Skill；后加入的 `ray-writer`、`ray-cover`、`ray-x-article` 已有场景测试、结构校验和真实流程回归，但尚未计入这份旧 baseline。因此本文只报告 15 项对照结果，不把 18 项结构验证写成 18 项对照实测。
+当前仓库共有 19 个 Skill；后加入的 `ray-writer`、`ray-cover`、`ray-x-article`、`ray-obsidian` 已有场景测试、结构校验和真实流程回归，但尚未计入这份旧 baseline。因此本文只报告 15 项对照结果，不把 19 项结构验证写成 19 项对照实测。
 
 ## 总分
 

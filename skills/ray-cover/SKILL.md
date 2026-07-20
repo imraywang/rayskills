@@ -75,7 +75,9 @@ python3 scripts/compose_cover.py --background <底图> --title "主标题上半|
 
 默认保存到：
 
-`rays-brain/60-素材/10-图片/10-封面/<YYYY-MM-DD-主题>/`
+`<vault>/60-素材/10-图片/10-封面/<YYYY-MM-DD-主题>/`
+
+`<vault>` 来自用户明确路径、`.ray-obsidian.json` 或兼容知识库结构。没有知识库时保存到用户指定的当前工作区，不得自行创建固定名称的 vault。
 
 保留：
 

@@ -5,9 +5,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_DIR="$ROOT/skills"
 DIST="$ROOT/dist/skills"
+WORKBUDDY_DIST="$ROOT/dist/workbuddy"
 
-rm -rf "$DIST"
-mkdir -p "$DIST"
+rm -rf "$DIST" "$WORKBUDDY_DIST"
+mkdir -p "$DIST" "$WORKBUDDY_DIST"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "FAIL: 缺少 python3,无法生成 WorkBuddy 导入包" >&2
+  exit 1
+fi
 
 count=0
 skipped=0
@@ -34,9 +40,12 @@ for dir in "$SKILLS_DIR"/*/; do
   fi
 
   cp -R "$dir" "$DIST/$name"
+  python3 "$ROOT/tools/package_workbuddy.py" "$dir" "$WORKBUDDY_DIST/$name.zip"
   echo "ok: $name"
   count=$((count+1))
 done
 
 echo "---"
-echo "构建完成:$count 个 skill 进产物,跳过 $skipped 个 beta。产物在 dist/skills/"
+echo "构建完成:$count 个 skill 进产物,跳过 $skipped 个 beta。"
+echo "目录产物:dist/skills/"
+echo "WorkBuddy 导入包:dist/workbuddy/"

@@ -1,0 +1,44 @@
+{
+  "skill_name": "ray-obsidian",
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-vault-safe-init",
+      "type": "happy-path",
+      "prompt": "/ray-obsidian 在 /tmp/my-content-vault 给我搭一套后续可以接 ray-writer 的本地知识库。",
+      "expected_output": "先确认绝对路径并预演，再创建缺失目录、manifest、流程说明和模板；复核为 ready，不安装插件或同步服务。",
+      "expectations": [
+        "初始化前运行 dry-run",
+        "建立资料、知识、成稿包、调研、草稿、发布和素材分区",
+        "最终运行 check 并确认 ready",
+        "不修改 Obsidian 配置或强制 Git/同步"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "existing-vault-preservation",
+      "type": "boundary",
+      "prompt": "/ray-obsidian 把我现有的 Obsidian 库接入这套内容管线，里面有很多旧笔记和自定义模板。",
+      "expected_output": "先只读审计；只补缺失结构，保留旧笔记和同名模板，不批量移动、改名或改 frontmatter。",
+      "expectations": [
+        "已有文件零覆盖",
+        "不批量移动或改写历史笔记",
+        "同名模板以用户版本为准",
+        "需要迁移时另给计划并等待确认"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "writer-bootstrap-handoff",
+      "type": "integration",
+      "prompt": "/ray-writer 把这个 idea 写成文章，但我没有 rays-brain，也没有准备过 Obsidian 知识库。",
+      "expected_output": "不假设固定路径；若用户希望使用完整管线则转交 ray-obsidian 建库，初始化通过后把根目录和材料交回 ray-writer。",
+      "expectations": [
+        "不硬编码 rays-brain",
+        "只问知识库根目录这一项关键问题",
+        "完成 ray-obsidian 到 ray-writer 的明确交接",
+        "不因缺少知识库而虚构或丢失材料"
+      ]
+    }
+  ]
+}
