@@ -27,6 +27,8 @@ def main():
     ap.add_argument("--model", default="gemini-3-pro-image",
                     help="便宜备选: gemini-3.1-flash-image")
     ap.add_argument("--aspect-ratio", default="9:16")
+    ap.add_argument("--style-ref", default=None,
+                    help="风格锚参考图(批量时传第一张过审静帧,锁定设计语言)")
     args = ap.parse_args()
 
     prompt = args.prompt
@@ -50,8 +52,23 @@ def main():
         config = types.GenerateContentConfig(response_modalities=["TEXT", "IMAGE"])
         prompt += f"\nAspect ratio: {args.aspect_ratio} vertical."
 
+    contents = prompt
+    if args.style_ref:
+        with open(args.style_ref, "rb") as f:
+            ref = f.read()
+        mime = ("image/jpeg" if args.style_ref.lower().endswith((".jpg", ".jpeg"))
+                else "image/png")
+        contents = [
+            types.Part.from_bytes(data=ref, mime_type=mime),
+            "The attached image is a STYLE REFERENCE from the same batch. "
+            "Match its exact design language: halftone treatment, cutout "
+            "edge style, keyline weight, shadow softness, paper grain and "
+            "accent-color family. Do NOT copy its subject or composition.\n\n"
+            + prompt,
+        ]
+
     resp = client.models.generate_content(
-        model=args.model, contents=prompt, config=config)
+        model=args.model, contents=contents, config=config)
 
     for part in resp.candidates[0].content.parts:
         if getattr(part, "inline_data", None) and part.inline_data.data:

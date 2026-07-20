@@ -31,6 +31,7 @@ MODEL_MAP = {
         "duration": lambda d: str(max(3, min(15, int(d)))),
         "extras": {"generate_audio": False, "shot_type": "customize"},
         "aspect_ratio": None,  # 无此参数,比例随输入图
+        "usd_per_sec": 0.084,  # 2026-07 标价,audio off
     },
     "kling-o3-pro": {
         "endpoint": "fal-ai/kling-video/o3/pro/image-to-video",
@@ -38,6 +39,7 @@ MODEL_MAP = {
         "duration": lambda d: str(max(3, min(15, int(d)))),
         "extras": {"generate_audio": False, "shot_type": "customize"},
         "aspect_ratio": None,
+        "usd_per_sec": None,  # 未查证,记账标 unknown
     },
     "seedance-2.0": {
         "endpoint": "bytedance/seedance-2.0/image-to-video",
@@ -46,6 +48,7 @@ MODEL_MAP = {
         "extras": {"generate_audio": False, "resolution": "720p",
                    "bitrate_mode": "standard"},
         "aspect_ratio": "aspect_ratio",
+        "usd_per_sec": 0.3024,  # 2026-07 标价,720p standard
     },
     "seedance-2.0-fast": {
         "endpoint": "bytedance/seedance-2.0/fast/image-to-video",
@@ -53,6 +56,7 @@ MODEL_MAP = {
         "duration": lambda d: str(max(4, min(15, int(d)))),
         "extras": {"generate_audio": False, "resolution": "720p"},
         "aspect_ratio": "aspect_ratio",
+        "usd_per_sec": 0.2419,  # 2026-07 标价
     },
 }
 
