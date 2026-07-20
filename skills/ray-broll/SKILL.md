@@ -45,7 +45,11 @@ bash <本skill目录>/scripts/check_setup.sh
 - 每次 Gate 3 在 QA 文档记一行成本账：生成次数 × 模型（含废片），让成本可见
 - 降本方向按杠杆排序：静帧换 flash 档试点 → 简单刚体动作（滑入/卡位类 beat）改
   HyperFrames 确定性动画，视频模型只留给物理质感镜头（迸裂/穿透） → 量产期再考虑
-  Flow 订阅积分路线
+  Flow 订阅积分路线。后两条均已实测走通，操作细节见
+  `references/flow-runbook.md`（L2 Flow 积分 + L3 HyperFrames 贴纸分离管线）
+- API 侧注意 AI Studio 的项目月度 spend cap：触顶后所有调用 429，
+  到 ai.studio/spend 提额或等月初重置；断供期间 Flow 内的 Nano Banana 2
+  可兜底静帧/贴纸生成
 
 ## 成功标准（视觉语法）
 
