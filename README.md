@@ -2,157 +2,205 @@
 
 # rayskills · builder 实战工具箱
 
-**根据真实业务沉淀的 AI Skill 工具箱，不给「该怎么想」的建议，直接把「下一步」干掉**
+**18 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
-网络环境 · 节点巡检 · thread 装配 · 数据周报 · 对标拆解 · 企业诊断 · 方案蓝图 · 产品概念 · 站点上线 · 周复盘
+基建运维 · 内容生产 · X 创作 · 企业咨询 · 产品落地 · 多模型协作 · 周期复盘
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-14%20%2B%20%2Fray%20路由-8b5cf6)](#-花名册14--路由)
-[![Evals](https://img.shields.io/badge/对照实测-14%2F14%20skill--helps-059669)](#-实测每个-skill-都真的有用)
-[![Validate](https://img.shields.io/badge/官方校验-14%2F14%20pass-3fb950)](#-架构与纪律)
+[![Skills](https://img.shields.io/badge/skills-18%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录18)
+[![Evals](https://img.shields.io/badge/eval%20cases-88-2563eb)](#-实测与验证)
+[![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
+[![Validate](https://img.shields.io/badge/结构校验-18%2F18%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex-supported-6366f1)](#-安装)
 
 </div>
 
 ---
 
-一个给 AI Agent（Claude Code / Codex 等）用的 builder 工具箱。每个 skill 背后是一段**真实发生的实践**：为付费客户构建 AI 网关、上过线的 B2B 站、交付过的咨询案、处置过的网络入侵事故、日更的 X 内容。
+rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用记 skill 名——把真实处境交给 `/ray`，它读上下文、判断此刻最该做的一步、分发到对的成员。每次只决定当前一步，做完再 `/ray` 决定下一步。
+不用先记住 18 个名字。把处境交给 `/ray`：
 
+- 下一步还不稳定时，它只选择此刻最该做的一步。
+- 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
+- 涉及删除、发布、生产修改等高影响动作时，仍然守住确认边界。
+
+```text
+你：我有个客户想上 AI 客服，不知道现在能不能做
+  → /ray-diagnose 做就绪度诊断
+  → 红黄绿评级 + 变绿条件
+  → 条件清楚后再交给 /ray-proposal 出分期方案
+
+你：把这个 idea 写成文章，做公众号和 X 封面，再放进 X Articles 后台
+  → /ray-writer 完成长文与质量检查
+  → /ray-cover 生成各平台封面
+  → /ray-x-article 保存并验证草稿
+  → 停在草稿，不自动发布
 ```
-你："我有个客户想上 AI 客服，不知道能不能做"
-  → /ray 判断意图 → 分发 /ray-diagnose
-  → 六维就绪度诊断 → 红黄绿评级 → 变绿条件
-  → （红灯）下一步接 /ray-proposal 出补齐前提的方案
-```
 
-## 🎯 你交给它什么 → 它替你干什么
+## 🎯 你交给它什么，它替你完成什么
 
-| 你手上的 | rayskills 干的 | 谁来干 |
+| 你手上的 | rayskills 完成的 | 入口 |
 |---|---|---|
-| 一台刚买的裸机 VPS | 开荒加固 + 代理栈一条龙，带防锁死闸 | `/ray-vpsinit` |
-| 一段刚发生的实践 / 事件  | 装配成 build-in-public thread 骨架，观点留白给你填 | `/ray-thread` |
-| 一个「能不能上 AI」的客户 | 六维就绪度诊断 + 红黄绿评级 + 变绿条件 | `/ray-diagnose` |
-| 一个人群 + 价格带 | 锻造一个经消费社会批判压测的产品概念 | `/ray-idea` |
-| 一个写好的站 | 上线全流程：部署坑位 + 域名切换 + 交接 | `/ray-launch` |
-| 想学的一个对标对象 | 拆产品 / 定价 / 增长，切出「能抄的」与「抄不来的」 | `/ray-benchmark` |
-| 一堆沉睡项目 | 扫出来分类归档，删前必逐项确认 | `/ray-cleanup` |
-| **不知道从哪开始** | 替你选此刻最该做的那一步 | **`/ray`** |
+| 一台刚买的裸机 VPS | 开荒、加固、代理栈、防火墙、验证与交接 | `/ray-vpsinit` |
+| 一批节点或中转链 | 端口、延迟、出口、流量和订阅健康巡检，只诊断不改动 | `/ray-nodecheck` |
+| 一个 idea、剪藏或旧草稿 | 事实清单、情绪结构、Ray 语气、可浏览中文长文 | `/ray-writer` |
+| 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
+| 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
+| 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-thread` |
+| 一周的 X 内容数据 | 周环比、top/bottom 内容、可复现规律与下周动作 | `/ray-metrics` |
+| 一个对标对象 | 拆产品、定价、增长和护城河，区分能学与学不了 | `/ray-benchmark` |
+| 一个“能不能上 AI”的客户 | 六维就绪度、病灶、风险等级与变绿条件 | `/ray-diagnose` |
+| 一份诊断结论 | 架构、选型、Phase 0–3、预算和运营责任 | `/ray-proposal` |
+| 一个人群与价格带 | 一个经过消费社会批判压测的产品概念 | `/ray-idea` |
+| 一个写好的站 | 部署、域名、SEO、表单、数据流和客户交接 | `/ray-launch` |
+| 一个适合并行或复核的大任务 | Grok、Claude、Codex 的最小充分分工与主控验收 | `/ray-multimodel` |
+| 一批沉睡项目 | 分类归档和磁盘瘦身，删除前逐项确认 | `/ray-cleanup` |
+| **不知道从哪里开始** | 读取当前处境，替你选下一步或正式管线 | **`/ray`** |
 
 ## 🧭 一张图看懂
 
 ```mermaid
 flowchart TD
-    RAY(["/ray · 主路由"]):::hub
+    RAY(["/ray · 主路由与阶段编排"]):::hub
+
     RAY --> INFRA["🛠 基建<br/>vpsinit · nodecheck"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>thread · tweet · metrics<br/>benchmark · report"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · x-article<br/>thread · tweet · metrics · benchmark · report"]
     RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal"]
     RAY --> PRODUCT["📦 产品<br/>idea · launch"]
+    RAY --> COLLAB["🤝 协作<br/>multimodel"]
     RAY --> OPS["🧹 内务<br/>weekly · cleanup"]
+
+    WRITER["ray-writer<br/>事实 · 情绪 · 长文"] --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
+    COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
+
     classDef hub fill:#b8553a,stroke:#7a3320,color:#fff,font-weight:bold;
 ```
 
-> 更细的衔接关系（实战→内容飞轮、诊断→方案漏斗）见 [docs/skill-link-map.md](docs/skill-link-map.md)。
+更细的交接关系见 [skill 关系图](docs/skill-link-map.md)。
 
-## 🗂 花名册（14 + 路由）
+## 🏭 已跑通的长文生产管线
 
-| 线 | 命令 | 干什么 |
+这条管线来自一次完整的真实生产过程，不是把三个 Skill 用箭头连起来就算完成。
+
+| 阶段 | 负责什么 | 必须通过的门控 |
 |---|---|---|
-| 🧭 路由 | **`/ray`** | 交任务，自动分发 |
-| 🛠 基建 | `/ray-vpsinit` | VPS 开荒：加固 + 代理栈 + 交接 |
-| | `/ray-nodecheck` | 节点 / 中转链健康巡检（只读） |
-| ✍️ 内容 | `/ray-thread` | 实战经历 → thread 骨架（不代笔） |
-| | `/ray-tweet` | 每日社会观察 / 哲理推文候选 |
-| | `/ray-metrics` | X 账号数据周报，找传播规律 |
-| | `/ray-benchmark` | 对标拆解，判可迁移性 |
-| | `/ray-report` | magazine 长文（HTML + PDF + 公众号） |
-| 🔍 咨询 | `/ray-diagnose` | 企业 AI 就绪度诊断（六维 + 红黄绿） |
-| | `/ray-proposal` | 诊断结论 → 方案蓝图 |
+| `ray-writer` | 从 idea、资料或草稿生成完整中文长文 | 事实可追溯；不虚构经历；有情绪曲线；长文有二级标题、关键句加粗和正常段距 |
+| `ray-cover` | 把文章判断压缩成一个视觉隐喻 | 图片模型只做无字底图；中文确定性排版；公众号、普通 X、5:2 Article 分别输出 |
+| `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
+
+管线支持中断恢复。例如 Chrome 暂时不能读取本地封面时，会保留同一草稿并记录 `draft-needs-cover`；权限恢复后只补封面，不重新建稿，也不重复写正文。
+
+完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
+
+## 🗂 Skill 全目录（18）
+
+| 线 | Skill | 干什么 |
+|---|---|---|
+| 🧭 路由 | **`/ray`** | 读取处境，选择下一步；终点明确时编排正式管线 |
+| 🛠 基建 | `/ray-vpsinit` | VPS 开荒：加固、代理栈、验证与交接 |
+| | `/ray-nodecheck` | 节点和中转链健康巡检，只读不改 |
+| ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 有事实、有情绪、有网感的中文长文 |
+| | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
+| | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
+| | `/ray-thread` | 真实实践 → build-in-public thread 骨架，不代笔 |
+| | `/ray-tweet` | 当日 X 主题推文候选，不自动发布 |
+| | `/ray-metrics` | X 账号周报与传播规律 |
+| | `/ray-benchmark` | 对标拆解，判断可迁移性 |
+| | `/ray-report` | magazine 风格 HTML、PDF 与公众号长报告 |
+| 🔍 咨询 | `/ray-diagnose` | 企业知识库 / AI 落地前置诊断 |
+| | `/ray-proposal` | 诊断结论 → 方案蓝图、分期与预算 |
 | 📦 产品 | `/ray-idea` | 从消费社会批判框架锻造产品概念 |
 | | `/ray-launch` | 落地页 / B2B 站上线全流程 |
-| 🧹 内务 | `/ray-weekly` | 每周复盘：项目 + 数据 + 业务线 |
-| | `/ray-cleanup` | 归档沉睡项目、磁盘瘦身 |
+| 🤝 协作 | `/ray-multimodel` | Grok / Claude / Codex 分工、复核、竞赛与实时调研 |
+| 🧹 内务 | `/ray-weekly` | 项目、内容和业务线周复盘 |
+| | `/ray-cleanup` | 项目归档与磁盘瘦身，删除前确认 |
 
-> `/ray-post`（公众号全流程）见独立仓 **[wewrite](https://github.com/imraywang/wewrite)**。
+`/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文与 Ray 内容管线，两者不混用。
 
-## 📊 实测：每个 skill 都真的有用
+## 📊 实测与验证
 
-不是「写了文档就算」。每个 skill 取一个旗舰 **failure-mode 用例**（测它是否防住裸模型会犯的错），**带 skill vs 裸模型**双跑、独立评分逐条判定：
+rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
-<div align="center">
+| 检查 | 当前结果 | 含义 |
+|---|---:|---|
+| Skill 数量 | **18** | 包含 `/ray` 主路由与 17 个成员 |
+| 场景测试 | **88** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **18 / 18 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| 对照实测 | **15 / 15 skill-helps** | 已纳入 v1 基准的 15 个 Skill 均明显优于裸模型 |
+| 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
+| 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
-| | 带 skill | 裸模型 |
-|:---:|:---:|:---:|
-| **skill-helps** | **14 / 14** | — |
-| 平均满足断言 | **100%** | 34.6% |
+新增的 `ray-writer`、`ray-cover`、`ray-x-article` 已完成真实文章、错误反例、封面任务包和 X 草稿恢复流程验证，但尚未计入旧版 15 项 baseline 对照统计。因此这里分别展示 **18 项结构验证** 和 **15 项对照实测**，不把两种口径混在一起。
 
-</div>
+最能体现 Skill 价值的不是文风，而是防住真实损害：
 
-最值钱的三个（防的是真实损害）：
+| Skill | 防住的问题 |
+|---|---|
+| `/ray-cleanup` | 不因“直接删”而误删源码或业务数据 |
+| `/ray-proposal` | 不因老板想“一期全上”而抹掉红灯前提 |
+| `/ray-report` | 不把深度报告做成霓虹 SaaS dashboard |
+| `/ray-writer` | 不虚构作者经历，也不交付没有阅读锚点的长文 |
+| `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
 
-| skill | Δ | 裸模型犯的错，skill 防住了 |
-|---|:---:|---|
-| `/ray-cleanup` | **+5** | 裸模型在「直接删别啰嗦」下真删了 16.5G，还把**源码**列入可删清单 |
-| `/ray-proposal` | **+5** | 裸模型对老板妥协「一期全上齐」，把红灯前提溶掉 |
-| `/ray-report` | **+4** | 裸模型照字面做成霓虹发光 dashboard |
-
-> 完整 14 项逐条记分卡 → [docs/eval-report-v1.md](docs/eval-report-v1.md)
+完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)。
 
 ## ✅ 适合 / ❌ 不适合
 
-**✅ 适合**：一个人 / 小团队要同时干基建、内容、咨询、产品几条线的 builder · 想把自己的实战流程固化成可复用工具的人 · 用 Claude Code / Codex 做真实业务而非玩具的人。
+**适合：**
 
-**❌ 不适合**：只要单一领域深度工具的人（各线单拆更专）· 纯问答 / 陪聊需求 · 不在这几条实战线上的通用任务（那直接用 Agent 就好，不必套 skill）。
+- 一个人或小团队同时处理基建、内容、咨询、产品和运营。
+- 想把真实实践沉淀成可复用、可验证流程的 builder。
+- 使用 Claude Code、Codex 等 Agent 完成真实业务，而不只是问答。
+- 需要 Agent 既能主动做完，又能在发布、删除和生产修改前守住边界。
+
+**不适合：**
+
+- 只需要一个领域的超深度专用工具。
+- 纯陪聊、纯灵感或无需验证的一次性问答。
+- 希望 Agent 无条件自动发布、自动删除或绕过确认。
+- 不在这些真实工作流中的通用任务。
 
 ## 🚀 安装
+
+安装全部 Skill：
 
 ```bash
 npx -y skills add imraywang/rayskills -g --all
 ```
 
-装好后，对任意 Agent 说一句真实处境即可：
+安装后可以从 `/ray` 开始，也可以直接调用具体 Skill：
 
 ```text
-/ray 我有台新买的 VPS 想开荒
-/ray-idea 潮玩 / 18-30岁 / 59-79元 / 复购要高
-/ray-diagnose 一家 800 人化妆品公司想上 AI 客服
+/ray 我有个客户想上 AI 客服，不知道该先做什么
+/ray 把这个 idea 走完整条内容管线，做到 X Articles 草稿，不要发布
+/ray-writer 把这条剪藏发展成一篇公众号长文
+/ray-cover 给这篇定稿文章做公众号和 X Article 封面
+/ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
+/ray-multimodel 让 Grok 和 Claude 独立给方案，由你验收
+/ray-vpsinit root@1.2.3.4
 ```
 
-新手完整入门 → [docs/新手入门.md](docs/新手入门.md)
+第一次使用建议先看 [新手入门](docs/新手入门.md)。
 
 ## 🏛 架构与纪律
 
-<table>
-<tr><td>
-
-**单一真源**
-monorepo 是唯一真源，本地 `~/.claude/skills/` 与 `~/.agents/skills/` 全部软链，禁独立副本
-
-</td><td>
-
-**渐进披露**
-SKILL.md 只放工作流骨架，长查表 / 模板下沉 `references/`
-
-</td></tr>
-<tr><td>
-
-**构建门控**
-`tools/build.sh` 校验目录名 = frontmatter name，beta 门控
-
-</td><td>
-
-**质量可核验**
-每 skill 带 `evals/evals.json`（含 failure-mode），过官方 `quick_validate.py`
-
-</td></tr>
-</table>
+| 原则 | 做法 |
+|---|---|
+| 单一真源 | monorepo 是 Skill 唯一真源，不维护分叉副本 |
+| 渐进披露 | `SKILL.md` 只保留工作流骨架，详细规则进入 `references/`，重复操作进入 `scripts/` |
+| 明确自由度 | 判断型任务保留空间；上传、清理、部署等脆弱流程使用严格顺序和验收门控 |
+| 可恢复 | 中断后优先读取本地状态和已有 URL，续写原任务，不制造重复项 |
+| 可验证 | 每个 Skill 都有场景测试；脚本必须实际运行；高风险结果必须保留可核对证据 |
+| 不越权 | 不自动发布、不编造数据、不虚构经历；删除与生产改动遵守确认边界 |
+| 构建门控 | `tools/build.sh` 校验目录名与 Skill 名称，beta Skill 不进入产物 |
 
 ## 📚 文档
 
-- [新手入门](docs/新手入门.md) — 第一次怎么用 + 全目录
-- [skill 关系图](docs/skill-link-map.md) — 成员之间怎么衔接
-- [对照实测报告](docs/eval-report-v1.md) — 14/14 逐条记分卡
+- [新手入门](docs/新手入门.md) — 第一次怎么用与完整目录
+- [Skill 关系图](docs/skill-link-map.md) — 成员之间的常见衔接
+- [长文生产管线](skills/ray/references/content-pipeline.md) — Writer → Cover → X Article 的交接与恢复
+- [对照实测报告](docs/eval-report-v1.md) — 15 项带 / 不带 Skill 逐条记分卡
 
 ---
 

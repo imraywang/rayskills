@@ -1,0 +1,73 @@
+{
+  "skill_name": "ray-x-article",
+  "evals": [
+    {
+      "id": 1,
+      "name": "长文与封面保存为草稿",
+      "type": "happy-path",
+      "prompt": "/ray-x-article 把这篇已经定稿的文章和封面放进 X Articles 后台。",
+      "expected_output": "检查文章和 5:2 封面，避免重复草稿，写入标题正文与封面，确认自动保存和预览，回写草稿地址，但不发布。",
+      "expectations": [
+        "先检查 Drafts 中是否存在同名文章",
+        "封面必须接近 5:2",
+        "使用富文本结构写入，避免把空行变成空白段落",
+        "二级标题和重点加粗与本地文章一致",
+        "验证标题、正文首尾、封面和保存状态",
+        "把草稿 URL 和内容指纹回写本地文章",
+        "不点击 Publish"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "拒绝用普通 Post 冒充 Article",
+      "type": "boundary",
+      "prompt": "/ray-x-article 用 xurl 把整篇文章发到 X Articles 草稿箱。",
+      "expected_output": "说明公开 Post 接口不能建立 Article 草稿，改用登录中的 X Articles 编辑器，并停在草稿状态。",
+      "expectations": [
+        "不调用普通 Post 发布接口",
+        "使用 X Articles 编辑器",
+        "不自动发布"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "已有同名草稿时续写",
+      "type": "failure-mode",
+      "prompt": "/ray-x-article 再把这篇文章放进后台，之前可能已经存过一次。",
+      "expected_output": "先按本地草稿 URL 或标题查找已有草稿，存在时打开更新，不连续创建重复草稿。",
+      "expectations": [
+        "优先使用本地记录的草稿 URL",
+        "找不到 URL 时再按标题检查 Drafts",
+        "不会新建第二份同名草稿"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "封面权限失败后原地恢复",
+      "type": "failure-mode",
+      "prompt": "/ray-x-article 正文已经在草稿里，但上传封面时 Chrome 提示 Not allowed。现在权限已开启，继续完成。",
+      "expected_output": "读取本地 draft-needs-cover 和已有 URL，打开同一草稿，只补传 5:2 封面；经过 Edit media 点击 Apply，验证 Remove photo、Preview 和保存状态，再把状态更新为 draft，不建立新草稿。",
+      "expectations": [
+        "使用已有草稿 URL 而不是重新创建",
+        "只补封面，不重复写入正文",
+        "完成 Edit media 的 Apply 步骤",
+        "在编辑页和 Preview 都验证封面",
+        "把 draft-needs-cover 更新为 draft",
+        "不点击 Publish"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "拒绝不可浏览的长文交付包",
+      "type": "boundary",
+      "prompt": "/ray-x-article 把这篇 4000 字、没有二级标题和加粗、段落间有连续空行的文章直接放到后台。",
+      "expected_output": "准备交付包时拒绝继续，退回 ray-writer 补充阅读锚点、关键判断加粗并清理连续空行；通过后再写入 X。",
+      "expectations": [
+        "长 X Article 至少检查二级标题和加粗",
+        "拒绝会产生空白段落的连续空行",
+        "不在 X 后台边写边补内容判断",
+        "修正后重新生成交付包"
+      ]
+    }
+  ]
+}

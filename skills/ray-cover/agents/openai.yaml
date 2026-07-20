@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Cover"
+  short_description: "为公众号和 X 长文生成有判断、有识别度的编辑封面"
+  default_prompt: "Use $ray-cover to turn this article into matching WeChat and X cover assets."

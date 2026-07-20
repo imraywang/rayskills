@@ -61,6 +61,20 @@
         "把其余需求列为后续步骤,不一次全启动",
         "体现单步动态导航的路由哲学"
       ]
+    },
+    {
+      "id": 6,
+      "name": "eval-explicit-content-pipeline",
+      "type": "happy-path",
+      "prompt": "/ray 把这个 idea 走完整条管线：写成公众号长文，生成公众号和 X 封面，再保存到 X Articles 草稿箱，不要发布。",
+      "expected_output": "用户给出了清楚终点，应按内容生产管线连续执行 ray-writer、ray-cover 和 ray-x-article。每一阶段通过门控后自动交接；X 端查重、保存和预览，最后停在草稿，不要求用户逐段重复确认。",
+      "expectations": [
+        "识别为明确的端到端内容生产任务",
+        "按 ray-writer → ray-cover → ray-x-article 连续执行",
+        "每阶段使用成员 skill 的验收标准",
+        "正常交接不反复要求用户确认",
+        "只保存 X Article 草稿，不点击 Publish"
+      ]
     }
   ]
 }

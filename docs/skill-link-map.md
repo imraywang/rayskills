@@ -1,6 +1,6 @@
 # rayskills 关系图
 
-`/ray` 是主入口,读上下文分发到成员 skill。下面是成员之间的常见衔接(不是固定流水线,是"上一个结果出来后通常接哪个")。
+`/ray` 是主入口，默认读上下文分发到一个成员 skill。用户明确要求从 idea 一路做到 X 草稿时，使用已经验证的内容生产管线连续执行；发布仍单独确认。
 
 ```mermaid
 flowchart TD
@@ -16,6 +16,9 @@ flowchart TD
         METRICS["/ray-metrics\n数据周报"]
         BENCH["/ray-benchmark\n对标拆解"]
         REPORT["/ray-report\n长文报告"]
+        WRITER["/ray-writer\n长文生产"]
+        COVER["/ray-cover\n平台封面"]
+        XARTICLE["/ray-x-article\nX 后台草稿"]
     end
     subgraph CONSULT["🔍 咨询"]
         DIAG["/ray-diagnose\n就绪度诊断"]
@@ -30,7 +33,11 @@ flowchart TD
         CLEANUP["/ray-cleanup\n归档瘦身"]
     end
 
-    RAY --> INFRA & CONTENT & CONSULT & PRODUCT & OPS
+    subgraph COLLAB["🤝 协作"]
+        MULTI["/ray-multimodel\n多模型分工与验收"]
+    end
+
+    RAY --> INFRA & CONTENT & CONSULT & PRODUCT & OPS & COLLAB
 
     %% 常见衔接
     DIAG -->|诊断结论| PROP
@@ -43,6 +50,12 @@ flowchart TD
     METRICS -->|数据规律| WEEKLY
     METRICS -.->|指导下批方向| TWEET
     WEEKLY -->|读项目动态| CLEANUP
+    WRITER -->|判断与正文通过检查| COVER
+    COVER -->|5:2 Article 封面| XARTICLE
+
+    BENCH -.->|X / 网页补充调研| MULTI
+    DIAG -.->|关键结论独立复核| MULTI
+    PROP -.->|高价值方案竞赛| MULTI
 ```
 
 ## 衔接逻辑
@@ -51,4 +64,5 @@ flowchart TD
 - **实战 → 内容飞轮**:任何一段实战(开荒/巡检/上线/事故)完成后,`ray-thread` 或 `ray-tweet` 把它变成 IP 素材(守不代笔)。
 - **数据 → 决策**:`ray-metrics` 的规律喂 `ray-weekly` 的内容数据节,并指导 `ray-tweet` 下一批方向。
 - **对标 → 产品**:`ray-benchmark` 拆完可迁移点,`ray-idea` 锻造差异化产品概念。
-
+- **长文 → 封面 → X 草稿**：`ray-writer` 完成事实、情绪、二级标题、重点加粗和段落检查；`ray-cover` 从核心判断生成无字底图并确定性排版；`ray-x-article` 续写或查重、富文本写入、封面裁切、预览、保存并回写状态。用户明确要求完整管线时连续执行，发布仍由用户确认。
+- **主控 → 外部通道**:`ray-multimodel` 只在大体量执行、独立复核、方案竞赛或 X 实时调研有明确收益时启用;当前会话始终负责最终验收。

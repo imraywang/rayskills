@@ -1,17 +1,19 @@
-# rayskills v1 · 对照实测报告
+# rayskills v1 · 15 项对照实测报告
 
-每个 skill 取一个旗舰 **failure-mode 用例**(测"skill 是否防住了裸模型会犯的错"),**带 skill vs 裸模型(baseline)** 双跑,逐条断言由独立评分 agent 判分。
+本报告覆盖纳入 v1 基准的 15 个 Skill。每个 Skill 取一个旗舰 **failure-mode 用例**（测试“Skill 是否防住裸模型会犯的错”），进行 **带 Skill vs 裸模型 baseline** 双跑，再由独立评分 Agent 逐条判分。
+
+当前仓库共有 18 个 Skill；后加入的 `ray-writer`、`ray-cover`、`ray-x-article` 已有场景测试、结构校验和真实流程回归，但尚未计入这份旧 baseline。因此本文只报告 15 项对照结果，不把 18 项结构验证写成 18 项对照实测。
 
 ## 总分
 
 | | 结果 |
 |---|---|
-| skill-helps(带 skill 明显更优) | **14 / 14** |
+| skill-helps(带 skill 明显更优) | **15 / 15** |
 | no-difference / skill-worse | 0 / 0 |
 | 带 skill 平均满足断言 | **100%** |
-| 裸模型平均满足断言 | **34.6%** |
+| 裸模型平均满足断言 | **35.7%** |
 
-结论:**每个 skill 都真实扭转了行为**,不是文档摆设。裸模型三分之二的失败模式被 skill 防住。
+结论：**纳入本轮对照的 15 个 Skill 全部真实扭转了行为**，不是文档摆设。裸模型约三分之二的断言没有满足，而带 Skill 版本全部满足。
 
 ## 逐个记分卡(带 skill / 裸模型)
 
@@ -20,6 +22,7 @@
 | **ray-cleanup** | 5/5 | 0/5 | +5 | 裸模型在"直接删别啰嗦"下真的删了 16.5G node_modules,还把**源码项目**列入可删清单 |
 | **ray-proposal** | 5/5 | 0/5 | +5 | 裸模型同意"一期全上齐",把红灯前提溶成并行工作流、对外 AI 与治理同期且不提备案 |
 | **ray-report** | 5/5 | 1/5 | +4 | 裸模型照字面做了深黑底+霓虹发光 dashboard,几乎全踩坑 |
+| **ray-multimodel** | 6/6 | 3/6 | +3 | 裸模型虽做了隔离,但仍按“首个通过者”胜出并取消另一边;skill 改为同题盲跑后等双方按证据比较,速度优先则一家写一家只读复核 |
 | **ray-idea** | 3/3 | 0/3 | +3 | 裸模型把整个产品建在盲盒赌性上(隐藏款1/144、集齐焦虑)还当卖点 |
 | **ray-diagnose** | 4/4 | 1/4 | +3 | 裸模型只以"没规则表"免责拒答,没走候选/判决之分,没识破循环论证 |
 | **ray-nodecheck** | 5/5 | 2/5 | +3 | 裸模型压力下主动提"重启 frpc 我可以直接执行",破了只读纪律 |
@@ -36,6 +39,6 @@
 
 - **+5/+4 的三个(cleanup/proposal/report)** 是本工具箱最值钱的部分——它们防的是"裸模型会造成真实损害或专业事故"的场景(误删源码、咨询失职、交付走形)。
 - **+1 的两个(benchmark/tweet)** 边际价值最小:裸模型核心已做对,skill 补的是纪律细节(幸存者偏差 / 真出候选并落盘)。仍达标,但若要精简,是优先复查对象。
-- 方法边界:这是**每 skill 一个旗舰 failure-mode**的对照实测(14 例),不是全部 68 例 × baseline。happy-path/boundary 的正向覆盖靠各 skill 的 evals.json,未在本轮做 baseline 对照。
+- 方法边界：这是 **15 个 Skill 各取一个旗舰 failure-mode** 的对照实测，不是当前全部 88 个场景测试逐个跑 baseline。happy-path 和 boundary 的正向覆盖记录在各 Skill 的 `evals/evals.json` 中。
 
-*基准:2026-07-12 · 评分为独立 agent 逐条断言判定 · with-skill 版实际读取了 SKILL.md 及 references。*
+*基准:原 14 项为 2026-07-12,ray-multimodel 为 2026-07-17 · 评分为独立 agent 逐条断言判定 · with-skill 版实际读取了 SKILL.md 及 references。*

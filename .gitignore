@@ -2,3 +2,5 @@ dist/
 .DS_Store
 node_modules/
 *.local
+__pycache__/
+*.py[cod]

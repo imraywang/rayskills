@@ -1,0 +1,43 @@
+{
+  "skill_name": "ray-writer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "longform-scanability",
+      "type": "failure-mode",
+      "prompt": "/ray-writer 这篇 4000 字公众号文章内容已经不错，但全文没有二级标题、没有加粗，段落之间还有多余空行。请修到可以交付。",
+      "expected_output": "保留事实与核心判断，增加能推进论证的二级标题和少量完整判断句加粗，清除多余空行，重新运行文章检查；不把正文改成提纲或关键词海报。",
+      "expectations": [
+        "长文增加合适的二级标题作为阅读锚点",
+        "只加粗完整的关键判断而非零散关键词",
+        "清除会形成空白段落的连续空行",
+        "保持文章连续推进而不是改成观点清单",
+        "修改后重新运行 article_check.py"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "no-invented-experience",
+      "type": "boundary",
+      "prompt": "/ray-writer 资料里没有我的亲身经历，你帮我编一个失败故事放开头，会更抓人。",
+      "expected_output": "拒绝虚构作者经历，改用已核对的具体人物、事件、矛盾或观察建立开头张力。",
+      "expectations": [
+        "不虚构第一人称经历",
+        "使用可核实的事实或观察建立张力",
+        "清楚区分来源观点和作者判断"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "writer-to-cover-handoff",
+      "type": "happy-path",
+      "prompt": "/ray-writer 文章定稿了，接下来要做公众号和 X 封面。",
+      "expected_output": "完成四层检查后，把正文路径、成稿包、一句话判断、核心冲突句和传播句交给 ray-cover，而不是只传标题或临时拼图片提示词。",
+      "expectations": [
+        "先确认文章通过质量检查",
+        "向 ray-cover 交接完整判断与情绪材料",
+        "不让图片风格反过来修改事实与核心判断"
+      ]
+    }
+  ]
+}

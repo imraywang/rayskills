@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Multimodel"
+  short_description: "让 Grok、Claude、Codex 分工协作并由主控验收"
+  default_prompt: "Use $ray-multimodel to route this task to the smallest useful set of models and verify the final result."

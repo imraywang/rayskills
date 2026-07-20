@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray X Article"
+  short_description: "把长文和封面可靠送入 X Articles 草稿箱"
+  default_prompt: "Use $ray-x-article to prepare this article and save it as an X Articles draft without publishing."
