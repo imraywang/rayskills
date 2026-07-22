@@ -133,7 +133,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
-v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式。方法论没有丢——合并项的完整流程和 eval 场景都随合并保留。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。
+v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式。方法论没有丢——合并项的完整流程和 eval 场景都随合并保留。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。v1 老用户升级请看 [从 v1 升级](#从-v1-升级)。
 
 最能体现 Skill 价值的不是文风，而是防住真实损害：
 
@@ -188,6 +188,23 @@ npx -y skills add imraywang/rayskills -g --all
 ```
 
 第一次使用建议先看 [新手入门](docs/新手入门.md)。
+
+### 从 v1 升级
+
+装过 v1（21 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 14 个成员，**不会删除远端已经不存在的旧 skill**。9 个旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等会和新的 `ray-consult`、`ray-writer` 抢触发，建议先清理再更新：
+
+```bash
+for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
+```
+
+旧成员去向对照：
+
+| v1 | v2 去处 |
+|---|---|
+| `ray-diagnose` / `ray-proposal` | 合并为 `/ray-consult`（诊断段 → 方案段） |
+| `ray-vpsinit` / `ray-nodecheck` | 合并为 `/ray-vps`（开荒 / `check` 巡检） |
+| `ray-thread` | `/ray-writer` 的 thread 骨架模式 |
+| `ray-tweet` · `ray-idea` · `ray-cleanup` · `ray-weekly` | 已删除，需要时直接向 Agent 描述任务即可 |
 
 ### WorkBuddy
 
