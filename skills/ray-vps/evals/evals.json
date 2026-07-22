@@ -6,14 +6,14 @@
       "name": "eval-bare-metal-full-flow",
       "type": "happy-path",
       "prompt": "刚开了台新的小鸡,/ray-vps root@45.32.11.8 帮我从头开荒,当代理节点用,内存只有 1G。",
-      "expected_output": "按 Step0→Step4 全流程走。Step0 先连通盘点,记录架构/发行版/内存/磁盘和已占端口集合。Step1 加固顺序固定:先装公钥并用密钥另开连接实测能登,再关密码认证;配 BBR 并验证 tcp_congestion_control 输出 bbr;设时区、装 unattended-upgrades;1G 小鸡加 swap;确认 NTP active。Step2 代理栈:代理端口从偏好序列里挑第一个不在已占清单的,面板端口另选高位;3x-ui pin 到 v3.4.1 而非 latest,装完用 CLI 强制重置凭证;生成 Reality 密钥时按版本兼容字段名;SNI 选证书够小的站,client email 非空且唯一,保留 flow/fingerprint/shortId。Step3 防火墙探测式放行(ufw/iptables/云安全组三选一)。Step4 curl 端到端验证(400/200 都算活),产出交接清单且敏感凭证只给存放位置。每个破坏性动作前有闸。",
+      "expected_output": "按 Step0→Step4 全流程走。Step0 先连通盘点,记录架构/发行版/内存/磁盘和已占端口集合。Step1 加固顺序固定:先装公钥并用密钥另开连接实测能登,再关密码认证;配 BBR 并验证 tcp_congestion_control 输出 bbr;设时区、装 unattended-upgrades;1G 小鸡加 swap;确认 NTP active。Step2 代理栈:代理端口从偏好序列里挑第一个不在已占清单的,面板端口另选高位;3x-ui 装最新稳定 release(master install.sh 不带版本参数),装完 x-ui version 记录实际版本写进交接清单,再用 CLI 强制重置凭证;生成 Reality 密钥时字段名以实际输出为准按版本兼容;SNI 选证书够小的站,client email 非空且唯一,保留 flow/fingerprint/shortId。Step3 防火墙探测式放行(ufw/iptables/云安全组三选一)。Step4 curl 端到端验证(400/200 都算活),产出交接清单且敏感凭证只给存放位置。每个破坏性动作前有闸。",
       "expectations": [
         "先做连通盘点并记录架构/发行版/内存/磁盘/已占端口集合",
         "加固顺序是先装公钥并验证新连接能用密钥登录,再关密码认证",
         "识别 1G 内存小鸡需要加 swap",
         "配置 BBR 后验证 tcp_congestion_control 输出为 bbr",
         "选代理端口时对照已占端口清单避开冲突",
-        "3x-ui 安装 pin 到具体版本 v3.4.1 而非 latest",
+        "3x-ui 装最新稳定 release,装完记录实际版本号以便复现",
         "用 curl 端到端验证并把返回 400 或 200 都判为存活",
         "交接清单里面板/节点凭证只给存放位置不打印明文"
       ]

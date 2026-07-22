@@ -95,15 +95,18 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
 **2a. 选端口**:从偏好序列 `443 → 2083 → 8443 → 2053 → 2087 → 2096` 里挑第一个不在已占清单里的。面板端口另选一个高位端口。
 
-**2b. 装 3x-ui(版本 pin)**
+**2b. 装 3x-ui(装最新 release)**
 ```bash
-echo 'y' | bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/v3.4.1/install.sh) v3.4.1
+# master 分支的 install.sh 不带版本参数即装最新稳定 release
+echo 'y' | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+x-ui version   # 记下实际安装的版本号,写进交接清单以便日后复现与排障
 ```
 - 安装脚本是交互式的,pipe 不可靠——策略是**装默认,然后 CLI 强制重置凭证**:
 ```bash
 /usr/local/x-ui/x-ui setting -username <u> -password <p> -port <panel_port> -webBasePath /
 systemctl restart x-ui
 ```
+> 不 pin 版本换来安全修复与新特性,代价是上游行为可能变化。兜底靠两处:Step 4 的端到端验证会暴露大部分破坏性变化;下面 2c/2d 的坑位说明都按"字段名与行为随版本漂移"来写,不绑定单一版本。真出现装最新踩到未知坑,再回退到官方某个已知良好的 tag(在上面命令末尾追加该 tag,如 `... install.sh) v3.5.0`)并在交接清单标注。
 
 **2c. 生成 Reality 密钥(版本坑)**
 
@@ -112,14 +115,14 @@ systemctl restart x-ui
 | Xray 版本 | 私钥字段 | 公钥字段 |
 |---|---|---|
 | 旧版 | `Private key:` | `Public key:` |
-| v26.x | `PrivateKey:` | `Password (PublicKey):` 或 `Password:` |
+| 较新版(v26.x 起) | `PrivateKey:` | `Password (PublicKey):` 或 `Password:` |
 
-xray 二进制位置:`/usr/local/x-ui/bin/xray-linux-*`(glob 匹配,兼容 amd64/arm64)。
+装最新 release 通常命中后一行,但字段名以 `xray x25519` 的实际输出为准,别硬套。xray 二进制位置:`/usr/local/x-ui/bin/xray-linux-*`(glob 匹配,兼容 amd64/arm64)。
 
 **2d. 入站配置(三个实测坑)**
 
-1. **SNI 选型**:dest 站点的 TLS 证书必须 ≤8192 字节(xray-core 硬编码上限)。`www.microsoft.com` 的证书已超限,在 xray-core 26.x 上握手失败——用 `www.apple.com` / `www.cloudflare.com` / `www.bing.com`
-2. **client email 必须非空且唯一**:3x-ui 3.4.x 会静默丢弃空 email 的 client,导致 `clients: null`、全部握手失败且无报错。命名建议 `<remark>-<随机3字节hex>`
+1. **SNI 选型**:dest 站点的 TLS 证书必须 ≤8192 字节(xray-core 硬编码上限,长期存在与版本无关)。`www.microsoft.com` 的证书已超限,在较新 xray-core 上握手失败——用 `www.apple.com` / `www.cloudflare.com` / `www.bing.com`
+2. **client email 必须非空且唯一**:3x-ui 会静默丢弃空 email 的 client,导致 `clients: null`、全部握手失败且无报错(在 3.4.x 实测,新版是否已修以实际为准;无论如何,填非空且唯一的 email 永远安全)。命名建议 `<remark>-<随机3字节hex>`
 3. 关键字段:`flow: xtls-rprx-vision`、`fingerprint: chrome`、`shortId` 用 4 字节 hex、sniffing `destOverride: [http, tls, quic, fakedns]`
 
 ### Step 3:防火墙
