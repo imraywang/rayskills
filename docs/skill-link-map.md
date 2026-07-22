@@ -14,7 +14,7 @@ flowchart TD
         METRICS["/ray-metrics\n数据周报"]
         BENCH["/ray-benchmark\n对标拆解"]
         REPORT["/ray-report\n长文报告"]
-        WRITER["/ray-writer\n长文 · thread 骨架"]
+        WRITER["/ray-writer\n长文 · thread · 口播"]
         COVER["/ray-cover\n平台封面"]
         BROLL["/ray-broll\n拼贴 B-roll"]
         WECHAT["/ray-wechat\n公众号排版与草稿"]
@@ -27,7 +27,7 @@ flowchart TD
         LAUNCH["/ray-launch\n站上线"]
     end
     subgraph COLLAB["🤝 协作"]
-        MULTI["/ray-multimodel\n多模型分工与验收"]
+        MULTI["/ray-multimodel\n多模型分工 · Grok 实时调研"]
     end
 
     RAY --> INFRA & CONTENT & CONSULT & PRODUCT & COLLAB
@@ -39,6 +39,7 @@ flowchart TD
     METRICS -.->|数据规律指导下批内容方向| WRITER
     OBSIDIAN -->|知识库根目录与模板| WRITER
     WRITER -->|判断与正文通过检查| COVER
+    WRITER -->|口播稿与拍摄节奏| BROLL
     COVER -->|公众号封面与定稿| WECHAT
     COVER -->|5:2 Article 封面| XARTICLE
     COVER -.-|共享编辑拼贴视觉体系| BROLL
@@ -54,7 +55,8 @@ flowchart TD
 - **数据 → 决策**:`ray-metrics` 的规律指导下一批内容的方向与形式,不代笔具体文案。
 - **对标 → 内容**:`ray-benchmark` 拆完可迁移点,交 `ray-writer` 写成长文或 thread。
 - **知识库 → 长文 → 封面 → 平台草稿**：没有兼容知识库时，`ray-obsidian` 先安全建立资料、知识、成稿包、草稿和发布结构；`ray-writer` 完成事实、情绪、二级标题、重点加粗和段落检查；`ray-cover` 从核心判断出发,默认 Image 2 直出并逐字检查,必要时回退无字底图 + 确定性排版；`ray-wechat` 负责公众号排版、预览确认、原草稿更新和 UTF-8 回读；`ray-x-article` 负责 X 草稿续写或查重、富文本写入、封面裁切、预览和保存。用户明确要求完整管线时连续执行，线上写入与发布仍由用户确认。
-- **主控 → 外部通道**:`ray-multimodel` 只在大体量执行、独立复核、方案竞赛或 X 实时调研有明确收益时启用;当前会话始终负责最终验收。
+- **母稿 → 多次分发**：`ray-writer` 把通过检查的长文作为唯一真源，重新选一个适合视频的判断，生成带母稿指纹的口播稿、拍摄节奏和素材清单；需要拼贴画面时再交给 `ray-broll`。公众号和 X 继续各自做格式转换，图片长文先保留视觉接口，后续再接独立样式系统。
+- **主控 → 外部通道**:`ray-multimodel` 只在大体量执行、独立复核、方案竞赛，或 X / Reddit / 网页实时调研有明确收益时启用。`scout` 使用隔离的 Grok 搜索流程，默认 quick，明确要求深度核实时使用 deep；当前会话始终负责最终验收。
 
 ## 精简说明（v2）
 

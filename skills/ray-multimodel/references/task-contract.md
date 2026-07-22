@@ -35,6 +35,12 @@ VERIFICATION
 <主控可重新执行的命令或检查>
 <调研任务要求的来源字段与日期>
 
+SCOUT SETTINGS（仅 scout）
+PLATFORM: x | reddit | web | auto
+DEPTH: quick | deep
+SINCE: <7d 或 ISO-8601 时间；没有严格起点时写 none>
+<quick 不追加浏览器或第二条搜索；deep 说明哪些关键判断需要独立核查>
+
 Return only the LANE REPORT below. Do not claim success without evidence.
 ```
 
@@ -46,8 +52,8 @@ PROVIDER: grok | claude | codex
 MODE: fast | review | race | scout
 STATUS: complete | partial | unavailable | permission_denied | timeout
 OBJECTIVE: <一句话>
-ARTIFACTS: <文件、差异、候选或来源>
-EVIDENCE: <实际运行结果、定位信息或原始链接>
+ARTIFACTS: <文件、差异、候选或来源；scout 写 run_id 与 result_path>
+EVIDENCE: <实际运行结果、定位信息或原始链接；scout 写时间窗和来源限制>
 GAPS: <未完成项、歧义、风险；没有写 none>
 ```
 

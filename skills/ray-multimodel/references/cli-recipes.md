@@ -24,9 +24,26 @@ codex --version
 
 只在计划使用对应通道时检查它。不要为了“完整”把三家都唤醒。
 
-## Grok
+## Grok 实时搜索（scout）
 
-适合 `fast`、`review`、`scout`，也可作为 `race` 的一条通道。
+`scout` 优先使用 Skill 自带的隔离搜索脚本，不直接把当前项目目录交给 Grok：
+
+```text
+python3 <skill-dir>/scripts/run_search.py run --platform x --depth quick --since 7d "<完整调研任务>"
+python3 <skill-dir>/scripts/run_search.py run --platform auto --depth deep --since 30d "<需要交叉核验的调研任务>"
+```
+
+- `x`：账号、帖子、线程、互动和当前 X 讨论。
+- `reddit`：社区帖子、评论、抱怨和用户反馈。
+- `web`：用户明确要求 Grok 参与的普通网页调研。
+- `auto`：跨平台问题。
+- 默认 `quick`；用户明确要求核实、深挖或高置信度时才用 `deep`。
+
+脚本固定使用 Grok 4.5，自动检查登录与隔离状态，只开放当前平台需要的搜索工具，并把可继续追问的结果保存在私有缓存中。命令只在标准输出返回简短状态；按 `result_path` 读取结果，不要把中间输出当成完成。
+
+## Grok 执行与复核
+
+适合 `fast`、`review`，也可作为 `race` 的一条通道。`scout` 使用上面的隔离搜索流程。
 
 - 使用单次/提示文件模式，避免人工界面。
 - 指定明确工作目录。
@@ -40,10 +57,10 @@ codex --version
 ```text
 grok --prompt-file <task-file> --cwd <target-dir> --permission-mode plan --output-format json --no-subagents
 
-grok --prompt-file <task-file> --cwd <isolated-worktree> --permission-mode acceptEdits --output-format json --no-subagents --check
+grok --prompt-file <task-file> --cwd <isolated-worktree> --permission-mode acceptEdits --output-format json --no-subagents
 ```
 
-不要使用无限制自动批准。若 `plan` 阻止必要的只读搜索，按最小范围允许具体读取或搜索工具，不要整体放开。
+不要把 `--no-subagents` 与 `--check` 放在同一次调用中。不要使用无限制自动批准。若 `plan` 阻止必要的只读搜索，按最小范围允许具体读取或搜索工具，不要整体放开。
 
 ## Claude
 

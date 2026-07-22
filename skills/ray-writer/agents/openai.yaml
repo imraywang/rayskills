@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray Writer"
-  short_description: "从知识库装配有事实、有情绪、有网感和传播力的中文长文并完成核验"
-  default_prompt: "Use $ray-writer to turn this idea or source note into a verified Chinese long-form article."
+  short_description: "把素材写成长文、thread 骨架或可拍口播稿并完成核验"
+  default_prompt: "Use $ray-writer to turn this source into a verified Chinese article or a shootable oral-video script."

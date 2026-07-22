@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray Multimodel"
-  short_description: "让 Grok、Claude、Codex 分工协作并由主控验收"
-  default_prompt: "Use $ray-multimodel to route this task to the smallest useful set of models and verify the final result."
+  short_description: "多模型分工验收，并用 Grok 实时调研 X、Reddit 和网页"
+  default_prompt: "Use $ray-multimodel to route this task, run isolated Grok research when needed, and verify the final result."

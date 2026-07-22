@@ -17,3 +17,7 @@ measures that legally restrict others from doing anything the license permits.
 Copyright (c) 2026 imraywang
 https://x.com/wangray
 https://github.com/imraywang/rayskills
+
+Third-party components are not relicensed by this file. The bundled
+codex-grok-search component under skills/ray-multimodel retains its MIT
+license; see skills/ray-multimodel/LICENSE.codex-grok-search.

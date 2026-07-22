@@ -112,6 +112,9 @@ def source_blocks(markdown_body: str) -> tuple[list[str], int, int, bool]:
             flush()
             blocks.append(re.sub(r"\s+", "", line[4:]))
             continue
+        if re.fullmatch(r"(?:---+|\*\*\*+|___+)", line):
+            flush()
+            continue
         line = re.sub(r"^(?:>|[-*+] |\d+[.)] )\s*", "", line)
         if re.fullmatch(r"!\[[^\]]*\]\([^)]+\)", line):
             continue

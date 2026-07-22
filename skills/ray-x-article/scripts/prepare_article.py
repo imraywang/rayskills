@@ -55,6 +55,19 @@ def inline_html(text):
     return value
 
 
+def strip_leading_title(markdown):
+    lines = markdown.replace("\r\n", "\n").splitlines()
+    for index, line in enumerate(lines):
+        if not line.strip():
+            continue
+        # The X editor has a dedicated title field. A leading H1 therefore
+        # belongs there even when its wording differs slightly from --title.
+        if re.match(r"^#\s+\S", line):
+            return "\n".join(lines[:index] + lines[index + 1 :]).lstrip()
+        break
+    return markdown
+
+
 def rich_html(markdown):
     if INLINE_IMAGE.search(markdown):
         raise ValueError("正文含行内图片；请先决定在 X 编辑器中的插入位置")
@@ -67,10 +80,10 @@ def rich_html(markdown):
             level = 2 if len(match.group(1)) <= 2 else 3
             rendered.append(f"<h{level}>{inline_html(match.group(2))}</h{level}>")
         elif lines and all(re.match(r"^[-*+]\s+", line) for line in lines):
-            items = "".join(f"<li>{inline_html(re.sub(r'^[-*+]\\s+', '', line))}</li>" for line in lines)
+            items = "".join(f"<li>{inline_html(re.sub(r'^[-*+]\s+', '', line))}</li>" for line in lines)
             rendered.append(f"<ul>{items}</ul>")
         elif lines and all(re.match(r"^\d+[.)]\s+", line) for line in lines):
-            items = "".join(f"<li>{inline_html(re.sub(r'^\\d+[.)]\\s+', '', line))}</li>" for line in lines)
+            items = "".join(f"<li>{inline_html(re.sub(r'^\d+[.)]\s+', '', line))}</li>" for line in lines)
             rendered.append(f"<ol>{items}</ol>")
         else:
             paragraph = "<br>".join(inline_html(re.sub(r"^>\s?", "", line)) for line in lines)
@@ -97,14 +110,15 @@ def main():
     raw = article.read_text(encoding="utf-8")
     frontmatter, markdown = split_frontmatter(raw)
     title = (args.title or scalar(frontmatter, "title")).strip()
-    body = plain_body(markdown)
-    body_html = rich_html(markdown)
-    source_blocks = [part.strip() for part in re.split(r"\n\s*\n", markdown) if part.strip()]
-    h2_count = len(re.findall(r"(?m)^##\s+\S", markdown))
-    bold_count = len(BOLD.findall(markdown))
-    extra_blank_runs = len(re.findall(r"\n{3,}", markdown.replace("\r\n", "\n")))
     if not title:
         raise ValueError("missing article title")
+    editor_markdown = strip_leading_title(markdown)
+    body = plain_body(editor_markdown)
+    body_html = rich_html(editor_markdown)
+    source_blocks = [part.strip() for part in re.split(r"\n\s*\n", editor_markdown) if part.strip()]
+    h2_count = len(re.findall(r"(?m)^##\s+\S", editor_markdown))
+    bold_count = len(BOLD.findall(editor_markdown))
+    extra_blank_runs = len(re.findall(r"\n{3,}", editor_markdown.replace("\r\n", "\n")))
     if len(title) > 120:
         raise ValueError("title is longer than 120 characters")
     if len(body) < 200:

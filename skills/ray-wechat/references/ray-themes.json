@@ -1,0 +1,77 @@
+{
+  "ray-judgment": {
+    "name": "Ray 判断",
+    "description": "黑白为主、暗红点睛。用于观点、争议判断和需要推动读者行动的文章。",
+    "preview_background": "#f2f2f2",
+    "styles": {
+      "container": "max-width:680px;margin:0 auto;padding:18px 20px 42px;background-color:#ffffff;color:#202020;font-family:-apple-system,BlinkMacSystemFont,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;font-size:16px;line-height:1.86;letter-spacing:0.01em;word-wrap:break-word;",
+      "h2": "margin:38px 0 18px;padding:10px 0 10px 14px;border-left:4px solid #b4232c;color:#171717;font-size:20px;font-weight:700;line-height:1.45;letter-spacing:0.01em;",
+      "h3": "margin:28px 0 14px;color:#222222;font-size:17px;font-weight:700;line-height:1.5;",
+      "p": "margin:17px 0;color:#2a2a2a;font-size:16px;line-height:1.86;",
+      "strong": "color:#171717;font-weight:700;border-bottom:2px solid #e8a2a7;",
+      "em": "color:#555555;font-style:italic;",
+      "a": "color:#8f1d25;text-decoration:none;border-bottom:1px solid #d9a0a4;",
+      "ul": "margin:18px 0;padding-left:24px;color:#2a2a2a;",
+      "ol": "margin:18px 0;padding-left:26px;color:#2a2a2a;",
+      "li": "margin:9px 0;padding-left:3px;color:#2a2a2a;font-size:16px;line-height:1.78;",
+      "blockquote": "margin:24px 0;padding:4px 0 4px 16px;border-left:3px solid #b4232c;color:#454545;font-size:15px;line-height:1.78;",
+      "code": "padding:2px 5px;border-radius:3px;background-color:#f3f3f3;color:#8f1d25;font-family:Menlo,Consolas,monospace;font-size:14px;",
+      "pre": "margin:22px 0;padding:16px 18px;border:1px solid #dddddd;border-radius:4px;background-color:#f7f7f7;color:#222222;font-family:Menlo,Consolas,monospace;font-size:13px;line-height:1.65;overflow-x:auto;",
+      "hr": "margin:36px auto;border:none;border-top:1px solid #d8d8d8;width:72px;",
+      "img": "max-width:100%;height:auto;display:block;margin:24px auto;",
+      "table": "width:100%;margin:22px 0;border-collapse:collapse;font-size:14px;line-height:1.6;",
+      "th": "padding:9px 10px;border-top:2px solid #222222;border-bottom:1px solid #999999;background-color:#ffffff;color:#222222;font-weight:700;text-align:left;",
+      "td": "padding:9px 10px;border-bottom:1px solid #dddddd;color:#333333;vertical-align:top;"
+    }
+  },
+  "ray-method": {
+    "name": "Ray 方法",
+    "description": "暖白纸张、焦橙索引。用于教程、操作步骤、工具盘点和行动指南。",
+    "preview_background": "#eeeae2",
+    "styles": {
+      "container": "max-width:680px;margin:0 auto;padding:18px 20px 42px;background-color:#fbfaf7;color:#26241f;font-family:-apple-system,BlinkMacSystemFont,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;font-size:16px;line-height:1.84;letter-spacing:0.01em;word-wrap:break-word;",
+      "h2": "margin:38px 0 18px;padding:12px 0 9px;border-top:3px solid #bd5428;border-bottom:1px solid #d9d2c6;color:#24211d;font-size:20px;font-weight:700;line-height:1.45;",
+      "h3": "margin:28px 0 14px;padding-left:12px;border-left:3px solid #bd5428;color:#2b2823;font-size:17px;font-weight:700;line-height:1.5;",
+      "p": "margin:17px 0;color:#312e29;font-size:16px;line-height:1.84;",
+      "strong": "color:#9f3f1a;font-weight:700;",
+      "em": "color:#655f56;font-style:italic;",
+      "a": "color:#9f3f1a;text-decoration:none;border-bottom:1px solid #d8a288;",
+      "ul": "margin:18px 0;padding-left:24px;color:#312e29;",
+      "ol": "margin:18px 0;padding-left:26px;color:#312e29;",
+      "li": "margin:9px 0;padding-left:3px;color:#312e29;font-size:16px;line-height:1.76;",
+      "blockquote": "margin:24px 0;padding:13px 16px;border-left:3px solid #bd5428;background-color:#f4efe7;color:#4a443b;font-size:15px;line-height:1.76;",
+      "code": "padding:2px 5px;border:1px solid #ded7cc;border-radius:3px;background-color:#f3efe8;color:#9f3f1a;font-family:Menlo,Consolas,monospace;font-size:14px;",
+      "pre": "margin:22px 0;padding:16px 18px;border:1px solid #d8d0c4;border-radius:4px;background-color:#f3efe8;color:#28251f;font-family:Menlo,Consolas,monospace;font-size:13px;line-height:1.65;overflow-x:auto;",
+      "hr": "margin:36px auto;border:none;border-top:2px solid #bd5428;width:52px;",
+      "img": "max-width:100%;height:auto;display:block;margin:24px auto;border-radius:3px;",
+      "table": "width:100%;margin:22px 0;border-collapse:collapse;font-size:14px;line-height:1.6;",
+      "th": "padding:9px 10px;border:1px solid #d7cfc2;background-color:#eee7dc;color:#292620;font-weight:700;text-align:left;",
+      "td": "padding:9px 10px;border:1px solid #ddd6cb;background-color:#fbfaf7;color:#36322c;vertical-align:top;"
+    }
+  },
+  "ray-deepread": {
+    "name": "Ray 深读",
+    "description": "纸白、石墨与深蓝。用于科技评论、专业分析和需要长时间阅读的文章。",
+    "preview_background": "#edf0f2",
+    "styles": {
+      "container": "max-width:660px;margin:0 auto;padding:20px 22px 44px;background-color:#ffffff;color:#242424;font-family:-apple-system,BlinkMacSystemFont,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;font-size:16px;line-height:1.9;letter-spacing:0.012em;word-wrap:break-word;",
+      "h2": "margin:40px 0 18px;padding:11px 0;border-top:1px solid #243f55;border-bottom:1px solid #c9d1d7;color:#1c2e3c;font-size:20px;font-weight:650;line-height:1.45;",
+      "h3": "margin:29px 0 14px;color:#243f55;font-size:17px;font-weight:650;line-height:1.5;",
+      "p": "margin:18px 0;color:#30343a;font-size:16px;line-height:1.9;",
+      "strong": "color:#193a54;font-weight:700;",
+      "em": "color:#5b646c;font-style:italic;",
+      "a": "color:#24577b;text-decoration:none;border-bottom:1px solid #9fb7c8;",
+      "ul": "margin:19px 0;padding-left:24px;color:#30343a;",
+      "ol": "margin:19px 0;padding-left:26px;color:#30343a;",
+      "li": "margin:10px 0;padding-left:3px;color:#30343a;font-size:16px;line-height:1.8;",
+      "blockquote": "margin:26px 0;padding:14px 18px;border-top:1px solid #9fb0bc;border-bottom:1px solid #9fb0bc;color:#46525b;font-size:15px;line-height:1.8;font-style:italic;",
+      "code": "padding:2px 5px;border-radius:3px;background-color:#eef2f4;color:#193a54;font-family:Menlo,Consolas,monospace;font-size:14px;",
+      "pre": "margin:23px 0;padding:16px 18px;border:1px solid #ccd5db;border-radius:3px;background-color:#f4f6f7;color:#26343e;font-family:Menlo,Consolas,monospace;font-size:13px;line-height:1.68;overflow-x:auto;",
+      "hr": "margin:38px auto;border:none;border-top:1px solid #aab8c2;width:84px;",
+      "img": "max-width:100%;height:auto;display:block;margin:26px auto;",
+      "table": "width:100%;margin:23px 0;border-collapse:collapse;font-size:14px;line-height:1.65;",
+      "th": "padding:9px 10px;border-top:2px solid #243f55;border-bottom:1px solid #8396a4;background-color:#ffffff;color:#243f55;font-weight:700;text-align:left;",
+      "td": "padding:9px 10px;border-bottom:1px solid #d8dfe4;color:#343c42;vertical-align:top;"
+    }
+  }
+}
