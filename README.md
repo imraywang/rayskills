@@ -2,15 +2,15 @@
 
 # rayskills · builder 实战工具箱
 
-**21 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
+**14 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
-本地知识库 · 基建运维 · 内容生产 · X 创作 · 企业咨询 · 产品落地 · 多模型协作 · 周期复盘
+本地知识库 · 基建运维 · 内容生产 · X 创作 · 企业咨询 · 产品落地 · 多模型协作
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-21%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录21)
-[![Evals](https://img.shields.io/badge/eval%20cases-102-2563eb)](#-实测与验证)
+[![Skills](https://img.shields.io/badge/skills-14%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录14)
+[![Evals](https://img.shields.io/badge/eval%20cases-84-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-21%2F21%20pass-3fb950)](#-实测与验证)
+[![Validate](https://img.shields.io/badge/结构校验-14%2F14%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 </div>
@@ -19,7 +19,7 @@
 
 rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用先记住 21 个名字。把处境交给 `/ray`：
+不用先记住 14 个名字。把处境交给 `/ray`：
 
 - 下一步还不稳定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
@@ -27,9 +27,9 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 
 ```text
 你：我有个客户想上 AI 客服，不知道现在能不能做
-  → /ray-diagnose 做就绪度诊断
+  → /ray-consult 诊断段做就绪度评估
   → 红黄绿评级 + 变绿条件
-  → 条件清楚后再交给 /ray-proposal 出分期方案
+  → 条件清楚后继续在方案段出分期蓝图
 
 你：把这个 idea 写成文章，做公众号和 X 封面，再放进两个平台的草稿箱
   → /ray-writer 完成长文与质量检查
@@ -43,23 +43,21 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 
 | 你手上的 | rayskills 完成的 | 入口 |
 |---|---|---|
-| 一台刚买的裸机 VPS | 开荒、加固、代理栈、防火墙、验证与交接 | `/ray-vpsinit` |
-| 一批节点或中转链 | 端口、延迟、出口、流量和订阅健康巡检，只诊断不改动 | `/ray-nodecheck` |
+| 一台刚买的裸机 VPS | 开荒、加固、代理栈、防火墙、验证与交接 | `/ray-vps` |
+| 一批节点或中转链 | 端口、延迟、出口、流量和订阅健康巡检，只诊断不改动 | `/ray-vps check` |
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、成稿包、草稿、发布与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 事实清单、情绪结构、Ray 语气、可浏览中文长文 | `/ray-writer` |
+| 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-writer`（thread 模式） |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
-| 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-thread` |
 | 一周的 X 内容数据 | 周环比、top/bottom 内容、可复现规律与下周动作 | `/ray-metrics` |
 | 一个对标对象 | 拆产品、定价、增长和护城河，区分能学与学不了 | `/ray-benchmark` |
-| 一个“能不能上 AI”的客户 | 六维就绪度、病灶、风险等级与变绿条件 | `/ray-diagnose` |
-| 一份诊断结论 | 架构、选型、Phase 0–3、预算和运营责任 | `/ray-proposal` |
-| 一个人群与价格带 | 一个经过消费社会批判压测的产品概念 | `/ray-idea` |
+| 一个“能不能上 AI”的客户 | 诊断段：六维就绪度、病灶、风险等级与变绿条件 | `/ray-consult` |
+| 一份诊断结论 | 方案段：架构、选型、Phase 0–3、预算和运营责任 | `/ray-consult` |
 | 一个写好的站 | 部署、域名、SEO、表单、数据流和客户交接 | `/ray-launch` |
 | 一个适合并行或复核的大任务 | Grok、Claude、Codex 的最小充分分工与主控验收 | `/ray-multimodel` |
-| 一批沉睡项目 | 分类归档和磁盘瘦身，删除前逐项确认 | `/ray-cleanup` |
 | **不知道从哪里开始** | 读取当前处境，替你选下一步或正式管线 | **`/ray`** |
 
 ## 🧭 一张图看懂
@@ -68,13 +66,12 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 flowchart TD
     RAY(["/ray · 主路由与阶段编排"]):::hub
 
-    RAY --> INFRA["🛠 基建<br/>vpsinit · nodecheck"]
+    RAY --> INFRA["🛠 基建<br/>vps（开荒 · 巡检）"]
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer · cover · wechat · x-article<br/>thread · tweet · metrics · benchmark · report · broll"]
-    RAY --> CONSULT["🔍 咨询<br/>diagnose → proposal"]
-    RAY --> PRODUCT["📦 产品<br/>idea · launch"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · thread） · cover · wechat<br/>x-article · metrics · benchmark · report · broll"]
+    RAY --> CONSULT["🔍 咨询<br/>consult（诊断 → 方案）"]
+    RAY --> PRODUCT["📦 产品<br/>launch"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
-    RAY --> OPS["🧹 内务<br/>weekly · cleanup"]
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 成稿包"] --> WRITER["ray-writer<br/>事实 · 情绪 · 长文"]
     WRITER --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
@@ -94,7 +91,7 @@ flowchart TD
 |---|---|---|
 | `ray-obsidian`（按需） | 新建或适配用户自己的本地知识库 | 先预演；已有文件零覆盖、零移动；结构检查为 ready |
 | `ray-writer` | 从 idea、资料或草稿生成完整中文长文 | 事实可追溯；不虚构经历；有情绪曲线；长文有二级标题、关键句加粗和正常段距 |
-| `ray-cover` | 把文章判断压缩成一个视觉隐喻 | 图片模型只做无字底图；中文确定性排版；公众号、普通 X、5:2 Article 分别输出 |
+| `ray-cover` | 把文章判断压缩成一个视觉隐喻 | Image 2 直出为主并逐字检查中文；错字或漂移时回退无字底图 + 确定性排版；公众号、普通 X、5:2 Article 分别输出 |
 | `ray-wechat` | 把定稿与公众号封面送进微信草稿箱 | 先确认手机预览；优先更新原草稿；标题、摘要、封面、全文、署名和 UTF-8 回读通过 |
 | `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
 
@@ -102,31 +99,24 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（21）
+## 🗂 Skill 全目录（14）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
 | 🧭 路由 | **`/ray`** | 读取处境，选择下一步；终点明确时编排正式管线 |
-| 🛠 基建 | `/ray-vpsinit` | VPS 开荒：加固、代理栈、验证与交接 |
-| | `/ray-nodecheck` | 节点和中转链健康巡检，只读不改 |
+| 🛠 基建 | `/ray-vps` | 开荒：加固、代理栈、验证与交接；巡检：`/ray-vps check`，只读不改 |
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
-| ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 有事实、有情绪、有网感的中文长文 |
+| ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；实战经历 → thread 骨架，不代笔 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
-| | `/ray-thread` | 真实实践 → build-in-public thread 骨架，不代笔 |
-| | `/ray-tweet` | 当日 X 主题推文候选，不自动发布 |
 | | `/ray-metrics` | X 账号周报与传播规律 |
 | | `/ray-benchmark` | 对标拆解，判断可迁移性 |
 | | `/ray-report` | magazine 风格 HTML、PDF 与公众号长报告 |
-| 🔍 咨询 | `/ray-diagnose` | 企业知识库 / AI 落地前置诊断 |
-| | `/ray-proposal` | 诊断结论 → 方案蓝图、分期与预算 |
-| 📦 产品 | `/ray-idea` | 从消费社会批判框架锻造产品概念 |
-| | `/ray-launch` | 落地页 / B2B 站上线全流程 |
+| 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
+| 📦 产品 | `/ray-launch` | 落地页 / B2B 站上线全流程 |
 | 🤝 协作 | `/ray-multimodel` | Grok / Claude / Codex 分工、复核、竞赛与实时调研 |
-| 🧹 内务 | `/ray-weekly` | 项目、内容和业务线周复盘 |
-| | `/ray-cleanup` | 项目归档与磁盘瘦身，删除前确认 |
 
 `/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文，`ray-wechat` 只接收定稿并负责排版与草稿验收；三者不混用。
 
@@ -136,28 +126,28 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **21** | 包含 `/ray` 主路由与 20 个成员 |
-| 场景测试 | **102** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **21 / 21 通过** | 名称、目录、frontmatter 与资源结构有效 |
-| 对照实测 | **15 / 15 skill-helps** | 已纳入 v1 基准的 15 个 Skill 均明显优于裸模型 |
+| Skill 数量 | **14** | 包含 `/ray` 主路由与 13 个成员 |
+| 场景测试 | **84** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **14 / 14 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
-新增的 `ray-writer`、`ray-cover`、`ray-broll`、`ray-wechat`、`ray-x-article`、`ray-obsidian` 已完成真实文章、错误反例、封面任务包、公众号草稿回读、X 草稿恢复与知识库安全初始化验证，但尚未计入旧版 15 项 baseline 对照统计。因此这里分别展示 **21 项结构验证** 和 **15 项对照实测**，不把两种口径混在一起。
+v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式。方法论没有丢——合并项的完整流程和 eval 场景都随合并保留。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。
 
 最能体现 Skill 价值的不是文风，而是防住真实损害：
 
 | Skill | 防住的问题 |
 |---|---|
-| `/ray-cleanup` | 不因“直接删”而误删源码或业务数据 |
-| `/ray-proposal` | 不因老板想“一期全上”而抹掉红灯前提 |
+| `/ray-consult` | 不因老板想“一期全上”而抹掉红灯前提 |
 | `/ray-report` | 不把深度报告做成霓虹 SaaS dashboard |
 | `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
 | `/ray-writer` | 不虚构作者经历，也不交付没有阅读锚点的长文 |
 | `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
 | `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
+| `/ray-vps` | 不在只有密码可用时关掉 SSH 密码登录，巡检只读不改 |
 
-完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)。
+完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)（历史成员名单）。
 
 ## ✅ 适合 / ❌ 不适合
 
@@ -194,7 +184,7 @@ npx -y skills add imraywang/rayskills -g --all
 /ray-wechat 把定稿排版并更新到已有公众号草稿，先预览再写入
 /ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
 /ray-multimodel 让 Grok 和 Claude 独立给方案，由你验收
-/ray-vpsinit root@1.2.3.4
+/ray-vps root@1.2.3.4
 ```
 
 第一次使用建议先看 [新手入门](docs/新手入门.md)。

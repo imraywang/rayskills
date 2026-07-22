@@ -6,12 +6,12 @@
       "name": "eval-route-clear-diagnose",
       "type": "happy-path",
       "prompt": "/ray 有个客户是做母婴用品的连锁,门店 200 家,老板想搞个 AI 让导购随时能查商品知识和话术,问我能不能做。",
-      "expected_output": "应识别这是企业能否上 AI 的就绪度问题,分发到 ray-diagnose,并说明为什么是它。只选一个 skill;可提示诊断出结论后通常接 ray-proposal。不该自己就地开始做诊断的全部工作而跳过 skill,也不该同时启动多个 skill。",
+      "expected_output": "应识别这是企业能否上 AI 的就绪度问题,分发到 ray-consult 并从诊断段开始,说明为什么是它。只选一个 skill;可提示诊断出结论后通常继续进 ray-consult 的方案段。不该自己就地开始做诊断的全部工作而跳过 skill,也不该同时启动多个 skill。",
       "expectations": [
-        "分发到 ray-diagnose",
+        "分发到 ray-consult 并从诊断段开始",
         "说明选择理由(就绪度评估)",
         "只选一个 skill,不一次启动多个",
-        "可提示下一步常接 ray-proposal"
+        "可提示诊断结论出来后接方案段"
       ]
     },
     {
@@ -19,9 +19,9 @@
       "name": "eval-route-content-not-ghostwrite",
       "type": "happy-path",
       "prompt": "/ray 上周把被入侵的服务器矿马清干净了,挺有料的,想发出去。",
-      "expected_output": "应分发到 ray-thread(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给作者。不该分发到 ray-tweet(那是日常哲理声部,不是长实战叙事),也不该自己替作者写成第一人称帖子。",
+      "expected_output": "应分发到 ray-writer 的 thread 骨架模式(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给作者。不该走 ray-writer 的长文流程(这是实战叙事 thread,不是长文),也不该自己替作者写成第一人称帖子。",
       "expectations": [
-        "分发到 ray-thread 而非 ray-tweet",
+        "分发到 ray-writer 的 thread 骨架模式而非长文流程",
         "带出不代笔纪律(骨架+素材,观点留白)",
         "不替作者直接写成成品帖"
       ]
@@ -54,10 +54,10 @@
       "id": 5,
       "name": "eval-multi-line-pick-one",
       "type": "failure-mode",
-      "prompt": "/ray 我刚把新节点部署好了,想顺便巡检一下所有节点健康,再把这次部署写成一条 thread,最好还能更新下我的项目周报。",
-      "expected_output": "陷阱用例:一个请求沾了三条线(基建巡检/内容/内务)。合格行为是选此刻最该做的一步(通常是 ray-nodecheck 先确认部署成功健康),把其余(ray-thread 写 thread、ray-weekly 周报)作为'下一步'提示,而不是一次性全启动。体现单步动态导航。",
+      "prompt": "/ray 我刚把新节点部署好了,想顺便巡检一下所有节点健康,再把这次部署写成一条 thread。",
+      "expected_output": "陷阱用例:一个请求沾了两条线(基建巡检/内容)。合格行为是选此刻最该做的一步(通常是 ray-vps 巡检模式先确认部署成功健康),把其余(ray-writer thread 骨架模式写 thread)作为'下一步'提示,而不是一次性全启动。体现单步动态导航。",
       "expectations": [
-        "只选一个当前最该做的 skill(如 ray-nodecheck)",
+        "只选一个当前最该做的动作(如 ray-vps 巡检模式)",
         "把其余需求列为后续步骤,不一次全启动",
         "体现单步动态导航的路由哲学"
       ]

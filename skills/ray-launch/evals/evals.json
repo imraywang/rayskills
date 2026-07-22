@@ -65,11 +65,11 @@
       "name": "eval-out-of-scope-backend-redirect",
       "type": "boundary",
       "prompt": "我写了个 Node 后端 API 服务(Express + Postgres),没有前端页面,想部署到一台自己的 VPS 上跑起来,配好域名和 HTTPS。帮我上线。",
-      "expected_output": "越界边界用例:这是纯后端服务部署到 VPS,不是落地页/站点上线,本 skill 不该硬接。合格行为是识别出这更贴 /ray-vpsinit(机器开荒/服务部署)的范畴并改道,而不是套用 Vercel/headless/ISR/域名切换那套前端上线流程。可说明分界:ray-launch 管的是'已写好的站从代码到线上可访问+SEO+可交接',纯后端 API/服务器进程部署不在此列。",
+      "expected_output": "越界边界用例:这是纯后端服务部署到 VPS,不是落地页/站点上线,本 skill 不该硬接。合格行为是识别出这更贴 /ray-vps(机器开荒/服务部署)的范畴并改道,而不是套用 Vercel/headless/ISR/域名切换那套前端上线流程。可说明分界:ray-launch 管的是'已写好的站从代码到线上可访问+SEO+可交接',纯后端 API/服务器进程部署不在此列。",
       "expectations": [
         "识别为越界:纯后端 API 部署不属于落地页/站点上线范畴",
-        "改道到 /ray-vpsinit,不套用 Vercel/headless/ISR/域名切换流程",
-        "说清 ray-launch 与 ray-vpsinit 的分界",
+        "改道到 /ray-vps,不套用 Vercel/headless/ISR/域名切换流程",
+        "说清 ray-launch 与 ray-vps 的分界",
         "不因'部署''域名''HTTPS'等共享关键词就误接"
       ]
     }

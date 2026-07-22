@@ -1,6 +1,6 @@
 ---
 name: ray-launch
-description: 把一个已经写好的落地页 / 官网 / B2B 询盘站从"代码就绪"带到"线上可访问、SEO 就绪、数据流通、可交接"。先按"谁长期维护"选技术路线(纯静态 / headless CMS+前端 / 全栈),再走一份带真实静默失败坑位的上线 checklist:Vercel 部署、域名 DNS 切换、ISR/revalidate 数据流、SEO metadata、表单询盘链路,直到真机验证通过并交接给客户。当用户要把站上线、部署 Next 到 Vercel、接 headless WordPress/CMS、做上线前检查、切换域名、或问"这个站能不能发了"时使用。触发:/ray-launch 「项目路径或站点类型」。不用于:本地开发调试与写业务代码、纯后端服务/API 部署(那更接近 /ray-vpsinit)、内容创作或选题。
+description: 把一个已经写好的落地页 / 官网 / B2B 询盘站从"代码就绪"带到"线上可访问、SEO 就绪、数据流通、可交接"。先按"谁长期维护"选技术路线(纯静态 / headless CMS+前端 / 全栈),再走一份带真实静默失败坑位的上线 checklist:Vercel 部署、域名 DNS 切换、ISR/revalidate 数据流、SEO metadata、表单询盘链路,直到真机验证通过并交接给客户。当用户要把站上线、部署 Next 到 Vercel、接 headless WordPress/CMS、做上线前检查、切换域名、或问"这个站能不能发了"时使用。触发:/ray-launch 「项目路径或站点类型」。不用于:本地开发调试与写业务代码、纯后端服务/API 部署(那更接近 /ray-vps)、内容创作或选题。
 ---
 
 # ray-launch:落地页 / B2B 站上线全流程
