@@ -8,7 +8,7 @@
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-14%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录14)
-[![Evals](https://img.shields.io/badge/eval%20cases-93-2563eb)](#-实测与验证)
+[![Evals](https://img.shields.io/badge/eval%20cases-104-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-14%2F14%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
@@ -134,7 +134,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
 | Skill 数量 | **14** | 包含 `/ray` 主路由与 13 个成员 |
-| 场景测试 | **93** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 场景测试 | **104** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
 | 结构校验 | **14 / 14 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
