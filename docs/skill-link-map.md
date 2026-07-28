@@ -14,11 +14,14 @@ flowchart TD
         WECHAT["/ray-wechat\n公众号排版与草稿"]
         XARTICLE["/ray-x-article\nX 后台草稿"]
     end
+    subgraph CONSULT["🔍 咨询"]
+        CONSULTSKILL["/ray-consult\n诊断段 → 方案段"]
+    end
     subgraph COLLAB["🤝 协作"]
         MULTI["/ray-multimodel\n多模型分工 · Grok 实时调研"]
     end
 
-    RAY --> CONTENT & COLLAB
+    RAY --> CONTENT & CONSULT & COLLAB
 
     %% 常见衔接
     OBSIDIAN -->|知识库根目录与模板| WRITER
@@ -29,10 +32,12 @@ flowchart TD
     COVER -.-|共享编辑拼贴视觉体系| BROLL
 
     WRITER -.->|X / Reddit / 网页实时调研| MULTI
+    CONSULTSKILL -.->|关键结论独立复核或方案竞赛| MULTI
 ```
 
 ## 衔接逻辑
 
+- **咨询漏斗**:`ray-consult` 内部完成诊断段(免费诊断,漏斗入口)→ 方案段(付费方案)的正式交接。红灯诊断时,方案 Phase 0 = 补齐前提。
 - **实战 → 内容飞轮**:任何一段实战(上线/排障/事故处置)完成后,`ray-writer` 的 thread 骨架模式把它变成 IP 素材(守不代笔)。
 - **知识库 → 长文 → 封面 → 平台草稿**：没有兼容知识库时，`ray-obsidian` 先安全建立资料、知识、成稿包、草稿和发布结构；`ray-writer` 完成事实、情绪、二级标题、重点加粗和段落检查；`ray-cover` 从核心判断出发，按公众号、普通 X、5:2 Article 各自尺寸分别用 Image 2 直出，验收构图与安全区；`ray-wechat` 负责公众号排版、预览确认、原草稿更新和 UTF-8 回读；`ray-x-article` 负责 X 草稿续写或查重、富文本写入、封面裁切、预览和保存。用户明确要求完整管线时连续执行，线上写入与发布仍由用户确认。
 - **译介支线**：内容主体属于别人的文章，`ray-writer` 译介模式先过授权与署名两道门；`source_permission` 没放行时 `ray-wechat` 与 `ray-x-article` 都只做本地产物。
@@ -42,4 +47,4 @@ flowchart TD
 ## 精简说明
 
 - **v2** 按成熟度精简：`ray-diagnose` + `ray-proposal` 合并为 `ray-consult`，`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`，`ray-thread` 并入 `ray-writer` 的 thread 骨架模式；`ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly` 删除。
-- **v3** 按使用频率收敛：`ray-benchmark`、`ray-consult`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 归档进 [attic/](../attic/)，完整保留，需要时移回 `skills/` 即可重新启用。
+- **v3** 按使用频率收敛：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用；`ray-consult` 经复核保留为咨询线成员。

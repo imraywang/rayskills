@@ -2,15 +2,15 @@
 
 # rayskills · builder 实战工具箱
 
-**8 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
+**9 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
-本地知识库 · 内容生产 · X 创作 · 多模型协作
+本地知识库 · 内容生产 · X 创作 · 企业咨询 · 多模型协作
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-8%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录8)
-[![Evals](https://img.shields.io/badge/eval%20cases-63-2563eb)](#-实测与验证)
+[![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录9)
+[![Evals](https://img.shields.io/badge/eval%20cases-73-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-8%2F8%20pass-3fb950)](#-实测与验证)
+[![Validate](https://img.shields.io/badge/结构校验-9%2F9%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 </div>
@@ -19,7 +19,7 @@
 
 rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用先记住 8 个名字。把处境交给 `/ray`：
+不用先记住 9 个名字。把处境交给 `/ray`：
 
 - 下一步还不稳定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
@@ -57,6 +57,8 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
+| 一个“能不能上 AI”的客户 | 诊断段：六维就绪度、病灶、风险等级与变绿条件 | `/ray-consult` |
+| 一份诊断结论 | 方案段：架构、选型、Phase 0–3、预算和运营责任 | `/ray-consult` |
 | 一个适合并行、复核或实时调研的大任务 | Grok、Claude、Codex 的最小充分分工；隔离检索 X、Reddit、网页并由主控验收 | `/ray-multimodel` |
 | **不知道从哪里开始** | 读取当前处境，替你选下一步或正式管线 | **`/ray`** |
 
@@ -68,6 +70,7 @@ flowchart TD
 
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
     RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · thread · 口播 · 译介） · cover<br/>wechat · x-article · broll"]
+    RAY --> CONSULT["🔍 咨询<br/>consult（诊断 → 方案）"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 成稿包"] --> WRITER["ray-writer<br/>长文 · thread · 口播"]
@@ -97,7 +100,7 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（8）
+## 🗂 Skill 全目录（9）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -108,6 +111,7 @@ flowchart TD
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
+| 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
 | 🤝 协作 | `/ray-multimodel` | Grok / Claude / Codex 分工、复核、竞赛；Grok 隔离检索 X、Reddit 与网页 |
 
 `/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文，`ray-wechat` 只接收定稿并负责排版与草稿验收；三者不混用。
@@ -118,21 +122,22 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **8** | 包含 `/ray` 主路由与 7 个成员 |
-| 场景测试 | **63** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **8 / 8 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| Skill 数量 | **9** | 包含 `/ray` 主路由与 8 个成员 |
+| 场景测试 | **73** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **9 / 9 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
 v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式。
 
-v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-consult`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移入 [attic/](attic/) 归档——它们自 v1 以来没有产生真实调用记录，与高频的内容生产管线也没有阶段交接。方法论没有丢：归档目录完整保留全部流程与 eval 场景，需要时移回 `skills/` 即可重新启用。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。老用户升级请看 [从旧版本升级](#从旧版本升级)。
+v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)（按需独立使用的 Skill 集，不依赖 `/ray` 路由）——它们自 v1 以来没有产生真实调用记录，与高频的内容生产管线也没有阶段交接；`ray-consult` 经复核保留为咨询线成员。方法论没有丢：移出的 Skill 完整保留全部流程与 eval 场景。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。老用户升级请看 [从旧版本升级](#从旧版本升级)。
 
 最能体现 Skill 价值的不是文风，而是防住真实损害：
 
 | Skill | 防住的问题 |
 |---|---|
+| `/ray-consult` | 不因老板想“一期全上”而抹掉红灯前提 |
 | `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
 | `/ray-writer` | 不虚构作者经历，也不交付没有阅读锚点的长文 |
 | `/ray-writer` 译介模式 | 不把别人的文章洗成自己的原创，授权没落地不进平台草稿 |
@@ -169,6 +174,7 @@ npx -y skills add imraywang/rayskills -g --all
 安装后可以从 `/ray` 开始，也可以直接调用具体 Skill：
 
 ```text
+/ray 我有个客户想上 AI 客服，不知道该先做什么
 /ray 把这个 idea 走完整条内容管线，做到 X Articles 草稿，不要发布
 /ray-obsidian 在这个本地目录搭一套可以接写作管线的知识库
 /ray-writer 把这条剪藏发展成一篇公众号长文
@@ -183,21 +189,21 @@ npx -y skills add imraywang/rayskills -g --all
 
 ### 从旧版本升级
 
-装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 8 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
+装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 9 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
 
 ```bash
-for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-consult ray-launch ray-metrics ray-report ray-vps; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
+for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
 ```
 
 旧成员去向对照：
 
 | 旧成员 | 去处 |
 |---|---|
-| `ray-diagnose` / `ray-proposal` | v2 合并为 `ray-consult`，v3 归档进 [attic/](attic/) |
-| `ray-vpsinit` / `ray-nodecheck` | v2 合并为 `ray-vps`，v3 归档进 [attic/](attic/) |
+| `ray-diagnose` / `ray-proposal` | v2 合并为 `/ray-consult`（诊断段 → 方案段），仍是正式成员 |
+| `ray-vpsinit` / `ray-nodecheck` | v2 合并为 `ray-vps`，v3 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
 | `ray-thread` | `/ray-writer` 的 thread 骨架模式 |
 | `ray-tweet` · `ray-idea` · `ray-cleanup` · `ray-weekly` | v2 已删除，需要时直接向 Agent 描述任务即可 |
-| `ray-benchmark` · `ray-consult` · `ray-launch` · `ray-metrics` · `ray-report` · `ray-vps` | v3 按使用频率归档进 [attic/](attic/)，完整保留可随时恢复 |
+| `ray-benchmark` · `ray-launch` · `ray-metrics` · `ray-report` · `ray-vps` | v3 按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用 |
 
 ### WorkBuddy
 

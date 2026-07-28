@@ -59,6 +59,12 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 | 把定稿文章和 5:2 封面保存到 X Articles 草稿箱 | `ray-x-article` |
 | 从 idea/草稿一路做到文章、封面与 X Article 草稿 | [内容生产管线](references/content-pipeline.md) |
 
+### 咨询 Consulting
+| 用户想做的 | 分发到 |
+|---|---|
+| 评估企业能不能上知识库/AI(就绪度诊断) | `ray-consult`(诊断段) |
+| 有了诊断结论,出方案蓝图/分期/报价 | `ray-consult`(方案段) |
+
 ### 协作 Orchestration
 | 用户想做的 | 分发到 |
 |---|---|
@@ -68,6 +74,7 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 
 这些不是固定流水线,是"上一个结果出来后,通常接哪个"的经验参考:
 
+- `ray-consult` 诊断段出了结论 → 通常直接进方案段;若结论是红灯,方案的 Phase 0 就是补齐前提。
 - 任何一段实战(上线/排障/事故处置)完成 → 可接 `ray-writer` 的 thread 骨架模式把它变成内容。
 - 用户没有兼容的本地知识库、但希望内容长期积累 → 先接 `ray-obsidian` 安全初始化，再把根目录和材料交给 `ray-writer`。
 - `ray-writer` 完成并通过事实、语气与移动端可浏览性检查 → 接 `ray-cover` 生成平台封面；需要进入公众号草稿箱时接 `ray-wechat`，需要进入 X 后台时接 `ray-x-article`，两者默认只保存草稿。用户明确要求“走完整条管线”时按 [content-pipeline.md](references/content-pipeline.md) 连续执行。
