@@ -42,6 +42,11 @@ LIMITS = {
 
 DIGITAL_LONGFORM_PLATFORMS = ("公众号", "wechat", "x", "article", "长文")
 
+# 译介支线：内容属于别人，多两道原创文章没有的门。契约见 references/translation.md。
+TRANSLATION_KINDS = {"translation", "repost"}
+PERMISSION_CLEARED = {"granted", "open-license"}
+SOURCE_FIELDS = ("source_title", "source_author", "source_url", "source_permission")
+
 
 def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
     if not text.startswith("---\n"):
@@ -67,6 +72,46 @@ def add(items: list[dict[str, str]], code: str, message: str) -> None:
     items.append({"code": code, "message": message})
 
 
+def flat(value: str) -> str:
+    return re.sub(r"\s+", "", value)
+
+
+def check_translation(
+    meta: dict[str, str],
+    body: str,
+    errors: list[dict[str, str]],
+    warnings: list[dict[str, str]],
+) -> None:
+    """授权与署名两道门。译文的事实属于原作者，机器只能验证出处在不在。"""
+    fields = {key: meta.get(key, "").strip().strip('"').strip("'") for key in SOURCE_FIELDS}
+    missing = [key for key, value in fields.items() if not value]
+    if missing:
+        add(errors, "translation-frontmatter", f"译介稿缺少来源字段：{'、'.join(missing)}")
+
+    permission = fields["source_permission"]
+    if permission and permission not in PERMISSION_CLEARED:
+        add(
+            errors,
+            "translation-permission",
+            f"source_permission 是 {permission}，未获授权的译稿只能停在本地，不进平台草稿",
+        )
+
+    visible = flat(body)
+    for key, label in (("source_url", "原文链接"), ("source_author", "原作者")):
+        value = fields[key]
+        if value and flat(value) not in visible:
+            add(errors, "translation-attribution", f"正文里找不到{label}，读者看不到的出处不算署名")
+
+    # 出处块自己就带"译文由 Ray 负责"这类句子，所以引用行不计入。
+    first_person = len(re.findall(r"(?m)^(?!\s*>).*我", body))
+    if first_person:
+        add(
+            warnings,
+            "translation-first-person",
+            f"正文有 {first_person} 行出现第一人称，逐处确认说话的是原作者还是 Ray",
+        )
+
+
 def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object]:
     text = path.read_text(encoding="utf-8")
     meta, body = split_frontmatter(text)
@@ -87,10 +132,17 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
     is_digital_longform = body_chars >= 2500 and any(
         marker in platform for marker in DIGITAL_LONGFORM_PLATFORMS
     )
+    kind = meta.get("kind", "").strip().strip('"').strip("'")
+    is_translation = kind in TRANSLATION_KINDS
 
     minimum, maximum = LIMITS[profile]
     if body_chars < minimum:
-        add(errors, "length-short", f"正文 {body_chars} 字，{profile} 建议至少 {minimum} 字")
+        # 译文长度由原文决定，写短了不是作者可以修的问题。
+        add(
+            warnings if is_translation else errors,
+            "length-short",
+            f"正文 {body_chars} 字，{profile} 建议至少 {minimum} 字",
+        )
     if body_chars > maximum:
         add(warnings, "length-long", f"正文 {body_chars} 字，超过 {profile} 建议上限 {maximum} 字")
 
@@ -135,9 +187,13 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
     if "prototype" not in meta:
         add(warnings, "missing-prototype", "页首未写文章原型，检查器采用了推断值")
 
+    if is_translation:
+        check_translation(meta, body, errors, warnings)
+
     return {
         "path": str(path),
         "profile": profile,
+        "kind": kind,
         "metrics": {
             "body_chars": body_chars,
             "paragraphs": len(paragraphs),
@@ -173,6 +229,8 @@ def main() -> int:
     else:
         print(f"文章：{result['path']}")
         print(f"原型：{result['profile']}")
+        if result["kind"] in TRANSLATION_KINDS:
+            print(f"类型：{result['kind']}（译介支线，额外验证授权与署名）")
         print(f"指标：{json.dumps(result['metrics'], ensure_ascii=False)}")
         for item in result["errors"]:
             print(f"错误 [{item['code']}] {item['message']}")
