@@ -47,14 +47,13 @@ def main():
 
     prompt_raw = str(data.get("image_prompt", ""))
     prompt = prompt_raw.lower()
-    fallback_prompt = str(data.get("fallback_image_prompt", "")).lower()
-    for field, value in (("image_prompt", prompt), ("fallback_image_prompt", fallback_prompt)):
+    for field, value in (("image_prompt", prompt),):
         for marker in FORBIDDEN_PROMPT_MARKERS:
             if marker in value:
                 errors.append(f"{field} must describe visual principles, not '{marker}'")
 
     explicit_strategy = data.get("generation_strategy")
-    strategy = explicit_strategy or "deterministic"
+    strategy = explicit_strategy or "direct-first"
     if strategy not in GENERATION_STRATEGIES:
         errors.append(
             "generation_strategy must be one of: "
@@ -85,26 +84,43 @@ def main():
                     line.strip() for line in title_lines
                     if isinstance(line, str) and line.strip()
                 )
-            for exact_text in exact_texts:
-                if exact_text not in prompt_raw:
+            platform_prompts = data.get("platform_prompts")
+            if not isinstance(platform_prompts, dict):
+                errors.append("platform_prompts is required for direct-first generation")
+                platform_prompts = {}
+
+            outputs = data.get("outputs", {})
+            for platform, output in outputs.items():
+                platform_prompt = platform_prompts.get(platform)
+                if not isinstance(platform_prompt, str) or not platform_prompt.strip():
                     errors.append(
-                        f"image_prompt must contain cover text verbatim: {exact_text}"
+                        f"platform_prompts.{platform} must be a non-empty string"
                     )
-        if not fallback_prompt:
-            errors.append("fallback_image_prompt is required for direct-first generation")
+                    continue
+
+                for exact_text in exact_texts:
+                    if exact_text not in platform_prompt:
+                        errors.append(
+                            f"platform_prompts.{platform} must contain cover text: {exact_text}"
+                        )
+
+                if isinstance(output, dict):
+                    width = output.get("width")
+                    height = output.get("height")
+                    normalized_prompt = (
+                        platform_prompt.lower().replace(" ", "").replace("×", "x")
+                    )
+                    if (
+                        isinstance(width, int)
+                        and isinstance(height, int)
+                        and f"{width}x{height}" not in normalized_prompt
+                    ):
+                        errors.append(
+                            f"platform_prompts.{platform} must mention "
+                            f"target size {width}x{height}"
+                        )
         if not ({"额外文字", "extra text"} & negative):
             errors.append("direct-first negative_prompt must forbid extra text/额外文字")
-        fallback_negative = {
-            str(item).lower() for item in data.get("fallback_negative_prompt", [])
-        }
-        if not ({"文字", "text"} & fallback_negative):
-            errors.append(
-                "fallback_negative_prompt must explicitly forbid text/文字"
-            )
-        if not ({"水印", "watermark"} & fallback_negative):
-            errors.append(
-                "fallback_negative_prompt must explicitly forbid watermark/水印"
-            )
     elif not ({"文字", "text"} & negative):
         errors.append(
             "deterministic negative_prompt must explicitly forbid text/文字"
