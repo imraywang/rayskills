@@ -30,6 +30,66 @@ SIGNATURE_MARKERS = (
 MOJIBAKE_MARKERS = ("Ã", "Â", "â", "å", "æ", "ç", "ã")
 
 
+# 译介支线：内容属于别人。授权和署名在写作阶段落定，这里是进后台前的最后一道门。
+# 契约见 ray-writer/references/translation.md。
+TRANSLATION_KINDS = {"translation", "repost"}
+PERMISSION_CLEARED = {"granted", "open-license"}
+SOURCE_FIELDS = ("source_title", "source_author", "source_url", "source_permission")
+
+
+MD_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
+WIKI_IMAGE = re.compile(r"!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]")
+WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
+HEADING = re.compile(r"^(#{1,6})\s+(.+)$")
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"}
+IMG_SRC = re.compile(r"<img\b[^>]*?\bsrc\s*=\s*\"([^\"]*)\"", re.I)
+
+
+CODE_SPAN = re.compile(r"`([^`]+)`")
+MD_LINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+# The underscore forms refuse intraword matches so identifiers such as
+# in_progress stay intact; render_article.py tokenises by the same rules.
+STRONG_STAR = re.compile(r"\*\*(.+?)\*\*")
+STRONG_UNDER = re.compile(r"(?<![0-9A-Za-z_])__(?!\s)(.+?)(?<!\s)__(?![0-9A-Za-z_])")
+EM_STAR = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
+EM_UNDER = re.compile(r"(?<![0-9A-Za-z_])_(?!\s)([^_\n]+)(?<!\s)_(?![0-9A-Za-z_])")
+
+
+def wikilink_label(inner: str) -> str:
+    """Display text for [[note|label]], [[folder/note]] and [[note#anchor]]."""
+    label = inner.split("|", 1)[1] if "|" in inner else inner.split("/")[-1]
+    return label.split("#", 1)[0].strip()
+
+
+def strip_inline_markup(text: str) -> str:
+    """Reduce a Markdown line to the text the renderer will actually show."""
+    held: list[str] = []
+
+    def hold(match: re.Match) -> str:
+        held.append(match.group(1))
+        return f"\x00{len(held) - 1}\x00"
+
+    clean = CODE_SPAN.sub(hold, text)
+    clean = WIKI_IMAGE.sub("", clean)
+    clean = MD_IMAGE.sub("", clean)
+    clean = WIKILINK.sub(lambda m: wikilink_label(m.group(1)), clean)
+    clean = MD_LINK.sub(r"\1", clean)
+    clean = STRONG_STAR.sub(r"\1", clean)
+    clean = STRONG_UNDER.sub(r"\1", clean)
+    clean = EM_STAR.sub(r"\1", clean)
+    clean = EM_UNDER.sub(r"\1", clean)
+    return re.sub(r"\x00(\d+)\x00", lambda m: held[int(m.group(1))], clean)
+
+
+def count_bold(text: str) -> int:
+    masked = CODE_SPAN.sub("", text)
+    return len(STRONG_STAR.findall(masked)) + len(STRONG_UNDER.findall(masked))
+
+
+def is_image_embed(target: str) -> bool:
+    return Path(target.split("#", 1)[0].strip()).suffix.lower() in IMAGE_SUFFIXES
+
+
 def mojibake_candidate(value: str) -> str | None:
     try:
         candidate = value.encode("latin-1").decode("utf-8")
@@ -78,11 +138,8 @@ def source_blocks(markdown_body: str) -> tuple[list[str], int, int, bool]:
         if not buffer:
             return
         text = " ".join(buffer).strip()
-        bold_count += len(re.findall(r"\*\*(.+?)\*\*", text))
-        clean = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
-        clean = re.sub(r"!\[[^\]]*\]\([^)]+\)", "", clean)
-        clean = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", clean)
-        clean = re.sub(r"`([^`]+)`", r"\1", clean)
+        bold_count += count_bold(text)
+        clean = strip_inline_markup(text)
         if re.search(r"我是.{1,40}[，,]", clean) or any(x in clean for x in SIGNATURE_MARKERS):
             signature_present = True
         blocks.append(re.sub(r"\s+", "", clean))
@@ -100,23 +157,25 @@ def source_blocks(markdown_body: str) -> tuple[list[str], int, int, bool]:
         if not line:
             flush()
             continue
-        if line.startswith("# "):
+        heading = HEADING.match(line)
+        if heading:
             flush()
-            continue
-        if line.startswith("## "):
-            flush()
-            h2_count += 1
-            blocks.append(re.sub(r"\s+", "", line[3:]))
-            continue
-        if line.startswith("### "):
-            flush()
-            blocks.append(re.sub(r"\s+", "", line[4:]))
+            level = len(heading.group(1))
+            if level == 1:
+                continue
+            if level == 2:
+                h2_count += 1
+            bold_count += count_bold(heading.group(2))
+            blocks.append(re.sub(r"\s+", "", strip_inline_markup(heading.group(2))))
             continue
         if re.fullmatch(r"(?:---+|\*\*\*+|___+)", line):
             flush()
             continue
         line = re.sub(r"^(?:>|[-*+] |\d+[.)] )\s*", "", line)
-        if re.fullmatch(r"!\[[^\]]*\]\([^)]+\)", line):
+        if MD_IMAGE.fullmatch(line):
+            continue
+        wiki_embed = WIKI_IMAGE.fullmatch(line)
+        if wiki_embed and is_image_embed(wiki_embed.group(1)):
             continue
         buffer.append(line)
     flush()
@@ -172,6 +231,42 @@ def ascii_emphasis_splits(fragment: str) -> list[str]:
     return found
 
 
+def translation_findings(
+    meta: dict[str, str], visible: str, fragment: str
+) -> tuple[list[str], list[str]]:
+    """Gate translated or reposted articles on permission and visible attribution.
+
+    `visible` is the fragment's rendered text with whitespace already collapsed,
+    so both sides of the attribution comparison get the same treatment. A source
+    URL that only lives in an href counts as present but earns a warning: most
+    accounts cannot make body links tappable, so the reader cannot reach it.
+    """
+    if meta.get("kind", "") not in TRANSLATION_KINDS:
+        return [], []
+    errors: list[str] = []
+    warnings: list[str] = []
+    fields = {key: meta.get(key, "").strip() for key in SOURCE_FIELDS}
+    missing = [key for key, value in fields.items() if not value]
+    if missing:
+        errors.append(f"translation frontmatter missing: {', '.join(missing)}")
+    permission = fields["source_permission"]
+    if permission and permission not in PERMISSION_CLEARED:
+        errors.append(f"source_permission is {permission}, not cleared for a platform draft")
+
+    author = fields["source_author"]
+    if author and re.sub(r"\s+", "", author) not in visible:
+        errors.append("attribution block missing the original author")
+    url = fields["source_url"]
+    if url:
+        if re.sub(r"\s+", "", url) in visible:
+            pass
+        elif url in fragment:
+            warnings.append("source URL is only a link target; most accounts cannot open it")
+        else:
+            errors.append("attribution block missing the source URL")
+    return errors, warnings
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate WeChat article HTML")
     parser.add_argument("--article", required=True, type=Path)
@@ -195,12 +290,23 @@ def main() -> int:
         if pattern.search(fragment):
             errors.append(f"forbidden {label}")
 
+    # Local paths survive rendering on purpose; they must be swapped for hosted
+    # URLs by wechat_images.py before the fragment may reach the draft API.
+    unhosted = [
+        src for src in IMG_SRC.findall(fragment) if not src.lower().startswith("https://")
+    ]
+    if unhosted:
+        errors.append(f"images are not uploaded yet: {unhosted[:5]}")
+
     parsed = FragmentParser()
     try:
         parsed.feed(fragment)
     except Exception as exc:
         errors.append(f"HTML parse failed: {exc}")
     visible = re.sub(r"\s+", "", "".join(parsed.text))
+    translation_errors, translation_warnings = translation_findings(meta, visible, fragment)
+    errors.extend(translation_errors)
+    warnings.extend(translation_warnings)
 
     cursor = 0
     missing: list[str] = []
@@ -243,6 +349,7 @@ def main() -> int:
         "article": str(args.article.resolve()),
         "html": str(args.html.resolve()),
         "title": meta.get("title", ""),
+        "kind": meta.get("kind", ""),
         "source_blocks": len(blocks),
         "chapter_count": source_h2,
         "source_bold_count": source_bold,

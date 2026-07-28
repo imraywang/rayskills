@@ -11,13 +11,68 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
+from prepare_article import MD_IMAGE, WIKI_IMAGE, is_image_embed, wikilink_label
+
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 THEMES_PATH = SKILL_ROOT / "references" / "ray-themes.json"
 
 
+class RenderError(RuntimeError):
+    pass
+
+
 def load_themes() -> dict[str, dict]:
     return json.loads(THEMES_PATH.read_text(encoding="utf-8"))
+
+
+def vault_root(start: Path) -> Path | None:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".obsidian").is_dir():
+            return candidate
+    return None
+
+
+def resolve_asset(src: str, base: Path) -> Path:
+    """Locate a local image the way Obsidian does: relative first, then vault-wide."""
+    raw = src.split("#", 1)[0].strip()
+    direct = (base / raw).expanduser()
+    if direct.is_file():
+        return direct.resolve()
+    absolute = Path(raw).expanduser()
+    if absolute.is_absolute() and absolute.is_file():
+        return absolute.resolve()
+    root = vault_root(base)
+    if root:
+        name = Path(raw).name
+        for found in root.rglob(name):
+            if found.is_file():
+                return found.resolve()
+    raise RenderError(f"image not found: {src}")
+
+
+def image_src(src: str, base: Path) -> str:
+    """Keep remote URLs; turn local references into absolute paths.
+
+    The local path is deliberately preserved so scripts/wechat_images.py can find
+    and replace it. prepare_article.py then refuses any fragment that still points
+    at a local file, which is what stops an un-uploaded image reaching WeChat.
+    """
+    value = src.strip()
+    if urlparse(value).scheme.lower() in {"http", "https"}:
+        return html.escape(value, quote=True)
+    return html.escape(str(resolve_asset(value, base)), quote=True)
+
+
+def match_image(stripped: str) -> tuple[str, str] | None:
+    """Return (alt, src) for a standalone Markdown or Obsidian image line."""
+    standard = MD_IMAGE.fullmatch(stripped)
+    if standard:
+        return standard.group(1), standard.group(2)
+    wiki = WIKI_IMAGE.fullmatch(stripped)
+    if wiki and is_image_embed(wiki.group(1)):
+        return (wiki.group(2) or ""), wiki.group(1)
+    return None
 
 
 def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
@@ -56,8 +111,16 @@ def safe_href(value: str) -> str:
 
 
 def inline_markup(text: str, styles: dict[str, str]) -> str:
+    # The underscore rules refuse intraword matches so identifiers such as
+    # in_progress and max_tokens survive instead of being eaten as emphasis.
     token_re = re.compile(
-        r"(`[^`]+`|\*\*.+?\*\*|__.+?__|\[[^\]]+\]\([^)]+\)|(?<!\*)\*[^*]+\*(?!\*)|(?<!_)_[^_]+_(?!_))"
+        r"(`[^`]+`"
+        r"|\*\*.+?\*\*"
+        r"|(?<![0-9A-Za-z_])__(?!\s).+?(?<!\s)__(?![0-9A-Za-z_])"
+        r"|\[\[[^\]]+\]\]"
+        r"|\[[^\]]+\]\([^)]+\)"
+        r"|(?<!\*)\*[^*]+\*(?!\*)"
+        r"|(?<![0-9A-Za-z_])_(?!\s)[^_]+(?<!\s)_(?![0-9A-Za-z_]))"
     )
     parts: list[str] = []
     cursor = 0
@@ -70,6 +133,9 @@ def inline_markup(text: str, styles: dict[str, str]) -> str:
             parts.append(
                 f'<strong style="{styles["strong"]}">{html.escape(token[2:-2])}</strong>'
             )
+        elif token.startswith("[["):
+            # WeChat cannot link into the vault, so only the display text survives.
+            parts.append(html.escape(wikilink_label(token[2:-2])))
         elif token.startswith("["):
             link = re.fullmatch(r"\[([^\]]+)\]\(([^)]+)\)", token)
             if link:
@@ -110,7 +176,7 @@ def render_table(lines: list[str], styles: dict[str, str]) -> str:
     return f'<table style="{styles["table"]}"><thead><tr>{head}</tr></thead><tbody>{"".join(body_rows)}</tbody></table>'
 
 
-def render_markdown(body: str, styles: dict[str, str]) -> str:
+def render_markdown(body: str, styles: dict[str, str], base: Path) -> str:
     lines = body.splitlines()
     rendered: list[str] = []
     paragraph: list[str] = []
@@ -120,6 +186,8 @@ def render_markdown(body: str, styles: dict[str, str]) -> str:
         if paragraph:
             text = " ".join(part.strip() for part in paragraph).strip()
             if text:
+                if MD_IMAGE.search(text) or WIKI_IMAGE.search(text):
+                    raise RenderError(f"image must sit on its own line: {text[:60]}")
                 rendered.append(f'<p style="{styles["p"]}">{inline_markup(text, styles)}</p>')
             paragraph.clear()
 
@@ -157,18 +225,26 @@ def render_markdown(body: str, styles: dict[str, str]) -> str:
             rendered.append(f'<h4 style="{styles["h3"]}">{inline_markup(stripped[4:], styles)}</h4>')
             index += 1
             continue
+        deep_heading = re.match(r"^#{4,6}\s+(.+)$", stripped)
+        if deep_heading:
+            flush_paragraph()
+            rendered.append(
+                f'<h5 style="{styles["h4"]}">{inline_markup(deep_heading.group(1), styles)}</h5>'
+            )
+            index += 1
+            continue
         if re.fullmatch(r"(?:---+|\*\*\*+|___+)", stripped):
             flush_paragraph()
             rendered.append(f'<hr style="{styles["hr"]}">')
             index += 1
             continue
 
-        image = re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", stripped)
+        image = match_image(stripped)
         if image:
             flush_paragraph()
-            alt, src = image.groups()
+            alt, src = image
             rendered.append(
-                f'<img src="{safe_href(src)}" alt="{html.escape(alt, quote=True)}" style="{styles["img"]}">'
+                f'<img src="{image_src(src, base)}" alt="{html.escape(alt, quote=True)}" style="{styles["img"]}">'
             )
             index += 1
             continue
@@ -272,7 +348,7 @@ def main() -> int:
         print(f'source is {meta["kind"]}, not a final article', file=sys.stderr)
         return 2
     theme = themes[args.theme]
-    content = render_markdown(body, theme["styles"])
+    content = render_markdown(body, theme["styles"], args.article.resolve().parent)
     fragment = f'<section style="{theme["styles"]["container"]}">\n{content}\n</section>\n'
     args.html.parent.mkdir(parents=True, exist_ok=True)
     args.html.write_text(fragment, encoding="utf-8")
@@ -300,4 +376,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except RenderError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        raise SystemExit(2) from None

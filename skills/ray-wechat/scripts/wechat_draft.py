@@ -8,6 +8,7 @@ import json
 import mimetypes
 import os
 import re
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -16,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
 from prepare_article import (
     FragmentParser,
@@ -26,6 +27,7 @@ from prepare_article import (
     source_blocks,
     split_frontmatter,
 )
+from wechat_egress import EgressError, fixed_egress, route_urlopen
 
 
 DEFAULT_API_BASE = "https://api.weixin.qq.com/cgi-bin"
@@ -34,6 +36,42 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 class DraftError(RuntimeError):
     pass
+
+
+SECRET_PARAMS = ("secret", "access_token", "appid")
+
+
+def tls_context() -> ssl.SSLContext:
+    """Return a verifying TLS context that works on python.org builds.
+
+    Those builds ship with an empty trust store until Install Certificates.command
+    is run, which turns every WeChat call into an opaque "network request failed".
+    """
+    override = os.environ.get("SSL_CERT_FILE")
+    if override:
+        try:
+            return ssl.create_default_context(cafile=override)
+        except (OSError, ssl.SSLError) as exc:
+            raise DraftError(f"SSL_CERT_FILE is unusable: {override} ({exc})") from None
+    context = ssl.create_default_context()
+    if context.cert_store_stats().get("x509_ca"):
+        return context
+    try:
+        import certifi
+    except ImportError:
+        raise DraftError(
+            "no trusted CA certificates available; run Install Certificates.command "
+            "for this Python or install certifi"
+        ) from None
+    return ssl.create_default_context(cafile=certifi.where())
+
+
+def redact(message: str, params: dict[str, str] | None) -> str:
+    for key in SECRET_PARAMS:
+        value = (params or {}).get(key)
+        if value:
+            message = message.replace(value, f"<{key}>")
+    return message
 
 
 def read_wechat_config(path: Path) -> dict[str, str]:
@@ -87,10 +125,11 @@ def request_json(
     headers = {"Content-Type": content_type} if body is not None else {}
     request = Request(url, data=body, headers=headers, method="POST" if body is not None else "GET")
     try:
-        with urlopen(request, timeout=30) as response:
+        with route_urlopen(request, timeout=30, context=tls_context()) as response:
             raw = response.read()
-    except (HTTPError, URLError, TimeoutError, OSError):
-        raise DraftError(f"{label} network request failed") from None
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        detail = redact(f"{type(exc).__name__}: {exc}", params)
+        raise DraftError(f"{label} network request failed — {detail}") from None
     try:
         data = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError):
@@ -125,26 +164,32 @@ def draft_get(api_base: str, token: str, media_id: str) -> dict:
     return items[0]
 
 
-def upload_cover(api_base: str, token: str, cover: Path) -> str:
-    if not cover.exists():
-        raise DraftError(f"cover not found: {cover}")
+def multipart(filename: str, payload: bytes, content_type: str | None = None) -> tuple[bytes, str]:
+    """Build a one-field `media` upload body for the WeChat material endpoints."""
     boundary = f"----raywechat{uuid.uuid4().hex}"
-    content_type = mimetypes.guess_type(cover.name)[0] or "application/octet-stream"
+    content_type = content_type or mimetypes.guess_type(filename)[0] or "application/octet-stream"
     body = b"".join(
         [
             f"--{boundary}\r\n".encode(),
-            f'Content-Disposition: form-data; name="media"; filename="{cover.name}"\r\n'.encode("utf-8"),
+            f'Content-Disposition: form-data; name="media"; filename="{filename}"\r\n'.encode("utf-8"),
             f"Content-Type: {content_type}\r\n\r\n".encode(),
-            cover.read_bytes(),
+            payload,
             f"\r\n--{boundary}--\r\n".encode(),
         ]
     )
+    return body, f"multipart/form-data; boundary={boundary}"
+
+
+def upload_cover(api_base: str, token: str, cover: Path) -> str:
+    if not cover.exists():
+        raise DraftError(f"cover not found: {cover}")
+    body, content_type = multipart(cover.name, cover.read_bytes())
     data = request_json(
         f"{api_base}/material/add_material",
         label="cover upload",
         params={"access_token": token, "type": "image"},
         body=body,
-        content_type=f"multipart/form-data; boundary={boundary}",
+        content_type=content_type,
     )
     media_id = data.get("media_id")
     if not media_id:
@@ -350,30 +395,17 @@ def add_common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--record", action="store_true")
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Manage a WeChat official-account draft")
-    sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("create", "update", "verify"):
-        child = sub.add_parser(name)
-        add_common(child)
-        if name != "verify":
-            child.add_argument("--confirm", action="store_true")
-    args = parser.parse_args()
-
-    manifest = run_prepare(args.article, args.html, args.signature)
-    md = args.article.read_text(encoding="utf-8")
-    meta, _ = split_frontmatter(md)
-    media_id = args.media_id or meta.get("wechat_draft_media_id", "")
-
-    if args.command in ("update", "verify") and not media_id:
-        raise DraftError("existing wechat_draft_media_id is required")
-    if args.command in ("create", "update") and not args.confirm:
-        raise DraftError("external draft write requires --confirm")
-    if args.command == "create" and media_id:
-        raise DraftError("article already has a draft media_id; use update")
-
-    appid, secret, config_author = credentials(args.config.expanduser())
-    api_base = os.environ.get("RAY_WECHAT_API_BASE", DEFAULT_API_BASE).rstrip("/")
+def run_remote(
+    args: argparse.Namespace,
+    *,
+    manifest: dict,
+    meta: dict,
+    media_id: str,
+    api_base: str,
+    appid: str,
+    secret: str,
+    config_author: str,
+) -> int:
     token = access_token(api_base, appid, secret)
     content = args.html.read_text(encoding="utf-8").strip()
     existing = draft_get(api_base, token, media_id) if media_id else None
@@ -467,6 +499,47 @@ def main() -> int:
         )
     )
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Manage a WeChat official-account draft")
+    sub = parser.add_subparsers(dest="command", required=True)
+    for name in ("create", "update", "verify"):
+        child = sub.add_parser(name)
+        add_common(child)
+        if name != "verify":
+            child.add_argument("--confirm", action="store_true")
+    args = parser.parse_args()
+
+    manifest = run_prepare(args.article, args.html, args.signature)
+    md = args.article.read_text(encoding="utf-8")
+    meta, _ = split_frontmatter(md)
+    media_id = args.media_id or meta.get("wechat_draft_media_id", "")
+
+    if args.command in ("update", "verify") and not media_id:
+        raise DraftError("existing wechat_draft_media_id is required")
+    if args.command in ("create", "update") and not args.confirm:
+        raise DraftError("external draft write requires --confirm")
+    if args.command == "create" and media_id:
+        raise DraftError("article already has a draft media_id; use update")
+
+    appid, secret, config_author = credentials(args.config.expanduser())
+    api_base = os.environ.get("RAY_WECHAT_API_BASE", DEFAULT_API_BASE).rstrip("/")
+    context = tls_context()
+    try:
+        with fixed_egress(context):
+            return run_remote(
+                args,
+                manifest=manifest,
+                meta=meta,
+                media_id=media_id,
+                api_base=api_base,
+                appid=appid,
+                secret=secret,
+                config_author=config_author,
+            )
+    except EgressError as exc:
+        raise DraftError(str(exc)) from None
 
 
 if __name__ == "__main__":

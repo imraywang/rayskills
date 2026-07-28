@@ -7,6 +7,7 @@
 3. 有 `wechat_draft_media_id` 时先调用 `draft/get`，再调用 `draft/update`。
 4. 没有 ID 且已获创建授权时，上传公众号封面为永久图片素材，再调用 `draft/add`。
 5. 写入后再次调用 `draft/get`，以回读结果为准。
+6. 没有本地 ID 但需要检查同题草稿时，只读取 `draft/batchget`；不得用 `freepublish/batchget` 代替草稿查重。
 
 ## 关键字段
 
@@ -31,8 +32,17 @@
 
 配置文件只读取 `wechat.appid`、`wechat.secret` 和可选 `wechat.author`。日志只报告凭证是否存在，不显示值。
 
+## 固定出口
+
+- `wechat_images.py` 与 `wechat_draft.py` 默认读取 `~/.wewrite/fixed-egress.json`，先建立加密通道并确认公网地址，再请求微信接口。
+- 当前确认配置使用 `ssh-socks5` 模式，SSH 主机别名为 `zgo-standard`，预期公网地址为 `23.165.40.62`。
+- 配置缺失、通道失败或实测公网地址不一致时必须停止；不得静默回退到本机动态地址。
+- 只有用户明确要求本次直连时才允许临时设置 `RAY_WECHAT_DIRECT=1`。这只改变网络路径，不改变 `draft_write` 判定，也不跳过写后回读。
+
 ## 授权边界
 
 - `prepare`、本地预览和远端 `verify` 是只读动作。
 - `draft/update`、`draft/add` 和封面上传是外部写入，必须对应用户当前任务中的明确授权并带 `--confirm`。
-- 本 Skill 不提供发布命令。
+- “推送到微信”“进入下一阶段”“发布到两个平台”不等于草稿写入授权；必须明确出现“草稿箱”或“更新原草稿”。
+- 本 Skill 不提供发布命令，不调用任何 `freepublish/*` 或群发接口。
+- 固定出口和 IP 白名单只是传输设置，不改变授权；修复后仍使用相同草稿命令和完整回读。

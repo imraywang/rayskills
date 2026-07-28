@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray WeChat"
   short_description: "把定稿文章排成公众号富文本并安全更新草稿、回读验收与恢复"
-  default_prompt: "Use $ray-wechat to format this approved article and safely update its existing WeChat draft."
+  default_prompt: "Use $ray-wechat to format this approved article and update its WeChat draft only when the current request explicitly authorizes a draft write. Never publish or mass-send."
