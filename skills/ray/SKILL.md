@@ -5,7 +5,7 @@ description: rayskills 工具箱的主入口与路由。当用户不确定该用
 
 # ray:主入口与路由
 
-rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户不需要记住十几个 skill 名——把真实处境交给 `/ray`,由它判断此刻最该做的一步,分发到对的成员 skill。
+rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户不需要记住各个 skill 名——把真实处境交给 `/ray`,由它判断此刻最该做的一步,分发到对的成员 skill。
 
 **路由哲学（默认单步，明确终点时连续执行）**：需求只有处境或下一步不稳定时，只决定当前一步。用户已经明确终点、且中间阶段存在稳定交接协议时，可以连续执行已验证的管线，不要求用户逐段确认。内容管线的固定终点是已验证草稿；公开发布不属于这条管线，也不能从“推送”“发布流程”或过去的许可中推断。
 
@@ -45,19 +45,10 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 
 ## 路由表
 
-### 基建 Infra
-| 用户想做的 | 分发到 |
-|---|---|
-| 新服务器开荒、加固、装代理栈 | `ray-vps`(开荒模式) |
-| 巡检代理节点/中转链健康、核订阅 | `ray-vps`(巡检模式,`/ray-vps check`) |
-
 ### 内容 / IP
 | 用户想做的 | 分发到 |
 |---|---|
 | 把一段实战经历做成 build-in-public thread | `ray-writer`(thread 骨架模式) |
-| 做 X 账号数据周报、找传播规律 | `ray-metrics` |
-| 拆对标(账号/产品/公司),提取可迁移的东西 | `ray-benchmark` |
-| 写 magazine 风格长文/深度报告/PDF | `ray-report` |
 | 新建、检查或适配本地 Obsidian 内容知识库 | `ray-obsidian` |
 | 把 idea、资料或草稿写成有事实和传播力的中文长文 | `ray-writer` |
 | 翻译外文文章或转载别人的中文文章 | `ray-writer`（译介模式，先过授权与署名两道门） |
@@ -68,17 +59,6 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 | 把定稿文章和 5:2 封面保存到 X Articles 草稿箱 | `ray-x-article` |
 | 从 idea/草稿一路做到文章、封面与 X Article 草稿 | [内容生产管线](references/content-pipeline.md) |
 
-### 咨询 Consulting
-| 用户想做的 | 分发到 |
-|---|---|
-| 评估企业能不能上知识库/AI(就绪度诊断) | `ray-consult`(诊断段) |
-| 有了诊断结论,出方案蓝图/分期/报价 | `ray-consult`(方案段) |
-
-### 产品 Product
-| 用户想做的 | 分发到 |
-|---|---|
-| 把落地页/B2B 站上线(部署+SEO+交接) | `ray-launch` |
-
 ### 协作 Orchestration
 | 用户想做的 | 分发到 |
 |---|---|
@@ -88,11 +68,7 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 
 这些不是固定流水线,是"上一个结果出来后,通常接哪个"的经验参考:
 
-- `ray-consult` 诊断段出了结论 → 通常直接进方案段;若结论是红灯,方案的 Phase 0 就是补齐前提。
-- `ray-launch` 上线了一个站 → 可接 `ray-writer` 的 thread 骨架模式,把上线过程做成 build-in-public。
-- 任何一段实战(开荒/巡检/事故处置)完成 → 可接 `ray-writer` 的 thread 骨架模式把它变成内容。
-- `ray-benchmark` 拆完对标 → 可接 `ray-writer`(把洞察写成长文或 thread)。
-- `ray-metrics` 出了数据规律 → 指导下一批内容的方向与形式。
+- 任何一段实战(上线/排障/事故处置)完成 → 可接 `ray-writer` 的 thread 骨架模式把它变成内容。
 - 用户没有兼容的本地知识库、但希望内容长期积累 → 先接 `ray-obsidian` 安全初始化，再把根目录和材料交给 `ray-writer`。
 - `ray-writer` 完成并通过事实、语气与移动端可浏览性检查 → 接 `ray-cover` 生成平台封面；需要进入公众号草稿箱时接 `ray-wechat`，需要进入 X 后台时接 `ray-x-article`，两者默认只保存草稿。用户明确要求“走完整条管线”时按 [content-pipeline.md](references/content-pipeline.md) 连续执行。
 - 已核验长文要做一次素材多次分发 → `ray-writer` 进入口播再分发模式，生成绑定母稿指纹的口播内容包；需要拼贴 B-roll 时再接 `ray-broll`。图片长文只在用户明确要求时进入后续视觉阶段。
