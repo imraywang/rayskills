@@ -65,7 +65,13 @@ def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
 
 def profile_of(meta: dict[str, str], explicit: str | None) -> str:
     raw = explicit or meta.get("prototype") or meta.get("framework") or ""
-    return PROFILE_ALIASES.get(raw, raw if raw in LIMITS else "practice")
+    if raw in PROFILE_ALIASES:
+        return PROFILE_ALIASES[raw]
+    if raw in LIMITS:
+        return raw
+    # 组合原型以第一个原型为主，例如“案例拆解 + 教程与方法”。
+    primary = re.split(r"\s*[+＋/&、]\s*", raw, maxsplit=1)[0].strip()
+    return PROFILE_ALIASES.get(primary, "practice")
 
 
 def add(items: list[dict[str, str]], code: str, message: str) -> None:
@@ -122,7 +128,9 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
     paragraphs = [part.strip() for part in re.split(r"\n\s*\n", body) if part.strip()]
     heading_count = len(re.findall(r"(?m)^#{1,6}\s+", body))
     h2_count = len(re.findall(r"(?m)^##\s+\S", body))
-    bold_count = len(re.findall(r"\*\*[^*\n]+\*\*|__[^_\n]+__", body))
+    bold_spans = re.findall(r"\*\*[^*\n]+\*\*|__[^_\n]+__", body)
+    bold_count = len(bold_spans)
+    chars_per_bold = round(body_chars / bold_count) if bold_count else None
     extra_blank_runs = len(re.findall(r"\n{3,}", body.replace("\r\n", "\n")))
     list_count = len(re.findall(r"(?m)^\s*(?:[-*+] |\d+[.)]\s+)", body))
     question_count = body.count("？") + body.count("?")
@@ -167,8 +175,12 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
         add(errors, "scanability-bold", f"移动端长文只有 {bold_count} 处重点加粗，至少需要 3 处关键判断")
     if h2_count > 10:
         add(warnings, "heading-heavy", f"正文有 {h2_count} 个二级标题，可能切得过碎")
-    if bold_count > 18:
-        add(warnings, "bold-heavy", f"正文有 {bold_count} 处加粗，重点可能失去区分度")
+    if bold_count > 18 and chars_per_bold is not None and chars_per_bold < 150:
+        add(
+            warnings,
+            "bold-heavy",
+            f"正文有 {bold_count} 处加粗，平均每 {chars_per_bold} 字一处，重点可能失去区分度",
+        )
     if profile == "tutorial" and h2_count < 3:
         add(warnings, "tutorial-headings", "教程标题少于 3 个，读者可能难以执行")
     if profile in {"phenomenon", "argument"} and list_count:
@@ -200,6 +212,7 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
             "headings": heading_count,
             "h2_headings": h2_count,
             "bold_spans": bold_count,
+            "chars_per_bold": chars_per_bold,
             "extra_blank_runs": extra_blank_runs,
             "list_items": list_count,
             "questions": question_count,

@@ -8,7 +8,7 @@
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录9)
-[![Evals](https://img.shields.io/badge/eval%20cases-73-2563eb)](#-实测与验证)
+[![Evals](https://img.shields.io/badge/eval%20cases-77-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-9%2F9%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
@@ -49,7 +49,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 你手上的 | rayskills 完成的 | 入口 |
 |---|---|---|
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、成稿包、草稿、发布与回流骨架 | `/ray-obsidian` |
-| 一个 idea、剪藏或旧草稿 | 事实清单、情绪结构、Ray 语气、可浏览中文长文 | `/ray-writer` |
+| 一个 idea、剪藏或旧草稿 | 读者收获、事实边界、Ray 语气、连续自然的中文长文 | `/ray-writer` |
 | 一段真实实践 | 装配成 build-in-public thread 骨架，不虚构第一人称 | `/ray-writer`（thread 模式） |
 | 一篇已经核验的长文 | 重新选角度，生成可直接录制的口播稿、拍摄节奏和素材清单 | `/ray-writer`（口播再分发模式） |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
@@ -123,7 +123,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
 | Skill 数量 | **9** | 包含 `/ray` 主路由与 8 个成员 |
-| 场景测试 | **73** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 场景测试 | **77** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
 | 结构校验 | **9 / 9 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
