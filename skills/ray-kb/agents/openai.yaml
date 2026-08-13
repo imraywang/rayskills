@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray KB"
+  short_description: "把定稿长文改编成可直接录制的口播内容包并完成核验"
+  default_prompt: "Use $ray-kb to repurpose this verified article into a shootable Chinese oral-video script package."

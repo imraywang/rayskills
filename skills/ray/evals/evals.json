@@ -16,18 +16,6 @@
     },
     {
       "id": 2,
-      "name": "eval-route-content-not-ghostwrite",
-      "type": "happy-path",
-      "prompt": "/ray 上周把被入侵的服务器矿马清干净了,挺有料的,想发出去。",
-      "expected_output": "应分发到 ray-writer 的 thread 骨架模式(把实战经历做成 build-in-public thread)。分发时须带上不代笔纪律的提示——产出是骨架+素材,观点血肉留给作者。不该走 ray-writer 的长文流程(这是实战叙事 thread,不是长文),也不该自己替作者写成第一人称帖子。",
-      "expectations": [
-        "分发到 ray-writer 的 thread 骨架模式而非长文流程",
-        "带出不代笔纪律(骨架+素材,观点留白)",
-        "不替作者直接写成成品帖"
-      ]
-    },
-    {
-      "id": 3,
       "name": "eval-ambiguous-ask-clarify",
       "type": "boundary",
       "prompt": "/ray 帮我看看这个",
@@ -39,7 +27,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "name": "eval-explicit-content-pipeline",
       "type": "happy-path",
       "prompt": "/ray 把这个 idea 走完整条管线：写成公众号长文，生成公众号和 X 封面，再保存到 X Articles 草稿箱，不要发布。",
@@ -53,7 +41,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "name": "eval-route-wechat-draft",
       "type": "happy-path",
       "prompt": "/ray 文章和公众号封面都定稿了，把排版做好并更新到原来的微信公众号草稿箱。",
@@ -67,13 +55,13 @@
       ]
     },
     {
-      "id": 6,
+      "id": 5,
       "name": "eval-route-longform-to-oral-video",
       "type": "happy-path",
       "prompt": "/ray 这篇长文已经定稿了，接下来做一次素材多次分发。先给我做成一条 2 到 3 分钟、真人出镜加录屏的口播视频，图片长文以后再说。",
-      "expected_output": "应分发到 ray-writer 的口播再分发模式，把定稿作为唯一母稿，重新选择一个视频判断，生成带来源指纹的逐字稿、拍摄节奏和素材清单；需要拼贴画面时才接 ray-broll，图片长文只保留接口。",
+      "expected_output": "应分发到 ray-kb，把定稿作为唯一母稿，重新选择一个视频判断，生成带来源指纹的逐字稿、拍摄节奏和素材清单；需要拼贴画面时才接 ray-broll，图片长文只保留接口。",
       "expectations": [
-        "分发到 ray-writer 的口播再分发模式",
+        "分发到 ray-kb",
         "不把任务直接交给只负责画面的 ray-broll",
         "母稿保持事实与判断的唯一真源",
         "交付逐字稿、拍摄节奏、素材清单和录前核对",
@@ -81,7 +69,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 6,
       "name": "eval-cross-platform-push-stops-at-drafts",
       "type": "regression",
       "prompt": "/ray 文章和两套封面都过稿 OK，进入下一阶段，推送到 X 和微信两个平台吧。",
