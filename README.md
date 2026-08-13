@@ -48,7 +48,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 
 | 你手上的 | rayskills 完成的 | 入口 |
 |---|---|---|
-| 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、成稿包、草稿、发布与回流骨架 | `/ray-obsidian` |
+| 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、候选选题、写作任务、母稿、发布反馈与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 读者收获、事实边界、Ray 语气、连续自然的中文长文 | `/ray-writer` |
 | 一篇已经核验的长文 | 重新选角度，生成可直接录制的口播稿、拍摄节奏和素材清单 | `/ray-kb` |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
@@ -72,7 +72,7 @@ flowchart TD
     RAY --> CONSULT["🔍 咨询<br/>consult（诊断 → 方案）"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
 
-    OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 成稿包"] --> WRITER["ray-writer<br/>长文 · 译介"]
+    OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 候选 · 写作任务 · 母稿"] --> WRITER["ray-writer<br/>长文 · 译介"]
     WRITER --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
     WRITER --> KB["ray-kb<br/>口播再分发"]
     KB --> BROLL["ray-broll<br/>口播画面 · 讲解片"]
@@ -188,6 +188,8 @@ npx -y skills add imraywang/rayskills -g --all
 ```
 
 第一次使用建议先看 [新手入门](docs/新手入门.md)。
+
+已有 `ray-content-v1` 知识库不需要搬家：`ray-obsidian` 会先预演，再补齐现行结构并保留全部旧目录和文件。
 
 ### 从旧版本升级
 

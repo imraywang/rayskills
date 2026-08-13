@@ -9,7 +9,7 @@
       "expected_output": "先确认绝对路径并预演，再创建缺失目录、manifest、流程说明和模板；复核为 ready，不安装插件或同步服务。",
       "expectations": [
         "初始化前运行 dry-run",
-        "建立资料、知识、成稿包、调研、草稿、发布和素材分区",
+        "建立资料、知识、候选选题、写作任务、调研、图文与口播母稿、发布反馈和素材分区",
         "最终运行 check 并确认 ready",
         "不修改 Obsidian 配置或强制 Git/同步"
       ]
@@ -38,6 +38,20 @@
         "只问知识库根目录这一项关键问题",
         "完成 ray-obsidian 到 ray-writer 的明确交接",
         "不因缺少知识库而虚构或丢失材料"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "v1-to-v2-safe-upgrade",
+      "type": "boundary",
+      "prompt": "/ray-obsidian 我这个库是以前用 ray-content-v1 建的，帮我升级到现在的结构，旧笔记和旧目录都要保留。",
+      "expected_output": "先预演；识别已知 v1 manifest，补齐 v2 的候选、写作任务、母稿和反馈结构，升级 manifest；旧目录与旧文件保持原位，最终检查为 ready。",
+      "expectations": [
+        "识别 ray-content-v1 为可升级版本",
+        "升级前运行 dry-run",
+        "旧目录和旧文件零移动零覆盖",
+        "manifest 升级为 ray-content-v2",
+        "最终运行 check 并确认 ready"
       ]
     }
   ]

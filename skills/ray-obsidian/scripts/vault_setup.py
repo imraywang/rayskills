@@ -7,31 +7,38 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-SCHEMA_VERSION = 1
-LAYOUT = "ray-content-v1"
+SCHEMA_VERSION = 2
+LAYOUT = "ray-content-v2"
+LEGACY_LAYOUTS = {(1, "ray-content-v1")}
 
 DIRECTORIES = (
     "00-入口/10-工作台",
     "10-创作/10-灵感/10-待评估",
-    "10-创作/10-灵感/20-成稿包",
-    "10-创作/10-灵感/90-归档",
-    "10-创作/20-草稿",
+    "10-创作/10-灵感/20-候选选题",
+    "10-创作/10-灵感/90-选题储备",
+    "10-创作/20-写作任务",
+    "10-创作/20-口播草稿",
+    "10-创作/30-文章草稿",
     "20-知识/10-概念",
     "20-知识/20-人物与组织",
+    "20-知识/25-产品与模型",
     "20-知识/30-问题",
     "20-知识/40-观点",
     "20-知识/50-案例",
     "20-知识/60-方法",
     "20-知识/70-知识地图",
-    "30-资料/00-待处理",
+    "30-资料/00-待抓取",
     "30-资料/10-自主调研",
     "30-资料/20-参考资料",
     "30-资料/30-X书签",
     "30-资料/40-网页剪藏",
+    "30-资料/50-读书划线",
+    "40-发布/00-内容反馈",
     "40-发布/10-X长文",
     "40-发布/20-X短帖",
     "40-发布/30-公众号",
     "40-发布/40-其他平台",
+    "40-发布/50-口播视频",
     "50-系统/10-文档",
     "50-系统/20-流程",
     "50-系统/30-模板/knowledge",
@@ -62,6 +69,20 @@ def load_manifest(root):
         return None, str(error)
 
 
+def manifest_signature(manifest):
+    if not manifest:
+        return None
+    return manifest.get("schema_version"), manifest.get("layout")
+
+
+def is_current_manifest(manifest):
+    return manifest_signature(manifest) == (SCHEMA_VERSION, LAYOUT)
+
+
+def is_legacy_manifest(manifest):
+    return manifest_signature(manifest) in LEGACY_LAYOUTS
+
+
 def audit(root):
     manifest, manifest_error = load_manifest(root)
     missing_dirs = [item for item in DIRECTORIES if not (root / item).is_dir()]
@@ -70,9 +91,9 @@ def audit(root):
         status = "missing"
     elif manifest_error:
         status = "invalid-manifest"
-    elif missing_dirs or missing_files or manifest is None:
+    elif missing_dirs or missing_files or manifest is None or is_legacy_manifest(manifest):
         status = "incomplete"
-    elif manifest.get("schema_version") != SCHEMA_VERSION or manifest.get("layout") != LAYOUT:
+    elif not is_current_manifest(manifest):
         status = "unsupported-manifest"
     else:
         status = "ready"
@@ -81,6 +102,7 @@ def audit(root):
         "vault": str(root),
         "manifest": manifest,
         "manifest_error": manifest_error,
+        "manifest_upgrade_available": is_legacy_manifest(manifest),
         "missing_directories": missing_dirs,
         "missing_files": missing_files,
     }
@@ -103,16 +125,20 @@ def initialize(root, vault_name, dry_run):
     existing_manifest, manifest_error = load_manifest(root) if root.exists() else (None, None)
     if manifest_error:
         raise ValueError(f"existing manifest is invalid: {manifest_error}")
-    if existing_manifest and (
-        existing_manifest.get("schema_version") != SCHEMA_VERSION
-        or existing_manifest.get("layout") != LAYOUT
+    if existing_manifest and not (
+        is_current_manifest(existing_manifest) or is_legacy_manifest(existing_manifest)
     ):
         raise ValueError("existing manifest uses an unsupported schema; refusing to overwrite it")
 
     created_dirs = [item for item in DIRECTORIES if not (root / item).is_dir()]
     created_files = [str(item) for item in ASSET_FILES if not (root / item).exists()]
     preserved_files = [str(item) for item in ASSET_FILES if (root / item).exists()]
-    manifest_action = "preserved" if existing_manifest else "created"
+    if is_current_manifest(existing_manifest):
+        manifest_action = "preserved"
+    elif is_legacy_manifest(existing_manifest):
+        manifest_action = "upgraded"
+    else:
+        manifest_action = "created"
     result = {
         "status": "dry-run" if dry_run else "initialized",
         "vault": str(root),
@@ -134,14 +160,18 @@ def initialize(root, vault_name, dry_run):
             continue
         destination.parent.mkdir(parents=True, exist_ok=True)
         write_text_safely(destination, render_asset(ASSET_ROOT / relative, vault_name))
-    if not existing_manifest:
+    if not is_current_manifest(existing_manifest):
+        now = utc_now()
         manifest = {
             "schema_version": SCHEMA_VERSION,
             "layout": LAYOUT,
-            "name": vault_name,
-            "created_at": utc_now(),
+            "name": (existing_manifest or {}).get("name", vault_name),
+            "created_at": (existing_manifest or {}).get("created_at", now),
             "managed_by": "ray-obsidian",
         }
+        if is_legacy_manifest(existing_manifest):
+            manifest["previous_schema_version"] = existing_manifest["schema_version"]
+            manifest["upgraded_at"] = now
         write_text_safely(
             root / ".ray-obsidian.json",
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
