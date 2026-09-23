@@ -108,6 +108,35 @@ def has_mojibake(value: str) -> bool:
     return any(marker in value for marker in MOJIBAKE_MARKERS) or mojibake_candidate(value) is not None
 
 
+def exclude_markdown_sections(markdown: str, spec: str) -> str:
+    """Remove platform-excluded heading sections while keeping the mother draft intact."""
+    names = {part.strip() for part in re.split(r"[,，、;；|]", spec or "") if part.strip()}
+    if not names:
+        return markdown
+    kept: list[str] = []
+    skipped_level: int | None = None
+    for raw in markdown.replace("\r\n", "\n").splitlines():
+        heading = HEADING.match(raw.strip())
+        if skipped_level is not None:
+            if heading and len(heading.group(1)) <= skipped_level:
+                skipped_level = None
+                if kept and kept[-1].strip():
+                    kept.append("")
+            else:
+                continue
+        if heading and heading.group(2).strip() in names:
+            while kept and not kept[-1].strip():
+                kept.pop()
+            if kept and re.fullmatch(r"(?:---+|\*\*\*+|___+)", kept[-1].strip()):
+                kept.pop()
+            while kept and not kept[-1].strip():
+                kept.pop()
+            skipped_level = len(heading.group(1))
+            continue
+        kept.append(raw)
+    return "\n".join(kept).rstrip() + "\n"
+
+
 def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
     if not text.startswith("---\n"):
         return {}, text
@@ -123,7 +152,8 @@ def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
             value = value[1:-1]
         meta[match.group(1)] = value
-    return meta, text[end + 5 :]
+    body = text[end + 5 :]
+    return meta, exclude_markdown_sections(body, meta.get("publish_exclude_sections", ""))
 
 
 def source_blocks(markdown_body: str) -> tuple[list[str], int, int, bool]:

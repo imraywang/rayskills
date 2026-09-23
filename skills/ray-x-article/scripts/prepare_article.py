@@ -25,6 +25,7 @@ INLINE_LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 WIKILINK = re.compile(r"\[\[([^\]|]+)\|?([^\]]*)\]\]")
 BOLD = re.compile(r"\*\*[^*\n]+\*\*|__[^_\n]+__")
 HEADING = re.compile(r"^(#{1,6})\s+(.+)$")
+THEMATIC_BREAK = re.compile(r"^(?:---+|\*\*\*+|___+)$")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"}
 
 # 译介支线：内容属于别人。授权和署名在写作阶段落定，这里是进后台前的最后一道门。
@@ -45,6 +46,35 @@ def scalar(frontmatter, key):
     if not match:
         return ""
     return match.group(1).strip().strip('"').strip("'")
+
+
+def exclude_markdown_sections(markdown, spec):
+    """Remove platform-excluded heading sections while keeping the mother draft intact."""
+    names = {part.strip() for part in re.split(r"[,，、;；|]", spec or "") if part.strip()}
+    if not names:
+        return markdown
+    kept = []
+    skipped_level = None
+    for raw in markdown.replace("\r\n", "\n").splitlines():
+        heading = HEADING.match(raw.strip())
+        if skipped_level is not None:
+            if heading and len(heading.group(1)) <= skipped_level:
+                skipped_level = None
+                if kept and kept[-1].strip():
+                    kept.append("")
+            else:
+                continue
+        if heading and heading.group(2).strip() in names:
+            while kept and not kept[-1].strip():
+                kept.pop()
+            if kept and THEMATIC_BREAK.fullmatch(kept[-1].strip()):
+                kept.pop()
+            while kept and not kept[-1].strip():
+                kept.pop()
+            skipped_level = len(heading.group(1))
+            continue
+        kept.append(raw)
+    return "\n".join(kept).rstrip() + "\n"
 
 
 def check_translation(frontmatter, body):
@@ -129,6 +159,8 @@ def inline_html(text):
     value = INLINE_LINK.sub(lambda m: f'<a href="{m.group(2)}">{m.group(1)}</a>', value)
     value = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", value)
     value = re.sub(r"__([^_]+)__", r"<strong>\1</strong>", value)
+    value = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"<em>\1</em>", value)
+    value = re.sub(r"(?<!_)_([^_\n]+)_(?!_)", r"<em>\1</em>", value)
     value = re.sub(r"`([^`]+)`", r"<code>\1</code>", value)
     return value
 
@@ -140,6 +172,8 @@ def inline_text(text):
     value = WIKILINK.sub(lambda m: m.group(2) or m.group(1).split("/")[-1], value)
     value = re.sub(r"\*\*([^*]+)\*\*", r"\1", value)
     value = re.sub(r"__([^_]+)__", r"\1", value)
+    value = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"\1", value)
+    value = re.sub(r"(?<!_)_([^_\n]+)_(?!_)", r"\1", value)
     value = re.sub(r"`([^`]+)`", r"\1", value)
     return value
 
@@ -243,6 +277,9 @@ def main():
 
     raw = article.read_text(encoding="utf-8")
     frontmatter, markdown = split_frontmatter(raw)
+    markdown = exclude_markdown_sections(
+        markdown, scalar(frontmatter, "publish_exclude_sections")
+    )
     title = (args.title or scalar(frontmatter, "title")).strip()
     if not title:
         raise ValueError("missing article title")

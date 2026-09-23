@@ -11,7 +11,13 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
-from prepare_article import MD_IMAGE, WIKI_IMAGE, is_image_embed, wikilink_label
+from prepare_article import (
+    MD_IMAGE,
+    WIKI_IMAGE,
+    exclude_markdown_sections,
+    is_image_embed,
+    wikilink_label,
+)
 
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
@@ -90,7 +96,8 @@ def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
             value = value[1:-1]
         meta[match.group(1)] = value
-    return meta, text[end + 5 :]
+    body = text[end + 5 :]
+    return meta, exclude_markdown_sections(body, meta.get("publish_exclude_sections", ""))
 
 
 def article_title(meta: dict[str, str], body: str) -> str:
