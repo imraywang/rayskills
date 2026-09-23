@@ -8,6 +8,17 @@ import sys
 from pathlib import Path
 
 
+HARD_BANNED = (
+    "综上所述",
+    "总的来说",
+    "不难发现",
+    "值得注意的是",
+    "让我们来看看",
+    "接下来让我们",
+)
+
+SOFT_BANNED = ("首先", "其次", "最后", "这意味着", "本质上", "换句话说")
+
 PROFILE_ALIASES = {
     "现象解读": "phenomenon",
     "现象解读型": "phenomenon",
@@ -136,12 +147,25 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
     if body_chars < minimum:
         # 译文长度由原文决定，写短了不是作者可以修的问题。
         add(
-            warnings,
+            warnings if is_translation else errors,
             "length-short",
             f"正文 {body_chars} 字，{profile} 建议至少 {minimum} 字",
         )
     if body_chars > maximum:
         add(warnings, "length-long", f"正文 {body_chars} 字，超过 {profile} 建议上限 {maximum} 字")
+
+    for phrase in HARD_BANNED:
+        count = body.count(phrase)
+        if count:
+            add(errors, "template-phrase", f"模板化表达“{phrase}”出现 {count} 次")
+    for phrase in SOFT_BANNED:
+        count = body.count(phrase)
+        if count:
+            add(warnings, "transition-phrase", f"常见模板词“{phrase}”出现 {count} 次，请逐处判断")
+
+    contrast_count = len(re.findall(r"不是.{0,35}而是", body, flags=re.S))
+    if contrast_count > 4:
+        add(warnings, "contrast-repeat", f"“不是……而是……”结构约出现 {contrast_count} 次，可能产生模板感")
 
     if extra_blank_runs:
         add(errors, "extra-blank-lines", f"发现 {extra_blank_runs} 处连续空行，会在发布后台形成空白段落")
@@ -159,13 +183,24 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
         )
     if profile == "tutorial" and h2_count < 3:
         add(warnings, "tutorial-headings", "教程标题少于 3 个，读者可能难以执行")
+    if profile in {"phenomenon", "argument"} and list_count:
+        add(warnings, "list-heavy", f"观点正文有 {list_count} 个列表项，请确认是否仍像完整文章")
+    if profile in {"phenomenon", "argument"} and question_count < 2:
+        add(warnings, "weak-tension", "疑问或反问少于 2 处，请检查开头与中段张力")
+    if short_paragraphs < 4:
+        add(warnings, "flat-rhythm", "独立短段落少于 4 个，请检查阅读节奏")
     if long_paragraphs > max(3, len(paragraphs) // 5):
         add(warnings, "dense-paragraphs", f"有 {long_paragraphs} 个超长段落，请检查移动端阅读")
 
+    first_person_number = re.findall(r"(?:我|我们).{0,30}\d+(?:\.\d+)?", body)
+    if first_person_number:
+        add(warnings, "personal-number", f"发现 {len(first_person_number)} 处第一人称数字，请与用户真实材料逐项核对")
+
+    if "prototype" not in meta:
+        add(warnings, "missing-prototype", "页首未写文章原型，检查器采用了推断值")
+
     if is_translation:
         check_translation(meta, body, errors, warnings)
-    elif not re.search(r"(?m)^##\s*待确认\s*$", body):
-        add(warnings, "missing-pending", "原创稿文末没有「## 待确认」；交给平台前才应删掉这一节")
 
     return {
         "path": str(path),
@@ -191,7 +226,7 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="检查 Ray Writer 中文长文的格式和篇幅（不查风格）")
+    parser = argparse.ArgumentParser(description="检查 Ray Writer 中文长文的机械质量项")
     parser.add_argument("path", type=Path)
     parser.add_argument("--profile", choices=sorted(LIMITS))
     parser.add_argument("--json", action="store_true")

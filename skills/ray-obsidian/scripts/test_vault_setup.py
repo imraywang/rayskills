@@ -28,6 +28,12 @@ class VaultSetupTests(unittest.TestCase):
         result = vault_setup.initialize(self.vault, "测试库", False)
         self.assertEqual(result["overwritten_files"], [])
         self.assertEqual(vault_setup.audit(self.vault)["status"], "ready")
+        fast_oral = self.vault / "50-系统/30-模板/快速口播母稿.md"
+        self.assertTrue(fast_oral.is_file())
+        self.assertIn(
+            "production_route: fast-oral",
+            fast_oral.read_text(encoding="utf-8"),
+        )
 
         repeated = vault_setup.initialize(self.vault, "测试库", False)
         self.assertEqual(repeated["created_files"], [])

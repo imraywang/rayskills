@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray Writer"
-  short_description: "把素材写成长文或译介稿并完成核验"
-  default_prompt: "Use $ray-writer to turn this source into a natural, verified Chinese article."
+  short_description: "把素材写成有 Ray 态度的长文，或做译介稿"
+  default_prompt: "Use $ray-writer to turn this source into a Chinese article in Ray's own voice."

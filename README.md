@@ -8,7 +8,7 @@
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-10%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录10)
-[![Evals](https://img.shields.io/badge/eval%20cases-71-2563eb)](#-实测与验证)
+[![Evals](https://img.shields.io/badge/eval%20cases-78-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-10%2F10%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
@@ -40,8 +40,13 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 
 你：把这篇定稿继续做成一条口播视频
   → /ray-kb 重新选择一个视频判断
-  → 生成逐字稿、拍摄节奏、素材清单和录前核对
+  → 以 Ray 口吻生成逐字稿，拿不准的内容列进「待确认」
   → 需要拼贴画面时再交给 /ray-broll
+
+你：我刚有一个企业 AI 的灵感，查完资料就想直接录
+  → /ray-kb 按需检索素材，以你的口吻直接写
+  → 只建立一份快速口播母稿，拿不准的内容列进「待确认」
+  → 录制后对照实际表达，发布后进入反馈回流
 ```
 
 ## 🎯 你交给它什么，它替你完成什么
@@ -50,7 +55,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 |---|---|---|
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、候选选题、写作任务、母稿、发布反馈与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 读者收获、事实边界、Ray 语气、连续自然的中文长文 | `/ray-writer` |
-| 一篇已经核验的长文 | 重新选角度，生成可直接录制的口播稿、拍摄节奏和素材清单 | `/ray-kb` |
+| 一个能在一条视频讲清的灵感，或一篇已经核验的长文 | 生成唯一快速口播母稿，或重新选角度生成完整口播内容包 | `/ray-kb` |
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
@@ -74,7 +79,8 @@ flowchart TD
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 候选 · 写作任务 · 母稿"] --> WRITER["ray-writer<br/>长文 · 译介"]
     WRITER --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
-    WRITER --> KB["ray-kb<br/>口播再分发"]
+    OBSIDIAN --> KB["ray-kb<br/>快速口播 · 长文再分发"]
+    WRITER --> KB
     KB --> BROLL["ray-broll<br/>口播画面 · 讲解片"]
     COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
     COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
@@ -91,9 +97,9 @@ flowchart TD
 | 阶段 | 负责什么 | 必须通过的门控 |
 |---|---|---|
 | `ray-obsidian`（按需） | 新建或适配用户自己的本地知识库 | 先预演；已有文件零覆盖、零移动；结构检查为 ready |
-| `ray-writer` | 从 idea、资料或草稿生成中文长文 | 事实可追溯；不虚构经历；母稿是唯一真源；长文通过对应检查 |
+| `ray-writer` | 从 idea、资料或草稿生成中文长文 | 表达先行，以作者口吻说满观点；拿不准或编补的内容进「待确认」由作者决定；长文通过格式检查 |
 | `ray-cover` | 把文章判断压缩成一个视觉隐喻 | 公众号、普通 X、5:2 Article 按各自尺寸分别用 Image 2 直出；验收构图、安全区与缩略图可读性，不跨平台裁切复用 |
-| `ray-kb`（按需） | 把定稿母稿改编成口播内容包 | 只选一个中心判断；绑定母稿路径与内容指纹；口播检查通过 |
+| `ray-kb`（按需） | 从灵感直接做唯一口播母稿，或把定稿母稿改编成口播内容包 | 表达先行，编补内容进「待确认」；快速模式不制造额外任务；长文模式绑定母稿指纹；口播检查通过 |
 | `ray-wechat` | 把定稿与公众号封面送进微信草稿箱 | 先确认手机预览；优先更新原草稿；标题、摘要、封面、全文、署名和 UTF-8 回读通过 |
 | `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
 
@@ -108,7 +114,7 @@ flowchart TD
 | 🧭 路由 | **`/ray`** | 读取处境，选择下一步；终点明确时编排正式管线 |
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；他人文章 → 译介稿 |
-| | `/ray-kb` | 定稿长文 → 绑定母稿指纹的口播内容包（选题卡 · 逐字稿 · 拍摄节奏） |
+| | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
@@ -125,7 +131,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
 | Skill 数量 | **10** | 包含 `/ray` 主路由与 9 个成员 |
-| 场景测试 | **71** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 场景测试 | **78** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
 | 结构校验 | **10 / 10 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
@@ -141,9 +147,9 @@ v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-
 |---|---|
 | `/ray-consult` | 不因老板想“一期全上”而抹掉红灯前提 |
 | `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
-| `/ray-writer` | 不虚构作者经历，也不交付没有阅读锚点的长文 |
+| `/ray-writer` | 不在正文里自保，也不交付没有阅读锚点的长文 |
 | `/ray-writer` 译介模式 | 不把别人的文章洗成自己的原创，授权没落地不进平台草稿 |
-| `/ray-kb` | 不把长文机械缩写，不让衍生稿脱离母稿自行增加事实 |
+| `/ray-kb` | 不让快速口播变成重流程，也不在逐字稿里自保 |
 | `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
 | `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
 
@@ -180,6 +186,7 @@ npx -y skills add imraywang/rayskills -g --all
 /ray 把这个 idea 走完整条内容管线，做到 X Articles 草稿，不要发布
 /ray-obsidian 在这个本地目录搭一套可以接写作管线的知识库
 /ray-writer 把这条剪藏发展成一篇公众号长文
+/ray-kb 我有一个现场观察，直接做成快速口播
 /ray-kb 把这篇定稿改成一条 2 到 3 分钟的口播视频稿
 /ray-cover 给这篇定稿文章做公众号和 X Article 封面
 /ray-wechat 把定稿排版并更新到已有公众号草稿，先预览再写入
@@ -228,7 +235,7 @@ for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-p
 | 明确自由度 | 判断型任务保留空间；上传、清理、部署等脆弱流程使用严格顺序和验收门控 |
 | 可恢复 | 中断后优先读取本地状态和已有 URL，续写原任务，不制造重复项 |
 | 可验证 | 每个 Skill 都有场景测试；脚本必须实际运行；高风险结果必须保留可核对证据 |
-| 不越权 | 不自动发布、不编造数据、不虚构经历；删除与生产改动遵守确认边界 |
+| 不越权 | 不自动发布；编补的经历和数据必须列进「待确认」由作者决定；删除与生产改动遵守确认边界 |
 | 构建门控 | `tools/build.sh` 校验目录名与 Skill 名称，beta Skill 不进入产物 |
 
 `ray-multimodel` 内置的 Grok 隔离搜索组件来自 [sudoHG/codex-grok-search](https://github.com/sudoHG/codex-grok-search)，按 MIT 协议保留原版权与许可；其余 rayskills 内容仍遵循仓库根目录的 CC BY-NC 4.0。
