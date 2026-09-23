@@ -9,7 +9,7 @@
   "short_title": "8到18个汉字的封面标题",
   "subtitle": "可选副标题",
   "eyebrow": "可选栏目名",
-  "generation_strategy": "direct-first",
+  "generation_strategy": "image2-direct",
   "cover_text": {
     "eyebrow": "栏目逐字文本",
     "title_lines": ["主标题第一行", "主标题第二行"],
@@ -39,18 +39,18 @@
 
 ## 提示词要求
 
-- 默认使用 `generation_strategy: direct-first`。只有用户明确要求后期排字、跨平台像素级一致，或明确提供无字底图时，使用 `deterministic`。
+- 固定使用 `generation_strategy: image2-direct`。画面和中文标题由 Image 2 在同一次生成中完成，不生成无字底图，不进入单独排字。
 - `cover_text` 是唯一文案来源。栏目、标题分行和副标题必须进入各平台的提示词。
 - `image_prompt` 描述共享视觉母题；`platform_prompts` 分别描述各平台的完整成图。
 - 每个平台提示词先写用途和核心隐喻，再写目标像素、比例、构图、媒介、颜色、材质、文字和字体层级。
 - 明确文字区、主视觉区与四周安全边距，不用“留一些空间”这种模糊表达。
 - 明确要求每段文字只出现一次、不增加其他文字；禁止标志和水印。
-- 不把中文字体、字形或个别字符细节作为重试、降级或验收失败的条件。
+- 缺字、错字、重复文字和额外文案需要针对性重新生成；中文字体风格或轻微字形差异本身不触发重做。
 - 不允许把一个平台的成图裁切、拉伸或复用到另一个平台。
 - 不写“Vox style”“AdrianPunk style”等作者或品牌名，直接描述视觉机制。
 - 画面人物不得暗示成文章里不存在的真实用户经历。
 
-旧任务包没有 `generation_strategy` 时，检查脚本仍允许兼容处理；新任务包默认显式填写 `direct-first`。
+新任务包必须显式填写 `image2-direct`。旧任务包进入生产前需要迁移，不能继续使用旧的生成策略字段。
 
 ## 生产与探索
 

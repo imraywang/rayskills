@@ -16,7 +16,7 @@ REQUIRED = [
     "negative_prompt", "outputs",
 ]
 FORBIDDEN_PROMPT_MARKERS = ["vox style", "adrianpunk style", "in the style of"]
-GENERATION_STRATEGIES = {"direct-first", "deterministic"}
+GENERATION_STRATEGIES = {"image2-direct"}
 
 
 def fail(messages):
@@ -53,7 +53,7 @@ def main():
                 errors.append(f"{field} must describe visual principles, not '{marker}'")
 
     explicit_strategy = data.get("generation_strategy")
-    strategy = explicit_strategy or "direct-first"
+    strategy = explicit_strategy
     if strategy not in GENERATION_STRATEGIES:
         errors.append(
             "generation_strategy must be one of: "
@@ -64,10 +64,10 @@ def main():
     if not ({"水印", "watermark"} & negative):
         errors.append("negative_prompt must explicitly forbid watermark/水印")
 
-    if strategy == "direct-first":
+    if strategy == "image2-direct":
         cover_text = data.get("cover_text")
         if not isinstance(cover_text, dict):
-            errors.append("cover_text is required for direct-first generation")
+            errors.append("cover_text is required for image2-direct generation")
         else:
             title_lines = cover_text.get("title_lines")
             if not isinstance(title_lines, list) or not title_lines or not all(
@@ -86,7 +86,7 @@ def main():
                 )
             platform_prompts = data.get("platform_prompts")
             if not isinstance(platform_prompts, dict):
-                errors.append("platform_prompts is required for direct-first generation")
+                errors.append("platform_prompts is required for image2-direct generation")
                 platform_prompts = {}
 
             outputs = data.get("outputs", {})
@@ -120,11 +120,7 @@ def main():
                             f"target size {width}x{height}"
                         )
         if not ({"额外文字", "extra text"} & negative):
-            errors.append("direct-first negative_prompt must forbid extra text/额外文字")
-    elif not ({"文字", "text"} & negative):
-        errors.append(
-            "deterministic negative_prompt must explicitly forbid text/文字"
-        )
+            errors.append("image2-direct negative_prompt must forbid extra text/额外文字")
 
     outputs = data.get("outputs", {})
     expected = {"wechat": (2100, 900), "x": (1600, 900)}
