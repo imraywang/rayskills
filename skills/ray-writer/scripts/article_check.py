@@ -165,7 +165,13 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
     if is_translation:
         check_translation(meta, body, errors, warnings)
     elif not re.search(r"(?m)^##\s*待确认\s*$", body):
-        add(warnings, "missing-pending", "原创稿文末没有「## 待确认」；交给平台前才应删掉这一节")
+        add(warnings, "missing-pending", "原创稿文末没有「## 待确认」")
+    elif "待确认" not in meta.get("publish_exclude_sections", ""):
+        add(
+            errors,
+            "pending-not-excluded",
+            "正文有「## 待确认」，但 frontmatter 缺少 publish_exclude_sections: 待确认，推送平台时会把它一起发出去",
+        )
 
     return {
         "path": str(path),

@@ -47,6 +47,7 @@ description: 把已经定稿的中文长文排成适合手机浏览的微信公�
 - `wechat_draft_theme`
 - 用户本轮是“看预览”还是已经授权“推送到草稿箱”
 - 用户当前原话能否明确判定为 `draft_write`
+- `publish_exclude_sections`（若存在）：列出的章节（如 `待确认`）在生成预览和草稿时自动剔除，母稿不改。正文带「待确认」而用户本轮没说已经看过时，推送前用一句话提醒一次
 
 先核对源文件角色。`kind: content-pack`、`kind: idea` 或 `kind: research` 必须停止，沿 frontmatter 中的 `draft` 链接找到正文；不要因为文件名写着“成稿包”就把任务说明当成最终文章。
 

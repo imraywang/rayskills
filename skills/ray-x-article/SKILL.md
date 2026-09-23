@@ -60,6 +60,7 @@ python3 scripts/prepare_article.py --article <文章.md> --cover <x-article-cove
 
 先读取文章 frontmatter：
 
+- `publish_exclude_sections`（若存在）：列出的章节（如 `待确认`）在准备正文时自动剔除，母稿不改。正文带「待确认」而用户本轮没说已经看过时，写入前用一句话提醒一次。
 - 已有 `x_article_draft_url` 时，直接打开该 URL，核对标题后更新原草稿。
 - 状态为 `draft-needs-cover` 时，只补封面并重新验证；不要重写正文或建立第二份草稿。
 - 状态已经是 `draft`、但用户提到过去失败时，以当前后台可见状态为准：先核验原草稿，封面确实缺失才补传，不能按旧叙述直接覆盖。

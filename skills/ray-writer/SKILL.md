@@ -73,7 +73,7 @@ description: 把灵感、剪藏审核卡、调研包或已有草稿写成有 Ray
 
 标题要让人想点开。内部可以生成多个候选，只向用户交付最适合的一版。
 
-文末加 `## 待确认`，格式见 [voice.md](references/voice.md)。
+文末加 `## 待确认`，格式见 [voice.md](references/voice.md)。同时在 frontmatter 写 `publish_exclude_sections: 待确认`：这一节一直留在母稿里当记录，推送公众号或 X Article 时由 `ray-wechat`、`ray-x-article` 自动剔除，不用手动删。
 
 ### 4. 自修与终检
 
@@ -104,7 +104,7 @@ python3 scripts/article_check.py <文章路径>
 
 用户明确要求公众号排版或保存草稿时，把文章、公众号封面和署名偏好交给 `ray-wechat`。它先生成本地预览，用户确认后才创建或更新公众号草稿。
 
-交给平台前，「待确认」必须已经由 Ray 处理并从正文删除。
+交给平台前，Ray 要看过「待确认」里的每一条，并在正文里定下改还是留；这一节本身不用删，靠 `publish_exclude_sections: 待确认` 在推送时剔除。
 
 用户要求把定稿变成口播视频时，把母稿和成稿包交给 `ray-kb`。
 
