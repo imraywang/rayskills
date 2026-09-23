@@ -1,0 +1,74 @@
+{
+  "skill_name": "ray-cover-editorial",
+  "evals": [
+    {
+      "id": 1,
+      "name": "双平台只生成无字底图",
+      "type": "happy-path",
+      "prompt": "/ray-cover-editorial 给 DeepSeek Harness 小白指南做公众号和 X 封面底图。",
+      "expected_output": "读取文章判断，把 Harness 转成一个连续场景，分别生成公众号和 X 比例的编辑版画 base 图；左右两侧承担叙事，中央保持低细节呼吸区，交付时停止在无字底图。",
+      "expectations": [
+        "只使用 ray-editorial-engraving，不为本篇重新选择画风",
+        "底图不含标题、字母、Logo 或水印",
+        "左右两个锚点属于同一个场景",
+        "中央约 26%–32% 宽度保持低细节但不是纯色挖空",
+        "不调用 compose_editorial_cover.py",
+        "不添加遮罩、RAY 字标或文章标题",
+        "公众号与 X 分别生成对应比例底图",
+        "只交付本地文件，不进入发布后台"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "知道标题也不自动排字",
+      "type": "boundary",
+      "prompt": "/ray-cover-editorial 标题是 DeepSeek Harness，帮我做一张统一风格封面。",
+      "expected_output": "把标题仅作为内容理解和追溯依据，生成带中央呼吸区的无字 base 图；不因为标题已经给出就自动把它写进图片。",
+      "expectations": [
+        "title 不进入图片提示词",
+        "图片模型不生成 DeepSeek Harness 字样",
+        "不自动叠加标题或关键词",
+        "交付说明已停止在 base 图"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "中央呼吸区不是白洞",
+      "type": "happy-path",
+      "prompt": "/ray-cover-editorial 中间留出后期排字的位置，但不要像硬挖出来的一块空白。",
+      "expected_output": "使用左右不对称的叙事锚点，中央延续深靛蓝背景、地面、阴影、纸张纹理和版画排线，只降低细节密度，不生成纯色矩形或文字底板。",
+      "expectations": [
+        "中央没有脸、关键物体和朱砂红焦点",
+        "中央保留连续背景和版画纹理",
+        "不添加蒙版、渐变或文字底板",
+        "缩略图仍能看出完整场景"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "拒绝品牌风格复制",
+      "type": "failure-mode",
+      "prompt": "/ray-cover-editorial 完全复制 Every 的画板风和配色，越像越好。",
+      "expected_output": "使用 Ray 自有编辑版画的线条、固定色板、纸张规则和左右叙事构图，不在提示词里写品牌名，也不复制对方 Logo、字体和具体画面。",
+      "expectations": [
+        "提示词不包含 Every 或 in the style of",
+        "固定使用 Ray 的深靛蓝、暖米白和朱砂红",
+        "保留左右叙事和中央呼吸结构",
+        "不复制品牌标志"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "文章判断缺失时不生成通用底图",
+      "type": "boundary",
+      "prompt": "/ray-cover-editorial 我想写 AI，但文章还没有，也不知道观点，先做一张统一封面。",
+      "expected_output": "识别到缺少文章判断和可画场景，先回到 ray-writer；不生成机器人、芯片等通用 AI 版画充数。",
+      "expectations": [
+        "指出缺少一句话判断和场景",
+        "转回 ray-writer",
+        "不生成通用 AI 图",
+        "不让固定画种替内容拍板"
+      ]
+    }
+  ]
+}

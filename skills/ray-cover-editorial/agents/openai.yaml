@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Cover Editorial"
+  short_description: "生成左右叙事、中央呼吸的统一编辑版画无字底图"
+  default_prompt: "Use $ray-cover-editorial to create a base-only editorial engraving with two side anchors and quiet breathing room in the center."
