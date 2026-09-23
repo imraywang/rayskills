@@ -1,0 +1,40 @@
+{
+  "skill_name": "ray-trend-search",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "检索最近30天企业 AI 转型和 FDE 的讨论，结合 X、Reddit、YouTube 给我 5 个口播选题参考。",
+      "expected_output": "A dated cross-platform trend brief with source health, direct evidence links, limitations, and a ranked shortlist of topic ideas.",
+      "assertions": [
+        "Routes X and Reddit through Grok and YouTube through the strict last30days collector.",
+        "Uses separate source-specific queries rather than one long bilingual query.",
+        "Does not count YouTube items outside the requested 30-day window as recent.",
+        "Reports missing Reddit permalinks or hidden metrics as limitations.",
+        "Each topic idea has an evidence anchor and a risk or uncertainty note."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "找最近7天某个 AI 编程工具在 X 和 Reddit 上最常见的真实用户抱怨，并判断是不是普遍问题。",
+      "expected_output": "A seven-day complaint map separating direct user evidence, repeated claims, and inference, with an explicit prevalence caveat.",
+      "assertions": [
+        "Searches X and Reddit separately with a strict seven-day window.",
+        "Requires direct links and checkable dates before counting Reddit items.",
+        "Does not infer prevalence from search ranking or a few viral posts.",
+        "Cross-checks material product claims against a primary source when available."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "看看抖音和视频号最近有哪些企业 AI 热门视频，给我选题参考。",
+      "expected_output": "A public-search sample of accessible videos with visible metrics and an explicit statement that it is not an official or complete platform ranking.",
+      "assertions": [
+        "Uses accessible public platform or browser search because no reliable local connector exists.",
+        "States the exact keywords used.",
+        "Labels login walls or hidden metrics as degraded coverage.",
+        "Does not present web articles as proof of platform popularity.",
+        "Does not claim complete coverage or an official ranking."
+      ]
+    }
+  ]
+}
