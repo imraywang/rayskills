@@ -58,6 +58,24 @@ When the page cannot be fetched or the target submission timestamp is missing, t
 
 ## Known limitations
 
+### Diagnosing rejected results
+
+`incomplete_result_artifact` means no acceptable research payload was produced; it does not
+by itself mean a network interruption or truncated response. The command now includes
+`result_validation_error`, and the manifest preserves `initial_result_validation_error`
+before exact-session export recovery. Read these reasons before retrying a search.
+
+Two observed complete responses were rejected for an 11-item summary (maximum 10), and
+an unrelated cross-check with empty `finding_ids`. The first also contained a known date
+outside the requested window. The worker prompt now explicitly states the count limits,
+nonempty references, platform scope, and treatment of older context in both quick and deep
+mode. Validation remains strict: no summaries are silently truncated, references invented,
+or known old dates relabeled as unverified. A malformed non-string reference is rejected
+cleanly rather than raising an exception.
+
+Regression check: `python3 -m unittest discover -s skills/ray-multimodel/scripts -p test_search_result_contract.py -v`
+from the Rayskills repository root.
+
 - Grok search coverage is not exhaustive.
 - X timestamps and engagement counts can change and are not locally revalidated.
 - Deleted, private, quarantined, or login-gated Reddit posts may be unverified.

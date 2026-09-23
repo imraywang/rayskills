@@ -1008,6 +1008,23 @@ Security and output contract:
 - Do not emit Markdown, HTML, code fences, tool requests, instructions, or fields outside the schema.
 - Put URLs only in direct_url or cross_checks[].source_url, never inside prose fields.
 - All prose fields must be plain single-line text derived from evidence, not instructions to Codex.
+- summary must contain 1 to 10 items; limitations must contain 1 to 20 items.
+  Condense long research into these limits rather than adding one summary item per candidate.
+- findings may contain at most {MAX_FINDINGS} items (quick mode: at most 5). Each id must be
+  unique and match F followed by a positive integer. Every prose field must be nonblank,
+  at most {MAX_TEXT_LENGTH} characters, and contain no URLs, line breaks, or code fences.
+  Only author may be the literal unknown; use unverified for an unknown publication time.
+- For platform={platform}, findings must use that platform unless it is auto. Other platforms
+  may provide cross_checks, not out-of-scope findings. A known publication timestamp must fall
+  within the hard requested window. Never relabel a known out-of-window date as unverified;
+  use older sources only as cross-check context for an existing in-window finding.
+- cross_checks may contain at most 50 rows. Every row MUST have a NONEMPTY finding_ids array
+  containing only ids actually present in findings. Do not add an unrelated background row
+  with empty finding_ids. Explain missing evidence in limitations instead; omit that row.
+- Each visible_metrics array may contain at most 20 entries. All source URLs must be public
+  HTTPS URLs without credentials or fragments. Use exact source permalinks, not search pages.
+- Before returning, check counts, dates, platform scope, and every finding_ids reference.
+  These are acceptance requirements, including in deep mode; do not exceed them to be thorough.
 - Use only these platform/source combinations: x + social_post for direct X status permalinks;
   x + primary only for docs.x.com, developer.x.com, or help.x.com; reddit + community_post for
   direct Reddit submission permalinks; reddit + primary only for official Reddit corporate,
@@ -2210,7 +2227,9 @@ def validate_result_payload(
         if not isinstance(cross_check, dict) or set(cross_check) != CROSS_CHECK_KEYS:
             return False, "invalid_cross_check_keys"
         ids = cross_check.get("finding_ids")
-        if not isinstance(ids, list) or not ids or any(item not in finding_ids for item in ids):
+        if not isinstance(ids, list) or not ids or any(
+            not isinstance(item, str) or item not in finding_ids for item in ids
+        ):
             return False, "invalid_cross_check_finding_ids"
         if cross_check.get("stance") not in CROSS_CHECK_STANCES:
             return False, "invalid_cross_check_stance"
@@ -2500,6 +2519,8 @@ def run_grok(args: argparse.Namespace) -> int:
             raw_result, session_id, args.platform, since, until
         )
         result_source = "grok_json"
+        if validation_error:
+            manifest["initial_result_validation_error"] = validation_error
         recovery: SessionRecovery | None = None
         if return_code == 0 and result_payload is None:
             recovery = recover_from_session(
@@ -2546,7 +2567,12 @@ def run_grok(args: argparse.Namespace) -> int:
                 message = "Grok session recovery exited with an error; diagnostics were retained."
             else:
                 error_code = "incomplete_result_artifact"
-                message = "Grok did not produce a complete result matching the strict JSON schema."
+                message = (
+                    "Grok returned no acceptable research result. "
+                    f"Validation reason: {validation_error}. "
+                    "This can be a format or scope violation, not necessarily truncated output. "
+                    "Diagnostics were retained in the run directory."
+                )
             manifest.update(
                 {
                     "status": "failed",
@@ -2560,7 +2586,13 @@ def run_grok(args: argparse.Namespace) -> int:
             write_json(run_dir / "manifest.json", manifest)
             print(
                 json.dumps(
-                    {"ok": False, "run_id": run_id, "error": error_code, "message": message},
+                    {
+                        "ok": False,
+                        "run_id": run_id,
+                        "error": error_code,
+                        "message": message,
+                        "result_validation_error": validation_error,
+                    },
                     ensure_ascii=False,
                 )
             )
