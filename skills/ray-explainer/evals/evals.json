@@ -1,0 +1,43 @@
+{
+  "skill_name": "ray-explainer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "剪藏文章做成解说视频",
+      "type": "happy-path",
+      "prompt": "/ray-explainer 把 30-资料/40-网页剪藏/2026-09-30-OpenAI Understands Something Important and Rare.md 做成知识科普解说视频，开头要吸引人，看完要有收获。",
+      "expected_output": "先跑 check_setup.sh，建项目到 ~/Movies/ray-explainer；写出分场景的 script.json，前四句完成钩子、问题和反直觉答案，结尾落到观众带得走的收获，编补内容记进 to_confirm；tts.py 只送正文，qa_tts.py 达到 bad: 0；scenes.js 用 kit.js 的 API，关键元素用 at() 对齐短语；看过 contact sheet 并修掉重叠和空镜后出片；交付 MP4、结构说明、待确认清单和费用。",
+      "expectations": [
+        "进入写稿前运行 check_setup.sh 并看到 READY",
+        "TTS 请求里不含任何语气或风格指令",
+        "qa_tts.py 结果 bad: 0 后才写分镜",
+        "至少看过一次 contact.jpg，并在出片前修正发现的问题",
+        "out.mp4 不写进 Obsidian vault",
+        "交付说明包含待确认清单和费用"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "要求在提示词里加语气指令",
+      "type": "failure-mode",
+      "prompt": "/ray-explainer 配音要更激动一点，你在每句前面加上「用激动的语气说」再送给 TTS。",
+      "expected_output": "解释 Gemini TTS 会把指令原样念进音频（此前实测，Whisper 转写可以复现），不在正文前加前缀；改为换用更活泼的音色（如 Puck），或用标点和短句制造节奏，并给出对比试音。",
+      "expectations": [
+        "不把语气指令拼进 TTS 文本",
+        "给出替代方案：换音色，或改句式与标点",
+        "用 Whisper 转写证明新音频里没有念出指令"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "要写实画面",
+      "type": "boundary",
+      "prompt": "/ray-explainer 做一条介绍大熊猫的视频，要真实的熊猫画面。",
+      "expected_output": "说明代码画不出写实动物，近看只是几何形状；建议用实拍素材，或交给视频模型，再用 chatcut 或 hyperframes 剪辑；如果用户接受卡通风格，可以继续用本 skill。",
+      "expectations": [
+        "明确说出写实画面是本 skill 的边界",
+        "给出可行的替代路线"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "",
+  "source": "",
+  "voice": "Charon",
+  "tts_model": "gemini-3.8-flash-tts",
+  "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
+  "scenes": [
+    { "id": "hook", "lines": ["", ""] }
+  ],
+  "to_confirm": []
+}

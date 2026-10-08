@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Explainer"
+  short_description: "把文章做成 JS + Canvas 手绘解说视频（Gemini 配音、Whisper 校对、逐帧渲染）"
+  default_prompt: "Use $ray-explainer to turn this article into a hand-drawn explainer video."

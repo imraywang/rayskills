@@ -2,15 +2,15 @@
 
 # rayskills · builder 实战工具箱
 
-**10 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
+**11 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
 本地知识库 · 内容生产 · X 创作 · 企业咨询 · 多模型协作
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-10%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录10)
-[![Evals](https://img.shields.io/badge/eval%20cases-86-2563eb)](#-实测与验证)
+[![Skills](https://img.shields.io/badge/skills-11%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录11)
+[![Evals](https://img.shields.io/badge/eval%20cases-89-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-10%2F10%20pass-3fb950)](#-实测与验证)
+[![Validate](https://img.shields.io/badge/结构校验-11%2F11%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 </div>
@@ -19,7 +19,7 @@
 
 rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用先记住 10 个名字。把处境交给 `/ray`：
+不用先记住 11 个名字。把处境交给 `/ray`：
 
 - 下一步还不稳定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
@@ -59,6 +59,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
+| 一篇文章或剪藏，想做成无人出镜的知识讲解 | 1.5–3 分钟竖屏手绘解说片：Canvas 逐帧绘制、Gemini 配音、Whisper 逐句校对、烧录字幕 | `/ray-explainer` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
 | 一个“能不能上 AI”的客户 | 诊断段：六维就绪度、病灶、风险等级与变绿条件 | `/ray-consult` |
@@ -73,7 +74,7 @@ flowchart TD
     RAY(["/ray · 主路由与阶段编排"]):::hub
 
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · 译介） · kb（口播）<br/>cover · wechat · x-article · broll"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · 译介） · kb（口播）<br/>cover · wechat · x-article · broll · explainer"]
     RAY --> CONSULT["🔍 咨询<br/>consult（诊断 → 方案）"]
     RAY --> COLLAB["🤝 协作<br/>multimodel"]
 
@@ -82,6 +83,7 @@ flowchart TD
     OBSIDIAN --> KB["ray-kb<br/>快速口播 · 长文再分发"]
     WRITER --> KB
     KB --> BROLL["ray-broll<br/>口播画面 · 讲解片"]
+    OBSIDIAN --> EXPLAINER["ray-explainer<br/>手绘解说视频"]
     COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
     COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
 
@@ -107,7 +109,7 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（10）
+## 🗂 Skill 全目录（11）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -117,6 +119,7 @@ flowchart TD
 | | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
+| | `/ray-explainer` | 文章 / 剪藏 → JS + Canvas 手绘解说视频（配音、字幕、逐帧渲染） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
@@ -130,9 +133,9 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **10** | 包含 `/ray` 主路由与 9 个成员 |
-| 场景测试 | **86** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **10 / 10 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| Skill 数量 | **11** | 包含 `/ray` 主路由与 10 个成员 |
+| 场景测试 | **89** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **11 / 11 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
@@ -152,6 +155,7 @@ v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-
 | `/ray-kb` | 不让快速口播变成重流程，也不在逐字稿里自保 |
 | `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
 | `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
+| `/ray-explainer` | 不把语气指令念进配音，不在没看过静帧的情况下出片 |
 
 完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)（历史成员名单）。
 
@@ -200,7 +204,7 @@ npx -y skills add imraywang/rayskills -g --all
 
 ### 从旧版本升级
 
-装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 10 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
+装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 11 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
 
 ```bash
 for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
