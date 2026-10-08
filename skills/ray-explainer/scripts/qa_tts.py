@@ -43,18 +43,25 @@ def char_times(line, words):
     return out, len(known) / max(1, len(idx))
 
 
+def score(text, heard):
+    n1 = "".join(c for c in text if norm_ch(c)).lower(); n2 = "".join(c for c in heard if norm_ch(c)).lower()
+    return difflib.SequenceMatcher(None, n1, n2).ratio()
+
+
 bad = 0
 for sc in tl["scenes"]:
     for line in sc["lines"]:
         f = os.path.join(PROJ, "audio", line["clip"])
         # pass 1 (QA): plain transcription — word_timestamps makes Whisper hallucinate on trailing silence
         heard = mlx_whisper.transcribe(f, path_or_hf_repo=MODEL, language="zh", initial_prompt=line["text"])["text"]
+        if score(line["text"], heard) <= .8:   # Whisper sometimes answers in traditional characters or drifts: retry with a simplified-Chinese prompt
+            alt = mlx_whisper.transcribe(f, path_or_hf_repo=MODEL, language="zh", initial_prompt="以下是普通话的句子，使用简体中文。")["text"]
+            if score(line["text"], alt) > score(line["text"], heard): heard = alt
         # pass 2 (timing only): word timestamps; hallucinated tail chars simply fail to align with the script
         r = mlx_whisper.transcribe(f, path_or_hf_repo=MODEL, language="zh", initial_prompt=line["text"],
                                    word_timestamps=True, condition_on_previous_text=False)
         words = [w for s in r["segments"] for w in s.get("words", [])]
-        n1 = "".join(c for c in line["text"] if norm_ch(c)).lower(); n2 = "".join(c for c in heard if norm_ch(c)).lower()
-        ratio = difflib.SequenceMatcher(None, n1, n2).ratio()
+        ratio = score(line["text"], heard)
         ok = ratio > .8
         bad += not ok
         line["chars"], cover = char_times(line, words) if words else ([], 0)
