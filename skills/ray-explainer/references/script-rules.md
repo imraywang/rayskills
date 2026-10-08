@@ -4,15 +4,15 @@
 
 ```json
 {
-  "title": "片名", "source": "素材路径或 URL",
-  "voice": "Charon", "tts_model": "gemini-3.8-flash-tts",
+  "title": "片名", "source": "素材路径或 URL", "header": "一篇读懂 · 主题",
+  "voice": "Charon 或已注册的复刻音色名（如 ray）", "speed": 1.0,
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
   "scenes": [ { "id": "hook", "lines": ["第一句", "第二句"] } ],
   "to_confirm": ["编补或存疑的说法，交付时列给 Ray"]
 }
 ```
 
-- `id` 只用英文小写，和 `scenes.js` 里的 `S.<id>` 一一对应。
+- `id` 只用英文小写。kit 场景和 `scenes.js` 里的 `S.<id>` 一一对应；语法场景另写 `grammar` 和 `cues`，见 [grammars.md](grammars.md)。完整范例：`assets/template/script.example.json`。
 - 每句 12–50 字。Charon 实测语速约 4 字/秒，2.5 分钟大约需要 550–650 字、25 句左右。
 - 场景数 7–10 个，每场 1–4 句。一个场景只讲一件事、只配一个主画面。
 

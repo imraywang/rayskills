@@ -1,11 +1,16 @@
 {
   "title": "",
   "source": "",
+  "header": "一篇读懂 · ",
   "voice": "Charon",
-  "tts_model": "gemini-3.8-flash-tts",
+  "speed": 1.0,
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
   "scenes": [
-    { "id": "hook", "lines": ["", ""] }
+    { "id": "hook", "lines": ["", ""] },
+    { "id": "list", "grammar": "y5_kinetic_type", "lines": [""], "cues": [
+      { "at": 0, "kind": "title", "text": "" },
+      { "at": { "line": 0, "phrase": "" }, "kind": "point", "text": "", "sub": "" }
+    ] }
   ],
   "to_confirm": []
 }

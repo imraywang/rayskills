@@ -8,7 +8,7 @@
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-11%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录11)
-[![Evals](https://img.shields.io/badge/eval%20cases-89-2563eb)](#-实测与验证)
+[![Evals](https://img.shields.io/badge/eval%20cases-91-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-11%2F11%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
@@ -59,7 +59,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
-| 一篇文章或剪藏，想做成无人出镜的知识讲解 | 1.5–3 分钟竖屏手绘解说片：Canvas 逐帧绘制、Gemini 配音、Whisper 逐句校对、烧录字幕 | `/ray-explainer` |
+| 一篇文章或剪藏，想做成无人出镜的知识讲解 | 1.5–3 分钟竖屏解说片：手绘 kit 与 8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）按幕混排，Gemini 或本人复刻音色配音，Whisper 逐字卡点 | `/ray-explainer` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
 | 一个“能不能上 AI”的客户 | 诊断段：六维就绪度、病灶、风险等级与变绿条件 | `/ray-consult` |
@@ -119,7 +119,7 @@ flowchart TD
 | | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
-| | `/ray-explainer` | 文章 / 剪藏 → JS + Canvas 手绘解说视频（配音、字幕、逐帧渲染） |
+| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘 kit + huashu 解说语法混排、复刻音色配音、逐字卡点） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
@@ -134,7 +134,7 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
 | Skill 数量 | **11** | 包含 `/ray` 主路由与 10 个成员 |
-| 场景测试 | **89** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 场景测试 | **91** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
 | 结构校验 | **11 / 11 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |

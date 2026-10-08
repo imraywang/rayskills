@@ -100,6 +100,7 @@ function wrapText(str, maxW, size) {
 
 // ---------- icons ----------
 function bulb(x, y, s, p, color = C.yellow, seed = 1) {
+  if (typeof color === 'number') { seed = color; color = C.yellow; }   // icon(x, y, s, p, seed) call style, like the other icons
   rcircle(x, y - s * .15, s * .5, { p, fill: color, seed, w: 5 });
   rline(x - s * .22, y + s * .45, x + s * .22, y + s * .45, { p, seed: seed + 2, w: 5 });
   rline(x - s * .16, y + s * .6, x + s * .16, y + s * .6, { p, seed: seed + 3, w: 5 });
@@ -135,9 +136,11 @@ function face(x, y, s, mood, seed, p = 1) { // mood: 1 happy, 0 neutral, -1 doub
 // ---------- timeline helpers ----------
 function scene(id) { return TL.scenes.find(s => s.id === id); }
 function L(sc, i) { return sc.lines[i]; }
-function at(sc, i, phrase) { // approximate time a phrase is spoken inside line i
+function at(sc, i, phrase) { // time the phrase starts being spoken in line i (Whisper per-char timing when qa_tts.py ran)
   const l = sc.lines[i]; if (!phrase) return l.start;
-  const idx = l.text.indexOf(phrase); return l.start + (l.end - l.start) * Math.max(0, idx) / l.text.length;
+  const idx = Math.max(0, l.text.indexOf(phrase));
+  if (l.chars && l.chars.length === l.text.length) return l.chars[idx];
+  return l.start + (l.end - l.start) * idx / l.text.length;
 }
 function title(t, sc, str, color = C.ink) {
   const p = pop(t, sc.start + .05, .5);
@@ -159,48 +162,23 @@ function makePaper() {
   g.fillStyle = v; g.fillRect(0, 0, W, H); return c;
 }
 
-function captionChunks(line) {
-  const parts = line.text.split(/(?<=[，。：？！、])/).map(s => s.trim()).filter(Boolean);
-  const out = [];
-  for (const p of parts) { const s = p.replace(/[，。：、]$/, ''); if (s.length > 15) { const h = Math.ceil(s.length / 2); out.push(s.slice(0, h), s.slice(h)); } else out.push(s); }
-  const total = out.reduce((a, s) => a + s.length, 0); let acc = 0;
-  return out.map(s => { const st = line.start + (line.end - line.start) * acc / total; acc += s.length; return { s, start: st, end: line.start + (line.end - line.start) * acc / total }; });
-}
-const CAPS = TL.scenes.flatMap(s => s.lines.flatMap(captionChunks));
-
-function drawCaption(t) {
-  const c = CAPS.find(c => t >= c.start - .05 && t < c.end + .25); if (!c) return;
-  ctx.font = `bold 54px ${FONT}`; const w = ctx.measureText(c.s).width + 70;
-  const a = ap(t, c.start - .05, .12);
-  ctx.save(); ctx.globalAlpha = a;
-  ctx.fillStyle = 'rgba(42,38,34,.88)';
-  const x = W / 2 - w / 2, y = 1640, h = 96, r = 22;
-  ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill();
-  text(c.s, W / 2, y + h / 2 + 2, { size: 54, color: '#fff8ec' });
-  ctx.restore();
-}
-
 window.renderFrame = function (t) {
   BOIL = Math.floor(t * 6);
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
   ctx.drawImage(paperTex, 0, 0);
   for (const sc of TL.scenes) {
-    if (t < sc.start - .01 || t >= sc.end) continue;
+    if (t < sc.start - .01 || t >= sc.end || sc.grammar) continue;   // grammar scenes are drawn by huashu clips
     const a = Math.min(ap(t, sc.start, .3), 1 - ap(t, sc.end - .28, .28));
     ctx.save(); ctx.globalAlpha = a;
     const z = 1 + (1 - eOut(ap(t, sc.start, .4))) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     S[sc.id](t, sc); ctx.restore();
   }
-  // progress bar + handle
-  const pr = t / TL.duration;
-  ctx.fillStyle = 'rgba(42,38,34,.12)'; ctx.fillRect(80, 90, W - 160, 10);
-  ctx.fillStyle = C.orange; ctx.fillRect(80, 90, (W - 160) * pr, 10);
-  text((window.META && META.header) || '', W / 2, 140, { size: 34, color: C.soft, weight: 'normal' });
-  drawCaption(t);
+  if (window.RXO) RXO.draw(ctx, t);   // captions + progress + header (overlay.js), shared with grammar clips
 };
 
 window.ready = (async () => {
   await Promise.all(['bold 60px "Hannotate SC"', '60px "Hannotate SC"', 'bold 60px "HanziPen SC"'].map(f => document.fonts.load(f, '测试中文')));
+  if (window.RXO) await RXO.ready;
   paperTex = makePaper();
   return { duration: TL.duration, fonts: document.fonts.check('bold 60px "Hannotate SC"', '中') };
 })();

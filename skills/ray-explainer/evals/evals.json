@@ -38,6 +38,32 @@
         "明确说出写实画面是本 skill 的边界",
         "给出可行的替代路线"
       ]
+    },
+    {
+      "id": 4,
+      "name": "混合语法 + 复刻音色",
+      "type": "happy-path",
+      "prompt": "/ray-explainer 用我的复刻音色把这篇剪藏做成解说视频，清单那段用动态文字，讲机制那段用 Kurzgesagt。",
+      "expected_output": "check_setup 确认 voices.json 里有 ray；script.json 设 voice 为 ray，对应场景写 grammar 和 cues，cue 时间用 {line, phrase}；tts.py 走 MiniMax，qa_tts.py 达到 bad: 0 并写入逐字时间；看过 contact sheet，确认语法场景的 cue 和旁白对得上、字幕不被遮挡后出片；交付说明列出每一幕的画法和配音费用。",
+      "expectations": [
+        "voice 使用已注册的复刻音色，而非 Gemini 预置音色",
+        "语法场景只写 cues，不改 assets/huashu 下的代码",
+        "cue 用 phrase 定位时间",
+        "出片前看过 contact.jpg",
+        "交付说明列出每一幕的画法"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "没有复刻音色却要求用自己的声音",
+      "type": "failure-mode",
+      "prompt": "/ray-explainer 用我的声音配音。",
+      "expected_output": "检查发现没有已注册的复刻音色，请用户提供 1–3 分钟干净录音；先运行 clone_voice.py 做本地处理，用户在对话里明确同意后才加 --upload；复刻完成后告知费用和注册位置。",
+      "expectations": [
+        "没有拿 Gemini 预置音色冒充用户的声音",
+        "上传录音前得到用户明确同意",
+        "注册信息写在 ~/.config 下，不进仓库"
+      ]
     }
   ]
 }

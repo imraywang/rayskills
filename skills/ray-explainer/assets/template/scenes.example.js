@@ -293,7 +293,7 @@ S.takeaway = (t, sc) => {
   const Q = [['它创造了什么', '新行为？', '它创造'], ['它能触达', '多杂的人？', '它能触达'], ['它能从这些人身上', '学到什么？', '它能从']];
   const shrink = eInOut(ap(t, l2.start + .2, .6));
   Q.forEach(([a, b, ph], i) => {
-    const s0 = i === 0 ? Math.min(at(sc, 1, ph), L(sc, 0).end) : at(sc, 1, ph);
+    const s0 = i === 0 ? at(sc, 0, '三个问题') : at(sc, 1, ph);   // first box as soon as「三个问题」is said
     const y = lerp(520 + i * 300, 450 + i * 210, shrink), p = ap(t, s0 - .2, .5);
     rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: '#fffaf1', seed: 401 + i, w: 6 });
     rrect(185, y - 40, 80, 80, { p, seed: 411 + i, w: 6 });

@@ -1,0 +1,59 @@
+# 解说语法（混合模式）
+
+一条片子按场景（scene）选画法：不写 `grammar` 的场景用 ray-explainer 自己的手绘 kit（`scenes.js`），写了 `grammar` 的场景交给 huashu-art-motion 的参数化片段（`assets/huashu/`）。字幕、进度条和顶部小标题由 `overlay.js` 统一叠加，全片风格一致。
+
+## 怎么选
+
+| 这一幕在讲…… | 用 | 竖屏效果 |
+|---|---|---|
+| 清单、几个要点、金句、数字开场 | `y5_kinetic_type` 动态文字 | ★★★ 整屏大字配色块翻页，最抓眼 |
+| 机制、系统、“里面是什么”、多个东西汇成一个 | `y1_kurzgesagt` 扁平科普 | ★★★ 发光星球 + 镜头推近穿行 |
+| 推理链、步骤、A → B → C | `y3_whiteboard` 白板 | ★★ 已优化：图标整宽横排 |
+| 一个概念变成另一个、因果反转、公式 | `t1_3b1b` | ★★ 已优化：公式居中当主角 |
+| 产品功能、教程步骤、参数 | `t2_keynote_ui` 发布会 | 未测 |
+| 营收、份额、走势等真实数字 | `t3_finance_chart` 财经图表 | 未测 |
+| 有截图、原话、新闻的论证 | `y2_vox` 拼贴 | 未测 |
+| 第一人称讲经历、翻车 | `y4_storytime`（主角是豆子形的花叔） | 不建议用：角色不是 Ray |
+| 需要定制画面：打叉、漏斗、排行榜、两张卡交换位置 | 不写 grammar，用 kit | 完全自由 |
+
+规则：
+- 一幕只用一种画法。换画法就是转场，所以放在换话题的地方。
+- 一条片子里语法别超过 3–4 种，同一种语法可以出现多次。开头钩子和结尾收获建议用 kit 或 y5，冲击力最强。
+- 用 `t2`、`t3`、`y2` 之前，先用 `render.js stills` 看竖屏效果，有问题照 `NOTICE.md` 的方式修改，并标注 `ray-explainer:`。
+
+## script.json 写法
+
+```json
+{ "id": "levers", "grammar": "y5_kinetic_type",
+  "lines": ["他说，……手里只有四根杠杆：", "创造新行为，扩大分发，定价赚钱，还有用户的切换成本。"],
+  "data": {},
+  "cues": [
+    { "at": 0, "kind": "title", "text": "四根杠杆", "sub": "想在 AI 前沿做成长久的生意", "data": { "key": "长久" } },
+    { "at": { "line": 1, "phrase": "创造新行为" }, "kind": "point", "text": "新行为", "sub": "让人开始用 AI 做新的事", "data": { "label": "01" } },
+    { "at": { "line": 1, "phrase": "简单的答案", "offset": -0.6 }, "kind": "enter", "text": "通用解" }
+  ] }
+```
+
+- `at` 可以写数字，表示从这一幕开头算起的秒数；也可以写成 `{line, phrase, offset?}`，表示第 `line` 句里 `phrase` 开口的时刻。时间来自 `qa_tts.py` 写进时间轴的逐字时间，`offset` 用来提前或推后。短语必须是原文里的子串，找不到时渲染会报错。
+- 片段时长等于这一幕的时长，由配音决定；`safe` 默认 `{top:170, bottom:330}`，给进度条和字幕让位。
+- 渲染时生成的 spec 写在 `<project>/specs/<id>.json`，排查问题时可以直接看。
+
+## 各语法的 cue 速查
+
+完整契约见上游文档：每种语法认哪些 kind 和字段、`number` 大数字的口径。写了语法不认的 kind，不会报错，只是什么都不画。
+
+| 语法 | spec 级 data | cue kind |
+|---|---|---|
+| `y5_kinetic_type` | `palette: [[底,字],…]` | `title`/`point`（`text` 主词，`sub` 辅句，`data.label`、`data.key` 着色词、`data.num`）、`number`（`data.value/suffix/decimals`，`at` = 数字落定的时刻）、`highlight`（`data.word`） |
+| `y1_kurzgesagt` | `center` 中心星球名、`flow: true` 串成链 | `title`、`point`（卫星节点）、`highlight`（`data.index`，镜头推近）、`enter`（`data.index`，`text` 新中心，`dur`，钻进下一层） |
+| `y3_whiteboard` | — | `title`、`point`、`draw`（`data.icon`：person cat network doc chat bulb check cross screen stack gear target clock chart；`text` 写说明）、`image`、`highlight`（`data.index`、`data.target: title/draw/image`、`data.style: underline`） |
+| `t1_3b1b` | — | `title`、`equation`（`data.tokens: [{s, col}]`，`col` 用 manim 色名 BLUE_C GREEN_C YELLOW RED_C TEAL_C 或 #hex；第二个公式会从上一个形变过来）、`point`、`line`（`data.values`）、`highlight`（`data.index` 或 `target: equation`） |
+| `t2_keynote_ui` | `eyebrow/title/subtitle/accent` | `title`、`card`/`step`（`text`、`sub`、`image`、`data.icon`）、`highlight`（`data.rect`）、`number` |
+| `t3_finance_chart` | `title/unit/source/chart/series/highlight/…` | `title`、`bar`/`line`/`candle`、`highlight`、`number`。用真实数据时不要写 `badge` |
+| `y2_vox` | — | `image`/`clip`、`title`、`point`、`highlight`（`data.rect`） |
+
+## 踩过的坑
+
+- y1 镜头推近时，卫星节点会滑进字幕区。节点别超过 5 个，字幕压在节点上影响不大。
+- t1 的公式里可以放中文 token，但所有公式共用一个字号，最长的那条决定字号。中文公式控制在 12 个字以内。
+- y3 的图标说明字要短，3–5 个字。要点写成一句完整的短句，不要堆关键词。

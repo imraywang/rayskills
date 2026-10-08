@@ -1,0 +1,378 @@
+{
+  "voice": "Charon",
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        "AI 模型的排行榜，差不多每周换一次第一。",
+        "开发者想换个模型，改一行代码就行。",
+        "那如果模型谁都追得上，AI 公司到底靠什么赢？",
+        "a16z 合伙人 David George 给了个很反直觉的答案：模型强不强，根本不是重点。"
+      ]
+    },
+    {
+      "id": "drucker",
+      "lines": [
+        "他引了德鲁克五十年前的一句话：",
+        "企业的目的，是创造顾客。"
+      ]
+    },
+    {
+      "id": "levers",
+      "lines": [
+        "他说，想在 AI 前沿做成一门长久的生意，手里只有四根杠杆：",
+        "创造新行为，扩大分发，定价赚钱，还有用户的切换成本。"
+      ],
+      "grammar": "y5_kinetic_type",
+      "cues": [
+        {
+          "at": 0,
+          "kind": "title",
+          "text": "四根杠杆",
+          "sub": "想在 AI 前沿做成长久的生意",
+          "data": {
+            "key": "长久"
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "创造新行为"
+          },
+          "kind": "point",
+          "text": "新行为",
+          "sub": "让人开始用 AI 做新的事",
+          "data": {
+            "label": "01",
+            "key": "新的事"
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "扩大分发"
+          },
+          "kind": "point",
+          "text": "分发",
+          "sub": "触达足够多的人",
+          "data": {
+            "label": "02",
+            "key": "多的人"
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "定价赚钱"
+          },
+          "kind": "point",
+          "text": "定价",
+          "sub": "把价值收回来",
+          "data": {
+            "label": "03",
+            "key": "收回来"
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "切换成本"
+          },
+          "kind": "point",
+          "text": "切换成本",
+          "sub": "让用户走不了",
+          "data": {
+            "label": "04",
+            "key": "走不了"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cross",
+      "lines": [
+        "切换成本，基本没了。模型随时能换，大家又都在变强，谁都停不下来。",
+        "定价，人人都想要。可最后性价比最高的，还是规模最大的那家。它是结果，拉不动。",
+        "所以真正能拉的，只剩两根：创造新行为，和分发。"
+      ]
+    },
+    {
+      "id": "behavior",
+      "lines": [
+        "先说新行为。ChatGPT 刚上线那几周，OpenAI 内部很多人觉得：一个聊天框而已，该去做点正经产品了。",
+        "是 Peter Thiel 跟 Sam Altman 说：你们创造了一种新顾客，没有比这更重要的事。",
+        "后来的推理、工具调用、Computer Use，都是这个路子：事后看简单到理所当然，之前就是没人做出来。"
+      ]
+    },
+    {
+      "id": "breadth",
+      "lines": [
+        "为什么总是它先找到？因为它的用户够杂。",
+        "从一个具体的解法走到通用的解法，比所有人想的都难。你得见过足够多、足够杂的用法，才知道那个简单的答案在哪。",
+        "所以通用能力，其实取决于分发。"
+      ],
+      "grammar": "y1_kurzgesagt",
+      "data": {
+        "center": "OpenAI"
+      },
+      "cues": [
+        {
+          "at": 0,
+          "kind": "title",
+          "text": "为什么总是它先找到？"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "用户够杂"
+          },
+          "kind": "point",
+          "text": "学生"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "用户够杂",
+            "offset": 0.45
+          },
+          "kind": "point",
+          "text": "程序员"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "用户够杂",
+            "offset": 0.9
+          },
+          "kind": "point",
+          "text": "企业"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "用户够杂",
+            "offset": 1.35
+          },
+          "kind": "point",
+          "text": "创作者"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "用户够杂",
+            "offset": 1.8
+          },
+          "kind": "point",
+          "text": "研究员"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "你得见过"
+          },
+          "kind": "highlight",
+          "data": {
+            "index": 2
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "简单的答案",
+            "offset": -0.6
+          },
+          "kind": "enter",
+          "data": {
+            "index": 2
+          },
+          "text": "通用解",
+          "dur": 1.6
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "通用能力"
+          },
+          "kind": "point",
+          "text": "见过的用法"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "取决于"
+          },
+          "kind": "point",
+          "text": "分发的广度"
+        }
+      ]
+    },
+    {
+      "id": "routes",
+      "lines": [
+        "分发有三条路：自己做产品，找合作伙伴，或者做平台。",
+        "合作来得最快，但顾客和数据，都留在对方手里。",
+        "平台最慢，可别人在你上面搭什么、怎么用，都在反过来教你。这个学习回路，最难抄。"
+      ],
+      "grammar": "y3_whiteboard",
+      "cues": [
+        {
+          "at": 0,
+          "kind": "title",
+          "text": "分发的三条路"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "自己做产品"
+          },
+          "kind": "draw",
+          "text": "自有产品",
+          "data": {
+            "icon": "screen"
+          }
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "找合作伙伴"
+          },
+          "kind": "draw",
+          "text": "合作伙伴",
+          "data": {
+            "icon": "person"
+          }
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "做平台"
+          },
+          "kind": "draw",
+          "text": "平台",
+          "data": {
+            "icon": "network"
+          }
+        },
+        {
+          "at": {
+            "line": 1
+          },
+          "kind": "point",
+          "text": "合作最快，顾客和数据归对方"
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "point",
+          "text": "平台最慢，用户反过来教你"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "这个学习回路"
+          },
+          "kind": "highlight",
+          "data": {
+            "index": 2,
+            "target": "draw"
+          }
+        }
+      ]
+    },
+    {
+      "id": "flip",
+      "lines": [
+        "所以这篇文章最反直觉的地方是：因果是反的。",
+        "OpenAI 会拥有最好的模型，是因为它有最好的分发，不是反过来。"
+      ],
+      "grammar": "t1_3b1b",
+      "cues": [
+        {
+          "at": 0,
+          "kind": "title",
+          "text": "因果是反的"
+        },
+        {
+          "at": 0.9,
+          "kind": "equation",
+          "data": {
+            "tokens": [
+              {
+                "s": "最好的模型",
+                "col": "BLUE_C"
+              },
+              {
+                "s": "→",
+                "col": "#ffffff"
+              },
+              {
+                "s": "赢",
+                "col": "YELLOW"
+              }
+            ]
+          }
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "最反直觉"
+          },
+          "kind": "point",
+          "text": "你以为：模型最强，所以会赢"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "是因为"
+          },
+          "kind": "equation",
+          "data": {
+            "tokens": [
+              {
+                "s": "最好的分发",
+                "col": "GREEN_C"
+              },
+              {
+                "s": "→",
+                "col": "#ffffff"
+              },
+              {
+                "s": "最好的模型",
+                "col": "BLUE_C"
+              }
+            ]
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "最好的分发"
+          },
+          "kind": "point",
+          "text": "其实：分发够广，才有最好的模型"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "不是反过来"
+          },
+          "kind": "highlight",
+          "data": {
+            "index": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "takeaway",
+      "lines": [
+        "下次再看到谁发了新模型、刷了新榜，你可以换三个问题去看它：",
+        "它创造了什么新行为？它能触达多杂的人？它能从这些人身上学到什么？",
+        "这三个问题，拿来看任何一家公司都好用。包括你自己。"
+      ]
+    }
+  ],
+  "tts_model": "gemini-3.8-flash-tts",
+  "header": "一篇读懂 · a16z 谈 OpenAI"
+}
