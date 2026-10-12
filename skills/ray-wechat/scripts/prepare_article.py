@@ -41,6 +41,8 @@ MD_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 WIKI_IMAGE = re.compile(r"!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]")
 WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
 HEADING = re.compile(r"^(#{1,6})\s+(.+)$")
+# Task-list checkboxes are presentation: renderers draw them as boxes or literal "[ ]".
+TASK_MARKER = re.compile(r"^\[[ xX]?\]\s*")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"}
 IMG_SRC = re.compile(r"<img\b[^>]*?\bsrc\s*=\s*\"([^\"]*)\"", re.I)
 
@@ -201,7 +203,13 @@ def source_blocks(markdown_body: str) -> tuple[list[str], int, int, bool]:
         if re.fullmatch(r"(?:---+|\*\*\*+|___+)", line):
             flush()
             continue
+        if line.startswith("|") and line.endswith("|"):
+            # Table row: separator rows carry no text; cell pipes never reach the HTML.
+            if re.fullmatch(r"[|:\-\s]+", line):
+                continue
+            line = line.strip("|").replace("|", " ")
         line = re.sub(r"^(?:>|[-*+] |\d+[.)] )\s*", "", line)
+        line = TASK_MARKER.sub("", line, count=1)
         if MD_IMAGE.fullmatch(line):
             continue
         wiki_embed = WIKI_IMAGE.fullmatch(line)
@@ -334,6 +342,7 @@ def main() -> int:
     except Exception as exc:
         errors.append(f"HTML parse failed: {exc}")
     visible = re.sub(r"\s+", "", "".join(parsed.text))
+    visible = re.sub(r"\[[xX]?\](?=\S)", "", visible)
     translation_errors, translation_warnings = translation_findings(meta, visible, fragment)
     errors.extend(translation_errors)
     warnings.extend(translation_warnings)
