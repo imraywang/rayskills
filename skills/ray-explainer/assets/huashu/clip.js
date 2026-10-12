@@ -46,9 +46,19 @@ async function boot() {
   const G = CLIPS[spec.grammar]; if (!G || typeof G.draw !== 'function') return fail(`clips/${spec.grammar}.js 没注册 CLIPS['${spec.grammar}'] = { draw }`);
   // 图片
   const IMG = {}, urls = new Set();
-  (spec.cues || []).forEach(q => q.image && urls.add(q.image)); if (spec.data && spec.data.image) urls.add(spec.data.image);
-  try { await Promise.all([...urls].map(u => new Promise((res, rej) => { const im = new Image(); im.onload = () => { IMG[u] = im; res(); }; im.onerror = () => rej(u); im.src = u; }))); }
+  // ray-explainer: 视频素材＝预先拆好的帧序列 q.video = {dir, count, fps=24, rate=1, offset=0, loop=true}。
+  // IMG[q.image] 是一块固定画布，renderFrame 每帧把第 floor((t−at−offset)·fps·rate) 帧画进去：语法照常当图片用（闭包里存的也是这块画布），帧只由 t 决定
+  const VID = [], loadImg = u => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(u); im.src = u; });
+  (spec.cues || []).forEach(q => { if (q.video) { q.image = q.image || q.video.dir + '#video'; VID.push(q); } });
+  (spec.cues || []).forEach(q => q.image && !q.video && urls.add(q.image)); if (spec.data && spec.data.image) urls.add(spec.data.image);
+  try { await Promise.all([...urls].map(u => loadImg(u).then(im => { IMG[u] = im; })));
+    for (const q of VID) { const v = q.video; if (!(v.count > 0)) throw v.dir + '（video.count 为空）';
+      v.frames = await Promise.all(Array.from({ length: v.count }, (_, i) => loadImg(`${v.dir}/${String(i + 1).padStart(4, '0')}.jpg`)));
+      const cvv = document.createElement('canvas'); cvv.width = v.frames[0].width; cvv.height = v.frames[0].height; v.canvas = cvv; IMG[q.image] = cvv; } }
   catch (u) { return fail('图片加载失败：' + u); }
+  const videoAt = t => { for (const q of VID) { const v = q.video, n = v.frames.length, k = Math.floor(Math.max(0, t - (+q.at || 0) - (v.offset || 0)) * (v.fps || 24) * (v.rate || 1) + 1e-6);
+    const i = v.loop === false ? Math.min(k, n - 1) : k % n; if (v.cur !== i) { v.canvas.getContext('2d').drawImage(v.frames[i], 0, 0); v.cur = i; } } };
+  videoAt(0);
   // 字体＋字形检查（spec 里的字缺字形只警告：回退系统字体照样能渲，但换台机器会变样）
   for (const f of (window.FONT_FACES || [])) { const ff = new FontFace(f.family, `url(${f.url})`, f.desc || {}); await ff.load(); document.fonts.add(ff); }
   await document.fonts.ready; await U.loadCmaps();
@@ -71,7 +81,7 @@ async function boot() {
   // safe.fill：让开的边涂成这个颜色（竖屏片把图表做成和相邻 contain 素材同一块「卡片」，外面是片子的底色）；透明模式下不涂
   const band = (safe.fill && !spec.alpha) ? (cc => { cc.fillStyle = safe.fill; const { top: t0, bottom: b0, left: l0, right: r0 } = safe;
     if (t0) cc.fillRect(0, 0, W, t0); if (b0) cc.fillRect(0, H - b0, W, b0); if (l0) cc.fillRect(0, 0, l0, H); if (r0) cc.fillRect(W - r0, 0, r0, H); }) : null;
-  window.renderFrame = t => { c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.save(); G.draw(c, t, ctx); c.restore(); if (band) band(c); };
+  window.renderFrame = t => { videoAt(t); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.save(); G.draw(c, t, ctx); c.restore(); if (band) band(c); };
   window.prepare = async () => {};
   window.__ready = true;
   window.renderFrame(0);

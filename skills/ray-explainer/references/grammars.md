@@ -52,6 +52,12 @@
 | `t3_finance_chart` | `title/unit/source/chart/series/highlight/…` | `title`、`bar`/`line`/`candle`、`highlight`、`number`。用真实数据时不要写 `badge` |
 | `y2_vox` | — | `image`/`clip`、`title`、`point`、`highlight`（`data.rect`） |
 
+## 真实影像与视频
+
+- 图片：cue 写 `"image": "/media/<文件>"`（以 `/` 开头，指项目根目录），放在 `<project>/media/`。来源和授权记在 `media/credits.json`，CC BY 类素材出发布包时写进描述。
+- 视频：先切帧 `$SK/scripts/video_frames.sh <project> <名字> <视频> <起点秒> <时长秒> [宽=960] [fps=24]`，再在任何认 `image` 的 cue 里写 `"video": {"dir": "/media/<名字>", "fps": 24}`（可选 `rate` 快放倍数、`offset` 延后起播秒数、`loop: false` 播完停在最后一帧，默认循环）。从 cue 的 `at` 开始播放，帧由时间算出，相机推近、荧光笔、白板揭开都照常生效。每段截 3–6 秒，帧数由 render.js 自动数。
+- 公有领域历史影片优先从维基共享资源找（`filetype:video` 搜索，看 License 字段）。
+
 ## 踩过的坑
 
 - y1 镜头推近时，卫星节点会滑进字幕区。节点别超过 5 个，字幕压在节点上影响不大。

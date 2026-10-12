@@ -49,6 +49,11 @@ function cueTime(at, tsc, where) {
 }
 function specFor(ssc, tsc, fps) {
   const cues = (ssc.cues || []).map((q, k) => ({ ...q, at: cueTime(q.at ?? 0, tsc, `scene ${ssc.id} cue ${k}`) }));
+  for (const q of cues) if (q.video) {   // 视频＝项目里的帧目录（scripts/video_frames.sh 生成 0001.jpg…），帧数在这里数好写进 spec
+    const dir = path.join(PROJ, q.video.dir.replace(/^\//, ''));
+    if (!fs.existsSync(dir)) throw new Error(`scene ${ssc.id}: video dir not found: ${q.video.dir}`);
+    q.video = { ...q.video, count: fs.readdirSync(dir).filter(f => /^\d{4}\.jpg$/.test(f)).length };
+  }
   return { grammar: ssc.grammar, duration: +(tsc.end - tsc.start).toFixed(3), fps, width: W, height: H,
     safe: { ...SAFE, ...(ssc.safe || {}) }, ...(ssc.data ? { data: ssc.data } : {}), cues };
 }

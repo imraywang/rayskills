@@ -8,15 +8,37 @@
   const FAM = '"RX-Caption","PingFang SC","Hannotate SC",sans-serif';
   const CAP_Y = 1640, CAP_H = 96, CAP_SIZE = 54;
 
-  // split a line into ≤15-char caption chunks at punctuation; time each chunk from per-char timing when present
+  // split a line into ≤15-wide caption chunks at punctuation; time each chunk from per-char timing when present.
+  // Width counts ASCII as half a CJK char; long pieces split near equal widths, only at Chinese word boundaries
+  // (Intl.Segmenter) and never inside a Latin word, number, or a Latin phrase like "Search Console".
+  const MAXW = 15, cw = ch => /[\x20-\x7e]/.test(ch) ? 0.55 : 1, width = s => [...s].reduce((a, ch) => a + cw(ch), 0);
+  const word = ch => /[A-Za-z0-9]/.test(ch || '');
+  const SEG = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh', { granularity: 'word' }) : null;
+  const bounds = s => SEG ? new Set([...SEG.segment(s)].map(x => x.index)) : null;
+  function splitWide(s, at, out) {
+    if (width(s) <= MAXW) { if (s.trim()) out.push({ s: s.trim(), i: at + (s.length - s.trimStart().length) }); return; }
+    const n = Math.ceil(width(s) / MAXW), target = width(s) / n, B = bounds(s); let best = -1, bestCost = 1e9, acc = 0;
+    for (let k = 1; k < s.length; k++) {
+      acc += cw(s[k - 1]);
+      if (word(s[k - 1]) && word(s[k])) continue;                                   // inside a Latin word / number
+      if (s[k - 1] === ' ' && word(s[k - 2]) && word(s[k])) continue;               // between two Latin words
+      if (s[k] === ' ' && word(s[k - 1]) && word(s[k + 1])) continue;
+      if (B && !B.has(k) && s[k - 1] !== ' ' && s[k] !== ' ') continue;              // inside a Chinese word
+      const fits = acc <= MAXW && width(s) - acc <= MAXW * (n - 1);
+      const cost = Math.abs(acc - target) - (s[k - 1] === ' ' || s[k] === ' ' ? 0.8 : 0)
+        - (fits && /[把会就才都也还被让在要和跟]/.test(s[k] === ' ' ? s[k + 1] : s[k]) ? 5 : 0) + (fits ? 0 : 6);   // break before a function word when both halves fit
+      if (cost < bestCost) { bestCost = cost; best = k; }
+    }
+    if (best < 0) { out.push({ s: s.trim(), i: at }); return; }   // one unbreakable token: keep whole
+    splitWide(s.slice(0, best), at, out); splitWide(s.slice(best), at + best, out);
+  }
   function chunks(line) {
     const parts = line.text.split(/(?<=[，。：？！、；])/).filter(s => s.trim());
     const out = []; let pos = 0;
     for (const p of parts) {
       const lead = p.length - p.trimStart().length, s = p.trim().replace(/[，。：、；]$/, '');
       const at = line.text.indexOf(p, pos) + lead; pos = at + p.trim().length;
-      if (s.length > 15) { const h = Math.ceil(s.length / 2); out.push({ s: s.slice(0, h), i: at }, { s: s.slice(h), i: at + h }); }
-      else out.push({ s, i: at });
+      splitWide(s, at, out);
     }
     const T = i => line.chars && line.chars.length === line.text.length ? line.chars[Math.min(i, line.text.length - 1)]
       : line.start + (line.end - line.start) * i / line.text.length;
