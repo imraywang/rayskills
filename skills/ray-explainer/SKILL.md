@@ -15,6 +15,7 @@ description: 把一篇文章、剪藏或一个观点做成知识解说视频（�
 素材 ─▶ ① 解说稿 script.json（每幕可标 grammar + cues）
      ─▶ ② 配音 tts.py（Gemini 预置 / Ray 复刻音色）
      ─▶ ③ Whisper 校对 qa_tts.py（合格判定 + 逐字时间写入 timeline）
+     ─▶ ③b 数字人主持人 host.py【可选，用户确认后才做】
      ─▶ ④ 分镜：kit 场景写 scenes.js；语法场景只写 cues
      ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video
 ```
@@ -76,6 +77,17 @@ python3 $SK/scripts/qa_tts.py <project>
 
 每句转写两遍：普通转写用来比对稿子，判定合不合格；带词级时间戳的那遍只用来对齐时间。后一遍会在句尾静音处产生幻觉，冒出"染染染""请点赞订阅"这类内容，所以不能拿来判定合格。不合格的片段会被改名为 `.bad`，重跑 `tts.py` 就会重新合成。必须 `bad: 0` 才能往下走。对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间；kit 的 `at()`、语法 cue 和字幕切换都会用到。
 
+### 3b. 数字人主持人（可选，用户确认后才做）
+
+```bash
+python3 $SK/scripts/host.py <project> --dry-run   # 列出大机位段落和预计费用，贴给用户等同意
+python3 $SK/scripts/host.py <project>             # Kling 生成大机位 + 角落口型，写 host/plan.json
+```
+
+大机位（开头、金句、结尾，每集约 30 秒）用 Kling 生成带手势的说话视频，约 $0.115/秒；其余时间主持人缩在左下角，用同一形象的换嘴型图层，不花钱。形象、选句原则、画面避让见 [host.md](references/host.md)。没有 `host` 字段的片子不受任何影响。
+
+**默认不加。** 只有用户明确要加（或被问到时确认要加），才写 `host` 字段、估价、生成。
+
 ## 4. 分镜：每一幕选画法
 
 按 [grammars.md](references/grammars.md) 的选型表给每一幕挑画法：
@@ -119,14 +131,14 @@ node $SK/scripts/render.js <project> video 30
 - 内容结构：开头怎么钩住人、主体讲了哪几步、结尾的收获是什么
 - 每一幕用的画法
 - **待确认**：编补的说法、夸张的说法、事实存疑之处、Whisper 相似度在 0.8–0.9 之间的句子（附时间点）
-- 费用：`python3 $SK/scripts/cost.py <project>` 给出配音的部分；Claude 的 token 从会话记录汇总
+- 费用：`python3 $SK/scripts/cost.py <project>` 给出配音和数字人大机位的部分；Claude 的 token 从会话记录汇总
 - 能改什么：音色、单句、单幕、换一幕的画法。改稿只需重跑 2→3→5→6；只改画面只需重跑 5→6
 
 不自动发布到任何平台。
 
 ## 边界
 
-- 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或转视频模型。
+- 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或转视频模型。卡通数字人主持人是例外，见 [host.md](references/host.md)。
 - kit 的手写体依赖 macOS 自带的 Hannotate SC；语法片段和字幕用的是随 skill 带的思源黑体和霞鹜文楷，换机器也不会变样。
 - 背景音乐、音效暂未接入。要加的话，用 FFmpeg 在合成时混入，音效时刻从 timeline.json 里取。
 - `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。

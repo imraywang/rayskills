@@ -15,10 +15,11 @@ if [ ! -d "$DEPS/node_modules/puppeteer-core" ]; then
   (cd "$DEPS" && { [ -f package.json ] || npm init -y >/dev/null; } && npm i --silent --no-audit --no-fund puppeteer-core@23.11.1 >/dev/null) && echo "ok   puppeteer-core" || { echo "MISS puppeteer-core"; ok=0; }
 else echo "ok   puppeteer-core"; fi
 system_profiler SPFontsDataType 2>/dev/null | grep -q "Hannotate SC" && echo "ok   font Hannotate SC" || echo "WARN font Hannotate SC missing — handwritten look falls back to PingFang"
-python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || echo "WARN fal_client missing — pip3 install fal-client (only needed for the cloned voice)"
+python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || echo "WARN fal_client missing — pip3 install fal-client (only needed for the cloned voice / digital host)"
 [ -d "$DIR/../assets/huashu/clips" ] && echo "ok   huashu grammars ($(ls "$DIR/../assets/huashu/clips" | wc -l | tr -d ' '))" || { echo "MISS assets/huashu (explainer grammars)"; ok=0; }
 VOICES="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/voices.json"
 [ -f "$VOICES" ] && echo "ok   voices: $(python3 -c "import json;print(', '.join(json.load(open('$VOICES'))))")" || echo "info no cloned voice yet (scripts/clone_voice.py) — Gemini prebuilt voices only"
+AV="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/avatars"; [ -d "$AV" ] && echo "info digital-host avatars (optional): $(ls "$AV" | tr '\n' ' ')"; python3 -c "import pypinyin" 2>/dev/null || echo "info pypinyin missing — pip3 install pypinyin (only for the optional digital host)"
 if [ -z "${FAL_KEY:-}" ]; then eval "$(grep -E '^\s*export\s+FAL_KEY=' ~/.zshrc 2>/dev/null)"; fi
 [ -n "${FAL_KEY:-}" ] && echo "ok   FAL_KEY present" || echo "info FAL_KEY missing — needed only for the cloned voice"
 # API key: shell env first, then ~/.zshrc export

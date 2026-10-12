@@ -21,9 +21,11 @@ const PROJ = path.resolve(projArg);
 const SCRIPT = JSON.parse(fs.readFileSync(path.join(PROJ, 'script.json')));
 const TL = JSON.parse(fs.readFileSync(path.join(PROJ, 'timeline.json')));
 const W = 1080, H = 1920, SAFE = { top: 170, bottom: 330 };   // overlay: progress/header above 170, captions below 1590
+// digital host (host.py wrote host/plan.json): captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
+if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
 
 // ---------- static server: project at /, vendored huashu engine at /huashu/ ----------
-const MIME = { '.js': 'text/javascript', '.html': 'text/html', '.woff': 'font/woff', '.woff2': 'font/woff2', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.wav': 'audio/wav' };
+const MIME = { '.webp': 'image/webp', '.js': 'text/javascript', '.html': 'text/html', '.woff': 'font/woff', '.woff2': 'font/woff2', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.wav': 'audio/wav' };
 function serve() {
   const srv = http.createServer((req, res) => {
     let u = decodeURIComponent(req.url.split('?')[0]); let base = PROJ;
@@ -94,8 +96,10 @@ function specFor(ssc, tsc, fps) {
     const sc = sceneAt(t);
     if (sc.grammar) {
       const { p } = await clipPage(sc.id), lt = Math.min(Math.max(0, t - sc.start), sc.end - sc.start - 1 / fps);
+      await p.evaluate(t => RXO.prep(t), t);
       return p.evaluate((lt, t, q) => { renderFrame(lt); RXO.draw(window.__canvas.getContext('2d'), t); return window.__canvas.toDataURL('image/jpeg', q).split(',')[1]; }, lt, t, q);
     }
+    await kit.evaluate(t => window.RXO && RXO.prep && RXO.prep(t), t);
     return kit.evaluate((t, q) => { renderFrame(t); return document.getElementById('c').toDataURL('image/jpeg', q).split(',')[1]; }, t, q);
   };
 

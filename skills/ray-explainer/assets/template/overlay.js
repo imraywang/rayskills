@@ -1,12 +1,13 @@
 // ray-explainer overlay: burned-in captions + progress bar + header, drawn on top of ANY scene
 // (kit scenes and huashu grammar clips alike), so the whole film shares one caption style.
-// Needs window.TIMELINE; reads window.META.header. Exposes window.RXO = { ready, draw(ctx, t) }.
+// Needs window.TIMELINE; reads window.META.header. Exposes window.RXO = { ready, prep(t), draw(ctx, t) }.
+// Optional host (digital presenter): drawn only when the project has host/plan.json (scripts/host.py writes it).
 // Deterministic: everything is a function of t.
 (() => {
   const TL = window.TIMELINE;
   const FONT_URL = window.RX_CAPTION_FONT || '/huashu/lib/fonts/NotoSansSC-700.woff';
   const FAM = '"RX-Caption","PingFang SC","Hannotate SC",sans-serif';
-  const CAP_Y = 1640, CAP_H = 96, CAP_SIZE = 54;
+  let CAP_Y = 1640; const CAP_H = 96, CAP_SIZE = 54;
 
   // split a line into ≤15-wide caption chunks at punctuation; time each chunk from per-char timing when present.
   // Width counts ASCII as half a CJK char; long pieces split near equal widths, only at Chinese word boundaries
@@ -47,9 +48,42 @@
   const CAPS = TL.scenes.flatMap(s => s.lines.flatMap(chunks));
   const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 
+  // ---- 数字人主持人（可选）：大机位播 Kling 帧序列，其余时间左下角换嘴型图层 ----
+  let HOST = null; const HIMG = {}, FRAMES = new Map();
+  const loadImg = u => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(u); im.src = u; });
+  async function hostInit() {
+    try { const r = await fetch('/host/plan.json'); if (!r.ok) return; HOST = await r.json(); } catch (e) { return; }
+    const A = HOST.avatar; HIMG.base = await loadImg(A.dir + 'base.png');
+    for (const k of Object.keys(A.patches)) HIMG[k] = await loadImg(A.dir + k + '.png');
+    CAP_Y = HOST.caption_y;
+  }
+  const segAt = t => HOST.segments.find(s => t >= s.start && t < s.end);
+  const frameUrl = (s, t) => s.dir + String(Math.min(s.count, Math.floor((t - s.start) * s.fps) + 1)).padStart(4, '0') + '.webp';
+  async function prep(t) {   // render.js awaits this before each frame: the big-shot frame for t must be decoded first
+    if (!HOST || window.RX_CLEAN) return; const s = segAt(t); if (!s) return; const u = frameUrl(s, t);
+    if (!FRAMES.has(u)) { if (FRAMES.size > 90) FRAMES.delete(FRAMES.keys().next().value); FRAMES.set(u, await loadImg(u)); }
+  }
+  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const mouthAt = t => { const M = HOST.mouth; let lo = 0, hi = M.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (M[m][0] <= t) { r = m; lo = m + 1; } else hi = m - 1; } return r < 0 ? 'X' : M[r][1]; };
+  function drawHost(ctx, t) {
+    const s = segAt(t), C = HOST.corner, B = HOST.big;
+    const k = s ? Math.min(ease(clamp((t - s.start) / HOST.trans)), ease(clamp((s.end - t) / HOST.trans))) : 0;
+    const w = C.w + (B.w - C.w) * k, x = C.x + (B.x - C.x) * k, h = w * HOST.aspect;
+    const y = C.y + (B.y - C.y) * k + (1 - ease(clamp(t / .5))) * 420;   // slides up at the very start
+    if (s) { const im = FRAMES.get(frameUrl(s, t)); if (im) { ctx.drawImage(im, x, y, w, h); return; } }
+    const A = HOST.avatar, sc = w / A.size[0];
+    ctx.save(); ctx.translate(x + w / 2, y + h); ctx.rotate(Math.sin(t / 1.6 * Math.PI) * .02); ctx.translate(-(x + w / 2), -(y + h));
+    ctx.drawImage(HIMG.base, x, y, w, h);
+    const put = key => { const [px, py, pw, ph] = A.patches[key]; ctx.drawImage(HIMG[key], x + px * sc, y + py * sc, pw * sc, ph * sc); };
+    const m = mouthAt(t); if (m !== 'X' && HIMG[m]) put(m);
+    if (HIMG.B && HOST.blinks.some(b => t >= b && t < b + .12)) put('B');
+    ctx.restore();
+  }
+
   function draw(ctx, t) {
     const W = ctx.canvas.width;
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    if (HOST) drawHost(ctx, t);   // under captions: the caption sits on the presenter's chest
     // progress bar + header
     const pr = clamp(t / TL.duration);
     ctx.fillStyle = 'rgba(128,128,128,.25)'; ctx.fillRect(80, 90, W - 160, 10);
@@ -69,8 +103,9 @@
   }
 
   const ready = (async () => {
+    await hostInit();
     try { const f = new FontFace('RX-Caption', `url(${FONT_URL})`, { weight: '100 900' }); await f.load(); document.fonts.add(f); return true; }
     catch (e) { console.warn('caption font not loaded, falling back to system font:', FONT_URL); return false; }
   })();
-  window.RXO = { ready, draw, CAPS };
+  window.RXO = { ready, prep, draw, CAPS };
 })();

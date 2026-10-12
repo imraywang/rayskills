@@ -1,14 +1,14 @@
 """Report TTS usage and cost for a project. usage: python3 cost.py <project_dir>
 Prices as listed 2026-10 — re-check before quoting budgets:
   gemini-3.8-flash-tts (standard tier): $0.50/M text-in tokens, $9/M audio-out tokens; free-tier AI Studio keys bill $0
-  fal-ai/minimax/speech-2.8-hd: $0.10 per 1000 characters (voice-clone itself: $1.50 once per voice)"""
+  fal-ai/minimax/speech-2.8-hd: $0.10 per 1000 characters (voice-clone itself: $1.50 once per voice)
+  fal-ai/kling-video/ai-avatar/v2: pro $0.115/s, standard $0.0562/s of output (digital host, host.py)"""
 import json, os, sys
 GEMINI = {"gemini-3.8-flash-tts": (0.50, 9.00), "gemini-3.8-flash-lite-tts": (0.25, 4.50)}
 MINIMAX = {"fal-ai/minimax/speech-2.8-hd": 0.10, "fal-ai/minimax/speech-2.8-turbo": 0.06}
 f = os.path.join(sys.argv[1], "audio", "usage.json")
-if not os.path.exists(f): sys.exit("no audio/usage.json — clips were cached or made outside tts.py")
-u = json.load(open(f))
-if not u: sys.exit("usage.json is empty")
+u = json.load(open(f)) if os.path.exists(f) else {}
+if not u: print("no audio/usage.json — TTS clips were cached or made outside tts.py")
 total = 0.0
 g = [v for v in u.values() if v.get("provider", "gemini") == "gemini"]
 if g:
@@ -21,3 +21,9 @@ if m:
     c = ch / 1000 * MINIMAX.get(m[0]["model"], 0.10); total += c
     print(f"MiniMax TTS calls {len(m)}  {ch} chars (~{sec:.0f}s)  ≈ ${c:.3f}")
 print(f"TTS total ≈ ${total:.3f}  (includes re-synthesized clips; cached clips cost nothing)")
+hf = os.path.join(sys.argv[1], "host", "usage.json")
+if os.path.exists(hf):
+    KLING = {"fal-ai/kling-video/ai-avatar/v2/pro": 0.115, "fal-ai/kling-video/ai-avatar/v2/standard": 0.0562}
+    h = json.load(open(hf)).values(); sec = sum(v.get("billed") or v["seconds"] for v in h); c = sum((v.get("billed") or v["seconds"]) * KLING.get(v["model"], 0.115) for v in h)
+    print(f"Kling host  calls {len(h)}  {sec:.1f}s video  ≈ ${c:.3f}  (cached segments cost nothing)")
+    print(f"TTS + host ≈ ${total + c:.3f}")
