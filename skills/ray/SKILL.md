@@ -54,6 +54,7 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 | 从灵感与检索直接做快速口播；从定稿长文再分发口播；审读或对照实际录制稿 | `ray-kb` |
 | 给定稿文章生成公众号、X 与 X Article 封面 | `ray-cover` |
 | 给口播文稿或选题做拼贴 B-roll / 讲解片 | `ray-broll` |
+| 把文章、剪藏或观点做成无人出镜的知识解说视频（代码绘制画面、复刻音色配音） | `ray-explainer`（先出分镜表给 Ray 确认，再配音和画） |
 | 把定稿文章排版并保存到微信公众号草稿箱 | `ray-wechat` |
 | 把定稿文章和 5:2 封面保存到 X Articles 草稿箱 | `ray-x-article` |
 | 从 idea/草稿一路做到文章、封面与 X Article 草稿 | [内容生产管线](references/content-pipeline.md) |
