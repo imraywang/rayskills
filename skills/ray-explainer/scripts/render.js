@@ -6,6 +6,7 @@
 //   node render.js <project> sheet [N]             -> N evenly spaced stills tiled into <project>/contact.jpg
 //   node render.js <project> video [fps]           -> <project>/out.mp4
 //   node render.js <project> serve                 -> live preview URL (kit scenes; grammar scenes show via stills)
+// env RX_CLEAN=1: frames without captions / progress bar (publish.py uses it for the cover)
 const path = require('path'), fs = require('fs'), http = require('http'), os = require('os');
 const { spawn, execFileSync } = require('child_process');
 // puppeteer-core lives outside the skill dir (installed by check_setup.sh) so the skill stays dependency-free
@@ -74,9 +75,10 @@ function specFor(ssc, tsc, fps) {
     if (init) await p.evaluateOnNewDocument(init);
     await p.goto(url); return p;
   };
-  const kit = await open(`${base}/video.html`);
+  const CLEAN = process.env.RX_CLEAN ? 'window.RX_CLEAN=true;' : '';
+  const kit = await open(`${base}/video.html`, CLEAN || undefined);
   const info = await kit.evaluate(() => window.ready);
-  const META = await kit.evaluate(() => window.META || {});
+  const META = { header: SCRIPT.header || '', ...(await kit.evaluate(() => window.META || {})) };
   if (!info.fonts) console.warn('WARN: handwriting font not available — kit text falls back');
   console.log('ready', { duration: TL.duration, scenes: TL.scenes.map(s => `${s.id}:${s.grammar || 'kit'}`).join(' ') });
 
@@ -85,7 +87,7 @@ function specFor(ssc, tsc, fps) {
     if (clips[sid]) return clips[sid];
     const ssc = SCRIPT.scenes.find(s => s.id === sid), tsc = TL.scenes.find(s => s.id === sid), spec = specFor(ssc, tsc, fps);
     fs.mkdirSync(path.join(PROJ, 'specs'), { recursive: true }); fs.writeFileSync(path.join(PROJ, 'specs', sid + '.json'), JSON.stringify(spec, null, 1));
-    const p = await open(`${base}/huashu/clip.html?render=1`, `window.CLIP_SPEC=${JSON.stringify(spec)};window.TIMELINE=${JSON.stringify(TL)};window.META=${JSON.stringify(META)};`);
+    const p = await open(`${base}/huashu/clip.html?render=1`, `${CLEAN}window.CLIP_SPEC=${JSON.stringify(spec)};window.TIMELINE=${JSON.stringify(TL)};window.META=${JSON.stringify(META)};`);
     await p.waitForFunction('window.__ready === true || !!window.__bootFailed', { timeout: 120000 });
     const bf = await p.evaluate('window.__bootFailed || null'); if (bf) throw new Error(`scene ${sid} (${ssc.grammar}) failed to boot:\n${bf}`);
     await p.addScriptTag({ url: `${base}/overlay.js` }); await p.evaluate(() => window.RXO.ready);

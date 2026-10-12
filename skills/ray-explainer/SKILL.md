@@ -12,13 +12,15 @@ description: 把一篇文章、剪藏或一个观点做成知识解说视频（�
 ## 链路
 
 ```
-素材 ─▶ ① 解说稿 script.json（每幕可标 grammar + cues）
+素材 ─▶ ① 解说稿 script.json ─▶ ①b 分镜表 storyboard.py【Ray 确认】
      ─▶ ② 配音 tts.py（Gemini 预置 / Ray 复刻音色）
      ─▶ ③ Whisper 校对 qa_tts.py（合格判定 + 逐字时间写入 timeline）
      ─▶ ③b 数字人主持人 host.py【可选，用户确认后才做】
      ─▶ ④ 分镜：kit 场景写 scenes.js；语法场景只写 cues
-     ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video
+     ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video ─▶ ⑧ 发布包 publish.py
 ```
+
+**两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
 脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
 
@@ -40,7 +42,23 @@ $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explai
 
 视频文件不要放进 Obsidian vault：vault 带 git 自动快照，大文件会进历史。
 
-按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写 `"header"`（顶部小标题）和 `"voice"`。写完先把稿子给用户过目；用户明确说“直接做”时可以跳过这一步。
+按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`（顶部小标题）、`voice`、`to_confirm`。
+
+### 1b. 分镜关
+
+稿子定了以后，给每一幕补三个字段，再按 [grammars.md](references/grammars.md) 选好画法（写 `grammar` 或 `pattern`；都不写表示手写 kit）：
+
+- `beat`：这一幕讲什么，一句话
+- `visual`：画面按出现顺序依次是什么，用大白话写
+- `anchors`：哪个词触发哪个画面事件
+
+```bash
+python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 storyboard.md
+```
+
+把表格原样贴给用户，等确认。用户关心三件事：每一幕画什么、画法对不对、要不要合并、拆分或删掉某一幕。预计时长按每秒约 5.8 字估算，误差在几秒以内。确认后才进入配音；分镜阶段改了旁白，先把 `lines` 改掉，再往下走。
+
+**数字人主持人默认不加。** 贴分镜表时附一句「这条要不要加数字人主持人」即可，不主动加；只有用户明确要加，才按 [host.md](references/host.md) 在第 3 步之后标大机位句子、先给估价、同意后再生成。
 
 ## 2. 配音
 
@@ -93,7 +111,8 @@ python3 $SK/scripts/host.py <project>             # Kling 生成大机位 + 角�
 按 [grammars.md](references/grammars.md) 的选型表给每一幕挑画法：
 
 - **语法场景**：在 `script.json` 的这一幕里写 `"grammar"` 和 `"cues"`，不用写代码。cue 的时间写成 `{"line": 1, "phrase": "创造新行为"}`，就能精确卡到这个词开口的时刻。
-- **kit 场景**：在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`。用于打叉、漏斗、排行榜、交换位置这类需要定制画面的内容。API 见 [kit-api.md](references/kit-api.md)，套路见 [scene-patterns.md](references/scene-patterns.md)，完整范例是 `assets/template/scenes.example.js`。**不要为了某一条片子去改 kit.js**。
+- **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
+- **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
 - 一条片子里语法不超过 3–4 种；开头钩子和结尾收获优先用 kit 或 y5。
 - 安全区：顶部 y<170 留给进度条，字幕条在 y 1640–1736。语法片段默认就会让开这两块；kit 场景的主舞台用 y 380–1500。
 
@@ -135,6 +154,20 @@ node $SK/scripts/render.js <project> video 30
 - 能改什么：音色、单句、单幕、换一幕的画法。改稿只需重跑 2→3→5→6；只改画面只需重跑 5→6
 
 不自动发布到任何平台。
+
+## 8. 发布包
+
+用户认可成片后，在 `script.json` 里写 `cover_t`（封面取第几秒那一帧）和 `publish`（`titles` 标题备选、`description` 描述、`tags` 标签，写法遵循 Ray 的写作规则：直接、口语化），然后：
+
+```bash
+python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
+```
+
+- 生成 `cover.jpg`：这一帧不带字幕和进度条
+- 生成 `publish.md`：标题、描述、标签，可以直接复制粘贴
+- 在 vault 的 `10-创作/25-口播草稿/<日期>-<标题>.md` 写一篇笔记：frontmatter 记录视频路径、时长、音色、画法、待确认条数；正文是分镜表、逐字稿和发布文案。视频本身不复制进 vault
+- 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
+- 暂不调用 ray-cover：它的风格不适合这类视频
 
 ## 边界
 

@@ -64,6 +64,18 @@
         "上传录音前得到用户明确同意",
         "注册信息写在 ~/.config 下，不进仓库"
       ]
+    },
+    {
+      "id": 6,
+      "name": "分镜关：先给表再动手",
+      "type": "happy-path",
+      "prompt": "/ray-explainer 把这篇剪藏做成解说视频，稿子你先写。",
+      "expected_output": "先给出逐字稿；稿子确认后补 beat/visual/anchors 和画法（优先 pattern 与 grammar），运行 storyboard.py 贴出分镜表，等用户确认后才调用 tts.py；手写 scenes.js 只用于套路覆盖不到的画面。",
+      "expectations": [
+        "分镜表确认之前不调用任何 TTS",
+        "分镜表包含画法、画面、卡点、预计时长",
+        "能用 pattern 或 grammar 的幕不手写代码"
+      ]
     }
   ]
 }

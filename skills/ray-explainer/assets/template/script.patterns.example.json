@@ -1,0 +1,696 @@
+{
+  "voice": "ray",
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        "AI 模型的排行榜，差不多每周换一次第一。",
+        "开发者想换个模型，改一行代码就行。",
+        "那如果模型谁都追得上，AI 公司到底靠什么赢？",
+        "a16z 合伙人 David George 给了个很反直觉的答案：模型强不强，根本不是重点。"
+      ],
+      "beat": "排行榜每周换第一 → 换模型改一行代码 → 靠什么赢 → 模型强不强根本不是重点",
+      "visual": "排行榜行位持续互换 → 代码卡片里的模型名被替换 → 大字问句 → 「模型强不强」被红叉划掉",
+      "anchors": "「改一行」替换模型名；「根本」落红叉",
+      "pattern": "leaderboard",
+      "data": {
+        "title": "模型排行榜",
+        "items": [
+          "GPT",
+          "Claude",
+          "Gemini",
+          "Grok"
+        ]
+      },
+      "cues": [
+        {
+          "at": 0,
+          "kind": "board"
+        },
+        {
+          "at": {
+            "line": 1
+          },
+          "kind": "code",
+          "text": "← 改一行就行"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "改一行"
+          },
+          "kind": "swap"
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "question",
+          "text": "AI 公司",
+          "sub": "到底靠什么赢？"
+        },
+        {
+          "at": {
+            "line": 3,
+            "phrase": "模型强不强"
+          },
+          "kind": "strike",
+          "text": "模型强不强",
+          "data": {
+            "who": "David George · a16z"
+          }
+        },
+        {
+          "at": {
+            "line": 3,
+            "phrase": "根本"
+          },
+          "kind": "cross",
+          "text": "根本不是重点"
+        }
+      ]
+    },
+    {
+      "id": "drucker",
+      "lines": [
+        "他引了德鲁克五十年前的一句话：",
+        "企业的目的，是创造顾客。"
+      ],
+      "beat": "德鲁克：企业的目的是创造顾客",
+      "visual": "涂鸦头像，引语卡逐字打出",
+      "anchors": "「创造顾客」下划线",
+      "pattern": "quote",
+      "data": {
+        "title": "德鲁克说",
+        "who": "Peter Drucker",
+        "lines": [
+          "企业的目的，",
+          "是创造顾客。"
+        ]
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 1
+          },
+          "kind": "quote",
+          "data": {
+            "dur": 2.2
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "创造顾客",
+            "offset": 0.4
+          },
+          "kind": "underline"
+        },
+        {
+          "at": {
+            "line": 1,
+            "offset": 2.6
+          },
+          "kind": "note",
+          "text": "—— 五十年前的一句话"
+        }
+      ]
+    },
+    {
+      "id": "levers",
+      "lines": [
+        "他说，想在 AI 前沿做成一门长久的生意，手里只有四根杠杆：",
+        "创造新行为，扩大分发，定价赚钱，还有用户的切换成本。"
+      ],
+      "beat": "四根杠杆",
+      "visual": "四页大字：新行为、分发、定价、切换成本",
+      "anchors": "说到每个词时翻页",
+      "pattern": "grid",
+      "data": {
+        "title": "四根杠杆",
+        "cards": [
+          {
+            "title": "新行为",
+            "sub": "创造新的用法",
+            "icon": "bulb"
+          },
+          {
+            "title": "分发",
+            "sub": "触达更多人",
+            "icon": "broadcast"
+          },
+          {
+            "title": "定价",
+            "sub": "把价值收回来",
+            "icon": "coin"
+          },
+          {
+            "title": "切换成本",
+            "sub": "让用户走不了",
+            "icon": "lock"
+          }
+        ]
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 1,
+            "phrase": "创造新行为"
+          },
+          "kind": "show",
+          "data": {
+            "index": 0
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "扩大分发"
+          },
+          "kind": "show",
+          "data": {
+            "index": 1
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "定价赚钱"
+          },
+          "kind": "show",
+          "data": {
+            "index": 2
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "切换成本"
+          },
+          "kind": "show",
+          "data": {
+            "index": 3
+          }
+        },
+        {
+          "at": 0.6,
+          "kind": "note",
+          "text": "想做成长久的生意，只有这四根"
+        }
+      ]
+    },
+    {
+      "id": "cross",
+      "lines": [
+        "切换成本，基本没了。模型随时能换，大家又都在变强，谁都停不下来。",
+        "定价，人人都想要。可最后性价比最高的，还是规模最大的那家。它是结果，拉不动。",
+        "所以真正能拉的，只剩两根：创造新行为，和分发。"
+      ],
+      "beat": "两根断了，剩两根",
+      "visual": "沿用四宫格，③④打叉变灰，①②被圈住",
+      "anchors": "「基本没了」「它是结果」各落一个叉；「只剩两根」画圈",
+      "pattern": "grid",
+      "data": {
+        "title": "四根里，两根是断的",
+        "cards": [
+          {
+            "title": "新行为",
+            "sub": "创造新的用法",
+            "icon": "bulb"
+          },
+          {
+            "title": "分发",
+            "sub": "触达更多人",
+            "icon": "broadcast"
+          },
+          {
+            "title": "定价",
+            "sub": "把价值收回来",
+            "icon": "coin"
+          },
+          {
+            "title": "切换成本",
+            "sub": "让用户走不了",
+            "icon": "lock"
+          }
+        ]
+      },
+      "cues": [
+        {
+          "at": -9,
+          "kind": "show"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "基本没了"
+          },
+          "kind": "cross",
+          "text": "随时能换",
+          "data": {
+            "index": 3,
+            "arrows": true
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "它是结果"
+          },
+          "kind": "cross",
+          "text": "规模说了算",
+          "data": {
+            "index": 2
+          }
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "dim",
+          "data": {
+            "index": [
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "只剩两根"
+          },
+          "kind": "circle",
+          "text": "真正能拉的",
+          "data": {
+            "index": [
+              0,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "behavior",
+      "lines": [
+        "先说新行为。ChatGPT 刚上线那几周，OpenAI 内部很多人觉得：一个聊天框而已，该去做点正经产品了。",
+        "是 Peter Thiel 跟 Sam Altman 说：你们创造了一种新顾客，没有比这更重要的事。",
+        "后来的推理、工具调用、Computer Use，都是这个路子：事后看简单到理所当然，之前就是没人做出来。"
+      ],
+      "beat": "ChatGPT 的故事 → 事后看理所当然",
+      "visual": "聊天框加怀疑脸 → Thiel 的话 → 四个灯泡依次点亮",
+      "anchors": "「新顾客」弹出；每个突破说出时点亮",
+      "pattern": "story",
+      "data": {
+        "title": "① 新行为：OpenAI 最会找"
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 0,
+            "offset": 0.2
+          },
+          "kind": "chat",
+          "text": "ChatGPT"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "一个聊天框"
+          },
+          "kind": "doubt",
+          "text": "一个聊天框而已？"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "你们创造"
+          },
+          "kind": "bubble",
+          "text": "你们创造了一种",
+          "sub": "新顾客",
+          "data": {
+            "who": "Peter Thiel → Sam Altman"
+          }
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "step",
+          "text": "聊天"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "推理"
+          },
+          "kind": "step",
+          "text": "推理"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "工具调用"
+          },
+          "kind": "step",
+          "text": "工具调用"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "Computer"
+          },
+          "kind": "step",
+          "text": "Computer Use"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "事后看"
+          },
+          "kind": "summary",
+          "text": "事后看：理所当然",
+          "sub": "之前：没人做出来"
+        }
+      ]
+    },
+    {
+      "id": "breadth",
+      "lines": [
+        "为什么总是它先找到？因为它的用户够杂。",
+        "从一个具体的解法走到通用的解法，比所有人想的都难。你得见过足够多、足够杂的用法，才知道那个简单的答案在哪。",
+        "所以通用能力，其实取决于分发。"
+      ],
+      "beat": "用户够杂 → 通用解 → 取决于分发",
+      "visual": "OpenAI 星球周围出现 5 类用户节点 → 镜头钻进「通用解」",
+      "anchors": "「够杂」出节点；「简单的答案」钻入",
+      "pattern": "funnel",
+      "data": {
+        "title": "为什么总是它先找到？"
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 0
+          },
+          "kind": "crowd",
+          "text": "用户够杂"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "从一个具体"
+          },
+          "kind": "funnel",
+          "text": "具体解法"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "足够杂",
+            "offset": -0.4
+          },
+          "kind": "pour"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "简单的答案"
+          },
+          "kind": "result",
+          "text": "通用解"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "通用能力"
+          },
+          "kind": "formula",
+          "text": "通用能力",
+          "sub": "分发",
+          "data": {
+            "verb": "取决于"
+          }
+        }
+      ]
+    },
+    {
+      "id": "routes",
+      "lines": [
+        "分发有三条路：自己做产品，找合作伙伴，或者做平台。",
+        "合作来得最快，但顾客和数据，都留在对方手里。",
+        "平台最慢，可别人在你上面搭什么、怎么用，都在反过来教你。这个学习回路，最难抄。"
+      ],
+      "beat": "分发的三条路",
+      "visual": "三个图标横排加箭头，两条要点，圈出「平台」",
+      "anchors": "说到每条路时画出对应图标；「学习回路」画圈",
+      "pattern": "paths",
+      "data": {
+        "title": "② 分发：三条路",
+        "root": "模型公司",
+        "paths": [
+          {
+            "title": "自有产品"
+          },
+          {
+            "title": "合作伙伴"
+          },
+          {
+            "title": "平台"
+          }
+        ]
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 0
+          },
+          "kind": "root"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "自己做产品"
+          },
+          "kind": "path",
+          "data": {
+            "index": 0
+          }
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "找合作伙伴"
+          },
+          "kind": "path",
+          "data": {
+            "index": 1
+          }
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "做平台"
+          },
+          "kind": "path",
+          "data": {
+            "index": 2
+          }
+        },
+        {
+          "at": {
+            "line": 1
+          },
+          "kind": "focus",
+          "data": {
+            "index": 1
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "最快"
+          },
+          "kind": "note",
+          "text": "最快",
+          "data": {
+            "index": 1,
+            "color": "green"
+          }
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "但顾客"
+          },
+          "kind": "loss",
+          "text": "合作方手里",
+          "sub": "数据"
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "focus",
+          "data": {
+            "index": 2
+          }
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "最慢"
+          },
+          "kind": "note",
+          "text": "最慢",
+          "data": {
+            "index": 2,
+            "color": "red"
+          }
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "别人在你上面"
+          },
+          "kind": "loop",
+          "text": "用户怎么用",
+          "sub": "反过来教你"
+        },
+        {
+          "at": {
+            "line": 2,
+            "phrase": "这个学习回路"
+          },
+          "kind": "punch",
+          "text": "学习回路 = 最难抄"
+        }
+      ]
+    },
+    {
+      "id": "flip",
+      "lines": [
+        "所以这篇文章最反直觉的地方是：因果是反的。",
+        "OpenAI 会拥有最好的模型，是因为它有最好的分发，不是反过来。"
+      ],
+      "beat": "因果是反的",
+      "visual": "公式「最好的模型→赢」形变成「最好的分发→最好的模型」",
+      "anchors": "「是因为」开始形变",
+      "pattern": "swap",
+      "data": {
+        "title": "最反直觉的一点",
+        "a": "最好的模型",
+        "b": "最好的分发",
+        "arrowBefore": "才能赢",
+        "arrowAfter": "才会有"
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 0
+          },
+          "kind": "show"
+        },
+        {
+          "at": {
+            "line": 0,
+            "phrase": "因果是反的"
+          },
+          "kind": "flip"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "是因为"
+          },
+          "kind": "punch",
+          "text": "分发 → 模型"
+        }
+      ]
+    },
+    {
+      "id": "takeaway",
+      "lines": [
+        "下次再看到谁发了新模型、刷了新榜，你可以换三个问题去看它：",
+        "它创造了什么新行为？它能触达多杂的人？它能从这些人身上学到什么？",
+        "这三个问题，拿来看任何一家公司都好用。包括你自己。"
+      ],
+      "beat": "三个问题，包括你自己",
+      "visual": "三个复选框逐个打勾 → 「包括你自己」",
+      "anchors": "每个问题说出时打勾",
+      "pattern": "checklist",
+      "data": {
+        "title": "下次换三个问题看"
+      },
+      "cues": [
+        {
+          "at": {
+            "line": 0,
+            "phrase": "三个问题"
+          },
+          "kind": "item",
+          "text": "新行为？",
+          "sub": "它创造了什么"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "它能触达"
+          },
+          "kind": "item",
+          "text": "多杂的人？",
+          "sub": "它能触达"
+        },
+        {
+          "at": {
+            "line": 1,
+            "phrase": "它能从"
+          },
+          "kind": "item",
+          "text": "学到什么？",
+          "sub": "它能从这些人身上"
+        },
+        {
+          "at": {
+            "line": 2
+          },
+          "kind": "final",
+          "text": "包括你自己",
+          "sub": "看任何一家公司都好用",
+          "data": {
+            "bigDelay": 2.2
+          }
+        }
+      ]
+    }
+  ],
+  "tts_model": "gemini-3.8-flash-tts",
+  "header": "一篇读懂 · a16z 谈 OpenAI",
+  "title": "a16z：OpenAI 会赢，理由跟模型无关",
+  "source": "30-资料/40-网页剪藏/2026-09-30-OpenAI Understands Something Important and Rare.md",
+  "central_judgment": "模型可替代，AI 公司真正能拉的只有创造新行为和分发；而且因果是反的——分发够广，才会有最好的模型",
+  "to_confirm": [
+    "「排行榜差不多每周换一次第一」是为开头写的夸张说法",
+    "「德鲁克五十年前的一句话」照搬原文 half a century，实际是 1954 年，七十多年前",
+    "作者是 a16z 投资人，片中未提立场"
+  ],
+  "cover_t": 16.8,
+  "publish": {
+    "titles": [
+      "模型谁都追得上，AI 公司到底靠什么赢？",
+      "a16z 押注 OpenAI 会赢，理由跟模型无关",
+      "最好的模型，是分发换来的"
+    ],
+    "description": "AI 排行榜天天换第一，换个模型只要改一行代码。那 AI 公司的护城河到底在哪？\n\na16z 合伙人 David George 的答案很反直觉：四根杠杆断了两根，剩下的是「创造新行为」和「分发」，而且因果是反的，分发够广，才会有最好的模型。\n\n看完你会多三个问题，以后看任何一家 AI 公司都能用：\n① 它创造了什么新行为？\n② 它能触达多杂的人？\n③ 它能从这些人身上学到什么？\n\n你觉得国内哪家 AI 公司分发做得最好？评论区聊聊👇",
+    "tags": [
+      "AI",
+      "人工智能",
+      "OpenAI",
+      "ChatGPT",
+      "商业思维",
+      "知识科普"
+    ]
+  }
+}

@@ -81,6 +81,7 @@
   }
 
   function draw(ctx, t) {
+    if (window.RX_CLEAN) return;   // clean frames (cover): no captions / progress
     const W = ctx.canvas.width;
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
     if (HOST) drawHost(ctx, t);   // under captions: the caption sits on the presenter's chest
@@ -88,7 +89,7 @@
     const pr = clamp(t / TL.duration);
     ctx.fillStyle = 'rgba(128,128,128,.25)'; ctx.fillRect(80, 90, W - 160, 10);
     ctx.fillStyle = '#e8743b'; ctx.fillRect(80, 90, (W - 160) * pr, 10);
-    const header = (window.META && window.META.header) || '';
+    const header = (window.META && window.META.header) || (window.SCRIPT && window.SCRIPT.header) || '';
     if (header) { ctx.font = `500 32px ${FAM}`; ctx.fillStyle = 'rgba(140,140,140,.95)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(header, W / 2, 140); }
     // caption
     const c = CAPS.find(c => t >= c.start - .05 && t < c.end + .25);

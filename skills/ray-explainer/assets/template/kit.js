@@ -171,7 +171,10 @@ window.renderFrame = function (t) {
     const a = Math.min(ap(t, sc.start, .3), 1 - ap(t, sc.end - .28, .28));
     ctx.save(); ctx.globalAlpha = a;
     const z = 1 + (1 - eOut(ap(t, sc.start, .4))) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
-    S[sc.id](t, sc); ctx.restore();
+    const def = typeof patternDef === 'function' ? patternDef(sc) : null;   // patterns.js: cue-driven hand-drawn scenes
+    if (def) { if (P[def.name]) P[def.name](t, sc, def); else if (!window['__warned' + sc.id]) { window['__warned' + sc.id] = 1; console.error(`scene ${sc.id}: unknown pattern ${def.name}`); } }
+    if (S[sc.id]) S[sc.id](t, sc);   // scenes.js: custom code (or extras on top of a pattern)
+    ctx.restore();
   }
   if (window.RXO) RXO.draw(ctx, t);   // captions + progress + header (overlay.js), shared with grammar clips
 };
@@ -179,6 +182,7 @@ window.renderFrame = function (t) {
 window.ready = (async () => {
   await Promise.all(['bold 60px "Hannotate SC"', '60px "Hannotate SC"', 'bold 60px "HanziPen SC"'].map(f => document.fonts.load(f, '测试中文')));
   if (window.RXO) await RXO.ready;
+  if (!window.SCRIPT) { try { window.SCRIPT = await (await fetch('script.json')).json(); } catch (e) { /* file:// preview: patterns need the http server (render.js serve) */ } }
   paperTex = makePaper();
   return { duration: TL.duration, fonts: document.fonts.check('bold 60px "Hannotate SC"', '中') };
 })();

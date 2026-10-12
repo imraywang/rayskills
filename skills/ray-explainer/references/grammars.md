@@ -1,6 +1,6 @@
 # 解说语法（混合模式）
 
-一条片子按场景（scene）选画法：不写 `grammar` 的场景用 ray-explainer 自己的手绘 kit（`scenes.js`），写了 `grammar` 的场景交给 huashu-art-motion 的参数化片段（`assets/huashu/`）。字幕、进度条和顶部小标题由 `overlay.js` 统一叠加，全片风格一致。
+一条片子按场景（scene）选画法，有三种：写 `grammar` 的交给 huashu-art-motion 的参数化片段（`assets/huashu/`）；写 `pattern` 的用 ray-explainer 的手绘套路（见 [patterns.md](patterns.md)）；两个都不写的用 `scenes.js` 手写代码。字幕、进度条和顶部小标题由 `overlay.js` 统一叠加，全片风格一致。
 
 ## 怎么选
 
@@ -14,7 +14,8 @@
 | 营收、份额、走势等真实数字 | `t3_finance_chart` 财经图表 | 未测 |
 | 有截图、原话、新闻的论证 | `y2_vox` 拼贴 | 未测 |
 | 第一人称讲经历、翻车 | `y4_storytime`（主角是豆子形的花叔） | 不建议用：角色不是 Ray |
-| 需要定制画面：打叉、漏斗、排行榜、两张卡交换位置 | 不写 grammar，用 kit | 完全自由 |
+| 排行榜钩子、名人金句、N 宫格与排除法、故事到规律、多到一的漏斗、几条路径、因果互换、收获清单 | 手绘套路 `pattern`（[patterns.md](patterns.md)） | 手绘风格，已用整片验证 |
+| 以上都覆盖不到的独特画面 | 手写 `scenes.js` | 完全自由 |
 
 规则：
 - 一幕只用一种画法。换画法就是转场，所以放在换话题的地方。
