@@ -45,14 +45,15 @@ description: 把已经完成的中文长文和 5:2 封面可靠写入登录中�
 python3 scripts/prepare_article.py --article <文章.md> --cover <x-article-cover.png> --out <临时交付包.json>
 ```
 
-脚本负责去掉 frontmatter 和正文首部一级标题、生成纯文本与富文本 HTML、检查标题与正文、确认长文有章节和重点加粗、拒绝连续空行、确认封面接近 5:2、对译介稿验证授权与署名，并输出编辑器应有的块数、`h1`/`h2` 数、加粗数、首尾锚点、插图清单与指纹。有序和无序列表只把内容放进 `<li>`，原始数字或项目符号必须剥离，交给 X 编辑器生成唯一一层列表标记。检查失败就退回 `ray-writer` 或 `ray-cover` 修正，不绕过。
+脚本负责去掉 frontmatter 和正文首部一级标题、生成纯文本与富文本 HTML、检查标题与正文、确认长文有章节和重点加粗、拒绝连续空行、确认封面接近 5:2、对译介稿验证授权与署名，并输出编辑器应有的块数、`h1`/`h2` 数、加粗数、首尾锚点、表格与插图清单及指纹。有序和无序列表只把内容放进 `<li>`，原始数字或项目符号必须剥离，交给 X 编辑器生成唯一一层列表标记。检查失败就退回 `ray-writer` 或 `ray-cover` 修正，不绕过。
 
 交付包里的数字都是按编辑器语义算的，核对时直接用，不要自己回头去数 Markdown：
 
-- `expected_editor.block_count` 是 Draft.js 的块数，列表里每个 `<li>` 单独算一块。
+- `expected_editor.block_count` 是粘贴 `body_html` 后、插入表格和图片前的块数；列表里每个 `<li>` 单独算一块。`block_count_with_tables` 是插入原生表格后、插图前的块数。
 - 编辑器只有 `Heading`（`h1`）和 `Subheading`（`h2`）两级，Markdown `##` 出 `h1`，`###` 及更深出 `h2`。
 - `start_anchor` / `end_anchor` 取自 HTML 粘贴后页面上真正显示的文字，链接只留锚文本。
-- `images` 是插图位置清单，正文没有图时是空数组。
+- `tables` 是原生表格清单，含原样 Markdown、行列数、逐格文字和插入位置。`body_html` 不含表格；不要把 `<table>` HTML 或带竖线的 Markdown 直接粘进正文。表格与图片各有 `source_order`，用来合并成原文顺序。
+- `images` 是插图位置清单，正文没有图时是空数组。表格或图片紧邻插图时，清单另给 `after_table_order` 或 `after_image_order`。
 
 ## 2. 进入 X Articles
 
@@ -75,10 +76,11 @@ python3 scripts/prepare_article.py --article <文章.md> --cover <x-article-cove
 1. 上传交付包中的 5:2 封面：读页面拿到 file input 元素的引用，用专用文件上传动作把绝对路径交给它，**不要点 `Choose File`**（它弹原生对话框，会卡死）。出现 `Edit media` 后点击 `Apply`，再以封面实际显示和 `Remove photo` 出现作为上传成功信号。
 2. 在 `Add a title` 填入标题，逐字核对。
 3. 把交付包中的 `body_html` 作为 HTML、`body` 作为纯文本同时写入浏览器剪贴板，在正文 textbox 全选后粘贴。这样让编辑器直接生成正常段落、标题、列表、链接和加粗，不插入空白段落。
-4. 粘贴后检查 Markdown 符号没有残留，并把页面块数、空白块数、`h1` 数、`h2` 数与加粗数和交付包的 `expected_editor` 逐项比较。仅当 HTML 粘贴不可用时才退回纯文本，再手工恢复格式。
+4. 粘贴后检查 Markdown 符号没有残留，并把页面块数、空白块数、`h1` 数、`h2` 数与加粗数和交付包的 `expected_editor` 逐项比较。此时块数用 `block_count`，加粗数用 `bold_count_before_tables`。仅当 HTML 粘贴不可用时才退回纯文本，再手工恢复格式。
 5. 抽查每个有序列表的第一项和最后一项：编辑器只显示一层自动编号，列表正文不得再次以 `1.`、`2.` 或 `1、` 开头。
-6. 块数核对通过后，再按交付包 `images` 清单从前往后插图：用 `after_block` 和 `after_text` 定位插入点，逐张确认插进去的是清单里那张。插图会改变页面块数，所以顺序不能颠倒。`images` 为空时跳过这一步。
-7. 等待页面出现 `Last saved just now` 或等价的已保存状态。
+6. 将 `tables` 和 `images` 按 `source_order` 合并，依照原文顺序逐项插入。用 `after_block`、`after_text` 及相邻表格或图片编号定位。遇到表格，在正文工具栏点 `Insert → Table`；网格里的 `R by C` 表示 **R 行、C 列**，选择清单里的 `row_count by column_count`。打开表格的 `Edit block`，把完整 `markdown` 放入 Markdown 输入框，切到 `Preview`，逐格核对表头、行列数和内容，再点 `Update`。若网格没有所需尺寸，先选可用尺寸，再用 Markdown 编辑并以预览为准；预览无法呈现完整表格时停下处理。遇到图片，用清单中的路径插入，逐张确认位置和内容。
+7. 若表格全部位于图片之前，插完表格、插图之前核对 `block_count_with_tables`。其他交错情形以初始正文块数、表格数量、每张图片位置和最终预览分别验收；不要用插图后的总块数反推原始位置。
+8. 等待页面出现 `Last saved just now` 或等价的已保存状态。
 
 封面上传被拒时，不要继续尝试绕过，也不要创建新草稿。先按 [recovery-runbook.md](references/recovery-runbook.md) 的「封面上传被拒」分清是路径没共享还是点错了控件：前者记录 `draft-needs-cover` 和当前 URL，把封面绝对路径给用户，请用户把该目录共享给本次会话；后者改用正确的上传链路重试。收到确认后从原 URL 只补封面。
 
@@ -89,11 +91,12 @@ python3 scripts/prepare_article.py --article <文章.md> --cover <x-article-cove
 完成以下检查：
 
 - 标题与交付包完全一致。
-- 页面词数不为零，正文块数与 `expected_editor.block_count` 一致（插图前核对），首块以 `start_anchor` 开头、末块以 `end_anchor` 结尾。
+- 页面词数不为零，粘贴后正文块数与 `expected_editor.block_count` 一致；插入表格后、插图前与 `block_count_with_tables` 一致。核对首尾文字锚点及表格原文。
 - 段落之间没有空白段落；`h1`、`h2` 与加粗数量和交付包一致。
 - `images` 清单里每一张都已插入、位置与 `after_block` 相符、图片能正常显示。
+- `tables` 清单里每张表都为 X 原生表格；预览中逐格核对，确认没有漏行、错列、竖线文本或遗留占位内容。
 - 封面已显示，且没有被裁掉标题或核心隐喻。
-- 打开 `Preview` 后，标题、段落、封面和作者信息都正常。
+- 打开 `Preview` 后，标题、段落、表格、封面和作者信息都正常。
 
 预览检查完回到编辑页，再确认封面仍在、正文格式未变、保存时间已经更新。若检查不通过，修正后重新验证；不要把问题草稿交给用户自行排查。
 

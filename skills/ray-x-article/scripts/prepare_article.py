@@ -26,6 +26,7 @@ WIKILINK = re.compile(r"\[\[([^\]|]+)\|?([^\]]*)\]\]")
 BOLD = re.compile(r"\*\*[^*\n]+\*\*|__[^_\n]+__")
 HEADING = re.compile(r"^(#{1,6})\s+(.+)$")
 THEMATIC_BREAK = re.compile(r"^(?:---+|\*\*\*+|___+)$")
+TABLE_RULE = re.compile(r"^:?-{3,}:?$")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"}
 
 # 译介支线：内容属于别人。授权和署名在写作阶段落定，这里是进后台前的最后一道门。
@@ -220,8 +221,38 @@ def render_block(lines):
     return f"<p>{paragraph}</p>", ["\n".join(inline_text(text) for text in texts)]
 
 
+def table_cells(line):
+    """Split a Markdown table row, retaining escaped pipes inside cells."""
+    value = line.strip()
+    if value.startswith("|"):
+        value = value[1:]
+    if value.endswith("|") and not value.endswith(r"\|"):
+        value = value[:-1]
+    return [cell.strip().replace(r"\|", "|") for cell in re.split(r"(?<!\\)\|", value)]
+
+
+def parse_table(lines):
+    """Return table dimensions and visible cells, or None for a non-table block."""
+    if len(lines) < 2 or "|" not in lines[0] or "|" not in lines[1]:
+        return None
+    header = table_cells(lines[0])
+    rules = table_cells(lines[1])
+    if not rules or not all(TABLE_RULE.fullmatch(cell) for cell in rules):
+        return None
+    width = len(header)
+    if width < 2 or len(rules) != width or len(lines) < 3:
+        raise ValueError("Markdown 表格至少需要两列、表头和一行数据，且分隔行列数一致")
+    rows = [header]
+    for line in lines[2:]:
+        cells = table_cells(line)
+        if len(cells) != width:
+            raise ValueError(f"Markdown 表格列数不一致：应为 {width} 列，实际 {len(cells)} 列")
+        rows.append(cells)
+    return rows
+
+
 def build_editor_content(markdown, base):
-    """Render the body and pull illustrations out into a positioned manifest.
+    """Render text and pull tables and illustrations into positioned manifests.
 
     X has no API for inserting an image at a given offset, so the images are
     delivered as a list the operator places by hand. Each entry says how many
@@ -230,6 +261,9 @@ def build_editor_content(markdown, base):
     parts = []
     block_texts = []
     images = []
+    tables = []
+    last_item = ("text", 0)
+    media_order = 0
     for source in re.split(r"\n\s*\n", markdown.replace("\r\n", "\n").strip()):
         lines = [line.rstrip() for line in source.splitlines() if line.strip()]
         if not lines:
@@ -237,26 +271,49 @@ def build_editor_content(markdown, base):
         image_lines = [match_image_line(line) for line in lines]
         if all(image_lines):
             for alt, target in image_lines:
-                images.append(
-                    {
+                media_order += 1
+                entry = {
                         "order": len(images) + 1,
+                        "source_order": media_order,
                         "alt": alt,
                         "path": str(resolve_asset(target, base)),
                         "after_block": len(block_texts),
                         "after_text": block_texts[-1][-60:] if block_texts else "",
                     }
-                )
+                if last_item[0] in ("table", "image"):
+                    entry[f"after_{last_item[0]}_order"] = last_item[1]
+                images.append(entry)
+                last_item = ("image", entry["order"])
             continue
         if any(image_lines) or any(
             MD_IMAGE.search(line) or WIKI_IMAGE.search(line) for line in lines
         ):
             raise ValueError(f"插图必须独占一段，不能和正文混在同一段：{lines[0][:60]}")
+        rows = parse_table(lines)
+        if rows is not None:
+            media_order += 1
+            entry = {
+                "order": len(tables) + 1,
+                "source_order": media_order,
+                "markdown": "\n".join(lines),
+                "row_count": len(rows),
+                "column_count": len(rows[0]),
+                "cells": [[inline_text(cell) for cell in row] for row in rows],
+                "after_block": len(block_texts),
+                "after_text": block_texts[-1][-60:] if block_texts else "",
+            }
+            if last_item[0] in ("table", "image"):
+                entry[f"after_{last_item[0]}_order"] = last_item[1]
+            tables.append(entry)
+            last_item = ("table", entry["order"])
+            continue
         rendered, texts = render_block(lines)
         parts.append(rendered)
         block_texts.extend(texts)
+        last_item = ("text", len(block_texts))
     if not block_texts:
         raise ValueError("正文没有可写入编辑器的内容块")
-    return "".join(parts), block_texts, images
+    return "".join(parts), block_texts, images, tables
 
 
 def main():
@@ -284,13 +341,14 @@ def main():
     if not title:
         raise ValueError("missing article title")
     editor_markdown = strip_leading_title(markdown)
-    body_html, block_texts, images = build_editor_content(editor_markdown, article.parent)
+    body_html, block_texts, images, tables = build_editor_content(editor_markdown, article.parent)
     body = plain_body(re.sub(r"(?m)^\s*(!\[[^\]]*\]\([^)]+\)|!\[\[[^\]]+\]\])\s*$", "", editor_markdown))
     check_translation(frontmatter, body)
     chapter_count = len(re.findall(r"(?m)^##\s+\S", editor_markdown))
     h1_count = body_html.count("<h1>")
     h2_count = body_html.count("<h2>")
     bold_count = len(BOLD.findall(editor_markdown))
+    pasted_bold_count = body_html.count("<strong>")
     extra_blank_runs = len(re.findall(r"\n{3,}", editor_markdown.replace("\r\n", "\n")))
     if len(title) > 120:
         raise ValueError("title is longer than 120 characters")
@@ -315,7 +373,7 @@ def main():
     digest = hashlib.sha256((title + "\n" + body).encode("utf-8")).hexdigest()
     paragraphs = [part.strip() for part in body.split("\n\n") if part.strip()]
     package = {
-        "schema_version": 3,
+        "schema_version": 4,
         "source_path": str(article),
         "kind": scalar(frontmatter, "kind"),
         "title": title,
@@ -329,12 +387,15 @@ def main():
         "bold_count": bold_count,
         "extra_blank_runs": extra_blank_runs,
         "images": images,
+        "tables": tables,
         "expected_editor": {
             "block_count": len(block_texts),
+            "block_count_with_tables": len(block_texts) + len(tables),
             "blank_blocks": 0,
             "h1_count": h1_count,
             "h2_count": h2_count,
             "bold_count": bold_count,
+            "bold_count_before_tables": pasted_bold_count,
         },
         "content_sha256": digest,
         "start_anchor": block_texts[0][:80],
@@ -344,7 +405,7 @@ def main():
     output.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
         f"OK: {title} | {len(body)} chars | {len(block_texts)} editor blocks "
-        f"| h1 {h1_count} / h2 {h2_count} | {len(images)} images | {width}x{height}"
+        f"| h1 {h1_count} / h2 {h2_count} | {len(tables)} tables | {len(images)} images | {width}x{height}"
     )
 
 
