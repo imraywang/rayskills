@@ -15,6 +15,7 @@ if [ ! -d "$DEPS/node_modules/puppeteer-core" ]; then
   (cd "$DEPS" && { [ -f package.json ] || npm init -y >/dev/null; } && npm i --silent --no-audit --no-fund puppeteer-core@23.11.1 >/dev/null) && echo "ok   puppeteer-core" || { echo "MISS puppeteer-core"; ok=0; }
 else echo "ok   puppeteer-core"; fi
 system_profiler SPFontsDataType 2>/dev/null | grep -q "Hannotate SC" && echo "ok   font Hannotate SC" || echo "WARN font Hannotate SC missing — handwritten look falls back to PingFang"
+command -v uv >/dev/null && echo "ok   uv (film_gate motion check)" || echo "WARN uv missing — brew install uv (only for the post-render film_gate report)"
 python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || echo "WARN fal_client missing — pip3 install fal-client (only needed for the cloned voice / digital host)"
 [ -d "$DIR/../assets/huashu/clips" ] && echo "ok   huashu grammars ($(ls "$DIR/../assets/huashu/clips" | wc -l | tr -d ' '))" || { echo "MISS assets/huashu (explainer grammars)"; ok=0; }
 VOICES="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/voices.json"
