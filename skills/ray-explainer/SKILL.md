@@ -60,7 +60,7 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 story
 
 把表格原样贴给用户，等确认。用户关心三件事：每一幕画什么、画法对不对、要不要合并、拆分或删掉某一幕。预计时长按每秒约 5.8 字估算，误差在几秒以内。确认后才进入配音；分镜阶段改了旁白，先把 `lines` 改掉，再往下走。
 
-**数字人主持人默认不加。** 贴分镜表时附一句「这条要不要加数字人主持人」即可，不主动加；只有用户明确要加，才按 [host.md](references/host.md) 在第 3 步之后标大机位句子、先给估价、同意后再生成。
+**左下角主持人是 IP 的一部分，大机位默认不加。** 新项目模板带 `"host": {"avatar": "ray", "big": []}`：Ray 的形象全片缩在左下角，嘴型跟着配音换，不调 Kling、不花钱，第 3 步之后跑一次 `host.py` 生成口型即可。大机位（Kling 生成的说话视频，要花钱）仍然默认不加：贴分镜表时附一句「这条要不要加大机位」，用户明确要加才按 [host.md](references/host.md) 标句子、先给估价、同意后再生成。
 
 ## 2. 配音
 
@@ -105,16 +105,17 @@ python3 $SK/scripts/check_numbers.py <project>   # Gemini 按实际读音听写�
 
 看到“两千零一十九”这类数值读法就改稿重配那一句。对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间；kit 的 `at()`、语法 cue 和字幕切换都会用到。
 
-### 3b. 数字人主持人（可选，用户确认后才做）
+### 3b. 左下角主持人（IP 默认带）与大机位（可选，用户确认后才做）
 
 ```bash
-python3 $SK/scripts/host.py <project> --dry-run   # 列出大机位段落和预计费用，贴给用户等同意
-python3 $SK/scripts/host.py <project>             # Kling 生成大机位 + 角落口型，写 host/plan.json
+python3 $SK/scripts/host.py <project>             # big 为空：只生成左下角口型，不花钱，直接跑
+python3 $SK/scripts/host.py <project> --dry-run   # big 里写了大机位句子时：先列段落和预计费用，贴给用户等同意
+python3 $SK/scripts/host.py <project>             # 用户同意后：Kling 生成大机位 + 角落口型，写 host/plan.json
 ```
 
 大机位（开头、金句、结尾，每集约 30 秒）用 Kling 生成带手势的说话视频，约 $0.115/秒；其余时间主持人缩在左下角，用同一形象的换嘴型图层，不花钱。形象、选句原则、画面避让见 [host.md](references/host.md)。没有 `host` 字段的片子不受任何影响。
 
-**默认不加。** 只有用户明确要加（或被问到时确认要加），才写 `host` 字段、估价、生成。
+**大机位默认不加。** `big` 为空时 `host.py` 只算角落口型、不花钱，直接跑；只有用户明确要大机位（或被问到时确认要加），才往 `big` 里写句子、`--dry-run` 估价、同意后再生成。
 
 ## 4. 分镜：每一幕选画法
 

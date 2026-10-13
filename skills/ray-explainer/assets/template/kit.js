@@ -199,8 +199,6 @@ window.renderFrame = function (t) {
     const sig = SIGC && sigTex && (window.SIG || []).some(s => s.id === sc.id), saved = sig ? { ...C } : null;
     if (sig) { ctx.globalAlpha = a; ctx.drawImage(sigTex, 0, 0); Object.assign(C, SIGC); }   // signature scene: ink-green ground, sig palette
     ctx.save(); ctx.globalAlpha = a;
-    const av = sig && ((window.SIG || []).find(s => s.id === sc.id) || {}).avatar;   // avatar beat: content makes room
-    if (av) { const k = 1 - .2 * eInOut(ap(t, av.at, .5)); ctx.translate(60, 300); ctx.scale(k, k); ctx.translate(-60, -300); }
     const z = 1 + (1 - eOut(ap(t, sc.start, .4))) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     const def = typeof patternDef === 'function' ? patternDef(sc) : null;   // patterns.js: cue-driven hand-drawn scenes
     if (def) { if (P[def.name]) P[def.name](t, sc, def); else if (!window['__warned' + sc.id]) { window['__warned' + sc.id] = 1; console.error(`scene ${sc.id}: unknown pattern ${def.name}`); } }

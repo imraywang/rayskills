@@ -60,23 +60,15 @@ function resolveTheme(th) {
   return { pal: six(out, 'theme', avail), kit: out.kit, overlay: out.overlay, sig: sig ? { pal: six(sig, 'theme.sig', avail), kit: sig.kit || {} } : null };
 }
 const THEME_ALL = resolveTheme(SCRIPT.theme), THEME = THEME_ALL && THEME_ALL.pal;
-// signature scenes (script.json scene "sig": true | {avatar: false | {at, x, y, h}}): opening / closing moments in the sig palette.
-// The avatar enters on one beat, not for the whole scene (Ray, 2026-10-13): in the film's first scene when its first line has been
-// said (the hook has landed), in any later sig scene when its last line starts (it lands with the closing line). avatar.at overrides
-// it with a cue time ({line, phrase, offset} or seconds into the scene). From that beat the kit content eases up-left to free the corner.
+// signature scenes (script.json scene "sig": true): the opening / closing moments, drawn in the theme's sig palette (ray-ip: ink green).
+// Ray's avatar is not part of the sig scene: it is the corner presenter (host with "big": [], free), present through the whole film.
 const SIG = SCRIPT.scenes.filter(s => s.sig).map(s => {
   const tsc = TL.scenes.find(x => x.id === s.id); if (!tsc) throw new Error(`scene ${s.id}: sig scene missing from timeline.json`);
-  const a = typeof s.sig === 'object' ? s.sig.avatar : undefined;
-  if (a === false) return { id: s.id, start: tsc.start, end: tsc.end, avatar: null };
-  const L = tsc.lines, open = s === SCRIPT.scenes[0];
-  const at = a && a.at != null ? tsc.start + cueTime(a.at, tsc, `scene ${s.id} sig.avatar.at`) : open ? L[0].end : L[L.length - 1].start;
-  return { id: s.id, start: tsc.start, end: tsc.end, avatar: { x: 905, y: 1545, h: 500, ...(typeof a === 'object' ? a : {}), at: +Math.min(at, tsc.end - .5).toFixed(3) } };
+  return { id: s.id, start: tsc.start, end: tsc.end };
 });
-if (SIG.length && !(THEME_ALL && THEME_ALL.sig)) console.warn('WARN script.json 有 sig 场景，但 theme 没有 sig 色板（用 "ray-ip"）——签名幕只会叠形象，不换底色');
-const AVATAR = process.env.RAY_EXPLAINER_AVATAR || path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'ray-explainer', 'avatars', (SCRIPT.ip && SCRIPT.ip.avatar) || 'ray', 'base.png');
-if (SIG.some(s => s.avatar) && !fs.existsSync(AVATAR)) console.warn(`WARN 签名幕要画形象，但找不到 ${AVATAR}——签名幕不画形象`);
+if (SIG.length && !(THEME_ALL && THEME_ALL.sig)) console.warn('WARN script.json 有 sig 场景，但 theme 没有 sig 色板（用 "ray-ip"）——sig 不起作用');
 const PAGE_INIT = (THEME_ALL ? `window.THEME=${JSON.stringify({ ...THEME_ALL.pal, kit: THEME_ALL.kit, overlay: THEME_ALL.overlay, sig: THEME_ALL.sig })};` : '') +
-  (SIG.length ? `window.SIG=${JSON.stringify(SIG.map(s => fs.existsSync(AVATAR) ? s : { ...s, avatar: null }))};` : '');
+  (SIG.length ? `window.SIG=${JSON.stringify(SIG)};` : '');
 
 // ---------- static server: project at /, vendored huashu engine at /huashu/, overlay.js always from the skill ----------
 // overlay.js (captions, progress bar, header, digital host) is pipeline infrastructure, not per-film content: it must match
@@ -87,7 +79,6 @@ function serve() {
     let u = decodeURIComponent(req.url.split('?')[0]); let base = PROJ;
     if (u.startsWith('/huashu/')) { base = HUASHU; u = u.slice(7); }
     else if (u === '/overlay.js') { base = TEMPLATE; }
-    else if (u === '/ip/avatar.png') { if (!fs.existsSync(AVATAR)) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'Content-Type': 'image/png' }); return fs.createReadStream(AVATAR).pipe(res); }
     const f = path.join(base, path.normalize(u));
     if (!f.startsWith(base) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);

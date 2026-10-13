@@ -3,6 +3,7 @@
   "source": "",
   "header": "一篇读懂 · ",
   "theme": "ray-ip",
+  "host": { "avatar": "ray", "big": [] },
   "voice": "Charon",
   "speed": 1.0,
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },

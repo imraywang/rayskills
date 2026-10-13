@@ -255,10 +255,11 @@ P.checklist = (t, sc, d) => {
   // closing line = a sticky note slapped onto the checklist (an action on the object), not a centred quote card
   if (fin && t > fin.t) {
     const big = fin.t + (fin.data.bigDelay ?? 2.5), l = t - big;
-    if (fin.sub) text(fin.sub, W / 2, 1120, { size: 54, color: C.soft, alpha: ap(t, fin.t + .5, .5) });
+    if (fin.sub) text(fin.sub, W / 2, 1085, { size: 54, color: C.soft, alpha: ap(t, fin.t + .5, .5) });
     if (l > 0) {
       const k = l < .1 ? lerp(1.55, .94, eOut(l / .1)) : l < .17 ? lerp(.94, 1, (l - .1) / .07) : 1;   // slam 0.17s: 1.55 → 0.94 → 1.0
-      ctx.save(); ctx.translate(W / 2 + 20, 1330); ctx.rotate(-.035); ctx.scale(k, k);
+      ctx.save(); ctx.translate(W / 2 + 20, 1280);   // note bottom ≤ 1410: clear of the captions even when a host lifts them to y 1470
+      ctx.rotate(-.035); ctx.scale(k, k);
       rrect(-370, -125, 740, 250, { fill: mixHex(C.yellow, C.card, .45), seed: 431, w: 6 });
       text(fin.text || '', 0, -5, { size: (fin.text || '').length > 7 ? 84 : 100, color: C.ink });
       rline(-240, 70, 240, 66, { p: ap(t, big + .35, .4), color: C.orange, w: 9, seed: 433 });

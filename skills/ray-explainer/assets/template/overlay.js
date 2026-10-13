@@ -94,23 +94,14 @@
     ctx.restore();
   }
 
-  // signature scenes (render.js injects window.SIG from script.json "sig"): the avatar stands in the scene. Not drawn when the
-  // project has a digital host — the presenter is already on screen. Part of the picture, so clean (cover) frames keep it.
+  // theme colours for bar / captions; window.SIG (render.js, from script.json "sig"): signature scenes, where the bar turns light
   const OV = (window.THEME && window.THEME.overlay) || {}, SIG = window.SIG || [];
-  let AV = null;
   const sigAt = t => SIG.find(s => t >= s.start && t < s.end);
-  function drawSig(ctx, t) {
-    const s = sigAt(t); if (!s || !s.avatar || !AV || HOST) return;
-    const at = s.avatar.at ?? s.start, a = clamp((t - at) / .35) * (1 - clamp((t - s.end + .35) / .3)), k = s.avatar.h / AV.height, w = AV.width * k;
-    const rise = (1 - ease(clamp((t - at) / .5))) * 80;
-    ctx.globalAlpha = a; ctx.drawImage(AV, s.avatar.x - w / 2, s.avatar.y - s.avatar.h + rise, w, s.avatar.h); ctx.globalAlpha = 1;
-  }
 
   function draw(ctx, t) {
     const W = ctx.canvas.width;
+    if (window.RX_CLEAN) return;   // clean frames (cover): no captions / progress
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
-    drawSig(ctx, t);
-    if (window.RX_CLEAN) { ctx.restore(); return; }   // clean frames (cover): no captions / progress
     if (HOST) { drawHost(ctx, t); ctx.globalAlpha = 1; }   // under captions: the caption sits on the presenter's chest
     // progress bar + header
     const pr = clamp(t / TL.duration);
@@ -132,7 +123,6 @@
 
   const ready = (async () => {
     await hostInit();
-    if (SIG.some(s => s.avatar)) { try { AV = await loadImg('/ip/avatar.png'); } catch (e) { console.warn('signature avatar not loaded: /ip/avatar.png'); } }
     try { const f = new FontFace('RX-Caption', `url(${FONT_URL})`, { weight: '100 900' }); await f.load(); document.fonts.add(f); return true; }
     catch (e) { console.warn('caption font not loaded, falling back to system font:', FONT_URL); return false; }
   })();
