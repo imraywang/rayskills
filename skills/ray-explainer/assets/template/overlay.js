@@ -66,7 +66,7 @@
   const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
   const mouthAt = t => { const M = HOST.mouth; let lo = 0, hi = M.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (M[m][0] <= t) { r = m; lo = m + 1; } else hi = m - 1; } return r < 0 ? 'X' : M[r][1]; };
   function drawHost(ctx, t) {
-    const s = segAt(t), C = HOST.corner, B = HOST.big;
+    const s = segAt(t), C = HOST.corner, B = (s && s.big) || HOST.big;   // 段落可以自带位置（host.big[].pos）
     const k = s ? Math.min(ease(clamp((t - s.start) / HOST.trans)), ease(clamp((s.end - t) / HOST.trans))) : 0;
     const w = C.w + (B.w - C.w) * k, x = C.x + (B.x - C.x) * k, h = w * HOST.aspect;
     const y = C.y + (B.y - C.y) * k + (1 - ease(clamp(t / .5))) * 420;   // slides up at the very start

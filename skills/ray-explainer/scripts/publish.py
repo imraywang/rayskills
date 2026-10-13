@@ -4,7 +4,11 @@ usage: python3 publish.py <project> [--vault <vault root>] [--force]
 
 Reads script.json:
   title, source, central_judgment, to_confirm[], cover_t (seconds; that frame becomes cover.jpg)
-  publish: { "titles": ["…", …], "description": "…", "tags": ["AI", …] }
+  publish: { "titles": ["…", …], "description": "…", "tags": ["AI", …], "video": "out_v3.mp4" (optional, default out.mp4) }
+  draft (optional): vault-relative path of the existing 母稿 (e.g. a ray-kb fast-oral note). When set, nothing new is
+    created in the vault: the 母稿 gets video_* frontmatter keys and a「## 发布文案」section (replaced on re-runs).
+HyperFrames projects (<project>/hf/ with build.py, see references/hyperframes.md): the cover is rendered with
+  COVER=1 hf/build.py (no captions / presenter, cover overlay on) + `npx hyperframes snapshot`, then index.html is rebuilt.
 Writes:
   <project>/cover.jpg           the frame at cover_t (via render.js)
   <project>/publish.md          titles / description / tags / cover path, ready to paste
@@ -18,16 +22,29 @@ ap = argparse.ArgumentParser(); ap.add_argument("project"); ap.add_argument("--v
 a = ap.parse_args()
 PROJ, SK = os.path.abspath(a.project), os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 s = json.load(open(os.path.join(PROJ, "script.json")))
-video = os.path.join(PROJ, "out.mp4")
-if not os.path.exists(video): sys.exit("no out.mp4 — render the video first")
+pub = s.get("publish") or {}
+video = os.path.join(PROJ, pub.get("video") or "out.mp4")
+if not os.path.exists(video): sys.exit(f"no {os.path.basename(video)} — render the video first")
+HF = os.path.join(PROJ, "hf") if os.path.exists(os.path.join(PROJ, "hf", "build.py")) else None
 if not a.vault or not os.path.isdir(os.path.join(a.vault, "10-创作", "25-口播草稿")):
     sys.exit("vault not found: pass --vault <root> (must contain 10-创作/25-口播草稿) or set RAY_VAULT")
 dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
-pub = s.get("publish") or {}
 
 # cover frame
 cover = None
-if s.get("cover_t") is not None:
+if s.get("cover_t") is not None and HF:
+    import shutil, tempfile
+    t = float(s["cover_t"]); tmp = tempfile.mkdtemp()
+    try:
+        subprocess.run([sys.executable, "build.py"], cwd=HF, check=True, capture_output=True, env={**os.environ, "COVER": "1"})
+        subprocess.run(["npx", "hyperframes", "snapshot", "--at", str(t), "--no-end", "--describe", "false", "-o", tmp], cwd=HF, check=True, capture_output=True)
+        png = next(os.path.join(tmp, f) for f in os.listdir(tmp) if f.startswith("frame-"))
+        cover = os.path.join(PROJ, "cover.jpg")
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", png, "-q:v", "2", cover], check=True)
+    finally:
+        subprocess.run([sys.executable, "build.py"], cwd=HF, check=True, capture_output=True)   # back to the normal index
+        shutil.rmtree(tmp, ignore_errors=True)
+elif s.get("cover_t") is not None:
     t = float(s["cover_t"])
     subprocess.run(["node", os.path.join(SK, "scripts", "render.js"), PROJ, "stills", str(t)], check=True, capture_output=True, env={**os.environ, "RX_CLEAN": "1"})
     src = os.path.join(PROJ, "stills", "t" + f"{t:.1f}".rjust(5, "0") + ".jpg")   # same name render.js writes
@@ -43,6 +60,24 @@ if pub.get("description"): copy += ["**描述**", "", pub["description"].strip()
 if pub.get("tags"): copy += [" ".join("#" + x.lstrip("#") for x in pub["tags"]), ""]
 if cover: copy += [f"**封面**：`{cover}`（第 {s['cover_t']} 秒那一帧）", ""]
 open(os.path.join(PROJ, "publish.md"), "w").write(f"# {s.get('title', '')}\n\n视频：`{video}`（{dur:.0f} 秒）\n\n" + "\n".join(copy))
+
+# existing 母稿: add the video fields and the publish copy to it instead of creating a second note
+if s.get("draft"):
+    note = os.path.join(a.vault, s["draft"])
+    if not os.path.exists(note): sys.exit(f"draft not found in vault: {s['draft']}")
+    txt = open(note).read()
+    keys = {"video_status": "rendered", "video_path": video, "video_cover": cover or "", "video_publish_pack": os.path.join(PROJ, "publish.md"),
+            "video_duration_s": round(dur)}
+    head, sep, rest = txt.partition("\n---\n") if txt.startswith("---\n") else ("", "", txt)
+    if sep:
+        lines = [l for l in head.split("\n") if l.split(":", 1)[0] not in keys]
+        head = "\n".join(lines + [f"{k}: {json.dumps(v, ensure_ascii=False)}" for k, v in keys.items()])
+    sec = "\n".join(["## 发布文案", "", *copy[2:]]).rstrip() + "\n\n"
+    rest = re.sub(r"## 发布文案\n.*?(?=\n## |\Z)", "", rest, flags=re.S).rstrip("\n") + "\n\n"
+    rest = rest.replace("## 录制与发布收尾", sec + "## 录制与发布收尾", 1) if "## 录制与发布收尾" in rest else rest + sec
+    open(note, "w").write(head + sep + rest if sep else rest)
+    print(f"updated draft: {note}\npublish.md: {os.path.join(PROJ, 'publish.md')}" + (f"\ncover: {cover}" if cover else ""))
+    sys.exit(0)
 
 # vault note
 date = (re.match(r"(\d{4}-\d{2}-\d{2})", os.path.basename(PROJ)) or [None, datetime.date.today().isoformat()])[1]

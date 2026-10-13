@@ -4,6 +4,7 @@ script.json 顶层写：
   "host": {"avatar": "ray", "big": [{"scene": "hook", "line": 0}, {"scene": "takeaway", "line": 2}], "model": "pro"}
   - avatar：~/.config/ray-explainer/avatars/<name>/ 里的形象（make_avatar.py 生成）
   - big：大机位的句子（line 从 0 数，和 cue 的 line 一致）。同一幕里相邻的句子合成一段
+    可选 "pos": {"x": 660, "y": 1150, "w": 420} 让这一段换个位置 / 大小（默认 x 272, y 1010, w 536），避开这一幕居中的主画面
   - model：pro（1080p，约 $0.115/秒，默认）或 standard（720p，约 $0.056/秒，偶尔生成出多余的贴纸，要抽帧检查）
 
 大机位的句子：形象图 + 这段配音 → Kling AI Avatar 生成说话视频（手势、表情），抠绿幕、拆成帧。
@@ -47,6 +48,7 @@ def ff(*a): subprocess.run(["ffmpeg", "-loglevel", "error", "-y", *a], check=Tru
 
 # ---------- 大机位段落 ----------
 scenes = {s["id"]: s for s in TL["scenes"]}
+POS = {(b["scene"], int(b["line"])): b["pos"] for b in H.get("big", []) if b.get("pos")}   # 按句指定大机位位置
 picks = sorted({(b["scene"], int(b["line"])) for b in H.get("big", [])}, key=lambda x: (list(scenes).index(x[0]), x[1]))
 segs = []
 for sid, li in picks:
@@ -54,9 +56,11 @@ for sid, li in picks:
     l = scenes[sid]["lines"][li]
     if segs and segs[-1]["scene"] == sid and segs[-1]["last"] == li - 1: segs[-1].update(end=l["end"], last=li)
     else: segs.append({"scene": sid, "first": li, "last": li, "start": l["start"], "end": l["end"]})
+    if (sid, li) in POS: segs[-1]["big"] = POS[(sid, li)]
 for s in segs: s["a"], s["b"] = max(0.0, round(s["start"] - 0.08, 3)), round(min(TL["duration"], s["end"] + 0.15), 3)
 total = sum(s["b"] - s["a"] for s in segs)
-print(f"大机位 {len(segs)} 段，共 {total:.1f} 秒，{H.get('model', 'pro')} 预计 ${total * PRICE:.2f}（已缓存的段落不再花钱）")
+# Kling 按生成视频的实际时长计费，实测比音频段长约 10%（2026-10 一期：估 21.7 秒，计费 23.7 秒）
+print(f"大机位 {len(segs)} 段，共 {total:.1f} 秒，{H.get('model', 'pro')} 预计约 ${total * PRICE * 1.1:.2f}（含约 10% 计费余量；已缓存的段落不再花钱）")
 for s in segs: print(f"  {s['scene']} 第 {s['first']}–{s['last']} 句  {s['a']:.2f}–{s['b']:.2f}s  ({s['b'] - s['a']:.1f}s)")
 if DRY: sys.exit(0)
 
@@ -129,7 +133,7 @@ meta = json.load(open(os.path.join(AV, "meta.json")))
 for f in ["base.png", *[k + ".png" for k in meta["patches"]]]: shutil.copy(os.path.join(AV, f), adir)
 plan = {**LAYOUT, "aspect": FH / FW,
         "avatar": {"dir": "/host/avatar/", **meta},
-        "segments": [{"start": s["a"], "end": s["b"], "dir": f"/host/frames/{s['key']}/", "count": s["count"], "fps": 30} for s in segs],
+        "segments": [{"start": s["a"], "end": s["b"], "dir": f"/host/frames/{s['key']}/", "count": s["count"], "fps": 30, **({"big": s["big"]} if s.get("big") else {})} for s in segs],
         "mouth": mouth, "blinks": blinks}
 json.dump(plan, open(os.path.join(OUT, "plan.json"), "w"), ensure_ascii=False)
 print(f"wrote host/plan.json：{len(segs)} 段大机位，角落口型 {len(mouth)} 次切换，眨眼 {len(blinks)} 次")

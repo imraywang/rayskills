@@ -1,0 +1,61 @@
+/* 「逆向工作台」—— 《三天涨星8万，AI开始逆向一切》的设计系统
+   概念：整片是一张深色反汇编台面。真实截图 / 录屏是被拆出来的「证据」，钉在台面上，
+   用证据红框、琥珀地址标签标注；历史与概念段用代码绘制的线框 + hex 纹理。
+   AI 青（--ai）是稀缺色：只在 AI 出手的瞬间出现。
+   画布 1080×1920。安全区：顶栏 0–110；主舞台 y=140–1440；字幕带 y=1470–1640；1660 以下留给平台 UI，只放氛围。 */
+
+@font-face { font-family: "HeiHeavy"; src: url("fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+@font-face { font-family: "HeiBold";  src: url("fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+@font-face { font-family: "Hei";      src: url("fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+
+:root {
+  --bg: #0b0d10;      /* 台面 */
+  --panel: #151a21;   /* 面板 / 窗口 */
+  --panel-2: #1c222b;
+  --line: #2a323d;    /* 分隔线、边框 */
+  --dim: #4a5563;     /* 暗码、被抹掉的东西 */
+  --mute: #8a94a3;    /* 次要文字 */
+  --fg: #e9e6df;      /* 正文：暖白 */
+  --red: #ff3b30;     /* 证据红：圈、框、章 */
+  --amber: #ffb000;   /* 地址琥珀：0x 标签、数字 */
+  --ai: #38e1c6;      /* AI 青：稀缺，只在 AI 出手时 */
+  --paper: #efeae1;   /* 纸面：账单、说明书 */
+  --hex: #18202a;     /* hex 底纹 */
+}
+
+.hei9 { font-family: "HeiHeavy", sans-serif; font-weight: 900; }
+.hei7 { font-family: "HeiBold", sans-serif; font-weight: 700; }
+.hei5 { font-family: "Hei", sans-serif; font-weight: 500; }
+.mono { font-family: "JetBrains Mono", "HeiBold", monospace; }
+
+/* 场景根：每幕同一张台面 */
+.scene { position: absolute; inset: 0; overflow: hidden; background: var(--bg); color: var(--fg); }
+
+/* hex / 汇编底纹：整块等宽字，极暗，慢慢漂 */
+.hexwall { position: absolute; left: -40px; right: -40px; top: -60px; bottom: -60px; font-family: "JetBrains Mono", monospace; font-size: 26px; line-height: 1.6; color: var(--hex); white-space: pre; overflow: hidden; letter-spacing: 0.04em; }
+/* 台面网格（细） */
+.bench { position: absolute; inset: -120px; background-image: linear-gradient(to right, rgba(233,230,223,0.035) 2px, transparent 2px), linear-gradient(to bottom, rgba(233,230,223,0.035) 2px, transparent 2px); background-size: 90px 90px; }
+.vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(0,0,0,0.65) 100%); pointer-events: none; }
+
+/* 证据：被钉上台面的截图 */
+.shot { position: absolute; border-radius: 14px; overflow: hidden; outline: 3px solid #2c3540; box-shadow: 0 30px 80px rgba(0,0,0,0.65); background: var(--panel); }
+.shot img { display: block; width: 100%; }
+.pin { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 7px rgba(255,59,48,0.22), 0 6px 10px rgba(0,0,0,0.5); }
+
+/* 标注 */
+.redbox { position: absolute; border: 6px solid var(--red); border-radius: 12px; }
+.ambox { position: absolute; border: 5px solid var(--amber); border-radius: 10px; }
+.tagA { position: absolute; font-family: "JetBrains Mono", "HeiBold", monospace; font-weight: 700; font-size: 30px; color: #1a1300; background: var(--amber); padding: 8px 18px; border-radius: 8px; white-space: nowrap; }
+.tagR { position: absolute; font-family: "JetBrains Mono", "HeiBold", monospace; font-weight: 700; font-size: 30px; color: #fff; background: var(--red); padding: 8px 18px; border-radius: 8px; white-space: nowrap; }
+.tagAI { position: absolute; font-family: "JetBrains Mono", "HeiBold", monospace; font-weight: 700; font-size: 30px; color: #04201b; background: var(--ai); padding: 8px 18px; border-radius: 8px; white-space: nowrap; }
+.stamp { position: absolute; border: 8px solid var(--red); color: var(--red); font-family: "HeiHeavy", sans-serif; font-weight: 900; padding: 10px 34px; border-radius: 12px; white-space: nowrap; }
+
+/* 面板 / 线框盒 */
+.box { position: absolute; border: 3px solid #3a4450; border-radius: 16px; background: var(--panel); display: flex; align-items: center; justify-content: center; text-align: center; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 34px; color: var(--fg); }
+.win { position: absolute; border: 3px solid var(--line); border-radius: 18px; background: #0e1217; overflow: hidden; }
+.win .tb { height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 20px; background: var(--panel); border-bottom: 2px solid var(--line); font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--mute); }
+.win .tb i { width: 16px; height: 16px; border-radius: 50%; background: #3a4450; display: block; }
+.code { font-family: "JetBrains Mono", "Hei", monospace; font-size: 30px; line-height: 1.7; white-space: pre; color: var(--mute); }
+
+/* 大字 */
+.big { font-family: "HeiHeavy", sans-serif; font-weight: 900; line-height: 1.08; letter-spacing: -0.01em; }

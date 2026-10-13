@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把一篇文章、剪藏或一个观点做成知识解说视频（竖屏 1080×1920，1.5–3 分钟，配音 + 烧录字幕）。画面全部由代码逐帧绘制：每一幕可以用自带的手绘 kit，也可以混用 huashu-art-motion 的 8 种解说语法（动态文字、Kurzgesagt 扁平科普、白板、3Blue1Brown、发布会、财经图表、Vox 拼贴）；配音可以用 Gemini 预置音色或 Ray 的 MiniMax 复刻音色，本地 Whisper 逐句校对并给出逐字时间；无头 Chrome 逐帧截图，FFmpeg 合成 MP4。用户说“把这篇文章做成解说视频”“做个知识科普短片”“手绘动画讲解”“用 Canvas 做视频”“无人出镜的讲解视频”“用我的声音配音”时使用。不用于：纸拼贴风格 B-roll（转 ray-broll）、现成素材剪辑（转 chatcut）、写实画面与真人出镜、只要口播逐字稿（转 ray-kb）。
+description: 把一篇文章、剪藏或一个观点做成知识解说视频（竖屏 1080×1920，1.5–3 分钟，配音 + 烧录字幕）。画面全部由代码逐帧绘制：每一幕可以用自带的手绘 kit，也可以混用 huashu-art-motion 的 8 种解说语法（动态文字、Kurzgesagt 扁平科普、白板、3Blue1Brown、发布会、财经图表、Vox 拼贴）；配音可以用 Gemini 预置音色或 Ray 的 MiniMax 复刻音色，本地 Whisper 逐句校对并给出逐字时间；无头 Chrome 逐帧截图，FFmpeg 合成 MP4。Ray 要“不套固定风格、要录屏 / 真实画面 / 截图”时，画面改走 HyperFrames 专属风格模式（每期单独设计，带配乐音效、数字人、发布包）。用户说“把这篇文章做成解说视频”“做个知识科普短片”“手绘动画讲解”“用 Canvas 做视频”“无人出镜的讲解视频”“用我的声音配音”时使用。不用于：纸拼贴风格 B-roll（转 ray-broll）、现成素材剪辑（转 chatcut）、写实画面与真人出镜、只要口播逐字稿（转 ray-kb）。
 ---
 
 # Ray Explainer
@@ -19,6 +19,8 @@ description: 把一篇文章、剪藏或一个观点做成知识解说视频（�
      ─▶ ④ 分镜：kit 场景写 scenes.js；语法场景只写 cues
      ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video ─▶ ⑧ 发布包 publish.py
 ```
+
+**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架和取材要点见 [hyperframes.md](references/hyperframes.md)。
 
 **两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
@@ -93,7 +95,15 @@ python3 $SK/scripts/clone_voice.py <录音> --name ray --upload     # 用户在�
 python3 $SK/scripts/qa_tts.py <project>
 ```
 
-每句转写两遍：普通转写用来比对稿子，判定合不合格；带词级时间戳的那遍只用来对齐时间。后一遍会在句尾静音处产生幻觉，冒出"染染染""请点赞订阅"这类内容，所以不能拿来判定合格。不合格的片段会被改名为 `.bad`，重跑 `tts.py` 就会重新合成。必须 `bad: 0` 才能往下走。对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间；kit 的 `at()`、语法 cue 和字幕切换都会用到。
+每句转写两遍：普通转写用来比对稿子，判定合不合格；带词级时间戳的那遍只用来对齐时间。后一遍会在句尾静音处产生幻觉，冒出"染染染""请点赞订阅"这类内容，所以不能拿来判定合格。不合格的片段会被改名为 `.bad`，重跑 `tts.py` 就会重新合成。必须 `bad: 0` 才能往下走。
+
+稿子里有年份、编号时（按 [script-rules.md](references/script-rules.md) 写成汉字逐位并配 `display`），再跑一遍：
+
+```bash
+python3 $SK/scripts/check_numbers.py <project>   # Gemini 按实际读音听写含数字的句子，几美分
+```
+
+看到“两千零一十九”这类数值读法就改稿重配那一句。对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间；kit 的 `at()`、语法 cue 和字幕切换都会用到。
 
 ### 3b. 数字人主持人（可选，用户确认后才做）
 
@@ -142,6 +152,12 @@ node $SK/scripts/render.js <project> video 30
 
 2.5 分钟的片子约 1 分钟渲染完。出片后用 `ffmpeg -ss <t> -i out.mp4 -frames:v 1` 从成片里抽 3–5 帧复查，再用 SendUserFile 交付 `out.mp4`。
 
+SendUserFile 发到手机 / 网页端的上限是 30 MB，超过只在本机桌面端可见。成片超过 30 MB 时同时压一份手机版一起交付（3–4 分钟的片子约 27 MB）：
+
+```bash
+ffmpeg -i out.mp4 -c:v libx264 -preset slow -b:v 900k -maxrate 1100k -bufsize 2200k -vf scale=720:-2 -c:a aac -b:a 96k out_phone.mp4
+```
+
 ## 7. 交付说明
 
 回复里给出：
@@ -166,12 +182,15 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 - 生成 `cover.jpg`：这一帧不带字幕和进度条
 - 生成 `publish.md`：标题、描述、标签，可以直接复制粘贴
 - 在 vault 的 `10-创作/25-口播草稿/<日期>-<标题>.md` 写一篇笔记：frontmatter 记录视频路径、时长、音色、画法、待确认条数；正文是分镜表、逐字稿和发布文案。视频本身不复制进 vault
+- **视频来自一篇已有的口播母稿**（ray-kb 快速口播等）时，在 `script.json` 写 `"draft": "<母稿在 vault 里的相对路径>"`：脚本不新建笔记，只给母稿加 `video_*` 字段和「发布文案」一节（重跑会替换，不会叠两份），避免和母稿同名撞文件
+- 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`；HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](references/hyperframes.md)
 - 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
+- 交付时提醒：平台的「AI 生成内容」声明要勾（复刻音色、数字人），CC 授权图片要在简介署名
 - 暂不调用 ray-cover：它的风格不适合这类视频
 
 ## 边界
 
 - 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或转视频模型。卡通数字人主持人是例外，见 [host.md](references/host.md)。
 - kit 的手写体依赖 macOS 自带的 Hannotate SC；语法片段和字幕用的是随 skill 带的思源黑体和霞鹜文楷，换机器也不会变样。
-- 背景音乐、音效暂未接入。要加的话，用 FFmpeg 在合成时混入，音效时刻从 timeline.json 里取。
+- kit / 语法模式没接背景音乐和音效，要加的话用 FFmpeg 在合成时混入，音效时刻从 timeline.json 里取；专属风格模式（HyperFrames）自带配乐、给人声让路和逐幕音效。
 - `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。
