@@ -1,6 +1,6 @@
 ---
 name: ray-cover-editorial
-description: 用固定的 Ray 编辑版画画种生成带中央呼吸区的无字文章底图，分别输出公众号、普通 X 与 X Article base 图。用于“所有文章封面保持同一种视觉风格”“左右呈现文章场景、中间留出高级的安静区域”“封面文字由我后期自己排”“只生成 base 图”“拿新封面流程与 ray-cover 比较”时；不用于自动加标题、字标、关键词、Logo、遮罩，或自动发布。
+description: 用固定的 Ray 编辑版画风格生成中间留白的无字封面底图（公众号、X、X Article），文字由 Ray 后期自己排。用于“封面统一风格”“只要 base 图”。不加标题和 Logo，不发布。
 ---
 
 # Ray Cover Editorial

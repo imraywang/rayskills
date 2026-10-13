@@ -1,6 +1,6 @@
 ---
 name: ray-multimodel
-description: 在 Grok、Claude、Codex 之间按任务价值做最小充分分工，并由当前会话担任主控完成验收。用于用户明确要求「让 Grok 先做」「多模型协作」「两家独立给方案」「模型竞赛」「找第二意见」「用 Grok 查 X / Reddit / 实时网页」，或任务本身值得引入跨模型执行、复核、竞赛、实时调研时。支持 auto / fast / review / race / scout 五种入口；scout 使用隔离的 Grok 4.5 搜索流程发现并留存 X、Reddit 和网页证据，其他模式按任务选择 Grok、Claude 或 Codex。默认不用于没有明显收益的简单问答，也不允许多个模型同时写同一工作区、静默换模型或用模型自报代替实际验证。触发：/ray-multimodel。
+description: 在 Grok、Claude、Codex 之间分工协作，由当前会话主控验收：第二意见、多家竞赛、交叉复核、用 Grok 查 X / Reddit 实时内容。用于“多模型协作”“让 Grok 先做”“找第二意见”。简单问答不用。触发：/ray-multimodel。
 ---
 
 # ray-multimodel：多模型协作

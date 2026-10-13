@@ -1,6 +1,6 @@
 ---
 name: ray-trend-search
-description: Use for recent trend research across X, Reddit, YouTube, Hacker News, Polymarket, Douyin, video accounts, and the public web, especially requests mentioning latest discussions, last N days, hot videos, community sentiment, trend checks, or topic references. Orchestrates local Grok for X and Reddit, last30days for supported indexes, and public-web verification with strict date and evidence boundaries. Do not use for stable facts, local-knowledge-base-only retrieval, or writing from already complete research.
+description: 跨 X、Reddit、YouTube、Hacker News、Polymarket、抖音、视频号和网页做近期趋势调研，严格核对日期和证据。用于“最近大家怎么讨论”“近 N 天热点”“热门视频”“社区情绪”。不用于稳定事实、只查本地知识库，或已有完整调研后的写作。
 ---
 
 # Ray Trend Search
