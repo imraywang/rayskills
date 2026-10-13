@@ -35,6 +35,7 @@ for b in plan["blinks"]:
     tw.append(f'tl.set("#hs-B", {{ opacity: 1 }}, {b}); tl.set("#hs-B", {{ opacity: 0 }}, {round(b + 0.12, 3)});')
 
 vids = []
+OPEN = 'tl.fromTo("#hs-wrap", { y: 360 }, { y: 0, duration: 0.6, ease: "back.out(1.4)" }, 0.1);'
 for i, seg in enumerate(plan.get("segments", [])):
     a, b = seg["start"], seg["end"]
     key = seg["dir"].rstrip("/").split("/")[-1]
@@ -45,10 +46,13 @@ for i, seg in enumerate(plan.get("segments", [])):
     big = seg.get("big") or plan["big"]
     bx, by, sc = big["x"], big["y"], big["w"] / W
     vids.append(f'<video id="hs-v{i}" class="hs-v" src="assets/host/big_{key}.webm" muted playsinline data-start="{a}" data-duration="{round(b - a, 3)}" data-track-index="{40 + i}"></video>')
-    tw.append(f'tl.to("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, duration: 0.4, ease: "power3.inOut" }}, {round(a - 0.4, 3)});')
+    if i == 0 and a < 1.0:   # 开场就是大机位：直接在大机位淡入，不和角落滑入抢在一起
+        OPEN = f'tl.fromTo("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, opacity: 0 }}, {{ opacity: 1, duration: 0.35, ease: "power1.out" }}, 0.05);'
+    else:
+        tw.append(f'tl.to("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, duration: 0.6, ease: "power2.inOut" }}, {round(a - 0.6, 3)});')
     tw.append(f'tl.set("#hs-body", {{ opacity: 0 }}, {a}); tl.set("#hs-v{i}", {{ opacity: 1 }}, {a});')
     tw.append(f'tl.set("#hs-v{i}", {{ opacity: 0 }}, {b}); tl.set("#hs-body", {{ opacity: 1 }}, {b});')
-    tw.append(f'tl.to("#hs-wrap", {{ x: 0, y: 0, scale: 1, duration: 0.4, ease: "power3.inOut" }}, {b});')
+    tw.append(f'tl.to("#hs-wrap", {{ x: 0, y: 0, scale: 1, duration: 0.8, ease: "power2.inOut" }}, {round(b + 0.15, 3)});')
 
 period = 4.2
 reps = max(0, int(TOTAL // period) - 1)
@@ -79,7 +83,7 @@ doc = f'''<!doctype html>
       <script>
         (function () {{
           const tl = gsap.timeline({{ paused: true }});
-          tl.fromTo("#hs-wrap", {{ y: 360 }}, {{ y: 0, duration: 0.6, ease: "back.out(1.4)" }}, 0.1);
+          {OPEN}
           tl.fromTo("#hs-body", {{ rotation: -1.2 }}, {{ rotation: 1.2, duration: {period / 2}, ease: "sine.inOut", yoyo: true, repeat: {reps * 2 + 1} }}, 0.7);
           {chr(10).join("          " + t for t in tw).lstrip()}
           window.__timelines["s-host"] = tl;

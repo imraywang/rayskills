@@ -63,13 +63,27 @@
     if (!HOST || window.RX_CLEAN) return; const s = segAt(t); if (!s) return; const u = frameUrl(s, t);
     if (!FRAMES.has(u)) { if (FRAMES.size > 90) FRAMES.delete(FRAMES.keys().next().value); FRAMES.set(u, await loadImg(u)); }
   }
-  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;   // power2.inOut
+  const ease3 = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const T_IN = .6, HOLD = .15, T_OUT = .8;   // 段首提前 0.6s 放大；段尾停 0.15s 再用 0.8s 缩回角落
+  const openBig = () => HOST.segments.length && HOST.segments[0].start < 1;   // 开场就是大机位：第 0 帧就在大机位淡入，不先滑入再放大
+  function bigAt(t) {   // 当前离大机位有多近（0 角落 … 1 大机位），以及对应段落
+    let k = 0, seg = null;
+    HOST.segments.forEach((s, i) => {
+      const v = i === 0 && openBig() && t < s.start ? 1
+        : t < s.start ? ease(clamp((t - s.start + T_IN) / T_IN))
+        : t < s.end + HOLD ? 1 : 1 - ease(clamp((t - s.end - HOLD) / T_OUT));
+      if (v > k) { k = v; seg = s; }
+    });
+    return { k, seg };
+  }
   const mouthAt = t => { const M = HOST.mouth; let lo = 0, hi = M.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (M[m][0] <= t) { r = m; lo = m + 1; } else hi = m - 1; } return r < 0 ? 'X' : M[r][1]; };
   function drawHost(ctx, t) {
-    const s = segAt(t), C = HOST.corner, B = (s && s.big) || HOST.big;   // 段落可以自带位置（host.big[].pos）
-    const k = s ? Math.min(ease(clamp((t - s.start) / HOST.trans)), ease(clamp((s.end - t) / HOST.trans))) : 0;
+    const s = segAt(t), C = HOST.corner, { k, seg } = bigAt(t), B = (seg && seg.big) || HOST.big;   // 段落可以自带位置（host.big[].pos）
     const w = C.w + (B.w - C.w) * k, x = C.x + (B.x - C.x) * k, h = w * HOST.aspect;
-    const y = C.y + (B.y - C.y) * k + (1 - ease(clamp(t / .5))) * 420;   // slides up at the very start
+    const slide = openBig() ? 0 : (1 - ease3(clamp(t / .5))) * 420;   // 默认开头从角落下方滑入
+    const y = C.y + (B.y - C.y) * k + slide;
+    if (openBig()) { const f = clamp((t - .05) / .35); ctx.globalAlpha = 1 - (1 - f) * (1 - f); }   // power1.out 淡入
     if (s) { const im = FRAMES.get(frameUrl(s, t)); if (im) { ctx.drawImage(im, x, y, w, h); return; } }
     const A = HOST.avatar, sc = w / A.size[0];
     ctx.save(); ctx.translate(x + w / 2, y + h); ctx.rotate(Math.sin(t / 1.6 * Math.PI) * .02); ctx.translate(-(x + w / 2), -(y + h));
@@ -84,7 +98,7 @@
     if (window.RX_CLEAN) return;   // clean frames (cover): no captions / progress
     const W = ctx.canvas.width;
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
-    if (HOST) drawHost(ctx, t);   // under captions: the caption sits on the presenter's chest
+    if (HOST) { drawHost(ctx, t); ctx.globalAlpha = 1; }   // under captions: the caption sits on the presenter's chest
     // progress bar + header
     const pr = clamp(t / TL.duration);
     ctx.fillStyle = 'rgba(128,128,128,.25)'; ctx.fillRect(80, 90, W - 160, 10);
