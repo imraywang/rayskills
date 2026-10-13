@@ -88,6 +88,41 @@ class OralScriptCheckTests(unittest.TestCase):
             self.assertIn("列表或表格", output)
             self.assertIn("括号", output)
 
+    def test_source_clip_lines_are_allowed_and_not_counted(self) -> None:
+        clip = "【原声：Dude — no way! (laughter) I just saw a flash! 100%!】"
+        with tempfile.TemporaryDirectory() as raw:
+            plain = self.write(Path(raw), "plain.md", self.fast_script())
+            with_clip = self.write(
+                Path(raw), "clip.md", self.fast_script(spoken=SPOKEN + "\n\n" + clip + "\n\n" + SPOKEN[:20])
+            )
+            _, plain_out = self.run_check(str(plain))
+            result, output = self.run_check(str(with_clip))
+            self.assertEqual(result, 0, output)
+            self.assertIn("1 处原声", output)
+            plain_count = int(plain_out.split("逐字稿汉字: ")[1].split()[0])
+            clip_count = int(output.split("逐字稿汉字: ")[1].split("（")[0])
+            self.assertEqual(clip_count, plain_count + checker.han_count(SPOKEN[:20]))
+
+    def test_source_clip_inside_sentence_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            script = self.write(
+                Path(raw), "fast.md", self.fast_script(spoken=SPOKEN + "他说【原声：wow】然后走了。")
+            )
+            result, output = self.run_check(str(script))
+            self.assertEqual(result, 1)
+            self.assertIn("单独成行", output)
+
+    def test_at_most_one_red_pending_item(self) -> None:
+        one = "- 🔴【拿不准】“立论句”：只抽查了一半。\n- 【数字】“一天三小时”：没核对。"
+        two = one + "\n- 🔴【拿不准】“另一句立论”：没查。"
+        with tempfile.TemporaryDirectory() as raw:
+            ok = self.write(Path(raw), "ok.md", self.fast_script(pending=one))
+            self.assertEqual(self.run_check(str(ok))[0], 0)
+            bad = self.write(Path(raw), "bad.md", self.fast_script(pending=two))
+            result, output = self.run_check(str(bad))
+            self.assertEqual(result, 1)
+            self.assertIn("2 条 🔴", output)
+
     def test_article_repurpose_checks_source_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
