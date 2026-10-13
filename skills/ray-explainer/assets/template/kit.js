@@ -11,11 +11,14 @@ const mixHex = (a, b, k) => '#' + [1, 3, 5].map(i => Math.round(parseInt(a.subst
 // script.json "theme" (render.js resolves it to the 6 palette keys and injects window.THEME before this file runs):
 // the kit's structural colours follow the palette, so kit scenes and huashu grammar clips share one set of colours.
 // green / red / yellow / purple stay as semantic colours (right / wrong / idea / extra); no theme → the original kit look.
-if (window.THEME) {
-  const T = window.THEME;
-  Object.assign(C, { paper: T.bg, card: T.surface, ink: T.ink, soft: T.sub, orange: T.accent, blue: T.accent2,
-    tint: mixHex(T.accent, T.surface, .78), btint: mixHex(T.accent2, T.surface, .78), gtint: mixHex(C.green, T.surface, .8) });
-}
+// A theme may also carry kit {green red yellow purple grain} (semantic colours, paper-grain rgb) and sig {6 keys + kit}: the palette
+// that signature scenes ("sig" in script.json) are drawn in.
+let GRAIN = '120,95,60';
+const palColors = (T, k = {}) => { const sem = { green: k.green || C.green, red: k.red || C.red, yellow: k.yellow || C.yellow, purple: k.purple || C.purple };
+  return { ...sem, paper: T.bg, card: T.surface, ink: T.ink, soft: T.sub, orange: T.accent, blue: T.accent2,
+    tint: mixHex(T.accent, T.surface, .78), btint: mixHex(T.accent2, T.surface, .78), gtint: mixHex(sem.green, T.surface, .8) }; };
+const SIGC = window.THEME && window.THEME.sig ? palColors(window.THEME.sig.pal, window.THEME.sig.kit) : null;
+if (window.THEME) { Object.assign(C, palColors(window.THEME, window.THEME.kit)); if (window.THEME.kit && window.THEME.kit.grain) GRAIN = window.THEME.kit.grain; }
 const FONT = '"Hannotate SC","HanziPen SC","PingFang SC",sans-serif';
 
 // ---------- math / rng ----------
@@ -176,11 +179,12 @@ const S = {};
 
 // ---------- frame ----------
 let paperTex = null;
-function makePaper() {
+let sigTex = null;
+function makePaper(fill = C.paper, grain = GRAIN) {
   const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  g.fillStyle = C.paper; g.fillRect(0, 0, W, H);
+  g.fillStyle = fill; g.fillRect(0, 0, W, H);
   const r = rng(99);
-  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(120,95,60,${r() * .06})`; g.fillRect(r() * W, r() * H, 1 + r() * 2.5, 1 + r() * 2.5); }
+  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(${grain},${r() * .06})`; g.fillRect(r() * W, r() * H, 1 + r() * 2.5, 1 + r() * 2.5); }
   const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(90,60,30,.12)');
   g.fillStyle = v; g.fillRect(0, 0, W, H); return c;
 }
@@ -192,12 +196,17 @@ window.renderFrame = function (t) {
   for (const sc of TL.scenes) {
     if (t < sc.start - .01 || t >= sc.end || sc.grammar) continue;   // grammar scenes are drawn by huashu clips
     const a = Math.min(ap(t, sc.start, .3), 1 - ap(t, sc.end - .28, .28));
+    const sig = SIGC && sigTex && (window.SIG || []).some(s => s.id === sc.id), saved = sig ? { ...C } : null;
+    if (sig) { ctx.globalAlpha = a; ctx.drawImage(sigTex, 0, 0); Object.assign(C, SIGC); }   // signature scene: ink-green ground, sig palette
     ctx.save(); ctx.globalAlpha = a;
+    const av = sig && ((window.SIG || []).find(s => s.id === sc.id) || {}).avatar;   // avatar beat: content makes room
+    if (av) { const k = 1 - .2 * eInOut(ap(t, av.at, .5)); ctx.translate(60, 300); ctx.scale(k, k); ctx.translate(-60, -300); }
     const z = 1 + (1 - eOut(ap(t, sc.start, .4))) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     const def = typeof patternDef === 'function' ? patternDef(sc) : null;   // patterns.js: cue-driven hand-drawn scenes
     if (def) { if (P[def.name]) P[def.name](t, sc, def); else if (!window['__warned' + sc.id]) { window['__warned' + sc.id] = 1; console.error(`scene ${sc.id}: unknown pattern ${def.name}`); } }
     if (S[sc.id]) S[sc.id](t, sc);   // scenes.js: custom code (or extras on top of a pattern)
     ctx.restore();
+    if (saved) Object.assign(C, saved);
   }
   if (window.RXO) RXO.draw(ctx, t);   // captions + progress + header (overlay.js), shared with grammar clips
 };
@@ -207,6 +216,7 @@ window.ready = (async () => {
   if (window.RXO) await RXO.ready;
   if (!window.SCRIPT) { try { window.SCRIPT = await (await fetch('script.json')).json(); } catch (e) { /* file:// preview: patterns need the http server (render.js serve) */ } }
   paperTex = makePaper();
+  if (SIGC) sigTex = makePaper(SIGC.paper, (window.THEME.sig.kit && window.THEME.sig.kit.grain) || GRAIN);
   return { duration: TL.duration, fonts: document.fonts.check('bold 60px "Hannotate SC"', '中') };
 })();
 

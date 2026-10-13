@@ -2,12 +2,12 @@
   "title": "",
   "source": "",
   "header": "一篇读懂 · ",
-  "theme": "ray",
+  "theme": "ray-ip",
   "voice": "Charon",
   "speed": 1.0,
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
   "scenes": [
-    { "id": "hook", "lines": ["", ""] },
+    { "id": "hook", "sig": true, "lines": ["", ""] },
     { "id": "list", "grammar": "y5_kinetic_type", "lines": [""], "cues": [
       { "at": 0, "kind": "title", "text": "" },
       { "at": { "line": 0, "phrase": "" }, "kind": "point", "text": "", "sub": "" }

@@ -28,25 +28,55 @@ const W = 1080, H = 1920, SAFE = { top: 290, bottom: 380 };   // overlay: progre
 if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
 
 // ---------- theme: script.json "theme" → one palette for kit scenes and grammar clips ----------
-// a huashu palette name (paper poster ink navy bauhaus snow wood chalk), "ray" (the kit's own colours), {name, <keys to override>},
-// or all 6 keys. Omitted → kit and every grammar keep their own default colours (old projects render unchanged).
+// a huashu palette name (paper poster ink navy bauhaus snow wood chalk), "ray" (the kit's own colours), "ray-ip" (Ray's IP look:
+// black / white / grey + ink green #054C4C, see references/ip-style.md), {name, <keys to override>}, or all 6 keys.
+// Omitted → kit and every grammar keep their own default colours (old projects render unchanged).
+// Besides the 6 palette keys a theme may carry: kit {green red yellow purple grain} (the kit's semantic colours / paper grain rgb),
+// overlay {bar caption captionInk sigBar}, sig {6 keys + kit} (the palette of signature scenes: scenes with "sig" in script.json).
 const RAY_PALETTE = { bg: '#f7f0e3', surface: '#fffaf1', ink: '#2a2622', sub: '#8a7f72', accent: '#e8743b', accent2: '#3d7fd9' };
+const RAY_IP = { bg: '#f3f3f0', surface: '#ffffff', ink: '#111111', sub: '#6e6e6e', accent: '#054c4c', accent2: '#8c8c8c',
+  kit: { green: '#054c4c', red: '#111111', yellow: '#d4d4d0', purple: '#8a8a8a', grain: '0,0,0' },
+  overlay: { bar: '#111111', caption: 'rgba(17,17,17,.88)', captionInk: '#f3f3f0', sigBar: '#f3f3f0' },
+  sig: { bg: '#054c4c', surface: '#0d5f5e', ink: '#f3f3f0', sub: '#9cc2bf', accent: '#ffffff', accent2: '#7fb0ac',
+    kit: { green: '#9cc2bf', red: '#ffffff', yellow: '#d4d4d0', purple: '#7fb0ac', grain: '255,255,255' } } };
 const PAL_KEYS = ['bg', 'surface', 'ink', 'sub', 'accent', 'accent2'];
+const hsv = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255), mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
+  const hue = d === 0 ? 0 : mx === r ? 60 * (((g - b) / d) % 6) : mx === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4); return [(hue + 360) % 360, mx ? d / mx : 0]; };
+function six(o, where, avail) {
+  const bad = PAL_KEYS.filter(k => !/^#[0-9a-f]{6}$/i.test(String(o[k] || '')));
+  if (bad.length) throw new Error(`script.json ${where} 缺或写错 ${bad.join(' ')}（每个键写 #rrggbb；或写 name 用一套色板补齐）。可用：${avail}`);
+  for (const k of ['bg', 'surface', 'accent']) { const [h, sat] = hsv(o[k]); if (h >= 225 && h <= 300 && sat >= .3) console.warn(`WARN ${where}.${k}=${o[k]} 落在蓝紫区（色相 225°–300°），film_gate 会量出蓝紫底`); }
+  return Object.fromEntries(PAL_KEYS.map(k => [k, o[k].toLowerCase()]));
+}
 function resolveTheme(th) {
   if (th == null) return null;
   const sb = { window: {} }; require('vm').runInNewContext(fs.readFileSync(path.join(HUASHU, 'lib', 'palettes.js'), 'utf8'), sb);
-  const named = { ray: RAY_PALETTE, ...sb.window.PALETTES }, avail = Object.keys(named).join(' / ');
+  const named = { ray: RAY_PALETTE, 'ray-ip': RAY_IP, ...sb.window.PALETTES }, avail = Object.keys(named).join(' / ');
   const name = typeof th === 'string' ? th : th.name;
   if (name != null && !named[name]) throw new Error(`script.json theme「${name}」不是色板名。可用：${avail}`);
-  const out = { ...(name != null ? named[name] : {}), ...(typeof th === 'object' ? th : {}) }; delete out.name;
-  const bad = PAL_KEYS.filter(k => !/^#[0-9a-f]{6}$/i.test(String(out[k] || '')));
-  if (bad.length) throw new Error(`script.json theme 缺或写错 ${bad.join(' ')}（每个键写 #rrggbb；或写 name 用一套色板补齐）。可用：${avail}`);
-  const hsv = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255), mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
-    const hue = d === 0 ? 0 : mx === r ? 60 * (((g - b) / d) % 6) : mx === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4); return [(hue + 360) % 360, mx ? d / mx : 0]; };
-  for (const k of ['bg', 'surface', 'accent']) { const [h, sat] = hsv(out[k]); if (h >= 225 && h <= 300 && sat >= .3) console.warn(`WARN theme.${k}=${out[k]} 落在蓝紫区（色相 225°–300°），film_gate 会量出蓝紫底`); }
-  return Object.fromEntries(PAL_KEYS.map(k => [k, out[k].toLowerCase()]));
+  const base = name != null ? named[name] : {}, over = typeof th === 'object' ? th : {};
+  const out = { ...base, ...over, kit: { ...(base.kit || {}), ...(over.kit || {}) }, overlay: { ...(base.overlay || {}), ...(over.overlay || {}) } };
+  const sig = over.sig || base.sig ? { ...(base.sig || {}), ...(over.sig || {}) } : null;
+  return { pal: six(out, 'theme', avail), kit: out.kit, overlay: out.overlay, sig: sig ? { pal: six(sig, 'theme.sig', avail), kit: sig.kit || {} } : null };
 }
-const THEME = resolveTheme(SCRIPT.theme);
+const THEME_ALL = resolveTheme(SCRIPT.theme), THEME = THEME_ALL && THEME_ALL.pal;
+// signature scenes (script.json scene "sig": true | {avatar: false | {at, x, y, h}}): opening / closing moments in the sig palette.
+// The avatar enters on one beat, not for the whole scene (Ray, 2026-10-13): in the film's first scene when its first line has been
+// said (the hook has landed), in any later sig scene when its last line starts (it lands with the closing line). avatar.at overrides
+// it with a cue time ({line, phrase, offset} or seconds into the scene). From that beat the kit content eases up-left to free the corner.
+const SIG = SCRIPT.scenes.filter(s => s.sig).map(s => {
+  const tsc = TL.scenes.find(x => x.id === s.id); if (!tsc) throw new Error(`scene ${s.id}: sig scene missing from timeline.json`);
+  const a = typeof s.sig === 'object' ? s.sig.avatar : undefined;
+  if (a === false) return { id: s.id, start: tsc.start, end: tsc.end, avatar: null };
+  const L = tsc.lines, open = s === SCRIPT.scenes[0];
+  const at = a && a.at != null ? tsc.start + cueTime(a.at, tsc, `scene ${s.id} sig.avatar.at`) : open ? L[0].end : L[L.length - 1].start;
+  return { id: s.id, start: tsc.start, end: tsc.end, avatar: { x: 905, y: 1545, h: 500, ...(typeof a === 'object' ? a : {}), at: +Math.min(at, tsc.end - .5).toFixed(3) } };
+});
+if (SIG.length && !(THEME_ALL && THEME_ALL.sig)) console.warn('WARN script.json 有 sig 场景，但 theme 没有 sig 色板（用 "ray-ip"）——签名幕只会叠形象，不换底色');
+const AVATAR = process.env.RAY_EXPLAINER_AVATAR || path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'ray-explainer', 'avatars', (SCRIPT.ip && SCRIPT.ip.avatar) || 'ray', 'base.png');
+if (SIG.some(s => s.avatar) && !fs.existsSync(AVATAR)) console.warn(`WARN 签名幕要画形象，但找不到 ${AVATAR}——签名幕不画形象`);
+const PAGE_INIT = (THEME_ALL ? `window.THEME=${JSON.stringify({ ...THEME_ALL.pal, kit: THEME_ALL.kit, overlay: THEME_ALL.overlay, sig: THEME_ALL.sig })};` : '') +
+  (SIG.length ? `window.SIG=${JSON.stringify(SIG.map(s => fs.existsSync(AVATAR) ? s : { ...s, avatar: null }))};` : '');
 
 // ---------- static server: project at /, vendored huashu engine at /huashu/, overlay.js always from the skill ----------
 // overlay.js (captions, progress bar, header, digital host) is pipeline infrastructure, not per-film content: it must match
@@ -57,6 +87,7 @@ function serve() {
     let u = decodeURIComponent(req.url.split('?')[0]); let base = PROJ;
     if (u.startsWith('/huashu/')) { base = HUASHU; u = u.slice(7); }
     else if (u === '/overlay.js') { base = TEMPLATE; }
+    else if (u === '/ip/avatar.png') { if (!fs.existsSync(AVATAR)) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'Content-Type': 'image/png' }); return fs.createReadStream(AVATAR).pipe(res); }
     const f = path.join(base, path.normalize(u));
     if (!f.startsWith(base) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);
@@ -106,7 +137,7 @@ function specFor(ssc, tsc, fps) {
     q.video = { ...q.video, count: fs.readdirSync(dir).filter(f => /^\d{4}\.jpg$/.test(f)).length };
   }
   return { grammar: ssc.grammar, duration: +(tsc.end - tsc.start).toFixed(3), fps, width: W, height: H,
-    safe: { ...SAFE, ...(ssc.safe || {}) }, ...(ssc.data ? { data: ssc.data } : {}), ...(THEME && ssc.theme === undefined ? { theme: THEME } : ssc.theme ? { theme: ssc.theme } : {}), cues };
+    safe: { ...SAFE, ...(ssc.safe || {}) }, ...(ssc.data ? { data: ssc.data } : {}), ...(ssc.theme ? { theme: ssc.theme } : ssc.sig && THEME_ALL && THEME_ALL.sig ? { theme: THEME_ALL.sig.pal } : THEME ? { theme: THEME } : {}), cues };
 }
 
 (async () => {
@@ -125,7 +156,7 @@ function specFor(ssc, tsc, fps) {
     await p.goto(url); return p;
   };
   const CLEAN = process.env.RX_CLEAN ? 'window.RX_CLEAN=true;' : '';
-  const kit = await open(`${base}/video.html`, (CLEAN + (THEME ? `window.THEME=${JSON.stringify(THEME)};` : '')) || undefined);
+  const kit = await open(`${base}/video.html`, (CLEAN + PAGE_INIT) || undefined);
   const info = await kit.evaluate(() => window.ready);
   const META = { header: SCRIPT.header || '', ...(await kit.evaluate(() => window.META || {})) };
   if (!info.fonts) console.warn('WARN: handwriting font not available — kit text falls back');
@@ -136,7 +167,7 @@ function specFor(ssc, tsc, fps) {
     if (clips[sid]) return clips[sid];
     const ssc = SCRIPT.scenes.find(s => s.id === sid), tsc = TL.scenes.find(s => s.id === sid), spec = specFor(ssc, tsc, fps);
     fs.mkdirSync(path.join(PROJ, 'specs'), { recursive: true }); fs.writeFileSync(path.join(PROJ, 'specs', sid + '.json'), JSON.stringify(spec, null, 1));
-    const p = await open(`${base}/huashu/clip.html?render=1`, `${CLEAN}window.CLIP_SPEC=${JSON.stringify(spec)};window.TIMELINE=${JSON.stringify(TL)};window.META=${JSON.stringify(META)};`);
+    const p = await open(`${base}/huashu/clip.html?render=1`, `${CLEAN}${PAGE_INIT}window.CLIP_SPEC=${JSON.stringify(spec)};window.TIMELINE=${JSON.stringify(TL)};window.META=${JSON.stringify(META)};`);
     await p.waitForFunction('window.__ready === true || !!window.__bootFailed', { timeout: 120000 });
     const bf = await p.evaluate('window.__bootFailed || null'); if (bf) throw new Error(`scene ${sid} (${ssc.grammar}) failed to boot:\n${bf}`);
     await p.addScriptTag({ url: `${base}/overlay.js` }); await p.evaluate(() => window.RXO.ready);
