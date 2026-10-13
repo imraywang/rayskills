@@ -16,6 +16,7 @@ try { puppeteer = require('puppeteer-core'); } catch { puppeteer = require(requi
 
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const HUASHU = path.resolve(__dirname, '..', 'assets', 'huashu');
+const TEMPLATE = path.resolve(__dirname, '..', 'assets', 'template');
 const [projArg, mode = 'sheet', arg] = process.argv.slice(2);
 if (!projArg) { console.error('usage: node render.js <project> stills|sheet|video|serve [arg]'); process.exit(2); }
 const PROJ = path.resolve(projArg);
@@ -25,12 +26,15 @@ const W = 1080, H = 1920, SAFE = { top: 290, bottom: 380 };   // overlay: progre
 // digital host (host.py wrote host/plan.json): captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
 if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
 
-// ---------- static server: project at /, vendored huashu engine at /huashu/ ----------
+// ---------- static server: project at /, vendored huashu engine at /huashu/, overlay.js always from the skill ----------
+// overlay.js (captions, progress bar, header, digital host) is pipeline infrastructure, not per-film content: it must match
+// this render.js (RXO.prep / ready / draw), so it is served from the skill even when an old project still has its own copy
 const MIME = { '.webp': 'image/webp', '.js': 'text/javascript', '.html': 'text/html', '.woff': 'font/woff', '.woff2': 'font/woff2', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.wav': 'audio/wav' };
 function serve() {
   const srv = http.createServer((req, res) => {
     let u = decodeURIComponent(req.url.split('?')[0]); let base = PROJ;
     if (u.startsWith('/huashu/')) { base = HUASHU; u = u.slice(7); }
+    else if (u === '/overlay.js') { base = TEMPLATE; }
     const f = path.join(base, path.normalize(u));
     if (!f.startsWith(base) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);
