@@ -102,7 +102,7 @@ function gridLayout(n, colsWanted) {
 }
 P.grid = (t, sc, d) => {
   const D = d.data, cards = D.cards || [], L0 = gridLayout(cards.length, D.cols), k = L0[0] ? L0[0].w / 420 : 1;
-  if (D.title) title(t, sc, D.title);
+  if (D.title) title(t, sc, D.title, C.ink, true);
   const shows = cueOf(d, 'show'), showT = i => { const q = shows.find(q => q.data.index == null || q.data.index === i || (Array.isArray(q.data.index) && q.data.index.includes(i))); return q ? q.t : -1e9; };
   const dimT = i => { const q = cueOf(d, 'dim').find(q => [].concat(q.data.index).includes(i)); return q ? q.t : 1e9; };
   cards.forEach((g, i) => {
@@ -243,7 +243,7 @@ P.swap = (t, sc, d) => {
 
 // ---------- checklist: question boxes tick one by one, then shrink up for a closing line ----------
 P.checklist = (t, sc, d) => {
-  const D = d.data; if (D.title) title(t, sc, D.title);
+  const D = d.data; if (D.title) title(t, sc, D.title, C.ink, true);
   const items = cueOf(d, 'item'), fin = first(d, 'final'), n = items.length, shrink = eInOut(ap(t, tOf(fin) + .2, .6));
   const g0 = Math.min(300, 1000 / Math.max(1, n)), g1 = Math.min(210, 700 / Math.max(1, n));
   items.forEach((q, i) => { const s0 = q.t, y = lerp(520 + i * g0, 490 + i * g1, shrink), p = ap(t, s0 - .2, .5);
@@ -267,3 +267,108 @@ P.checklist = (t, sc, d) => {
     }
   }
 };
+
+// ======================================================================================================================
+// Camera + caption beats for pattern scenes (2026-10-13). Each pattern lists where its elements land and when (FOCUS);
+// the kit turns that into a camera path and, for captions that have no cue of their own, a small hand-drawn mark.
+// Rules (huashu-art-motion 镜头语言): hold while the viewer reads; ease in to a detail (0.9s), glide between neighbours
+// (0.7s), pull back to the whole (1.1s, long tail); quick punch (0.28s) only for accents, at most a third of the moves;
+// after going in, come back out. Scene "camera": false / "marks": false in script.json turns either off.
+// FOCUS[name](sc, def) → [{ t, r: [x, y, w, h] | null (= whole frame), kind: 'detail' | 'overview' | 'accent' }]
+// ======================================================================================================================
+const FOCUS = {};
+const VIEW = { cx: W / 2, cy: 870, h: 1140 };   // content box y 300–1440 (captions / corner host below)
+const R = (x, y, w, h) => [x, y, w, h];
+const F = (q, r, kind = 'detail') => q ? [{ t: q.t, r, kind }] : [];
+
+FOCUS.leaderboard = (sc, d) => { const n = (d.data.items || [1, 2, 3, 4]).length, cy = 380 + 175 + n * 112 + 30;
+  return [...F(first(d, 'code'), R(150, cy - 20, 780, 290)), ...F(first(d, 'swap'), R(150, cy - 20, 780, 290), 'accent'),
+    ...F(first(d, 'question'), null, 'overview'), ...F(first(d, 'strike'), R(140, 720, 800, 420)), ...F(first(d, 'cross'), R(140, 720, 800, 600), 'accent')]; };
+FOCUS.quote = (sc, d) => { const n = (d.data.lines || [1]).length, ac = d.data.accent ?? n - 1;
+  return [...F(first(d, 'quote'), R(110, 860, 860, 190 + n * 150)), ...F(first(d, 'underline'), R(300, 1000 + ac * 150 - 40, 640, 160), 'accent'),
+    ...F(first(d, 'note'), null, 'overview')]; };
+FOCUS.grid = (sc, d) => { const L0 = gridLayout((d.data.cards || []).length, d.data.cols), box = o => o && R(o.x - o.w / 2 - 30, o.y - o.h / 2 - 30, o.w + 60, o.h + 120);
+  const one = q => { const ix = q.data.index; return ix == null || Array.isArray(ix) ? null : box(L0[ix]); };
+  return [...cueOf(d, 'show').map(q => ({ t: q.t, r: one(q), kind: one(q) ? 'detail' : 'overview' })),
+    ...cueOf(d, 'cross').map(q => ({ t: q.t, r: box(L0[q.data.index]), kind: 'detail' })),
+    ...cueOf(d, 'dim').map(q => ({ t: q.t, r: null, kind: 'overview' })), ...cueOf(d, 'circle').map(q => ({ t: q.t, r: null, kind: 'overview' }))]; };
+FOCUS.story = (sc, d) => { const steps = cueOf(d, 'step'), gap = Math.min(230, 860 / Math.max(1, steps.length));
+  return [...F(first(d, 'chat'), R(170, 380, 740, 370)), ...F(first(d, 'doubt'), R(120, 740, 840, 380)), ...F(first(d, 'bubble'), R(120, 1120, 840, 360)),
+    ...steps.map((q, i) => ({ t: q.t, r: i === 0 ? null : R(140, 470 + i * gap - 130, 820, 260), kind: i === 0 ? 'overview' : 'detail' })),
+    ...F(first(d, 'summary'), R(120, 1330, 840, 240))]; };
+FOCUS.funnel = (sc, d) => [...F(first(d, 'funnel'), R(180, 960, 720, 380)), ...F(first(d, 'pour'), null, 'overview'),
+  ...F(first(d, 'result'), R(380, 1280, 640, 280), 'accent'), ...F(first(d, 'formula'), R(140, 620, 800, 560))];
+FOCUS.paths = (sc, d) => { const ps = d.data.paths || [], n = ps.length, sp = Math.min(320, (W - 160) / Math.max(1, n)), bw = Math.min(280, sp - 40);
+  const xs = ps.map((_, i) => W / 2 + (i - (n - 1) / 2) * sp), box = i => R(xs[i] - bw / 2 - 40, 660, bw + 80, 240);
+  const lo = first(d, 'loss'), lx = lo ? xs[lo.data.index ?? 0] ?? 540 : 540;
+  return [...cueOf(d, 'focus').map(q => ({ t: q.t, r: box(q.data.index ?? 0), kind: 'detail' })),
+    ...F(lo, R(lx - 240, 880, 480, 600)), ...F(first(d, 'loop'), R(280, 940, 520, 540)), ...F(first(d, 'punch'), null, 'overview')]; };
+FOCUS.swap = (sc, d) => [...F(first(d, 'flip'), null, 'overview'), ...F(first(d, 'punch'), R(120, 1320, 840, 200), 'accent')];
+FOCUS.checklist = (sc, d) => { const items = cueOf(d, 'item'), n = items.length, g0 = Math.min(300, 1000 / Math.max(1, n)), fin = first(d, 'final');
+  return [...items.map((q, i) => ({ t: q.t, r: i === 0 ? null : R(120, 520 + i * g0 - 140, 840, 280), kind: i === 0 ? 'overview' : 'detail' })),
+    ...F(fin, null, 'overview'), ...(fin ? [{ t: fin.t + (fin.data.bigDelay ?? 2.5), r: R(170, 1140, 760, 290), kind: 'accent' }] : [])]; };
+
+const CAM_KEYS = {};
+const zoomFor = r => r ? clamp(Math.min(W / (r[2] * 1.15), VIEW.h / (r[3] * 1.3)), 1, 1.3) : 1;
+function camKeys(sc, d) {
+  if (CAM_KEYS[sc.id]) return CAM_KEYS[sc.id];
+  const ss = window.SCRIPT && SCRIPT.scenes.find(x => x.id === sc.id);
+  let ev = ss && ss.camera === false ? [] : (FOCUS[d.name] ? FOCUS[d.name](sc, d) : []).filter(e => e.t > sc.start + .2 && e.t < sc.end - 1).sort((a, b) => a.t - b.t);
+  const maxAcc = Math.max(1, Math.floor(ev.length / 3)); let acc = 0;   // punches are accents: at most a third of the moves
+  ev = ev.map(e => e.kind === 'accent' && ++acc > maxAcc ? { ...e, kind: 'detail' } : e);
+  const keys = [{ t: sc.start, cx: VIEW.cx, cy: VIEW.cy, z: 1, dur: 0 }]; let cur = keys[0], ins = 0;
+  const go = (t, cx, cy, z, dur, ease) => { cur = { t, cx, cy, z, dur, ease }; keys.push(cur); };
+  ev.forEach((e, i) => {
+    const t = Math.max(e.t - .1, cur.t + cur.dur), next = ev[i + 1];
+    if (e.kind === 'overview' || !e.r) { if (cur.z > 1.02) { go(t, VIEW.cx, VIEW.cy, 1, 1.1, 'pull'); ins = 0; } return; }
+    const z = zoomFor(e.r), cx = e.r[0] + e.r[2] / 2, cy = e.r[1] + e.r[3] / 2;
+    if (e.kind === 'accent') { go(t, cur.z > 1.02 ? cur.cx : cx, cur.z > 1.02 ? cur.cy : cy, Math.min(1.6, Math.max(cur.z, 1) * 1.14), .28, 'punch'); }
+    else if (ins >= 2) { go(t, VIEW.cx, VIEW.cy, 1, 1.1, 'pull'); ins = 0; return; }   // went in twice: come back out to the whole
+    else { go(t, cx, cy, z, cur.z > 1.02 ? .7 : .9, cur.z > 1.02 ? 'glide' : 'push'); ins++; }
+    if (!next || next.t - e.t > 4.2) { const tb = e.t + 3.2; if (tb < sc.end - 1.4) { go(tb, VIEW.cx, VIEW.cy, 1, 1.1, 'pull'); ins = 0; } }   // nothing new for a while: back to the whole
+  });
+  if (cur.z > 1.02) go(Math.max(sc.end - 1.5, cur.t + cur.dur), VIEW.cx, VIEW.cy, 1, 1.1, 'pull');   // leave every scene on the whole frame
+  return (CAM_KEYS[sc.id] = keys);
+}
+const EASE = { push: x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2, glide: x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2,
+  pull: x => 1 - Math.pow(1 - x, 4), punch: x => 1 - Math.pow(1 - x, 3) };
+function camAt(sc, d, t) {
+  const ks = camKeys(sc, d); let a = ks[0];
+  for (let i = 1; i < ks.length; i++) { const k = ks[i]; if (t < k.t) break;
+    const e = EASE[k.ease](clamp((t - k.t) / k.dur)); a = { cx: lerp(a.cx, k.cx, e), cy: lerp(a.cy, k.cy, e), z: lerp(a.z, k.z, e) }; }
+  const hw = W / 2 / a.z; return { cx: clamp(a.cx, hw, W - hw), cy: a.cy, z: a.z };
+}
+// once the camera is in, the pattern layer is clipped to the content box so nothing slides under the header / progress bar
+function applyCam(sc, d, t) { const c = camAt(sc, d, t);
+  if (c.z > 1.005) { ctx.beginPath(); ctx.rect(0, 292, W, 1166); ctx.clip(); }
+  ctx.translate(VIEW.cx, VIEW.cy); ctx.scale(c.z, c.z); ctx.translate(-c.cx, -c.cy); }
+
+const NO_MARKS = new Set(['funnel', 'paths']);   // their elements keep moving (crowd, flows, loop): a mark would circle a moving target
+// caption beats: a caption that starts with no cue near it gets a quick hand-drawn mark on the element last in focus
+const MARKS = {};
+function marksFor(sc, d) {
+  if (MARKS[sc.id]) return MARKS[sc.id];
+  const ss = window.SCRIPT && SCRIPT.scenes.find(x => x.id === sc.id), caps = (window.RXO && RXO.CAPS) || [];
+  if ((ss && ss.marks === false) || NO_MARKS.has(d.name)) return (MARKS[sc.id] = []);
+  // only marks the element that is still the subject: the last focus event must be a detail (an overview or a vanished
+  // element resets it), no older than 6 s, and not too big to read as "this one"
+  const cueT = d.cues.map(q => q.t), foc = FOCUS[d.name] ? FOCUS[d.name](sc, d) : [];
+  const out = [];
+  caps.filter(c => c.start > sc.start + .3 && c.start < sc.end - .6).forEach(c => {
+    if (cueT.some(t => Math.abs(t - c.start) < .7)) return;
+    const f = foc.filter(e => e.t <= c.start).pop();
+    if (!f || !f.r || f.kind === 'overview' || c.start - f.t > 6 || f.r[2] > 860 || f.r[3] > 640) return;
+    out.push({ t: c.start, r: f.r, k: out.length });
+  });
+  return (MARKS[sc.id] = out);
+}
+function drawMarks(t, sc, d) {
+  const ms = marksFor(sc, d);
+  ms.forEach((m, i) => { const end = ms[i + 1] ? ms[i + 1].t : sc.end - .3; if (t < m.t || t > end + .3) return;
+    const p = ap(t, m.t, .45), [x, y, w, h] = m.r, a = 1 - ap(t, end, .3);
+    ctx.save(); ctx.globalAlpha *= a;
+    if (m.k % 2 === 0) { const pts = []; for (let k = 0; k <= 40; k++) { const g = -Math.PI * .6 + k / 36 * Math.PI * 2; pts.push([x + w / 2 + Math.cos(g) * w * .56, y + h / 2 + Math.sin(g) * h * .6]); }
+      rpath(pts, { p, color: C.green, w: 8, seed: 900 + i }); }   // circle it
+    else rline(x + w * .12, y + h - 18, x + w * .88, y + h - 26, { p, color: C.green, w: 10, seed: 900 + i });   // underline it
+    ctx.restore(); });
+}

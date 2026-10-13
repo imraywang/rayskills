@@ -168,11 +168,17 @@ function at(sc, i, phrase) { // time the phrase starts being spoken in line i (W
   if (l.chars && l.chars.length === l.text.length) return l.chars[idx];
   return l.start + (l.end - l.start) * idx / l.text.length;
 }
-function title(t, sc, str, color = C.ink) {
-  const p = pop(t, sc.start + .05, .5);
-  text(str, W / 2, 320, { size: 72, scale: p, color });   // 安全区：标题在进度条（y 252）下面
-  const w = Math.min(760, str.length * 74);
-  rline(W / 2 - w / 2, 380, W / 2 + w / 2, 376, { p: ap(t, sc.start + .25, .5), color: C.orange, w: 9, seed: 77 });
+// scene title: not a fixed page header. It opens big in the middle of the empty frame, then, as the first element of the
+// scene arrives, shrinks into a small tag top-left (drawn in world space, so the camera carries it away when it moves in).
+// The big phase only where the pattern leaves the frame empty until its first cue (canOpen); otherwise, or when the first
+// element comes almost at once, the tag is drawn straight away.
+function title(t, sc, str, color = C.ink, canOpen = false) {
+  const def = typeof patternDef === 'function' ? patternDef(sc) : null, firstT = def && def.cues.length ? def.cues[0].t : sc.end;
+  const big = canOpen && firstT - sc.start > 1.1, m = big ? eInOut(ap(t, firstT - .35, .6)) : 1, p = pop(t, sc.start + .05, .5);
+  const size = lerp(100, 50, m), y = lerp(780, 330, m);
+  ctx.font = `bold ${size}px ${FONT}`; const tw = Math.min(ctx.measureText(str).width, W - 180), x = lerp(W / 2 - tw / 2, 90, m);   // left-aligned, slides from centred to the corner
+  text(str, x, y, { size, scale: p, color, align: 'left' });
+  rline(x, y + size * .72, x + tw * lerp(1, .55, m), y + size * .68, { p: ap(t, sc.start + .25, .5), color: C.orange, w: lerp(9, 6, m), seed: 77 });
 }
 
 const S = {};
@@ -199,9 +205,14 @@ window.renderFrame = function (t) {
     const sig = SIGC && sigTex && (window.SIG || []).some(s => s.id === sc.id), saved = sig ? { ...C } : null;
     if (sig) { ctx.globalAlpha = a; ctx.drawImage(sigTex, 0, 0); Object.assign(C, SIGC); }   // signature scene: ink-green ground, sig palette
     ctx.save(); ctx.globalAlpha = a;
-    const z = 1 + (1 - eOut(ap(t, sc.start, .4))) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     const def = typeof patternDef === 'function' ? patternDef(sc) : null;   // patterns.js: cue-driven hand-drawn scenes
+    const e = eOut(ap(t, sc.start, .45)), v = def ? TL.scenes.indexOf(sc) % 3 : 0;   // pattern scenes rotate their entrance
+    if (v === 0) { const z = 1 + (1 - e) * .03; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); }
+    else if (v === 1) ctx.translate(0, (1 - e) * 90);                                                 // rises in
+    else { const z = .94 + .06 * e; ctx.translate(W / 2, 870); ctx.scale(z, z); ctx.translate(-W / 2, -870); }   // opens out
+    if (def && typeof applyCam === 'function') applyCam(sc, def, t);   // pattern camera: ease in to what is being said, come back out
     if (def) { if (P[def.name]) P[def.name](t, sc, def); else if (!window['__warned' + sc.id]) { window['__warned' + sc.id] = 1; console.error(`scene ${sc.id}: unknown pattern ${def.name}`); } }
+    if (def && typeof drawMarks === 'function') drawMarks(t, sc, def);   // captions with no cue of their own get a mark
     if (S[sc.id]) S[sc.id](t, sc);   // scenes.js: custom code (or extras on top of a pattern)
     ctx.restore();
     if (saved) Object.assign(C, saved);

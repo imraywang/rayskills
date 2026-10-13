@@ -89,7 +89,7 @@ function serve() {
 // ---------- film gate (scripts/film_gate.py, from huashu-art-motion): report only, never blocks the render ----------
 // measures how much of the film moves inside the shot, mid-film blank frames and blue/purple share; writes <project>/gate.json
 function gate(mp4) {
-  const L = { red: '红', yellow: '黄', green: '绿' };
+  const L = { red: '红', yellow: '黄', green: '绿', pass: '绿' };
   let d;
   try {
     const raw = execFileSync('uv', ['run', '-q', path.join(__dirname, 'film_gate.py'), mp4, '--no-template', '--sub-band', '0.2', '--json'],
