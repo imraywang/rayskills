@@ -6,13 +6,7 @@
 const { clamp, lerp } = U;
 const MO = window.MO = {};
 
-// ---------- 画布尺寸（片段渲染用） ----------
-// 引擎和全部示范片是 1920×1080。clip.html（口播管线的参数化片段）可能是竖屏 1080×1920：
-// 用到屏幕尺寸的库（CAM / UI / CH / DG / CL）用 U.onStage 登记，clip.js 启动时 U.setStage(w, h) 一次性改掉。
-const stageHooks = [];
-window.STAGE = { W: 1920, H: 1080 };
-U.onStage = f => { stageHooks.push(f); };
-U.setStage = (w, h) => { window.STAGE = { W: w, H: h }; stageHooks.forEach(f => f(w, h)); };
+// 画布尺寸 U.setStage / U.onStage 在 util.js（比本文件先加载的 paint/brush/render/post 也要登记）。
 
 // ---------- 时间片 ----------
 MO.seg = (t, a, b) => clamp((t - a) / (b - a));                          // [a,b] → 0..1
@@ -89,7 +83,21 @@ MO.springHz = (t, freq = 2.5, decay = 9) => t <= 0 ? 0 : 1 - Math.exp(-decay * t
 // 到位后的余振（Dan Ebberts 惯性回弹）：amp·sin(2πft)/e^(decay·t)。换姿势的身体挤压、屏幕震动都用它。
 MO.settle = (t, amp, freq = 3, decay = 5) => t <= 0 ? 0 : amp * Math.sin(2 * Math.PI * freq * t) / Math.exp(decay * t);
 
+// ---------- 镜头动作时长（什么时候用哪一种，见 references/镜头语言.md） ----------
+// 两类：过渡（缓推 push、找下一件 glide、拉远 pull，0.6–1.5s 缓入缓出）是默认；重音（快推 punch、快移 pan、砸入 slam）留给揭晓、数字、反转。
+// 过渡的数取自参考片实测：Vox 推进 1.0–1.5s、找卡 0.5–0.9s、拉出约 1s；3b1b 推镜约 1s。
+// 重音的数：一支「每镜匀速推近 7.5%」被判像 PPT 的片子，改成停住→0.28s 快推→停住后被认可；但 2026-10-12 诺奖短片每 2 秒一次快推，被判「太多、太快、不 smooth」。
+// 时长常量集中在这里，CAM.track / MD / 各片段都读它；要改节奏改这里，别在片段里另写一套。
+MO.PULSE = { punch: 0.28, pan: 0.30, slam: 0.17, k: 0.25, kMin: 0.18, kMax: 0.32, push: 0.9, glide: 0.7, pull: 1.1 };
+// 砸入曲线：k = 0..1（砸入进度）→ 缩放。1.55 → 0.94（前 60%，3 帧砸下）→ 1.0（后 40%，2 帧回弹）。k≤0 返回 1.55（还没落下）。
+MO.slamK = (k, from = 1.55, under = 0.94) => k <= 0 ? from : k < 0.6 ? from - (from - under) * (k / 0.6) : k < 1 ? under + (1 - under) * ((k - 0.6) / 0.4) : 1;
+// 某个元素在 at 这一帧砸进来：返回它此刻的缩放（at 之前 = 0，元素还不该画）。o: {dur=0.17, from=1.55, under=0.94}
+MO.slam = (t, at, o = {}) => t < at ? 0 : MO.slamK((t - at) / (o.dur || MO.PULSE.slam), o.from, o.under);
+// 动作进度：at 起 dur 秒内按 ease 从 0 走到 1，之后停在 1（默认快推的时长和曲线；缓推写 MO.pulse(t, at, MO.PULSE.push, MO.sineInOut)）
+MO.pulse = (t, at, dur = MO.PULSE.punch, ease = MO.cubicInOut) => ease(clamp((t - at) / dur));
+
 // ---------- 持续微动 ----------
+// 只给环境层（星闪、粒子、远景云）和艺术风格画面用。解说片的主体、标签、卡片落定后停住，不加浮动、呼吸。
 // 漂浮：两频正弦叠加。周期避开 5s 左右（HIG：~0.2Hz 的持续摆动让人不适）
 MO.float = (t, amp = 6, period = 4, ph = 0) => amp * (0.75 * Math.sin(2 * Math.PI * t / period + ph) + 0.25 * Math.sin(2 * Math.PI * t / (period * 0.53) + ph * 1.7));
 

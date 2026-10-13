@@ -7,13 +7,13 @@
 | 这一幕在讲…… | 用 | 竖屏效果 |
 |---|---|---|
 | 清单、几个要点、金句、数字开场 | `y5_kinetic_type` 动态文字 | ★★★ 整屏大字配色块翻页，最抓眼 |
-| 机制、系统、“里面是什么”、多个东西汇成一个 | `y1_kurzgesagt` 扁平科普 | ★★★ 发光星球 + 镜头推近穿行 |
+| 机制、系统、“里面是什么”、多个东西汇成一个 | `y1_kurzgesagt` 扁平科普 | ★★★ 中心物 + 卫星节点，点名时缓推过去；能钻进下一层 |
 | 推理链、步骤、A → B → C | `y3_whiteboard` 白板 | ★★ 已优化：图标整宽横排 |
 | 一个概念变成另一个、因果反转、公式 | `t1_3b1b` | ★★ 已优化：公式居中当主角 |
 | 产品功能、教程步骤、参数 | `t2_keynote_ui` 发布会 | 未测 |
 | 营收、份额、走势等真实数字 | `t3_finance_chart` 财经图表 | 未测 |
 | 有截图、原话、新闻的论证 | `y2_vox` 拼贴 | 未测 |
-| 第一人称讲经历、翻车 | `y4_storytime`（主角是豆子形的花叔） | 不建议用：角色不是 Ray |
+| 第一人称讲经历、翻车 | `y4_storytime` | 不建议用：上游已停用代码画的角色，只接受 AI 生帧的帧库（`data.character.frames`），没有帧库启动就失败 |
 | 排行榜钩子、名人金句、N 宫格与排除法、故事到规律、多到一的漏斗、几条路径、因果互换、收获清单 | 手绘套路 `pattern`（[patterns.md](patterns.md)） | 手绘风格，已用整片验证 |
 | 以上都覆盖不到的独特画面 | 手写 `scenes.js` | 完全自由 |
 
@@ -46,7 +46,7 @@
 | 语法 | spec 级 data | cue kind |
 |---|---|---|
 | `y5_kinetic_type` | `palette: [[底,字],…]` | `title`/`point`（`text` 主词，`sub` 辅句，`data.label`、`data.key` 着色词、`data.num`）、`number`（`data.value/suffix/decimals`，`at` = 数字落定的时刻）、`highlight`（`data.word`） |
-| `y1_kurzgesagt` | `center` 中心星球名、`flow: true` 串成链 | `title`、`point`（卫星节点）、`highlight`（`data.index`，镜头推近）、`enter`（`data.index`，`text` 新中心，`dur`，钻进下一层） |
+| `y1_kurzgesagt` | `center` 中心物名、`center_style`（颜色、形状、要不要轨道环）或 `image`（真实图片裁进中心物）、`flow: true` 串成链；不写样式就按名字生成中性样式 | `title`、`point`（卫星节点）、`highlight`（`data.index`，镜头缓推过去）、`enter`（`data.index`，`text` 新中心，`dur`，钻进下一层） |
 | `y3_whiteboard` | — | `title`、`point`、`draw`（`data.icon`：person cat network doc chat bulb check cross screen stack gear target clock chart；`text` 写说明）、`image`、`highlight`（`data.index`、`data.target: title/draw/image`、`data.style: underline`） |
 | `t1_3b1b` | — | `title`、`equation`（`data.tokens: [{s, col}]`，`col` 用 manim 色名 BLUE_C GREEN_C YELLOW RED_C TEAL_C 或 #hex；第二个公式会从上一个形变过来）、`point`、`line`（`data.values`）、`highlight`（`data.index` 或 `target: equation`） |
 | `t2_keynote_ui` | `eyebrow/title/subtitle/accent` | `title`、`card`/`step`（`text`、`sub`、`image`、`data.icon`）、`highlight`（`data.rect`）、`number` |
@@ -61,6 +61,7 @@
 
 ## 踩过的坑
 
-- y1 镜头推近时，卫星节点会滑进字幕区。节点别超过 5 个，字幕压在节点上影响不大。
+- y1 镜头推近时，卫星节点会滑进字幕区。节点别超过 5 个，字幕压在节点上影响不大。（2026-10-13 同步上游后改成缓推、推得更浅，挤进字幕区的情况少了。）
+- 2026-10-13 同步上游后，各语法默认不再慢推、漂移、呼吸：画面在事件之间是停住的。停住是对的，要动就靠 cue 触发的事件，不要为了「有动静」去加 cue。
 - t1 的公式里可以放中文 token，但所有公式共用一个字号，最长的那条决定字号。中文公式控制在 12 个字以内。
 - y3 的图标说明字要短，3–5 个字。要点写成一句完整的短句，不要堆关键词。
