@@ -60,7 +60,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 想让所有封面保持同一种画风，文字自己排 | 固定编辑版画画种、中央留白的无字底图，分别输出公众号、普通 X、X Article | `/ray-cover-editorial` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
-| 一篇文章或剪藏，想做成知识讲解视频 | 1.5–3 分钟竖屏解说片：手绘套路、8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）和真实照片 / 历史影像按幕混排，Gemini 或本人复刻音色配音，Whisper 逐字卡点；确认后可加卡通数字人主持人（大机位 Kling 生成手势，角落按拼音对口型） | `/ray-explainer` |
+| 一篇文章或剪藏，想做成知识讲解视频 | 1.5–3 分钟竖屏解说片：手绘套路、8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）和真实照片 / 历史影像按幕混排，Gemini 或本人复刻音色配音，Whisper 逐字卡点；确认后可加卡通数字人主持人（大机位 Kling 生成手势，角落按拼音对口型）。想要每期专属风格时走 HyperFrames 模式：真实截图当证据、本机实跑工具的真实输出、配乐与音效、并行做场景，发布包直接并进口播母稿 | `/ray-explainer` |
 | 一个想追的近期话题 | X、Reddit、YouTube、Hacker News、抖音、视频号与公开网页的近期讨论，严格标注日期与证据边界 | `/ray-trend-search` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
@@ -125,7 +125,7 @@ flowchart TD
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
 | | `/ray-cover-editorial` | 定稿文章 → 固定编辑版画风格、中央留白的无字封面底图（三个平台尺寸） |
-| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路 + huashu 解说语法 + 真实影像混排、复刻音色配音、逐字卡点、可选数字人主持人） |
+| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路 + huashu 解说语法 + 真实影像混排、复刻音色配音、逐字卡点、可选数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
@@ -162,7 +162,7 @@ v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-
 | `/ray-kb` | 不让快速口播变成重流程，也不在逐字稿里自保 |
 | `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
 | `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
-| `/ray-explainer` | 不把语气指令念进配音，不在没看过静帧的情况下出片，不在没报价、没确认时生成数字人 |
+| `/ray-explainer` | 不把语气指令念进配音，不把年份按数值念（2019 不会变成“两千零一十九”），不在画面里编具体金额和名称，不在没看过静帧的情况下出片，不在没报价、没确认时生成数字人 |
 
 完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)（历史成员名单）。
 
@@ -203,6 +203,7 @@ npx -y skills add imraywang/rayskills -g --all
 /ray-wechat 把定稿排版并更新到已有公众号草稿，先预览再写入
 /ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
 /ray-explainer 把这篇剪藏做成 2 分钟竖屏解说视频，用我的声音
+/ray-explainer 这期别套固定风格，要真实截图和录屏，配上数字人
 /ray-trend-search 过去 7 天大家在怎么讨论这个产品
 /ray-multimodel 让 Grok 和 Claude 独立给方案，由你验收
 ```
