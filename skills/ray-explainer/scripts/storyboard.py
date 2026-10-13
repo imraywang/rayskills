@@ -41,6 +41,10 @@ if s.get("central_judgment"): out += [f"**核心判断**：{s['central_judgment'
 out += ["| # | 幕 | 讲什么 | 画法 | 画面 | 卡点 | 时长 |", "|---|---|---|---|---|---|---|", *rows, ""]
 out += [f"**预计时长**：约 {total / 60:.0f} 分 {total % 60:02.0f} 秒（{sum(len(l) for sc in s['scenes'] for l in sc['lines'])} 字，按 {RATE:.1f} 字/秒估）",
         f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}", ""]
+styles = sorted({sc.get("grammar") or "kit" for sc in s["scenes"]})   # one film, one style (Ray, 2026-10-13); kit patterns + custom kit code = one style
+if len(styles) > 1 and not s.get("mix"):
+    out += [f"**⚠ 一期只用一种画法**：这条片子混了 {len(styles)} 种（" + "、".join("手绘" if x == "kit" else NAMES.get(x, x) for x in styles) +
+            "）。按 grammars.md「一期一种画法」改成一种；确实要混，在 script.json 顶层写 \"mix\": true 并说明理由。", ""]
 if s.get("to_confirm"): out += ["**待确认**", *[f"- {x}" for x in s["to_confirm"]], ""]
 out += ["## 逐字稿", ""]
 for i, sc in enumerate(s["scenes"], 1):

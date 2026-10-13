@@ -59,6 +59,8 @@ function resolveTheme(th) {
   const sig = over.sig || base.sig ? { ...(base.sig || {}), ...(over.sig || {}) } : null;
   return { pal: six(out, 'theme', avail), kit: out.kit, overlay: out.overlay, sig: sig ? { pal: six(sig, 'theme.sig', avail), kit: sig.kit || {} } : null };
 }
+{ const st = [...new Set(SCRIPT.scenes.map(s => s.grammar || 'kit'))];   // one film, one style (Ray, 2026-10-13)
+  if (st.length > 1 && !SCRIPT.mix) console.warn(`WARN 一期只用一种画法：这条片子混了 ${st.length} 种（${st.join(' / ')}），见 grammars.md「一期一种画法」；确实要混，script.json 写 "mix": true`); }
 const THEME_ALL = resolveTheme(SCRIPT.theme), THEME = THEME_ALL && THEME_ALL.pal;
 // signature scenes (script.json scene "sig": true): the opening / closing moments, drawn in the theme's sig palette (ray-ip: ink green).
 // Ray's avatar is not part of the sig scene: it is the corner presenter (host with "big": [], free), present through the whole film.

@@ -48,7 +48,7 @@ $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explai
 
 ### 1b. 分镜关
 
-稿子定了以后，给每一幕补三个字段，再按 [grammars.md](references/grammars.md) 选好画法（写 `grammar` 或 `pattern`；都不写表示手写 kit）：
+稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
 
 - `beat`：这一幕讲什么，一句话
 - `visual`：画面按出现顺序依次是什么，用大白话写
@@ -117,14 +117,14 @@ python3 $SK/scripts/host.py <project>             # 用户同意后：Kling 生�
 
 **大机位默认不加。** `big` 为空时 `host.py` 只算角落口型、不花钱，直接跑；只有用户明确要大机位（或被问到时确认要加），才往 `big` 里写句子、`--dry-run` 估价、同意后再生成。
 
-## 4. 分镜：每一幕选画法
+## 4. 分镜：先定这一期的画法，再写每一幕
 
-按 [grammars.md](references/grammars.md) 的选型表给每一幕挑画法：
+按 [grammars.md](references/grammars.md) 的选型表，按这期**整体**讲什么挑**一种**画法，每一幕都用它：
 
 - **语法场景**：在 `script.json` 的这一幕里写 `"grammar"` 和 `"cues"`，不用写代码。cue 的时间写成 `{"line": 1, "phrase": "创造新行为"}`，就能精确卡到这个词开口的时刻。
 - **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
 - **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
-- 一条片子里语法不超过 3–4 种；开头钩子和结尾收获优先用 kit 或 y5。
+- **一期只用一种画法**：手绘套路、某一种语法、或整期 HyperFrames，三选一，开场和结尾也用它（开场结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒，确实要混写 `"mix": true` 并说明理由。
 - 安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290，字幕条在 y 1560–1656；语法片段默认就会让开这两块；kit 场景的主舞台用 y 300–1520。
 
 ## 5. 静帧检查（必做，不能跳过）
