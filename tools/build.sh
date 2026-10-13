@@ -17,6 +17,7 @@ fi
 
 count=0
 skipped=0
+leftover=0
 for dir in "$SKILLS_DIR"/*/; do
   name="$(basename "$dir")"
 
@@ -24,6 +25,13 @@ for dir in "$SKILLS_DIR"/*/; do
   if [[ "$name" == *beta* ]]; then
     echo "skip (beta): $name"
     skipped=$((skipped+1))
+    continue
+  fi
+
+  # 残留目录:git 里没有任何文件(删除或合并 skill 后只剩 __pycache__ 之类被忽略的文件),提示后跳过
+  if [[ ! -f "$dir/SKILL.md" && -z "$(git -C "$ROOT" ls-files -- "skills/$name")" ]]; then
+    echo "skip (untracked leftover, safe to delete): skills/$name"
+    leftover=$((leftover+1))
     continue
   fi
 
@@ -46,6 +54,6 @@ for dir in "$SKILLS_DIR"/*/; do
 done
 
 echo "---"
-echo "构建完成:$count 个 skill 进产物,跳过 $skipped 个 beta。"
+echo "构建完成:$count 个 skill 进产物,跳过 $skipped 个 beta$([[ $leftover -gt 0 ]] && echo ",$leftover 个残留目录(git 里没有文件,可删)")。"
 echo "目录产物:dist/skills/"
 echo "WorkBuddy 导入包:dist/workbuddy/"
