@@ -73,7 +73,8 @@ Truthfulness
 - Real products (GitHub, X, the tool being explained) are always the provided screenshots or real output, never redrawn UI. Drawn mock UI only for generic things (an editor, a bill, an app icon, a terminal, an installer box).
 
 Layout
-- The global top bar covers y 0–110. Main stage y 140–1400. Captions are drawn globally at y ≈1420–1570 — keep your key content out of y 1400–1590. {{有角落数字人时：左下 x 0–380、y 1520 以下是数字人，别放内容}}. Below 1600 only ambience. x margins ≥ 50 px.
+- Phone safe area: on Douyin / 视频号 the status bar and Dynamic Island cover y 0–200 and the author name, caption text and buttons cover y 1680–1920. **Nothing that carries information goes outside y 200–1680** — only ambience/texture there.
+- The global top bar sits at y 210–290. Main stage y 300–1490. Captions are drawn globally at y ≈1500–1650 — keep your key content out of y 1490–1660. {{有角落数字人时：左下 x 0–380、y 1420 以下是数字人，别放内容}}. x margins ≥ 50 px.
 - Every scene keeps a persistent ambience layer drifting slowly over the whole scene, so it never looks empty.
 - Hard cuts between scenes: make the first 0.3 s decisive; end on the final state held (no fade-to-black).
 

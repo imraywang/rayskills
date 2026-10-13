@@ -20,7 +20,7 @@ description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟�
      ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video ─▶ ⑧ 发布包 publish.py
 ```
 
-**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架和取材要点见 [hyperframes.md](references/hyperframes.md)。
+**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
 
 **两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
@@ -124,7 +124,7 @@ python3 $SK/scripts/host.py <project>             # Kling 生成大机位 + 角�
 - **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
 - **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
 - 一条片子里语法不超过 3–4 种；开头钩子和结尾收获优先用 kit 或 y5。
-- 安全区：顶部 y<170 留给进度条，字幕条在 y 1640–1736。语法片段默认就会让开这两块；kit 场景的主舞台用 y 380–1500。
+- 安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290，字幕条在 y 1560–1656；语法片段默认就会让开这两块；kit 场景的主舞台用 y 300–1520。
 
 ## 5. 静帧检查（必做，不能跳过）
 

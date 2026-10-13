@@ -245,7 +245,7 @@ P.checklist = (t, sc, d) => {
   const D = d.data; if (D.title) title(t, sc, D.title);
   const items = cueOf(d, 'item'), fin = first(d, 'final'), n = items.length, shrink = eInOut(ap(t, tOf(fin) + .2, .6));
   const g0 = Math.min(300, 1000 / Math.max(1, n)), g1 = Math.min(210, 700 / Math.max(1, n));
-  items.forEach((q, i) => { const s0 = q.t, y = lerp(520 + i * g0, 450 + i * g1, shrink), p = ap(t, s0 - .2, .5);
+  items.forEach((q, i) => { const s0 = q.t, y = lerp(520 + i * g0, 490 + i * g1, shrink), p = ap(t, s0 - .2, .5);
     rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: '#fffaf1', seed: 401 + i, w: 6 });
     rrect(185, y - 40, 80, 80, { p, seed: 411 + i, w: 6 });
     rpath([[200, y], [225, y + 28], [275, y - 50]], { p: ap(t, s0 + (q.data.checkDelay ?? .9), .4), color: C.green, w: 11, seed: 421 + i });

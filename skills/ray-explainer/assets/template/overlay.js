@@ -7,7 +7,7 @@
   const TL = window.TIMELINE;
   const FONT_URL = window.RX_CAPTION_FONT || '/huashu/lib/fonts/NotoSansSC-700.woff';
   const FAM = '"RX-Caption","PingFang SC","Hannotate SC",sans-serif';
-  let CAP_Y = 1640; const CAP_H = 96, CAP_SIZE = 54;
+  let CAP_Y = 1560; const CAP_H = 96, CAP_SIZE = 54;   // 安全区 y 200–1680：字幕底边 1656，躲开平台底部的作者名/文案/互动栏
 
   // split a line into ≤15-wide caption chunks at punctuation; time each chunk from per-char timing when present.
   // Width counts ASCII as half a CJK char; long pieces split near equal widths, only at Chinese word boundaries
@@ -101,10 +101,10 @@
     if (HOST) { drawHost(ctx, t); ctx.globalAlpha = 1; }   // under captions: the caption sits on the presenter's chest
     // progress bar + header
     const pr = clamp(t / TL.duration);
-    ctx.fillStyle = 'rgba(128,128,128,.25)'; ctx.fillRect(80, 90, W - 160, 10);
-    ctx.fillStyle = '#e8743b'; ctx.fillRect(80, 90, (W - 160) * pr, 10);
+    ctx.fillStyle = 'rgba(128,128,128,.25)'; ctx.fillRect(80, 252, W - 160, 8);   // y 200 以上会被灵动岛/状态栏挡住：小标题 y 222，进度条 y 252
+    ctx.fillStyle = '#e8743b'; ctx.fillRect(80, 252, (W - 160) * pr, 8);
     const header = (window.META && window.META.header) || (window.SCRIPT && window.SCRIPT.header) || '';
-    if (header) { ctx.font = `500 32px ${FAM}`; ctx.fillStyle = 'rgba(140,140,140,.95)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(header, W / 2, 140); }
+    if (header) { ctx.font = `500 30px ${FAM}`; ctx.fillStyle = 'rgba(140,140,140,.95)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(header, W / 2, 222); }
     // caption
     const c = CAPS.find(c => t >= c.start - .05 && t < c.end + .25);
     if (c) {

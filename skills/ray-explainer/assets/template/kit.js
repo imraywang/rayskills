@@ -144,9 +144,9 @@ function at(sc, i, phrase) { // time the phrase starts being spoken in line i (W
 }
 function title(t, sc, str, color = C.ink) {
   const p = pop(t, sc.start + .05, .5);
-  text(str, W / 2, 230, { size: 72, scale: p, color });
+  text(str, W / 2, 320, { size: 72, scale: p, color });   // 安全区：标题在进度条（y 252）下面
   const w = Math.min(760, str.length * 74);
-  rline(W / 2 - w / 2, 290, W / 2 + w / 2, 286, { p: ap(t, sc.start + .25, .5), color: C.orange, w: 9, seed: 77 });
+  rline(W / 2 - w / 2, 380, W / 2 + w / 2, 376, { p: ap(t, sc.start + .25, .5), color: C.orange, w: 9, seed: 77 });
 }
 
 const S = {};

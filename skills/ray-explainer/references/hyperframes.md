@@ -31,7 +31,13 @@
 - **网页截图**：puppeteer-core（`~/.cache/ray-explainer`）+ 本机 Chrome，`deviceScaleFactor: 2`，GitHub 用 dark 配色；组织页、列表页视口宽度至少 1300，否则会变成手机布局。
 - **X / 被拦的站点**：X 和 Adobe 帮助页会拒绝无头浏览器。X 用 chrome-devtools MCP（未登录也能看文章正文和推文）；它的截图只能写进工作区（vault）里，存成 vault 根目录下的 `.tmp-*.png` 再 `mv` 到项目目录，别留在 vault。拦死的页面改成代码绘制，内容用规则原文，具体金额用占位。
 - **Wikimedia Commons**：用 API 查 `imageinfo&iiurlwidth=1920` 拿 `thumburl`（只有标准尺寸能下），curl 必须带 User-Agent，否则返回 HTML 报错页。授权和作者写进项目的 `credits.json`，CC BY-SA 的发布时在简介里署名。
+- **会动的网页（交互图解、WebGL 演示、Anatomy 作品、看板）录成确定的片段**：`node $SK/scripts/record_clip.mjs jobs.json`。它把页面的时钟（performance.now、Date.now、rAF、定时器）换成虚拟时钟，每截一帧推进 1/fps，所以再慢的截图也录出均匀、每次一样的 30fps 视频，WebGL 效果照录；`actions` 可以在指定秒点击按钮、移鼠标、按键（点火、拆开、打字、关机），`crop: "auto"` 自动裁到画面本体。产出 `clips/<name>.mp4`（无声）和首尾帧 PNG，给子任务看图定位。第一次实战：《一句话造一台机器》（2026-10-13）录了 21 段 Anatomy 作品。
+- **页面自己能定位时间（`window.__seek(t)`）的，按旁白重映射时间逐帧截**：用几个“开口词 → 页面时刻”的锚点做分段线性映射，旁白说到“落刀”刀就落下；一段 30 秒的演示能压进一句话。片段的 0 秒对齐第一个锚点，场景里 `data-start` 填那个时刻。
 - **配乐**：`media-use` 的 retrieve 需要登录 HeyGen（`npx hyperframes auth status`）。没登录就沿用 Ray 确认过的上一期配乐，并在交付时说明。
+
+## 安全区
+
+按 1080×1920 出片，抖音、视频号上 y 0–200 被灵动岛和状态栏挡住，y 1680–1920 被作者名、文案、互动栏盖住：**带信息的东西只放 y 200–1680**，两头只放底纹。骨架默认：顶栏 y 210–290、舞台 y 300–1490、字幕带 y 1500–1650（`build.py` 的 `CAP_TOP = 1500`）。旧片子的场景按 y 132–1408 画的，在 `build.py` 设 `STAGE_FIT = (132, 1408)` 就整体缩放平移进去，场景不用改；这时场景底色会跟着缩，`#root` 的 `BG` 要和它一致（有纹理的话在根上铺一层同样的纹理，场景底设透明）。
 
 ## 数字人
 

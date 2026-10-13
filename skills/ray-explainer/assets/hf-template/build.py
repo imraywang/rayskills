@@ -12,10 +12,11 @@ COVER = bool(os.environ.get("COVER"))
 
 # ───────────── 本片专属（每片重写这一段，其余不动）─────────────
 BG, FG = "#0b0d10", "#e9e6df"                     # 与 assets/style.css 的台面色、正文色一致
-CHROME_CSS = ""                                   # 顶栏等全片常驻元素的样式
+CHROME_CSS = ""                                   # 顶栏等全片常驻元素的样式（放 y 210–290：y 200 以上会被灵动岛/状态栏挡住）
 CHROME_HTML = ""                                  # 常驻元素（放在场景之上、字幕之下）
 CHROME_TWEENS = []                                # 常驻元素的动画："tl.fromTo(...)" 字符串，时间是全片秒
-CAP_TOP = 1420                                    # 字幕带顶（有角落数字人时 ≤1420，给头部让位）
+CAP_TOP = 1500                                    # 字幕带顶，带高 150 → 底边 1650（安全区 y 200–1680；有角落数字人时 ≤1420，给头部让位）
+STAGE_FIT = None                                  # 旧片子的场景按 y 132–1408 画的：设 (132, 1408) 就把整个舞台缩放平移进 y 300–1490
 COVER_HTML = ""                                   # 封面版额外叠加的大字（钩子数字放画面中段，3:4 裁切也完整）
 COVER_T = 0.0                                     # 封面取哪一秒（publish.py 读 script.json 的 cover_t，两处保持一致）
 BGM = "assets/audio/bgm.m4a"                      # 没有配乐就设为 None
@@ -40,6 +41,11 @@ for i, s in enumerate(SC):
         if 0 <= at <= TOTAL - 0.3:
             sfx.append(f'    <audio id="sfx{len(sfx)}" src="assets/audio/{name}.mp3" data-start="{at:.3f}" data-track-index="{20 + len(sfx)}" data-volume="{vol}"></audio>')
 
+stage_open = stage_close = ""
+if STAGE_FIT:   # 舞台整体缩放进安全区；场景自己的底色会跟着缩，外面露出的是 #root 的 BG
+    a, b = STAGE_FIT; k = (1490 - 300) / (b - a); ty = 300 - k * a
+    stage_open = f'    <div id="stage" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:translate(0px,{ty:.1f}px) scale({k:.4f});transform-origin:540px 0px">'
+    stage_close = "    </div>"
 host = ""
 if os.path.exists(os.path.join(HERE, "compositions", "s-host.html")) and not COVER:   # host_build.py 生成
     host = f'    <div id="s-host" data-composition-id="s-host" data-composition-src="compositions/s-host.html" data-start="0" data-duration="{TOTAL}" data-track-index="8" data-width="1080" data-height="1920"></div>'
@@ -67,7 +73,7 @@ doc = f'''<!doctype html>
       #root {{ position: relative; width: 100%; height: 100%; overflow: hidden; color: {FG}; background: {BG}; }}
       .cap {{ position: absolute; left: 50px; right: 50px; top: {CAP_TOP}px; height: 150px; z-index: 60; display: flex; align-items: center; justify-content: center; }}
       .cap span {{ display: inline-block; max-width: 980px; padding: 14px 36px; border-radius: 14px; background: rgba(11,13,16,0.86); border: 2px solid rgba(42,50,61,0.9);
-        font-family: "HeiBold", sans-serif; font-weight: 700; font-size: 60px; line-height: 1.25; color: {FG}; text-align: center; }}
+        font-family: "HeiBold", sans-serif; font-weight: 700; font-size: 56px; line-height: 1.25; color: {FG}; text-align: center; }}
       {CHROME_CSS}
     </style>
   </head>
@@ -75,7 +81,9 @@ doc = f'''<!doctype html>
     <div id="root" data-composition-id="main" data-start="0" data-duration="{TOTAL}" data-width="1080" data-height="1920">
     <audio id="narration" src="assets/audio/narration.m4a" data-start="0" data-duration="{NARR}" data-track-index="0" data-volume="1"></audio>
 {chr(10).join(bgm)}
+{stage_open}
 {chr(10).join(slots)}
+{stage_close}
 {host}
 {CHROME_HTML}
 {chr(10).join(caps)}

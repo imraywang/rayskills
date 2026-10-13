@@ -21,7 +21,7 @@ if (!projArg) { console.error('usage: node render.js <project> stills|sheet|vide
 const PROJ = path.resolve(projArg);
 const SCRIPT = JSON.parse(fs.readFileSync(path.join(PROJ, 'script.json')));
 const TL = JSON.parse(fs.readFileSync(path.join(PROJ, 'timeline.json')));
-const W = 1080, H = 1920, SAFE = { top: 170, bottom: 330 };   // overlay: progress/header above 170, captions below 1590
+const W = 1080, H = 1920, SAFE = { top: 290, bottom: 380 };   // overlay: progress/header y 200–290, captions y 1560–1656; above 200 / below 1680 the phone UI covers the frame
 // digital host (host.py wrote host/plan.json): captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
 if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
 
