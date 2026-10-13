@@ -15,12 +15,13 @@ description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟�
 素材 ─▶ ① 解说稿 script.json ─▶ ①b 分镜表 storyboard.py【Ray 确认】
      ─▶ ② 配音 tts.py（Gemini 预置 / Ray 复刻音色）
      ─▶ ③ Whisper 校对 qa_tts.py（合格判定 + 逐字时间写入 timeline）
-     ─▶ ③b 数字人主持人 host.py【可选，用户确认后才做】
+     ─▶ ③c 原声插入 splice_clips.py【有原声时】
+     ─▶ ③b 数字人主持人 host.py（左下角口型默认带；大机位用户确认后才做）
      ─▶ ④ 分镜：kit 场景写 scenes.js；语法场景只写 cues
-     ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video ─▶ ⑧ 发布包 publish.py
+     ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video + 听感检查 audio_check.py ─▶ ⑧ 发布包 publish.py
 ```
 
-**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
+**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。这个模式自带：按章节分段的进度条顶栏、原声插入（`splice_clips.py`）、本地生成配乐（`gen_bgm.py` / `mix_bgm.py`）、用锚点定位的少量音效。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
 
 **两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
@@ -70,9 +71,9 @@ python3 -I $SK/scripts/tts.py <project>
 
 **选音色**（`script.json` 的 `"voice"`）：
 
-- `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，走 fal 上的 MiniMax `speech-2.8-hd`，每千字 0.1 美元。用户要“用我的声音”时选它。
+- `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，走 fal 上的 MiniMax `speech-2.8-hd`，每千字 0.1 美元。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
 - 其他值都当作 Gemini 预置音色：Charon（男、利落，默认）、Puck（男、活泼）、Kore（女）。
-- `"speed"`：语速，默认 1.0。MiniMax 支持 0.5–2；Gemini 只能用默认值。
+- `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
 
 **还没有复刻音色时**：请用户提供 1–3 分钟干净的口播录音（手机录音或已发视频的原片都行），然后：
 
@@ -151,7 +152,13 @@ node $SK/scripts/render.js <project> stills 7,36.3,95  # 指定时刻（全片�
 node $SK/scripts/render.js <project> video 30
 ```
 
-2.5 分钟的片子约 1 分钟渲染完。出片后用 `ffmpeg -ss <t> -i out.mp4 -frames:v 1` 从成片里抽 3–5 帧复查，再用 SendUserFile 交付 `out.mp4`。
+2.5 分钟的片子约 1 分钟渲染完（HyperFrames 模式约 1:1 实时）。出片后用 `ffmpeg -ss <t> -i out.mp4 -frames:v 1` 从成片里抽 3–5 帧复查，**再跑听感检查**，然后用 SendUserFile 交付：
+
+```bash
+python3 $SK/scripts/audio_check.py <project> [out.mp4]
+```
+
+它量人声和句间配乐的音量差（低于 −32 dB 等于听不见，高于 −8 dB 抢人声）、每段原声下面的配乐、音效个数（超过 15 个提醒）。只看截图验收会漏掉声音的问题：配乐听不见、音效太密，Ray 看片时一耳朵就听出来。
 
 **运动量检查（自动，只报告不拦片）**：`video` 渲完会自动跑 `scripts/film_gate.py`（来自 huashu-art-motion），结果写进 `<project>/gate.json`，终端打两行 `gate:`。对已有成片单独跑：`node $SK/scripts/render.js <project> gate [文件名.mp4]`。三项门禁：
 

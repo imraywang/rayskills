@@ -7,7 +7,7 @@ You build HyperFrames scene sub-compositions for a vertical 1080×1920 narrated 
 ## Output per scene `<id>`
 
 1. `compositions/s-<id>.html` — the scene.
-2. `compositions/s-<id>.sfx.json` — sound cues, scene-local seconds: `[[t, "name", vol], ...]`. Names = files in `assets/audio/*.mp3`. Volumes 0.12–0.3, short sounds, roughly one cue per visual event. Long hits (`hit-hero`, `impact-bass-1`) only where the storyboard names a 长重击, max one per scene.
+2. `compositions/s-<id>.sfx.json` — sound cues `[[when, "name", vol], ...]`. Names = files in `assets/audio/*.mp3`. **`when` is an anchor, never a computed number**, so cues follow the voice when it is re-recorded: `{"line": 0, "phrase": "拍到", "off": 0.05}` (that word's onset), `{"clip": "c1", "t": 2.8}` (seconds into a source clip in this scene), or `{"cap": 3}` (a caption's start). **Sparse:** 0–2 cues per scene, about a dozen for the whole film — only key story moments (a reveal, a stamp, the one recurring motif such as a flash or shutter). No cue per caption, no typing/sweep/click under every event, never inside a source clip except one motif hit. Volumes 0.12–0.3, short sounds. Long hits (`hit-hero`, `impact-bass-1`) only where the storyboard names a 长重击, max one in the film.
 
 Do NOT edit `index.html`, `build.py`, `make_beats.py`, `assets/style.css`, `assets/beats.js`, `beats.json` or other scenes. Shared styles you need go inside your scene's `<style>` with a scene prefix.
 
@@ -74,7 +74,8 @@ Truthfulness
 
 Layout
 - Phone safe area: on Douyin / 视频号 the status bar and Dynamic Island cover y 0–200 and the author name, caption text and buttons cover y 1680–1920. **Nothing that carries information goes outside y 200–1680** — only ambience/texture there.
-- The global top bar sits at y 210–290. Main stage y 300–1490. Captions are drawn globally at y ≈1500–1650 — keep your key content out of y 1490–1660. {{有角落数字人时：左下 x 0–380、y 1420 以下是数字人，别放内容}}. x margins ≥ 50 px.
+- The global top bar (chapter progress bar + chapter title, with its own opaque backing) covers y 200–300; never put content there. Main stage y 300–1400. Captions are drawn globally at y 1420–1570 — keep key content out of y 1410–1580. The corner host occupies bottom-left x 0–380, y ≥ 1420 (Ray's IP default; if `build.py` has no host, captions move to 1500–1650 and the stage may extend to 1490). x margins ≥ 50 px.
+- Source clips: when `BEATS[id].clips` is non-empty, the soundtrack plays the original recording there with no narration. Show it (real waveform from the clip audio, playhead synced to clip start/end, speaker + UTC/date label, transcript typed in sync with `segs`); the caption bar already shows the zh + en lines.
 - Every scene keeps a persistent ambience layer drifting slowly over the whole scene, so it never looks empty.
 - Hard cuts between scenes: make the first 0.3 s decisive; end on the final state held (no fade-to-black).
 

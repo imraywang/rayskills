@@ -88,6 +88,20 @@
         "正式调用 Kling 之前先给出 --dry-run 的段落与费用并等确认",
         "大机位只用在直接对观众说话的句子，图表细节留给角落"
       ]
+    },
+    {
+      "id": 8,
+      "name": "专属风格模式：原声插入、章节进度条、本地配乐与听感检查",
+      "type": "happy-path",
+      "prompt": "/ray-explainer 把这篇叙事型口播稿做成视频，素材里有宇航员的原始录音，要真实画面，用我的声音，配乐要有",
+      "expected_output": "走 HyperFrames 专属风格模式：复刻音色 1.1 倍语速配音；原声切好后写进 script.json clips，配音校对后用 splice_clips.py 插入，字幕是中文大字加英文原句；顶栏是按 chapters 分段的进度条加章节小标题；音效用锚点、全片十几个；配乐用 gen_bgm.py 本地出 3 首给 Ray 挑，再 mix_bgm.py 做包络（关键原声处静音）；渲完跑 audio_check.py 再交付。",
+      "expectations": [
+        "script.json 有 voice: ray、speed: 1.1、chapters、clips",
+        "配音和 qa_tts 之后跑 splice_clips.py，旁白文本没有因为原声被改写",
+        "sfx.json 用 line/phrase、clip 或 cap 锚点，总数不超过 15",
+        "配乐来自 gen_bgm.py 的候选，Ray 挑过之后才 mix_bgm.py",
+        "交付前跑 audio_check.py 并在回复里报告配乐音量差和音效个数"
+      ]
     }
   ]
 }

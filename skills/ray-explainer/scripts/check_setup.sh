@@ -22,6 +22,7 @@ VOICES="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/voices.json"
 [ -f "$VOICES" ] && echo "ok   voices: $(python3 -c "import json;print(', '.join(json.load(open('$VOICES'))))")" || echo "info no cloned voice yet (scripts/clone_voice.py) — Gemini prebuilt voices only"
 AV="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/avatars"; [ -d "$AV" ] && echo "info digital-host avatars (optional): $(ls "$AV" | tr '\n' ' ')"; python3 -c "import pypinyin" 2>/dev/null || echo "info pypinyin missing — pip3 install pypinyin (only for the optional digital host)"
 if [ -z "${FAL_KEY:-}" ]; then eval "$(grep -E '^\s*export\s+FAL_KEY=' ~/.zshrc 2>/dev/null)"; fi
+ACE="${ACESTEP_DIR:-$HOME/projects/ACE-Step-1.5}"; if [ -d "$ACE/.venv" ] && [ -d "$ACE/checkpoints/acestep-v15-turbo" ]; then echo "ok   ACE-Step 1.5 (local BGM: gen_bgm.py)"; elif [ -d "$ACE" ]; then echo "info ACE-Step at $ACE but models not reachable — external drive unplugged? (only for gen_bgm.py)"; else echo "info ACE-Step not installed — only needed for local BGM (see scripts/gen_bgm.py)"; fi
 [ -n "${FAL_KEY:-}" ] && echo "ok   FAL_KEY present" || echo "info FAL_KEY missing — needed only for the cloned voice"
 # API key: shell env first, then ~/.zshrc export
 if [ -z "${GEMINI_API_KEY:-}" ]; then eval "$(grep -E '^\s*export\s+GEMINI_API_KEY=' ~/.zshrc 2>/dev/null)"; fi

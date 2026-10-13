@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""../timeline.json（tts.py + qa_tts.py 产出的逐字时间，已按 script.json 的 display 映射成显示文本）
-→ beats.json（每幕的旁白行与字幕节拍，时间都是幕内秒）+ assets/beats.js（window.BEATS，场景只读不抄）。
+"""../timeline.json（tts.py + qa_tts.py 产出的逐字时间，已按 script.json 的 display 映射成显示文本；有原声时再经 splice_clips.py）
+→ beats.json（每幕的旁白行、字幕节拍、原声段，时间都是幕内秒）+ assets/beats.js（window.BEATS，场景只读不抄）。
 
-每条字幕 = 一个画面节拍：按标点切，过长的按视觉宽度对半切；切得别扭的在 FORCE 里手工断句。
-改了配音（重跑 tts/qa）以后只需重跑本脚本和 build.py，场景文件不用动。"""
+每条字幕 = 一个画面节拍：按标点切，过长的按视觉宽度对半切；切得别扭的（拆开了“科学家”这种词）在 FORCE 里手工断句。
+原声（timeline.json 的 clips）：字幕带英文原句（caps[].en），每幕的 BEATS[id].clips = [{id, start, end, speaker, utc, segs}]。
+改了配音（重跑 tts/qa/splice）以后只需重跑本脚本和 build.py，场景文件和用锚点写的音效都不用动。"""
 import json, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 T = json.load(open(os.path.join(HERE, "..", "timeline.json")))
+SCRIPT = json.load(open(os.path.join(HERE, "..", "script.json")))
 PUNCT = "，。？！：；、,.?!:;"
 MAXW = 13          # 一条字幕的最大视觉宽度（中文 1，拉丁 0.55）
 FORCE = {          # 手工断句：整段原文 → 各段原文（按顺序、首尾相接）
@@ -49,7 +51,18 @@ for n, s in enumerate(T["scenes"]):
             a = ch[min(at, len(ch) - 1)] - S
             b = (ch[min(segs[k + 1][1], len(ch) - 1)] - S) if k + 1 < len(segs) else l["end"] - S
             caps.append({"s": seg.strip(PUNCT + " "), "a": round(a, 3), "b": round(b, 3)})
-    out.append({"id": s["id"], "start": round(S, 3), "end": round(s["end"], 3), "lines": lines, "caps": caps})
+    sc_clips = []
+    for c in T.get("clips", []):   # splice_clips.py 插入的原声：字幕 = 中文大字 + 英文原句（优先用 script.json clips[].caps 的短句）
+        if s["start"] <= c["start"] < s["end"]:
+            capdef = {x["id"]: x.get("caps") for x in SCRIPT.get("clips", [])}.get(c["id"])
+            segs = [[c["start"] + t, en, zh] for t, en, zh in capdef] if capdef else c["segs"]
+            for k, (a, en, zh) in enumerate(segs):
+                b = segs[k + 1][0] if k + 1 < len(segs) else c["end"]
+                caps.append({"s": zh, "en": en, "a": round(a - S, 3), "b": round(b - S, 3), "clip": c["id"]})
+            sc_clips.append({"id": c["id"], "start": round(c["start"] - S, 3), "end": round(c["end"] - S, 3), "speaker": c["speaker"], "utc": c["utc"],
+                             "segs": [[round(a - S, 3), en, zh] for a, en, zh in c["segs"]]})
+    caps.sort(key=lambda c: c["a"])
+    out.append({"id": s["id"], "start": round(S, 3), "end": round(s["end"], 3), "lines": lines, "caps": caps, "clips": sc_clips})
 
 B = {"scenes": out, "total": round(T["scenes"][-1]["end"] + 0.4, 3), "narration": round(T["duration"], 3)}
 json.dump(B, open(os.path.join(HERE, "beats.json"), "w"), ensure_ascii=False)
