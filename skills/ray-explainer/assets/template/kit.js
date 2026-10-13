@@ -4,8 +4,18 @@
 const W = 1080, H = 1920;
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 const TL = window.TIMELINE;
-const C = { paper: '#f7f0e3', ink: '#2a2622', soft: '#8a7f72', orange: '#e8743b', blue: '#3d7fd9',
+const C = { paper: '#f7f0e3', card: '#fffaf1', ink: '#2a2622', soft: '#8a7f72', orange: '#e8743b', blue: '#3d7fd9',
   green: '#35a372', red: '#d9483b', yellow: '#f2c14e', purple: '#8a5cd1', tint: '#fbe3cf', btint: '#dde9fb', gtint: '#d8f0e3' };
+// mix two #rrggbb colours: k=0 → a, k=1 → b
+const mixHex = (a, b, k) => '#' + [1, 3, 5].map(i => Math.round(parseInt(a.substr(i, 2), 16) * (1 - k) + parseInt(b.substr(i, 2), 16) * k).toString(16).padStart(2, '0')).join('');
+// script.json "theme" (render.js resolves it to the 6 palette keys and injects window.THEME before this file runs):
+// the kit's structural colours follow the palette, so kit scenes and huashu grammar clips share one set of colours.
+// green / red / yellow / purple stay as semantic colours (right / wrong / idea / extra); no theme → the original kit look.
+if (window.THEME) {
+  const T = window.THEME;
+  Object.assign(C, { paper: T.bg, card: T.surface, ink: T.ink, soft: T.sub, orange: T.accent, blue: T.accent2,
+    tint: mixHex(T.accent, T.surface, .78), btint: mixHex(T.accent2, T.surface, .78), gtint: mixHex(C.green, T.surface, .8) });
+}
 const FONT = '"Hannotate SC","HanziPen SC","PingFang SC",sans-serif';
 
 // ---------- math / rng ----------
@@ -126,7 +136,7 @@ function person(x, y, s, color, seed, p = 1) {
   rpath(pts, { p, seed: seed + 3, w: 4, amp: 1.2, color: C.ink, fill: color });
 }
 function face(x, y, s, mood, seed, p = 1) { // mood: 1 happy, 0 neutral, -1 doubtful
-  rcircle(x, y, s, { p, fill: '#fff6e8', seed, w: 5 });
+  rcircle(x, y, s, { p, fill: C.card, seed, w: 5 });
   if (p < .6) return;
   rcircle(x - s * .35, y - s * .15, s * .07, { fill: C.ink, seed: seed + 1, w: 3 }); rcircle(x + s * .35, y - s * .15, s * .07, { fill: C.ink, seed: seed + 2, w: 3 });
   const m = []; for (let k = 0; k <= 8; k++) { const u = k / 8 - .5; m.push([x + u * s * .8, y + s * .38 + mood * (0.25 - u * u) * s * .9 + (mood < 0 ? u * s * .25 : 0)]); }

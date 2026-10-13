@@ -22,6 +22,17 @@
 - 一条片子里语法别超过 3–4 种，同一种语法可以出现多次。开头钩子和结尾收获建议用 kit 或 y5，冲击力最强。
 - 用 `t2`、`t3` 之前，先用 `render.js stills` 看竖屏效果，有问题照 `NOTICE.md` 的方式修改，并标注 `ray-explainer:`。
 
+## 全片色板（theme）
+
+`script.json` 顶层写 `"theme"`，手绘 kit、套路和所有语法片段就用同一套颜色，不再出现「黄底 → 星空 → 白底 → 黑底」来回跳。
+
+- `"ray"`：kit 原本的配色（米色纸、墨色字、橙色强调、蓝色副强调）。新项目默认就是它：kit 画面不变，语法片段改成跟 kit 同色。
+- huashu 的 8 套色板：`paper` 纸本、`poster` 海报黄、`ink` 深墨、`navy` 海军、`bauhaus` 包豪斯、`snow` 雪原、`wood` 暖木、`chalk` 黑板（色值见 `assets/huashu/lib/palettes.js`）。
+- 只改一两个色：`{"name": "ray", "accent": "#c4552d"}`；完全自定义就写全 6 个键 `bg surface ink sub accent accent2`（#rrggbb）。落在蓝紫区的色值 render.js 会警告。
+- 不写 `theme`：kit 和各语法各用各的默认色（2026-10-13 之前的项目都是这样，重渲不变）。某一幕要单独换色，在那一幕写 `"theme"` 覆盖。
+- kit 里跟色板走的是底色、卡片、主字、次字、橙（→ accent）、蓝（→ accent2）和三种淡底；绿、红、黄、紫保留为语义色（对、错、灵感、其他）。旧项目要让 kit 也跟色板，得把项目里的 `kit.js`、`patterns.js` 换成模板里的新版。
+- **cue 里写死的颜色不跟色板**：比如为 3b1b 黑底写的 `{"s": "→", "col": "#ffffff"}`，换成浅色底就看不见了。换色板后跑 `render.js stills` 看一遍，把这类写死的色值删掉，或改成 manim 色名。
+
 ## script.json 写法
 
 ```json

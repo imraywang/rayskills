@@ -44,7 +44,7 @@ $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explai
 
 视频文件不要放进 Obsidian vault：vault 带 git 自动快照，大文件会进历史。
 
-按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`（顶部小标题）、`voice`、`to_confirm`。
+按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`（顶部小标题）、`theme`（全片色板，见 [grammars.md](references/grammars.md)「全片色板」，新项目默认 `"ray"`）、`voice`、`to_confirm`。
 
 ### 1b. 分镜关
 

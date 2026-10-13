@@ -19,7 +19,7 @@ const first = (def, kind) => def.cues.find(q => q.kind === kind);
 const tOf = (q, fb = 1e9) => q ? q.t : fb;
 const ICON = { bulb: (x, y, s, p, sd) => bulb(x, y, s, p, C.yellow, sd), broadcast, coin, lock,
   person: (x, y, s, p, sd) => person(x, y + s * .1, s * .7, C.orange, sd, p), none: () => {} };
-const TINTS = [C.tint, C.btint, '#fbf0cc', '#e8e1f6', C.gtint, '#f6dede'];
+const TINTS = [C.tint, C.btint, mixHex(C.yellow, C.card, .75), mixHex(C.soft, C.card, .8), C.gtint, mixHex(C.red, C.card, .82)];
 
 // ---------- leaderboard: rankings reshuffle → code card swap → big question → a claim gets crossed out ----------
 P.leaderboard = (t, sc, d) => {
@@ -30,7 +30,7 @@ P.leaderboard = (t, sc, d) => {
   if (boardA > 0) {
     ctx.save(); ctx.globalAlpha *= boardA;
     const bx = 170, by = 380, bw = 740, period = D.period || 1.25;
-    rrect(bx, by, bw, 175 + items.length * 112 - 15, { p: ap(t, t0, .7), fill: '#fffaf1', seed: 11, w: 6 });
+    rrect(bx, by, bw, 175 + items.length * 112 - 15, { p: ap(t, t0, .7), fill: C.card, seed: 11, w: 6 });
     text(D.title || '排行榜', W / 2, by + 75, { size: 60, alpha: ap(t, t0 + .3, .3) });
     const ph = clamp(t - t0 - .8, 0, 999) / period, k = Math.floor(ph), f = eInOut(ap(ph - k, .55, .35));
     if (D.label !== '') text((D.label || '第 {n} 周').replace('{n}', k + 1), bx + bw - 30, by + 75, { size: 40, align: 'right', color: C.orange, alpha: ap(t, t0 + .8, .3) });
@@ -137,7 +137,7 @@ P.story = (t, sc, d) => {
     ctx.save(); ctx.globalAlpha *= out;
     const ch = first(d, 'chat');
     if (ch) { const p = ap(t, ch.t, .6);
-      rrect(190, 400, 700, 330, { p, fill: '#fffaf1', seed: 101, w: 6 });
+      rrect(190, 400, 700, 330, { p, fill: C.card, seed: 101, w: 6 });
       text(ch.text || 'ChatGPT', 240, 450, { size: 40, align: 'left', color: C.green, alpha: p });
       rrect(240, 510, 420, 80, { p: ap(t, ch.t + .4, .4), fill: C.btint, seed: 102, w: 4 }); rrect(420, 615, 420, 80, { p: ap(t, ch.t + .7, .4), fill: C.gtint, seed: 103, w: 4 }); }
     const dq = first(d, 'doubt');
@@ -168,7 +168,7 @@ P.funnel = (t, sc, d) => {
   const ppl = Array.from({ length: N }, (_, i) => ({ x: 120 + r() * 840, y: 420 + r() * 520, c: cols[i % cols.length], s: 42 + r() * 22, d: r() }));
   const cr = tOf(first(d, 'crowd'), sc.start), fn = first(d, 'funnel'), po = first(d, 'pour'), re = first(d, 'result'), fo = first(d, 'formula');
   const fp = ap(t, tOf(fn), .7);
-  rpath([[200, 1000], [880, 1000], [610, 1230], [610, 1310], [470, 1310], [470, 1230], [200, 1000]], { p: fp, seed: 161, w: 6, fill: '#fffaf1' });
+  rpath([[200, 1000], [880, 1000], [610, 1230], [610, 1310], [470, 1310], [470, 1230], [200, 1000]], { p: fp, seed: 161, w: 6, fill: C.card });
   ppl.forEach((q, i) => { const a = ap(t, cr + q.d * 1.6, .4), m = eInOut(ap(t, tOf(po) + q.d * 1.8, 1.1));
     const x = lerp(q.x, 540 + (q.x - 540) * .05, m), y = lerp(q.y + Math.sin(t * 2 + i) * 6, 1180, m);
     ctx.save(); ctx.globalAlpha *= a * (1 - ap(m, .85, .15)); person(x, y, q.s * (1 - m * .5), q.c, 170 + i, 1); ctx.restore(); });
@@ -199,13 +199,13 @@ P.paths = (t, sc, d) => {
   ps.forEach((g, i) => { const pq = cueOf(d, 'path').find(q => q.data.index === i), s0 = tOf(pq, rt + .4 + i * .4), p = ap(t, s0, .5);
     ctx.save(); ctx.globalAlpha *= 1 - (focus >= 0 && focus !== i ? .55 : 0);
     rarrow(540 + (i - (n - 1) / 2) * 60, 560, xs[i], 700, { p, seed: 210 + i, w: 5, color: C.soft, head: 24 });
-    rrect(xs[i] - bw / 2, 720, bw, 150, { p, fill: g.color || ['#fffaf1', C.btint, C.gtint, C.tint][i % 4], seed: 220 + i, w: 6 });
+    rrect(xs[i] - bw / 2, 720, bw, 150, { p, fill: g.color || [C.card, C.btint, C.gtint, C.tint][i % 4], seed: 220 + i, w: 6 });
     text(g.title || '', xs[i], 795, { size: (g.title || '').length > 3 ? 52 : 64, scale: pop(t, s0 + .15) }); ctx.restore(); });
   cueOf(d, 'note').forEach(q => { const i = q.data.index ?? 0; text(q.text || '', xs[i], 680, { size: 40, color: q.data.color ? C[q.data.color] || q.data.color : C.orange, scale: pop(t, q.t) }); });
   const lo = first(d, 'loss');
   if (lo && t > lo.t) { const end = ends.find(e => e > lo.t + .1) || sc.end, a = ap(t, lo.t, .4) * (1 - ap(t, end - .1, .4)), i = lo.data.index ?? Math.max(0, focus), x = xs[i] ?? 540;
     ctx.save(); ctx.globalAlpha *= a;
-    rrect(x - 210, 1150, 420, 300, { p: ap(t, lo.t + .3, .5), fill: '#efe7da', seed: 231, w: 6 });
+    rrect(x - 210, 1150, 420, 300, { p: ap(t, lo.t + .3, .5), fill: mixHex(C.soft, C.card, .82), seed: 231, w: 6 });
     if (lo.text) text(lo.text, x, 1400, { size: 46, color: C.red, alpha: ap(t, lo.t + 1.2, .4) });
     const m = eInOut(ap(t, lo.t + .2, 1.2)), dm = eInOut(ap(t, lo.t + .6, 1.2));
     person(lerp(x - 60, x - 70, m), lerp(950, 1270, m), 70, C.orange, 241);
@@ -246,7 +246,7 @@ P.checklist = (t, sc, d) => {
   const items = cueOf(d, 'item'), fin = first(d, 'final'), n = items.length, shrink = eInOut(ap(t, tOf(fin) + .2, .6));
   const g0 = Math.min(300, 1000 / Math.max(1, n)), g1 = Math.min(210, 700 / Math.max(1, n));
   items.forEach((q, i) => { const s0 = q.t, y = lerp(520 + i * g0, 490 + i * g1, shrink), p = ap(t, s0 - .2, .5);
-    rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: '#fffaf1', seed: 401 + i, w: 6 });
+    rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: C.card, seed: 401 + i, w: 6 });
     rrect(185, y - 40, 80, 80, { p, seed: 411 + i, w: 6 });
     rpath([[200, y], [225, y + 28], [275, y - 50]], { p: ap(t, s0 + (q.data.checkDelay ?? .9), .4), color: C.green, w: 11, seed: 421 + i });
     if (q.sub) text(q.sub, 310, y - 30, { size: 44, align: 'left', color: C.soft, alpha: p * (1 - shrink) });

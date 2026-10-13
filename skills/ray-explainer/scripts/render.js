@@ -27,6 +27,27 @@ const W = 1080, H = 1920, SAFE = { top: 290, bottom: 380 };   // overlay: progre
 // digital host (host.py wrote host/plan.json): captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
 if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
 
+// ---------- theme: script.json "theme" → one palette for kit scenes and grammar clips ----------
+// a huashu palette name (paper poster ink navy bauhaus snow wood chalk), "ray" (the kit's own colours), {name, <keys to override>},
+// or all 6 keys. Omitted → kit and every grammar keep their own default colours (old projects render unchanged).
+const RAY_PALETTE = { bg: '#f7f0e3', surface: '#fffaf1', ink: '#2a2622', sub: '#8a7f72', accent: '#e8743b', accent2: '#3d7fd9' };
+const PAL_KEYS = ['bg', 'surface', 'ink', 'sub', 'accent', 'accent2'];
+function resolveTheme(th) {
+  if (th == null) return null;
+  const sb = { window: {} }; require('vm').runInNewContext(fs.readFileSync(path.join(HUASHU, 'lib', 'palettes.js'), 'utf8'), sb);
+  const named = { ray: RAY_PALETTE, ...sb.window.PALETTES }, avail = Object.keys(named).join(' / ');
+  const name = typeof th === 'string' ? th : th.name;
+  if (name != null && !named[name]) throw new Error(`script.json theme「${name}」不是色板名。可用：${avail}`);
+  const out = { ...(name != null ? named[name] : {}), ...(typeof th === 'object' ? th : {}) }; delete out.name;
+  const bad = PAL_KEYS.filter(k => !/^#[0-9a-f]{6}$/i.test(String(out[k] || '')));
+  if (bad.length) throw new Error(`script.json theme 缺或写错 ${bad.join(' ')}（每个键写 #rrggbb；或写 name 用一套色板补齐）。可用：${avail}`);
+  const hsv = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255), mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
+    const hue = d === 0 ? 0 : mx === r ? 60 * (((g - b) / d) % 6) : mx === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4); return [(hue + 360) % 360, mx ? d / mx : 0]; };
+  for (const k of ['bg', 'surface', 'accent']) { const [h, sat] = hsv(out[k]); if (h >= 225 && h <= 300 && sat >= .3) console.warn(`WARN theme.${k}=${out[k]} 落在蓝紫区（色相 225°–300°），film_gate 会量出蓝紫底`); }
+  return Object.fromEntries(PAL_KEYS.map(k => [k, out[k].toLowerCase()]));
+}
+const THEME = resolveTheme(SCRIPT.theme);
+
 // ---------- static server: project at /, vendored huashu engine at /huashu/, overlay.js always from the skill ----------
 // overlay.js (captions, progress bar, header, digital host) is pipeline infrastructure, not per-film content: it must match
 // this render.js (RXO.prep / ready / draw), so it is served from the skill even when an old project still has its own copy
@@ -85,7 +106,7 @@ function specFor(ssc, tsc, fps) {
     q.video = { ...q.video, count: fs.readdirSync(dir).filter(f => /^\d{4}\.jpg$/.test(f)).length };
   }
   return { grammar: ssc.grammar, duration: +(tsc.end - tsc.start).toFixed(3), fps, width: W, height: H,
-    safe: { ...SAFE, ...(ssc.safe || {}) }, ...(ssc.data ? { data: ssc.data } : {}), cues };
+    safe: { ...SAFE, ...(ssc.safe || {}) }, ...(ssc.data ? { data: ssc.data } : {}), ...(THEME && ssc.theme === undefined ? { theme: THEME } : ssc.theme ? { theme: ssc.theme } : {}), cues };
 }
 
 (async () => {
@@ -104,7 +125,7 @@ function specFor(ssc, tsc, fps) {
     await p.goto(url); return p;
   };
   const CLEAN = process.env.RX_CLEAN ? 'window.RX_CLEAN=true;' : '';
-  const kit = await open(`${base}/video.html`, CLEAN || undefined);
+  const kit = await open(`${base}/video.html`, (CLEAN + (THEME ? `window.THEME=${JSON.stringify(THEME)};` : '')) || undefined);
   const info = await kit.evaluate(() => window.ready);
   const META = { header: SCRIPT.header || '', ...(await kit.evaluate(() => window.META || {})) };
   if (!info.fonts) console.warn('WARN: handwriting font not available — kit text falls back');
