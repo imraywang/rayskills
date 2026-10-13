@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray Cover"
-  short_description: "优先用 Image 2 生成图文一体的公众号与 X 编辑封面"
-  default_prompt: "Use $ray-cover to turn this article into integrated WeChat and X cover assets."
+  short_description: "按 Ray 的黑白灰 + 墨绿 IP，用 Punk 风格库为文章和视频生成三平台封面"
+  default_prompt: "Use $ray-cover to write cover copy, pick one Punk style and generate WeChat, X and X Article covers."

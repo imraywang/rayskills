@@ -56,8 +56,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、候选选题、写作任务、母稿、发布反馈与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 读者收获、事实边界、Ray 语气、连续自然的中文长文 | `/ray-writer` |
 | 一个能在一条视频讲清的灵感，或一篇已经核验的长文 | 生成唯一快速口播母稿，或重新选角度生成完整口播内容包 | `/ray-kb` |
-| 一篇已经定稿的文章 | 一个编辑隐喻，分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
-| 想让所有封面保持同一种画风，文字自己排 | 固定编辑版画画种、中央留白的无字底图，分别输出公众号、普通 X、X Article | `/ray-cover-editorial` |
+| 一篇已经定稿的文章或视频 | 按内容写封面文案、选一种风格，按黑白灰 + 墨绿 IP 分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
 | 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
 | 一篇文章或剪藏，想做成知识讲解视频 | 1.5–3 分钟竖屏解说片：手绘套路、8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）和真实照片 / 历史影像按幕混排，Gemini 或本人复刻音色配音，Whisper 逐字卡点；确认后可加卡通数字人主持人（大机位 Kling 生成手势，角落按拼音对口型）。想要每期专属风格时走 HyperFrames 模式：真实截图当证据、本机实跑工具的真实输出、配乐与音效、并行做场景，发布包直接并进口播母稿 | `/ray-explainer` |
@@ -81,12 +80,11 @@ flowchart TD
     RAY --> COLLAB["🤝 协作与调研<br/>multimodel · trend-search"]
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 候选 · 写作任务 · 母稿"] --> WRITER["ray-writer<br/>长文 · 译介"]
-    WRITER --> COVER["ray-cover<br/>视觉隐喻 · 平台封面"]
+    WRITER --> COVER["ray-cover<br/>封面文案 · IP 风格 · 平台封面"]
     OBSIDIAN --> KB["ray-kb<br/>快速口播 · 长文再分发"]
     WRITER --> KB
     KB --> BROLL["ray-broll<br/>口播画面 · 讲解片"]
     OBSIDIAN --> EXPLAINER["ray-explainer<br/>解说视频 · 可选数字人"]
-    WRITER --> COVERED["ray-cover-editorial<br/>固定画风无字底图"]
     TREND["ray-trend-search<br/>近期趋势调研"] -.-> WRITER
     TREND -.-> KB
     COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
@@ -105,7 +103,7 @@ flowchart TD
 |---|---|---|
 | `ray-obsidian`（按需） | 新建或适配用户自己的本地知识库 | 先预演；已有文件零覆盖、零移动；结构检查为 ready |
 | `ray-writer` | 从 idea、资料或草稿生成中文长文 | 表达先行，以作者口吻说满观点；拿不准或编补的内容进「待确认」由作者决定；长文通过格式检查 |
-| `ray-cover` | 把文章判断压缩成一个视觉隐喻 | 公众号、普通 X、5:2 Article 按各自尺寸分别用 Image 2 直出；验收构图、安全区与缩略图可读性，不跨平台裁切复用 |
+| `ray-cover` | 按内容写三层封面文案，从 Punk 风格库（MIT 版）选一种风格，套 Ray 的黑白灰 + 墨绿 IP | Codex CLI 调 Image 2 按公众号、普通 X、5:2 Article 各自生成；逐字与颜色验收，不跨平台裁切复用 |
 | `ray-kb`（按需） | 从灵感直接做唯一口播母稿，或把定稿母稿改编成口播内容包 | 表达先行，编补内容进「待确认」；快速模式不制造额外任务；长文模式绑定母稿指纹；口播检查通过 |
 | `ray-wechat` | 把定稿与公众号封面送进微信草稿箱 | 先确认手机预览；优先更新原草稿；标题、摘要、封面、全文、署名和 UTF-8 回读通过 |
 | `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
@@ -122,10 +120,9 @@ flowchart TD
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；他人文章 → 译介稿 |
 | | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
-| | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面 |
+| | `/ray-cover` | 定稿文章或视频 → 公众号、普通 X、X Article 封面 |
 | | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
-| | `/ray-cover-editorial` | 定稿文章 → 固定编辑版画风格、中央留白的无字封面底图（三个平台尺寸） |
-| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路 + huashu 解说语法 + 真实影像混排、复刻音色配音、逐字卡点、可选数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
+| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路或一种 huashu 解说语法，一期只用一种画法、复刻音色配音、逐字卡点、可选数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
 | 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
@@ -217,7 +214,7 @@ npx -y skills add imraywang/rayskills -g --all
 装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 13 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
 
 ```bash
-for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
+for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps ray-cover-editorial; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
 ```
 
 旧成员去向对照：
@@ -227,6 +224,7 @@ for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-p
 | `ray-diagnose` / `ray-proposal` | v2 合并为 `/ray-consult`（诊断段 → 方案段），仍是正式成员 |
 | `ray-vpsinit` / `ray-nodecheck` | v2 合并为 `ray-vps`，v3 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
 | `ray-thread` | v2 曾并入 `/ray-writer`，现已移除；方法论保留在 git 历史，需要时直接向 Agent 描述任务即可 |
+| `ray-cover-editorial` | 2026-10-13 并入 `/ray-cover`：固定版画风格停用，封面改为 Punk 风格库 + Ray 的黑白灰 + 墨绿 IP |
 | `ray-tweet` · `ray-idea` · `ray-cleanup` · `ray-weekly` | v2 已删除，需要时直接向 Agent 描述任务即可 |
 | `ray-benchmark` · `ray-launch` · `ray-metrics` · `ray-report` · `ray-vps` | v3 按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用 |
 
