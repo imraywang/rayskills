@@ -34,7 +34,7 @@
 
 ## 图标（`x, y, size, p, ...`）
 
-`bulb(x,y,s,p,color?,seed)`（灯泡，新想法；第 5 个参数传数字时当作 seed）· `broadcast`（广播，分发）· `coin`（¥ 硬币，钱）· `lock`（锁，锁定）· `person(x,y,s,color,seed)`（小人）· `face(x,y,s,mood,seed,p)`（mood：1 笑，0 平，-1 怀疑）
+`bulb(x,y,s,p,color?,seed)`（灯泡，新想法；第 5 个参数传数字时当作 seed）· `broadcast`（广播，分发）· `coin`（¥ 硬币，钱）· `lock`（锁，锁定）· `person(x,y,s,color,seed)`（无五官的人形符号，只用在人群、流向这类信息图）· `bust(x,y,s,p,seed,fill?)`（剪影胸像，人物出场用它）· `qbubble(x,y,s,p,seed)`（问号气泡，表示怀疑、困惑）· `mixHex(a,b,k)`（两色按 k 混合，从色板派生淡色）· `face(...)`（停用，只为旧项目保留，见 [patterns.md](patterns.md)「不画的东西」）
 
 ## 调色板 `C`
 

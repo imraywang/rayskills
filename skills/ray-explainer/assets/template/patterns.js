@@ -75,9 +75,10 @@ P.leaderboard = (t, sc, d) => {
 P.quote = (t, sc, d) => {
   const D = d.data; if (D.title) title(t, sc, D.title);
   const p = ap(t, sc.start + .2, .8);
-  face(W / 2, 560, 150, 1, 41, p);
-  if (D.glasses !== false) { rcircle(W / 2 - 55, 540, 42, { p: ap(t, sc.start + .8, .4), seed: 45, w: 5 }); rcircle(W / 2 + 55, 540, 42, { p: ap(t, sc.start + .9, .4), seed: 46, w: 5 }); rline(W / 2 - 13, 540, W / 2 + 13, 540, { p: ap(t, sc.start + 1, .2), seed: 47, w: 5 }); }
-  if (D.who) text(D.who, W / 2, 760, { size: 44, color: C.soft, alpha: ap(t, sc.start + .8, .4) });
+  rrect(W / 2 - 170, 380, 340, 330, { p, fill: C.card, seed: 40, w: 6 });   // portrait frame; the person is a silhouette, no cartoon face
+  ctx.save(); ctx.beginPath(); ctx.rect(W / 2 - 165, 385, 330, 320); ctx.clip(); bust(W / 2, 545, 110, p, 41); ctx.restore();
+  if (D.glasses !== false) { rcircle(W / 2 - 40, 540, 30, { p: ap(t, sc.start + .8, .4), seed: 45, w: 5 }); rcircle(W / 2 + 40, 540, 30, { p: ap(t, sc.start + .9, .4), seed: 46, w: 5 }); rline(W / 2 - 10, 540, W / 2 + 10, 540, { p: ap(t, sc.start + 1, .2), seed: 47, w: 5 }); }
+  if (D.who) text(D.who, W / 2, 765, { size: 44, color: C.soft, alpha: ap(t, sc.start + .8, .4) });
   const q = first(d, 'quote');
   if (q && t > q.t - .3) {
     const lines = D.lines || [q.text || ''], n = lines.length, accent = D.accent ?? n - 1, dur = q.data.dur || 2.4;
@@ -141,7 +142,7 @@ P.story = (t, sc, d) => {
       text(ch.text || 'ChatGPT', 240, 450, { size: 40, align: 'left', color: C.green, alpha: p });
       rrect(240, 510, 420, 80, { p: ap(t, ch.t + .4, .4), fill: C.btint, seed: 102, w: 4 }); rrect(420, 615, 420, 80, { p: ap(t, ch.t + .7, .4), fill: C.gtint, seed: 103, w: 4 }); }
     const dq = first(d, 'doubt');
-    if (dq) { [[250, 900], [460, 930], [670, 900]].forEach(([x, y], i) => face(x, y, 80, -1, 110 + i * 4, ap(t, dq.t - .3 + i * .15, .4)));
+    if (dq) { [[250, 880], [540, 920], [830, 880]].forEach(([x, y], i) => qbubble(x, y, 95, ap(t, dq.t - .3 + i * .15, .4), 110 + i * 4));
       text(dq.text || '', W / 2, 1060, { size: 64, color: C.soft, scale: pop(t, dq.t + .3), rot: -.03 }); }
     const b = first(d, 'bubble');
     if (b && t > b.t - .1) { const tp = ap(t, b.t, .5);
@@ -251,10 +252,17 @@ P.checklist = (t, sc, d) => {
     rpath([[200, y], [225, y + 28], [275, y - 50]], { p: ap(t, s0 + (q.data.checkDelay ?? .9), .4), color: C.green, w: 11, seed: 421 + i });
     if (q.sub) text(q.sub, 310, y - 30, { size: 44, align: 'left', color: C.soft, alpha: p * (1 - shrink) });
     text(q.text || '', 310, q.sub ? lerp(y + 40, y + 5, shrink) : y, { size: 66, align: 'left', scale: pop(t, s0 + .3) }); });
+  // closing line = a sticky note slapped onto the checklist (an action on the object), not a centred quote card
   if (fin && t > fin.t) {
-    const big = fin.t + (fin.data.bigDelay ?? 2.5);
-    if (fin.sub) text(fin.sub, W / 2, 1150, { size: 60, alpha: ap(t, fin.t + .5, .5) });
-    text(fin.text || '', W / 2, 1320, { size: 120, color: C.orange, scale: pop(t, big, .6), rot: -.03 });
-    rarrow(W / 2 + 280, 1420, W / 2 + 150, 1480, { p: ap(t, big + .5, .5), color: C.orange, w: 8, seed: 431 });
+    const big = fin.t + (fin.data.bigDelay ?? 2.5), l = t - big;
+    if (fin.sub) text(fin.sub, W / 2, 1120, { size: 54, color: C.soft, alpha: ap(t, fin.t + .5, .5) });
+    if (l > 0) {
+      const k = l < .1 ? lerp(1.55, .94, eOut(l / .1)) : l < .17 ? lerp(.94, 1, (l - .1) / .07) : 1;   // slam 0.17s: 1.55 → 0.94 → 1.0
+      ctx.save(); ctx.translate(W / 2 + 20, 1330); ctx.rotate(-.035); ctx.scale(k, k);
+      rrect(-370, -125, 740, 250, { fill: mixHex(C.yellow, C.card, .45), seed: 431, w: 6 });
+      text(fin.text || '', 0, -5, { size: (fin.text || '').length > 7 ? 84 : 100, color: C.ink });
+      rline(-240, 70, 240, 66, { p: ap(t, big + .35, .4), color: C.orange, w: 9, seed: 433 });
+      ctx.restore();
+    }
   }
 };

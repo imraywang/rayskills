@@ -60,11 +60,12 @@ S.hook = (t, sc) => {
 
 S.drucker = (t, sc) => {
   title(t, sc, '德鲁克说');
-  // doodle portrait
+  // portrait: a framed silhouette with the person's prop (glasses), no cartoon face
   const p = ap(t, sc.start + .2, .8);
-  face(W / 2, 560, 150, 1, 41, p);
-  rcircle(W / 2 - 55, 540, 42, { p: ap(t, sc.start + .8, .4), seed: 45, w: 5 }); rcircle(W / 2 + 55, 540, 42, { p: ap(t, sc.start + .9, .4), seed: 46, w: 5 });
-  rline(W / 2 - 13, 540, W / 2 + 13, 540, { p: ap(t, sc.start + 1, .2), seed: 47, w: 5 });
+  rrect(W / 2 - 170, 380, 340, 330, { p, fill: C.card, seed: 40, w: 6 });
+  ctx.save(); ctx.beginPath(); ctx.rect(W / 2 - 165, 385, 330, 320); ctx.clip(); bust(W / 2, 545, 110, p, 41); ctx.restore();
+  rcircle(W / 2 - 40, 540, 30, { p: ap(t, sc.start + .8, .4), seed: 45, w: 5 }); rcircle(W / 2 + 40, 540, 30, { p: ap(t, sc.start + .9, .4), seed: 46, w: 5 });
+  rline(W / 2 - 10, 540, W / 2 + 10, 540, { p: ap(t, sc.start + 1, .2), seed: 47, w: 5 });
   text('Peter Drucker', W / 2, 760, { size: 44, color: C.soft, alpha: ap(t, sc.start + .8, .4) });
   // the quote
   const l1 = L(sc, 1);
@@ -147,9 +148,9 @@ S.behavior = (t, sc) => {
     text('ChatGPT', 240, 450, { size: 40, align: 'left', color: C.green, alpha: p });
     rrect(240, 510, 420, 80, { p: ap(t, l0.start + .6, .4), fill: C.btint, seed: 102, w: 4 });
     rrect(420, 615, 420, 80, { p: ap(t, l0.start + .9, .4), fill: C.gtint, seed: 103, w: 4 });
-    // doubtful colleagues
+    // doubt: three question bubbles (an object carries the doubt, not frowning faces)
     const dp = at(sc, 0, '一个聊天框');
-    [[250, 900], [460, 930], [670, 900]].forEach(([x, y], i) => face(x, y, 80, -1, 110 + i * 4, ap(t, dp - .3 + i * .15, .4)));
+    [[250, 880], [540, 920], [830, 880]].forEach(([x, y], i) => qbubble(x, y, 95, ap(t, dp - .3 + i * .15, .4), 110 + i * 4));
     text('一个聊天框而已？', W / 2, 1060, { size: 64, color: C.soft, scale: pop(t, dp + .3), rot: -.03 });
     // Thiel's counsel
     if (t > l1.start - .1) {

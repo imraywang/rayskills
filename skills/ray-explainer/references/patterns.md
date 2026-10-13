@@ -7,13 +7,22 @@
 | 套路 | 用途 | data | cue |
 |---|---|---|---|
 | `leaderboard` | 反常现象钩子：排行榜互换 → 改一行代码 → 大字问句 → 划掉一个说法 | `title`、`items[]`、`period`（秒）、`label`（`第 {n} 周`，写 `""` 不显示） | `board`（出现，默认幕首）· `code`（代码卡；`data.from/to/head/tail`，`text` = 旁注）· `swap`（替换那一行）· `hide`（收起榜单，默认在 `question` 时收起）· `question`（`text` 小行，`sub` 橙色大行）· `strike`（`text` 被质疑的说法，`data.who` 出处）· `cross`（红叉，`text` 结论） |
-| `quote` | 名人金句 | `title`、`who`、`lines[]`、`accent`（加粗的那一行，默认最后一行）、`glasses` | `quote`（引语卡打字，`data.dur`）· `underline` · `note`（下方小字） |
+| `quote` | 名人金句（人物是相框里的剪影，不画脸；`glasses` 给剪影戴眼镜当身份道具） | `title`、`who`、`lines[]`、`accent`（加粗的那一行，默认最后一行）、`glasses` | `quote`（引语卡打字，`data.dur`）· `underline` · `note`（下方小字） |
 | `grid` | N 个要素的框架；排除法 | `title`、`cols`、`cards[{title, sub, icon, color}]`，icon：bulb broadcast coin lock person none | `show`（`data.index`，不写 = 全部；`at: -9` 表示一开场就全部可见）· `cross`（`data.index`，`text` 红字注，`data.arrows` 加来回箭头）· `dim`（`data.index[]`）· `circle`（`data.index[]` 圈住，`text` 大字）· `note` |
-| `story` | 一段故事 → 一串突破的规律 | `title` | `chat`（产品草图，`text` 产品名）· `doubt`（三张怀疑脸 + `text`）· `bubble`（`text`、`sub` 橙色大字、`data.who`）· `step`（灯泡时间线的一项，第一项出现时故事淡出）· `summary`（`text`、`sub`） |
+| `story` | 一段故事 → 一串突破的规律 | `title` | `chat`（产品草图，`text` 产品名）· `doubt`（三个问号气泡 + `text`）· `bubble`（`text`、`sub` 橙色大字、`data.who`）· `step`（灯泡时间线的一项，第一项出现时故事淡出）· `summary`（`text`、`sub`） |
 | `funnel` | 多到一：杂的用户 → 通用解 | `title`、`crowd`（人数） | `crowd`（人群出现，`text` 标签）· `funnel`（`text` 漏斗内字）· `pour`（人群流入）· `result`（菱形 + `text`）· `formula`（遮罩卡：`text` 上 ← `data.verb` ← `sub` 下） |
 | `paths` | 一个起点分出几条路 | `title`、`root`、`paths[{title, color}]` | `root` · `path`（`data.index`）· `focus`（`data.index`，其余变暗）· `note`（`data.index` 上方小字，`data.color`）· `loss`（小人和数据走进别人的盒子，`text` 盒子标签，`sub` 数据标签）· `loop`（旋转的学习回路，`text`/`sub` 两侧标签）· `punch`（底部大字） |
 | `swap` | 因果反转：A→B 变成 B→A | `title`、`a`、`b`、`before`/`after`（默认“你以为”“其实是”）、`arrowBefore`/`arrowAfter` | `show` · `flip`（两个盒子交换位置）· `punch`（底部大字） |
-| `checklist` | 收获清单 → 结尾金句 | `title` | `item`（`text` 大字，`sub` 上方小字，`data.checkDelay`）· `final`（`text` 橙色大字，`sub` 上一行，`data.bigDelay`） |
+| `checklist` | 收获清单 → 一张便利贴砸到清单上收尾 | `title` | `item`（`text` 大字，`sub` 上方小字，`data.checkDelay`）· `final`（`text` 写在便利贴上，0.17 秒砸入，`sub` 上一行，`data.bigDelay`） |
+
+## 不画的东西（2026-10-13 起）
+
+huashu-art-motion 作者看过多支模型做的片子后，把这几样判为一眼 AI 味：代码画的 Q 版笑脸、豆豆眼小人、长了脸的金币和小球、结尾一张居中的大字金句卡。套路已经改掉：
+
+- 人物：相框里的剪影 `bust()`，靠道具（眼镜）和名字认人，不画五官；`person()` 是没有五官的示意符号，可以用在人群、流向这类信息图里，不要用它演一段剧情。
+- 情绪：交给物来演，`qbubble()` 问号气泡代替皱眉脸；物不加脸，靠动作（掉落、翻转、被划掉）讲。
+- 结尾：字写在画里的物上，并配一个动作（便利贴砸到清单上），不要单独一张居中金句卡。
+- `face()` 还留在 kit 里，只为旧项目的 scenes.js 能照常渲染；新画面不要再用。
 
 ## 什么时候还得写代码
 

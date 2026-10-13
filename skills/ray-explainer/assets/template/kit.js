@@ -135,6 +135,19 @@ function person(x, y, s, color, seed, p = 1) {
   const pts = []; for (let k = 0; k <= 12; k++) { const a = Math.PI + k / 12 * Math.PI; pts.push([x + Math.cos(a) * s * .45, y + s * .45 + Math.sin(a) * s * .5]); }
   rpath(pts, { p, seed: seed + 3, w: 4, amp: 1.2, color: C.ink, fill: color });
 }
+// silhouette bust (head + shoulders, no facial features): a person without the "AI-made cartoon face" look
+function bust(x, y, s, p = 1, seed = 1, fill = mixHex(C.soft, C.card, .35)) {
+  const sh = []; for (let k = 0; k <= 14; k++) { const a = Math.PI + k / 14 * Math.PI; sh.push([x + Math.cos(a) * s * .95, y + s * 1.55 + Math.sin(a) * s * .75]); }
+  rpath(sh, { p, seed: seed + 2, w: 5, fill });
+  rcircle(x, y, s * .52, { p, seed, w: 5, fill });
+}
+// speech bubble with a hand-drawn "?" — doubt / confusion carried by an object instead of a frowning face
+function qbubble(x, y, s, p = 1, seed = 1) {
+  rpath([[x - s, y - s * .7], [x + s, y - s * .7], [x + s, y + s * .5], [x - s * .1, y + s * .5], [x - s * .45, y + s * .95], [x - s * .4, y + s * .5], [x - s, y + s * .5], [x - s, y - s * .7]],
+    { p, seed, w: 5, fill: C.card });
+  if (p > .5) text('?', x, y - s * .08, { size: s * 1.05, color: C.soft, alpha: ap(p, .5, .5) });
+}
+// kept for old scenes.js; patterns no longer draw cartoon faces
 function face(x, y, s, mood, seed, p = 1) { // mood: 1 happy, 0 neutral, -1 doubtful
   rcircle(x, y, s, { p, fill: C.card, seed, w: 5 });
   if (p < .6) return;
