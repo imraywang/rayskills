@@ -194,7 +194,7 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 - 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`；HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](references/hyperframes.md)
 - 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
 - 交付时提醒：平台的「AI 生成内容」声明要勾（复刻音色、数字人），CC 授权图片要在简介署名
-- 暂不调用 ray-cover：它的风格不适合这类视频
+- 竖屏封面（抖音、视频号 9:16，小红书 3:4）交给 `ray-cover` 的视频封面流程：Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP；`cover.jpg`（成片里的一帧）只作备用
 
 ## 边界
 
