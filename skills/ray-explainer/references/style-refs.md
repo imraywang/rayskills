@@ -3,7 +3,7 @@
 每期选画法时，从这里挑一张参考卡，分镜表里写明「向谁靠、借什么」（`script.json` 顶层 `"style_ref": "<卡片 id>"`，`storyboard.py` 会打印出来）。Ray 只在心里有具体样子时才指定；没指定就按下面的「怎么选」自己定，分镜关给他确认。
 
 - 卡片里「看到了什么」只写抽帧核实过的东西，不凭印象。
-- 截帧只存本机 `~/.config/ray-explainer/style-refs/<id>/`（别人的作品，只作私人参考，不进任何仓库、不放进成片）。总览图：`board-real-frames.jpg`（14 帧精选）、`board-storyboards.jpg`（YouTube 进度条预览图）。动手前用 Read 看一眼对应目录，比读文字准。
+- 截帧存在 Ray 的知识库 `60-素材/50-调研媒体/解说视频风格参考/<id>/`，带图的笔记是 `30-资料/10-自主调研/解说视频风格参考/README.md`（Ray 在 Obsidian 里看的版本，和这份内容一致，改一处要同步另一处）。别人的作品只作私人参考，不进这个公开仓库、不放进成片。总览图：`board-real-frames.jpg`（14 帧精选）、`board-storyboards.jpg`（YouTube 进度条预览图）。动手前用 Read 看一眼对应目录，比读文字准。
 - 借的是**版式、节奏、信息组织**，颜色一律换成 Ray 的 IP（[ip-style.md](ip-style.md)）：黑白灰 + 墨绿，深色版 `ray-ip-dark`。
 
 ## 怎么选
@@ -79,9 +79,9 @@
 
 Ray 丢来链接、或想对标某个频道时：
 
-1. 在 Ray 的 Chrome（Claude in Chrome）里打开视频页；本机起接收服务：`python3 $SK/scripts/ref_frames.py <id>`（后台跑）。
-2. 把 `python3 $SK/scripts/ref_frames.py --js <id> 12` 打印的 JS 放进页面执行：暂停视频、按比例跳 12 个时间点、把画面画进 canvas 发回本机，存到 `~/.config/ray-explainer/style-refs/<id>/`。YouTube 有广告先等它结束。用完停掉接收服务。
+1. 在 Ray 的 Chrome（Claude in Chrome）里打开视频页；本机起接收服务：`python3 $SK/scripts/ref_frames.py <id> --vault <知识库根目录>`（后台跑；不给 `--vault` 就存到 `~/.config/ray-explainer/style-refs/`）。
+2. 把 `python3 $SK/scripts/ref_frames.py --js <id> 12` 打印的 JS 放进页面执行：暂停视频、按比例跳 12 个时间点、把画面画进 canvas 发回本机。YouTube 有广告先等它结束。用完停掉接收服务。
 3. `ffmpeg -pattern_type glob -i '<id>-*.jpg' -vf scale=480:-2,tile=4x3 sheet.jpg` 拼图，用 Read 看。
-4. 按上面的格式写一张卡：来源（链接、日期）、看到了什么（只写帧里有的）、借、不借、对应参数，再把它加进「怎么选」的表。
+4. 按上面的格式写一张卡：来源（链接、日期）、看到了什么（只写帧里有的）、借、不借、对应参数，再把它加进「怎么选」的表；知识库那篇笔记同样加一张（嵌 4 张代表帧，其余放进折叠区块）。
 
 yt-dlp 抓 YouTube 片段会 403，读 Chrome 的 cookie 不允许，所以走页面内截帧这条路。B 站同样可用。
