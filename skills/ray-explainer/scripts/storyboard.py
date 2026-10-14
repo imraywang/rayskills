@@ -24,6 +24,7 @@ cell = lambda x: str(x or "").replace("|", "／").replace("\n", " ")
 def how(sc):
     if sc.get("grammar"): return f"**{NAMES.get(sc['grammar'], sc['grammar'])}**"
     if sc.get("pattern"): return f"手绘·{sc['pattern']}"
+    if os.path.exists(os.path.join(PROJ, "hf", "build.py")): return "HyperFrames"   # 专属风格模式：每幕是 hf/compositions/s-<id>.html
     return "手绘·定制"
 
 
