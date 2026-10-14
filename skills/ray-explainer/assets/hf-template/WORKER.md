@@ -2,7 +2,7 @@
 
 > 模板：编排者复制到 `hf/WORKER.md`，填好 `{{…}}` 的四处（片名、设计真相、图片清单、本片额外规则），硬规则一字不改。
 
-You build HyperFrames scene sub-compositions for a vertical 1080×1920 narrated explainer (Chinese). The project root is `PROJECT_DIR` (the folder holding this file). Read this whole file, then `STORYBOARD.md` (only your frames + the 设计 section), then `beats.json` (only your scenes). Look at every image you use (Read tool) before placing it, so annotations land on the right spot.
+You build HyperFrames scene sub-compositions for a vertical 1080×1920 narrated explainer (Chinese) — or 1920×1080 when `../script.json` has `"aspect": "landscape"` (then use the landscape layout rules below and `data-width="1920" data-height="1080"`). The project root is `PROJECT_DIR` (the folder holding this file). Read this whole file, then `STORYBOARD.md` (only your frames + the 设计 section), then `beats.json` (only your scenes). Look at every image you use (Read tool) before placing it, so annotations land on the right spot.
 
 ## Output per scene `<id>`
 
@@ -75,6 +75,7 @@ Truthfulness
 Layout
 - Phone safe area: on Douyin / 视频号 the status bar and Dynamic Island cover y 0–200 and the author name, caption text and buttons cover y 1680–1920. **Nothing that carries information goes outside y 200–1680** — only ambience/texture there.
 - The global top bar (chapter progress bar + chapter title, with its own opaque backing) covers y 200–300; never put content there. Main stage y 300–1400. Captions are drawn globally at y 1420–1570 — keep key content out of y 1410–1580. The corner host occupies bottom-left x 0–380, y ≥ 1420 (Ray's IP default; if `build.py` has no host, captions move to 1500–1650 and the stage may extend to 1490). x margins ≥ 50 px.
+- **Landscape films (1920×1080)** replace the two bullets above: no phone UI covers the frame, keep 5% title-safe margins (x ≥ 96, y ≥ 54). There is **no top bar** (no progress bar or chapter title in landscape) — the stage is y 60–850. Captions are drawn at y 930–1040 (white text with a black outline, no box, centered) — keep key content out of y 920–1050. The host is a small circle (164 px, bottom-left x 56–220, y 860–1024, or mirrored to bottom-right in scenes whose `script.json` entry has `"host_side": "right"`) that only appears during key lines (`host.show` / big-shot lines) — it is gone the rest of the time, so the frame must look complete without it; never put content behind it. A big-shot segment grows it to a 420 px circle on its side. Use the width: side-by-side layouts (evidence on one side, explanation on the other) instead of stacking.
 - Source clips: when `BEATS[id].clips` is non-empty, the soundtrack plays the original recording there with no narration. Show it (real waveform from the clip audio, playhead synced to clip start/end, speaker + UTC/date label, transcript typed in sync with `segs`); the caption bar already shows the zh + en lines.
 - Every scene keeps a persistent ambience layer drifting slowly over the whole scene, so it never looks empty.
 - Hard cuts between scenes: make the first 0.3 s decisive; end on the final state held (no fade-to-black).

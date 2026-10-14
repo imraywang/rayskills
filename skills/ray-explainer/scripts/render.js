@@ -23,13 +23,21 @@ if (!projArg) { console.error('usage: node render.js <project> stills|sheet|vide
 const PROJ = path.resolve(projArg);
 const SCRIPT = JSON.parse(fs.readFileSync(path.join(PROJ, 'script.json')));
 const TL = JSON.parse(fs.readFileSync(path.join(PROJ, 'timeline.json')));
-const W = 1080, H = 1920, SAFE = { top: 290, bottom: 380 };   // overlay: progress/header y 200–290, captions y 1560–1656; above 200 / below 1680 the phone UI covers the frame
-// digital host (host.py wrote host/plan.json): captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
-if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = 480;
+// canvas: script.json "aspect" picks a profile in assets/canvas.json (default portrait 1080×1920; landscape 1920×1080).
+// Size, safe area, progress bar, captions and host layout all come from that one file.
+const CANVASES = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'assets', 'canvas.json'))), ASPECT = SCRIPT.aspect || 'portrait';
+const die = m => { console.error(m); process.exit(2); };
+if (!CANVASES[ASPECT] || ASPECT.startsWith('_')) die(`script.json aspect「${ASPECT}」不对，可用：portrait / landscape`);
+const CV = CANVASES[ASPECT], W = CV.W, H = CV.H, SAFE = { ...CV.safe };
+// digital host (host.py wrote host/plan.json): portrait captions move up to ~1470 and the corner presenter takes the bottom, so grammar clips keep clear of y>1440
+if (fs.existsSync(path.join(PROJ, 'host', 'plan.json'))) SAFE.bottom = CV.safe_host_bottom;
+// the hand-drawn kit and its patterns are laid out for 1080×1920 only: a landscape film uses grammar clips (or HyperFrames, hf/)
+if (ASPECT !== 'portrait') { const kitScenes = SCRIPT.scenes.filter(s => !s.grammar).map(s => s.id);
+  if (kitScenes.length) die(`横屏（aspect: ${ASPECT}）不支持手绘套路 / scenes.js：${kitScenes.join(' ')} 这几幕要写 grammar，或整期走 HyperFrames 模式`); }
 
 // ---------- theme: script.json "theme" → one palette for kit scenes and grammar clips ----------
 // a huashu palette name (paper poster ink navy bauhaus snow wood chalk), "ray" (the kit's own colours), "ray-ip" (Ray's IP look:
-// black / white / grey + ink green #054C4C, see references/ip-style.md), {name, <keys to override>}, or all 6 keys.
+// black / white / grey + ink green #054C4C, see references/ip-style.md), "ray-ip-dark" (the same IP on deep grey), {name, <keys to override>}, or all 6 keys.
 // Omitted → kit and every grammar keep their own default colours (old projects render unchanged).
 // Besides the 6 palette keys a theme may carry: kit {green red yellow purple grain} (the kit's semantic colours / paper grain rgb),
 // overlay {bar caption captionInk sigBar}, sig {6 keys + kit} (the palette of signature scenes: scenes with "sig" in script.json).
@@ -39,6 +47,11 @@ const RAY_IP = { bg: '#f3f3f0', surface: '#ffffff', ink: '#111111', sub: '#6e6e6
   overlay: { bar: '#111111', caption: 'rgba(17,17,17,.88)', captionInk: '#f3f3f0', sigBar: '#f3f3f0' },
   sig: { bg: '#054c4c', surface: '#0d5f5e', ink: '#f3f3f0', sub: '#9cc2bf', accent: '#ffffff', accent2: '#7fb0ac',
     kit: { green: '#9cc2bf', red: '#ffffff', yellow: '#d4d4d0', purple: '#7fb0ac', grain: '255,255,255' } } };
+// ray-ip-dark：深灰底 + 墨绿（参考差评君的深灰 + 单一绿色）。墨绿 #054C4C 在深灰上太暗，做块面用提亮一档的同色相 #0B6B69，线和高亮字用浅墨绿 #9CC2BF
+const RAY_IP_DARK = { bg: '#1c1d1d', surface: '#2a2c2c', ink: '#f3f3f0', sub: '#9a9a96', accent: '#0b6b69', accent2: '#9cc2bf',
+  kit: { green: '#9cc2bf', red: '#f3f3f0', yellow: '#4a4c4c', purple: '#8a8a8a', grain: '255,255,255' },
+  overlay: { bar: '#f3f3f0', caption: 'rgba(0,0,0,.72)', captionInk: '#f3f3f0', sigBar: '#f3f3f0' },
+  sig: RAY_IP.sig };
 const PAL_KEYS = ['bg', 'surface', 'ink', 'sub', 'accent', 'accent2'];
 const hsv = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255), mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
   const hue = d === 0 ? 0 : mx === r ? 60 * (((g - b) / d) % 6) : mx === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4); return [(hue + 360) % 360, mx ? d / mx : 0]; };
@@ -51,7 +64,7 @@ function six(o, where, avail) {
 function resolveTheme(th) {
   if (th == null) return null;
   const sb = { window: {} }; require('vm').runInNewContext(fs.readFileSync(path.join(HUASHU, 'lib', 'palettes.js'), 'utf8'), sb);
-  const named = { ray: RAY_PALETTE, 'ray-ip': RAY_IP, ...sb.window.PALETTES }, avail = Object.keys(named).join(' / ');
+  const named = { ray: RAY_PALETTE, 'ray-ip': RAY_IP, 'ray-ip-dark': RAY_IP_DARK, ...sb.window.PALETTES }, avail = Object.keys(named).join(' / ');
   const name = typeof th === 'string' ? th : th.name;
   if (name != null && !named[name]) throw new Error(`script.json theme「${name}」不是色板名。可用：${avail}`);
   const base = name != null ? named[name] : {}, over = typeof th === 'object' ? th : {};
@@ -69,7 +82,7 @@ const SIG = SCRIPT.scenes.filter(s => s.sig).map(s => {
   return { id: s.id, start: tsc.start, end: tsc.end };
 });
 if (SIG.length && !(THEME_ALL && THEME_ALL.sig)) console.warn('WARN script.json 有 sig 场景，但 theme 没有 sig 色板（用 "ray-ip"）——sig 不起作用');
-const PAGE_INIT = (THEME_ALL ? `window.THEME=${JSON.stringify({ ...THEME_ALL.pal, kit: THEME_ALL.kit, overlay: THEME_ALL.overlay, sig: THEME_ALL.sig })};` : '') +
+const PAGE_INIT = `window.CANVAS=${JSON.stringify(CV)};` + (THEME_ALL ? `window.THEME=${JSON.stringify({ ...THEME_ALL.pal, kit: THEME_ALL.kit, overlay: THEME_ALL.overlay, sig: THEME_ALL.sig })};` : '') +
   (SIG.length ? `window.SIG=${JSON.stringify(SIG)};` : '');
 
 // ---------- static server: project at /, vendored huashu engine at /huashu/, overlay.js always from the skill ----------

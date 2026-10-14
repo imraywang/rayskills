@@ -24,12 +24,14 @@
 - 选定以后，开场钩子和结尾收获也用这一种画法讲。开场结尾的风格记号靠签名幕（整屏墨绿）给，不靠换一种画法。
 - 某一幕这种画法实在画不出来，先想这一幕能不能换个讲法；还是不行，再在 `script.json` 顶层写 `"mix": true` 和理由，交付说明里写清楚为什么混。`storyboard.py` 和 `render.js` 发现混用会提醒。
 - 用 `t2`、`t3` 之前，先用 `render.js stills` 看竖屏效果，有问题照 `NOTICE.md` 的方式修改，并标注 `ray-explainer:`。
+- **横屏片**（`"aspect": "landscape"`）只能用语法片段或 HyperFrames：手绘套路和 `scenes.js` 按 1080×1920 写死了坐标，`render.js` 遇到会直接报错。语法片段上游本来就是横屏（1920×1080）。2026-10-14 按横屏实测改了两个：白板（图标横排、居中、放大）和 3b1b（左右分栏的主视觉版式），改动见 `NOTICE.md`；其余语法走上游原版。横屏有主持人时内容区只有 y 60–760（气泡和字幕占底部一条带），一幕里的东西要比竖屏少：白板「标题 + 一排 3 个图标 + 2 条要点」差不多就满了，再多相机会往下走。
 
 ## 全片色板（theme）
 
 `script.json` 顶层写 `"theme"`，手绘 kit、套路和所有语法片段就用同一套颜色，不再出现「黄底 → 星空 → 白底 → 黑底」来回跳。
 
 - `"ray-ip"`：Ray 的 IP 规范（黑白灰 + 墨绿记号色，开场结尾的签名幕整屏墨绿、带形象），新项目默认用它，细则见 [ip-style.md](ip-style.md)。
+- `"ray-ip-dark"`：同一套 IP 的深色版（深灰底 + 墨绿），见 [ip-style.md](ip-style.md)「深色版」。
 - `"ray"`：kit 原本的配色（米色纸、墨色字、橙色强调、蓝色副强调）。
 - huashu 的 8 套色板：`paper` 纸本、`poster` 海报黄、`ink` 深墨、`navy` 海军、`bauhaus` 包豪斯、`snow` 雪原、`wood` 暖木、`chalk` 黑板（色值见 `assets/huashu/lib/palettes.js`）。
 - 只改一两个色：`{"name": "ray", "accent": "#c4552d"}`；完全自定义就写全 6 个键 `bg surface ink sub accent accent2`（#rrggbb）。落在蓝紫区的色值 render.js 会警告。

@@ -63,8 +63,8 @@ return {
     const pad = (ctx.portrait ? 70 : 140) * u, yTop = safe.top, yBot = H - safe.bottom - (ctx.portrait ? 90 : 70) * u;
     const hasLine = ctx.of('line').length > 0, hasEq = ctx.of('equation').length > 0;
     // 标题
-    const titles = ctx.of('title').map(q => ({ q, ...titleLines(g, q.text || '', W - 2 * pad, (ctx.portrait ? (hasLine ? 72 : 86) : 62) * u, ctx.portrait ? 3 : 2) }));   // ray-explainer: 竖屏无曲线标题放大
-    const tH = titles.length ? Math.max(...titles.map(z => z.lines.length * z.size * 1.25)) : 0;
+    let titles = ctx.of('title').map(q => ({ q, ...titleLines(g, q.text || '', W - 2 * pad, (ctx.portrait ? (hasLine ? 72 : 86) : (hasLine ? 62 : 84)) * u, ctx.portrait ? 3 : 2) }));   // ray-explainer: 无曲线时标题放大（横屏 2026-10-14 跟上）
+    let tH = titles.length ? Math.max(...titles.map(z => z.lines.length * z.size * 1.25)) : 0;
     let titleY = yTop + (ctx.portrait ? 170 : 130) * u;
     let y = titles.length ? titleY + tH : yTop + 90 * u;
     let eqSz = (ctx.portrait ? 72 : 66) * u;
@@ -72,20 +72,31 @@ return {
     let eqY = y + eqSz * (titles.length ? 1.15 : 0.9);
     if (hasEq) y = eqY + eqSz * 0.6;
     y += 30 * u;
-    // ray-explainer: 竖屏无曲线时用「主视觉」版式——标题在上方，公式放大当主角放在 40% 高度，要点排下半屏（原版全部挤在顶部，下半屏空着）
-    if (ctx.portrait && !hasLine) {
+    // ray-explainer: 无曲线时用「主视觉」版式——标题在上方，公式放大当主角放在 40% 高度，要点排下半屏（原版全部挤在顶部，下半屏空着；先改竖屏，2026-10-14 横屏也这样）
+    if (!hasLine) {
       const band = yBot - yTop;
-      if (hasEq) { eqSz = 112 * u; for (const q of ctx.of('equation')) { const tk = q.data && q.data.tokens ? q.data.tokens : toks(q.text || ''), w = widthT(g, tk, eqSz) + 60 * u; if (w > W - 2 * pad) eqSz *= (W - 2 * pad) / w; } }
+      if (hasEq) { eqSz = (ctx.portrait ? 112 : 124) * u; for (const q of ctx.of('equation')) { const tk = q.data && q.data.tokens ? q.data.tokens : toks(q.text || ''), w = widthT(g, tk, eqSz) + 60 * u; if (w > W - 2 * pad) eqSz *= (W - 2 * pad) / w; } }
       titleY = yTop + band * 0.10 + (titles.length ? titles[0].size : 0);
-      eqY = yTop + band * 0.40;
+      eqY = Math.max(yTop + band * 0.40, titleY + eqSz * 1.25);   // ray-explainer: 横屏可用高度矮，公式不能顶到标题上
       y = (hasEq ? eqY + eqSz * 0.6 : titleY + tH) + 120 * u;
     }
     // 要点：预先折行（每条可能多行）
-    const size0 = (hasLine ? (ctx.portrait ? 56 : 50) : (ctx.portrait ? 66 : 58)) * u;
+    const size0 = (hasLine ? (ctx.portrait ? 56 : 50) : (ctx.portrait ? 66 : 68)) * u;   // ray-explainer: 横屏无曲线要点 58 → 68
     let text, plot = null;
     if (hasLine && ctx.portrait) { plot = { x: pad + 20 * u, y: y + 20 * u, w: W - 2 * pad - 20 * u, h: (yBot - y) * 0.5 }; text = { x: pad, y0: plot.y + plot.h + 70 * u, y1: yBot, w: W - 2 * pad }; }
     else if (hasLine) { plot = { x: W * 0.52, y: y + 20 * u, w: W * 0.48 - pad, h: yBot - y - 40 * u }; text = { x: pad, y0: y, y1: yBot, w: W * 0.47 - pad }; }
     else text = { x: pad, y0: y, y1: yBot, w: W - 2 * pad };
+    // ray-explainer: 横屏无曲线、有要点：左右分栏——左栏标题 + 公式（竖直居中），右栏要点（竖直居中）。横屏有主持人时可用高度只有 ~700，上下堆叠会把要点挤到 0.6 倍字号
+    let cx = W / 2;
+    if (!ctx.portrait && !hasLine && ctx.of('point').length) {
+      const leftW = W * 0.5 - pad; cx = pad + leftW / 2;
+      titles = ctx.of('title').map(q => ({ q, ...titleLines(g, q.text || '', leftW, 84 * u, 3) }));
+      tH = titles.length ? Math.max(...titles.map(z => z.lines.length * z.size * 1.25)) : 0;
+      if (hasEq) { eqSz = 124 * u; for (const q of ctx.of('equation')) { const tk = q.data && q.data.tokens ? q.data.tokens : toks(q.text || ''), w = widthT(g, tk, eqSz) + 60 * u; if (w > leftW) eqSz *= leftW / w; } }
+      const blockH = tH + (hasEq ? eqSz * 1.6 : 0), top0 = yTop + Math.max(0, (yBot - yTop - blockH) / 2);
+      titleY = top0 + (titles.length ? titles[0].size : 0); eqY = top0 + tH + eqSz * 1.05;
+      text = { x: W * 0.55, y0: yTop + 20 * u, y1: yBot, w: W * 0.45 - pad };
+    }
     // 要点放不下（竖屏有曲线、要点多）：先让曲线让位（竖屏 50% → 最少 30%），再缩字号（最小 0.6 倍），不压进 safe.bottom
     let points, blockH, size = size0; const gapP = 36 * u, room = yBot - y;
     for (let k = 1; ; k *= 0.94) {
@@ -96,7 +107,7 @@ return {
       if (blockH <= text.y1 - text.y0 || k < 0.6) break;
     }
     if (blockH > text.y1 - text.y0 + 1) console.warn(`t1：${points.length} 条要点缩到 0.6 倍字号仍放不下（超出 ${Math.round(blockH - (text.y1 - text.y0))}px）：新要点出来时整块上卷、最早的淡出；想全留在屏上就删几条或拆成两段`);
-    let py = text.y0 + Math.max(0, (text.y1 - text.y0 - blockH) / 2) * ((hasLine && !ctx.portrait) || (ctx.portrait && !hasLine) ? 1 : 0.6);   // ray-explainer: 竖屏主视觉版式里要点在下半屏完全居中   // 要点块竖直居中（竖屏略偏上）
+    let py = text.y0 + Math.max(0, (text.y1 - text.y0 - blockH) / 2) * ((hasLine && !ctx.portrait) || !hasLine ? 1 : 0.6);   // ray-explainer: 主视觉版式里要点在下半屏完全居中   // 要点块竖直居中（竖屏略偏上）
     for (const p of points) { p.y = py + size; py += p.h + gapP; p.need = Math.max(0, py - gapP - text.y1); }   // need：这一条出来时整块要上卷多少才不越过 y1
     // 曲线：坐标统一用所有 line 的数据范围（Transform 时坐标系不动）
     const lines = ctx.of('line').map(q => { const d = q.data || {}; return { q, d, pts0: d.points || (d.values || []).map((v, i) => [i, v]) }; }).filter(l => l.pts0.length >= 2);
@@ -108,7 +119,7 @@ return {
         // 每条曲线横向铺满坐标系（不同 line 的 x 量纲可以不同：损失-参数 → 损失-步数）
         l.scr = l.pts0.map(([px, py]) => [plot.x + (px - lx0) / ((lx1 - lx0) || 1) * plot.w, plot.Y(py)]); l.rs = resample(l.scr, 160); }
     }
-    L = { titleY, titles, eqY, eqSz, text, plot, points, size, lines };
+    L = { titleY, titles, eqY, eqSz, text, plot, points, size, lines, cx };
   },
   draw(c0, t, ctx) {
     const { W, H, u } = ctx;
@@ -119,7 +130,7 @@ return {
       const q = z.q, nx = L.titles[i + 1], out = nx ? MO.smooth(MO.seg(t, nx.q.at - 0.45, nx.q.at)) : 0; if (out >= 1 || ctx.lt(t, q.at) <= 0) return;
       const n = [...(q.text || '')].length, dur = q.dur || clamp(n / 14, 0.6, 1.6);
       c.save(); c.globalAlpha = 1 - out; c.translate(0, -50 * u * out);
-      z.lines.forEach((ln, k) => writeT(c, toks(ln), W / 2, L.titleY + k * z.size * 1.25, z.size, ctx.p(t, q.at + k * dur / z.lines.length, dur / z.lines.length), { col: col(q.data && q.data.color) || INK }));
+      z.lines.forEach((ln, k) => writeT(c, toks(ln), L.cx, L.titleY + k * z.size * 1.25, z.size, ctx.p(t, q.at + k * dur / z.lines.length, dur / z.lines.length), { col: col(q.data && q.data.color) || INK }));
       c.restore();
     });
     // ---- 公式：第一个 Write，之后每个从上一个 TransformMatchingTex 过来 ----
@@ -128,10 +139,10 @@ return {
     const eqCues = ctx.of('equation'), sz = L.eqSz;
     let k = -1; eqCues.forEach((q, i) => { if (ctx.lt(t, q.at) > 0) k = i; });
     if (k >= 0) {
-      const q = eqCues[k], tk = eqs[k], Ln = layoutT(c, tk, sz), tot = Ln.length ? Ln[Ln.length - 1].x + Ln[Ln.length - 1].w : 0, x0 = W / 2 - tot / 2;
-      if (k === 0) writeT(c, tk, W / 2, L.eqY, sz, ctx.p(t, q.at, q.dur || 1.2), { col: INK });
+      const q = eqCues[k], tk = eqs[k], Ln = layoutT(c, tk, sz), tot = Ln.length ? Ln[Ln.length - 1].x + Ln[Ln.length - 1].w : 0, x0 = L.cx - tot / 2;
+      if (k === 0) writeT(c, tk, L.cx, L.eqY, sz, ctx.p(t, q.at, q.dur || 1.2), { col: INK });
       else {
-        const p = MO.smooth(ctx.p(t, q.at, q.dur || 1.5)), old = eqs[k - 1], Lo = layoutT(c, old, sz), toto = Lo.length ? Lo[Lo.length - 1].x + Lo[Lo.length - 1].w : 0, xo = W / 2 - toto / 2;
+        const p = MO.smooth(ctx.p(t, q.at, q.dur || 1.5)), old = eqs[k - 1], Lo = layoutT(c, old, sz), toto = Lo.length ? Lo[Lo.length - 1].x + Lo[Lo.length - 1].w : 0, xo = L.cx - toto / 2;
         const used = new Set(), from = tk.map(nt => { const j = old.findIndex((ot, jj) => !used.has(jj) && ot.s === nt.s && (ot.sub || '') === (nt.sub || '') && (ot.sup || '') === (nt.sup || '')); if (j >= 0) used.add(j); return j; });
         const one = (tok, x, a, cl) => { if (a <= 0) return; c.save(); c.globalAlpha *= a; withFont(tok, t2 => DG.math(c, [{ ...t2, col: cl }], x, L.eqY, sz, { p: 1, align: 'left' })); c.restore(); };
         old.forEach((ot, j) => { if (!used.has(j)) { c.save(); c.translate(0, -30 * u * p); one(ot, xo + Lo[j].x, 1 - clamp(p * 1.6), ot.col || INK); c.restore(); } });   // 对不上的旧符号：淡出上移

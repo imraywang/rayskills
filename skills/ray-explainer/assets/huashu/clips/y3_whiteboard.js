@@ -66,19 +66,19 @@ function layout(ctx, f) {
   const hasDraw = cues.some(q => q.kind === 'draw'), hasImg = cues.some(q => q.kind === 'image' && ctx.IMG[q.image]);
   // 栏：横屏有图就左文右图；竖屏有 draw 时图标排在右侧窄栏、和它说的那条字并排（截图仍整宽）
   const S = (ctx.portrait ? 250 : 210) * u * f, gap = 70 * u * f;
-  const two = ctx.portrait ? false : (hasDraw || hasImg);   // ray-explainer: 竖屏不再开右侧窄栏，图标改为整宽横排（见下方 draw 分支）
+  const two = ctx.portrait ? false : hasImg;   // ray-explainer: 图标一律整宽横排（见下方 draw 分支）；横屏只有截图才开右栏（竖叠图标太高，相机会把标题推出画面）
   const colP = !two ? null : ctx.portrait ? { x: W - pad - S, w: S } : { x: W * 0.55, w: W * 0.45 - pad };
   const nPt = cues.filter(q => q.kind === 'point').length, split = !ctx.portrait && !two && nPt >= 5 ? Math.ceil(nPt / 2) : 0;   // 横屏纯文字、要点 ≥5 条：分左右两栏写
   const colT = { x: pad, w: split ? W / 2 - pad - 40 * u : !two ? W - 2 * pad : ctx.portrait ? colP.x - gap - pad : W * 0.5 - pad };
   let kPt = 0, col0 = null;
-  // ray-explainer: 竖屏把连续的 draw 分成一行最多 3 个的横排；rowOf: cue → {k: 行内序号, n: 这一行几个}
+  // ray-explainer: 把连续的 draw 分成一行最多 3 个的横排（横屏没有截图时也是）；rowOf: cue → {k: 行内序号, n: 这一行几个}
   const rowOf = new Map(); { let run = []; const flush = () => { for (let i = 0; i < run.length; i += 3) { const r = run.slice(i, i + 3); r.forEach((q, k) => rowOf.set(q, { k, n: r.length })); } run = []; };
     for (const q of cues) { if (q.kind === 'draw') run.push(q); else if (q.kind !== 'highlight') flush(); } flush(); }
   let rowY = 0, rowBot = 0;
   // 同一份清单的要点用同一个字号：取「放进一行」要缩到的最小那个（最小 0.72），还放不下的那条再折行
   const pSize = Math.min(74 * u * f, ...cues.filter(q => q.kind === 'point').map(q => { const r = TY.fit(g, q.text || '', colT.w - 80 * u, 74 * u * f, FONT, { maxLines: 1, min: 0.72, soft: true }); return r.ok ? r.size : 74 * u * f * 0.72; }));
   const B = DG.board({ ink: INK, lw, speed: 2600 * u, font: `"${FONT}"` }), items = [];
-  const top = (ctx.portrait ? 240 : 130) * u + safe.top;
+  const top = (ctx.portrait ? 240 : 40) * u + safe.top;   // ray-explainer: 横屏 130 → 40（顶上已经有 safe.top，横屏也不放进度条）
   let yT = top, yP = top, lastText = null, lastDraw = null;               // 文字流 / 图流的当前 y
   const start = q => B.at(Math.max(0, q.at - 1 / FPS));                  // 第一笔在 at 这一帧可见
   const capSz = (ctx.portrait ? 52 : 50) * u * Math.max(0.85, Math.min(1.1, f)), capRight = !ctx.portrait;   // 横屏说明写在图标右边，竖屏写在下面
@@ -98,7 +98,7 @@ function layout(ctx, f) {
       g.font = `${size}px "${FONT}"`; it.w = Math.max(...lines.map(l => g.measureText(l).width)); it.y1 = y + (lines.length - 1) * size * 1.3 + size * 0.25;
       yT = it.y1 + (title ? 60 : 44) * u * f; items.push(it);
       if (title) yP = Math.max(yP, yT); else lastText = it;
-    } else if (q.kind === 'draw' && ctx.portrait) {   // ray-explainer: 竖屏横排图标
+    } else if (q.kind === 'draw' && !two) {   // ray-explainer: 横排图标（竖屏，以及没有截图的横屏）
       const icon = (q.data && q.data.icon) || '', mk = ICONS[icon];
       if (!mk && icon) console.warn(`y3 draw：没有图标「${icon}」，可用：${Object.keys(ICONS).join(' ')}（只写说明字）`);
       const { k, n } = rowOf.get(q), gapH = 120 * u, S2 = Math.min(300 * u * f, (W - 2 * pad - (n - 1) * gapH) / n);
@@ -199,13 +199,13 @@ return {
     if (p) { INK = p.ink; ORANGE = p.accent; WASH = PAL.alpha(p.accent, 0.22); BOARD = p.bg; } else { INK = '#0A0503'; ORANGE = '#EF7226'; WASH = 'rgba(239,114,38,.22)'; BOARD = '#FBFBFB'; }
     band = { y0: safe.top, y1: H - safe.bottom }; band.h = band.y1 - band.y0;
     // 字号系数 f 从 1.2 往下试：内容少就放大撑满版面，内容多就缩（最小 0.72），还放不下才让相机往下走
-    let L; for (let f = ctx.portrait ? 1.45 : 1.2; f >= 0.7; f -= 0.04) { L = layout(ctx, f); if (L.bottom + 70 * u <= band.y1) break; }   // 内容少就放大（ray-explainer: 竖屏上限 1.45）把版面撑满
+    let L; for (let f = 1.45; f >= (ctx.portrait ? 0.7 : 0.62); f -= 0.04) { L = layout(ctx, f); if (L.bottom + 70 * u <= band.y1) break; }   // 内容少就放大（ray-explainer: 上限从 1.2 提到 1.45，横竖屏都是）把版面撑满；横屏有主持人时可用高度只有 700，最小放到 0.62
     ({ B, items } = L);
     OFF = [W + 140 * u, H + 280 * u];
     lastEnd = Math.max(0, ...B.S.map(s => s.t1));
     // 相机：内容超出可用带就在下一条开写前平移过去（sineInOut）；最后有空就拉远看全图（只拉进 safe 带）
-    // ray-explainer: 竖屏内容放得下时整块竖直居中（原版顶对齐，下半屏空着）
-    const slack = ctx.portrait ? Math.max(0, band.y1 - (L.bottom + 70 * u) - (L.top - band.y0) * 0.4) / 2 : 0;
+    // ray-explainer: 内容放得下时整块竖直居中（原版顶对齐，下半屏空着；先改竖屏，2026-10-14 横屏也这样）
+    const slack = Math.max(0, band.y1 - (L.bottom + 70 * u) - (L.top - band.y0) * 0.4) / 2;   // ray-explainer: 横屏也居中
     keys = [{ t: 0, x: W / 2, y: H / 2 - slack, z: 1 }]; let cy = H / 2 - slack, panned = false;
     for (const it of items) {
       const need = it.y1 + 70 * u - (cy + band.y1 - H / 2); if (need <= 0) continue;

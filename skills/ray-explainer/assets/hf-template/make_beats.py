@@ -11,7 +11,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 T = json.load(open(os.path.join(HERE, "..", "timeline.json")))
 SCRIPT = json.load(open(os.path.join(HERE, "..", "script.json")))
 PUNCT = "，。？！：；、,.?!:;"
-MAXW = 13          # 一条字幕的最大视觉宽度（中文 1，拉丁 0.55）
+_cv = next(p for p in (os.path.join(HERE, "canvas.json"), os.path.expanduser("~/.claude/skills/ray-explainer/assets/canvas.json")) if os.path.exists(p))
+MAXW = json.load(open(_cv))[SCRIPT.get("aspect", "portrait")]["hf"]["cap_chars"]   # 一条字幕的最大视觉宽度（中文 1，拉丁 0.55）：竖屏 13，横屏 22
 FORCE = {          # 手工断句：整段原文 → 各段原文（按顺序、首尾相接）
     # "以前逆向工程师就是对着这一大坨东西": ["以前逆向工程师", "就是对着这一大坨东西"],
 }

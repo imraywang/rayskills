@@ -104,6 +104,20 @@
         "配乐来自 gen_bgm.py 的候选，Ray 挑过之后才 mix_bgm.py",
         "交付前跑 audio_check.py 并在回复里报告配乐音量差和音效个数"
       ]
+    },
+    {
+      "id": 9,
+      "name": "要横屏版",
+      "type": "happy-path",
+      "prompt": "/ray-explainer 这期要发 YouTube，做成横屏的，主持人放左下角像 Screen Studio 那样。",
+      "expected_output": "用 new_project.sh --landscape 建项目（script.json 顶层 aspect: landscape），只用语法片段或 HyperFrames 模式，不用手绘套路；主持人是左下角圆角气泡；静帧检查看横屏安全区；封面走 ray-cover 的 landscape（16:9），不出竖屏版。",
+      "expectations": [
+        "script.json 顶层写了 \"aspect\": \"landscape\"",
+        "没有一幕用手绘套路或 scenes.js",
+        "成片 1920×1080，没有进度条，字幕白字黑描边无底框",
+        "主持人圆角气泡按主画面在左下 / 右下之间换（host_side）",
+        "封面用 ray-cover --platforms landscape，不同时出竖屏版"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟，配音 + 字幕）：画面由代码逐帧绘制，可用 Ray 的复刻音色；要真实截图、录屏或专属风格时走 HyperFrames 模式（配乐、数字人、发布包）。用于“做成解说视频”“知识科普短片”“用我的声音配音”。只要口播稿转 ray-kb，要封面转 ray-cover。
+description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，配音 + 字幕）：画面由代码逐帧绘制，可用 Ray 的复刻音色；要真实截图、录屏或专属风格时走 HyperFrames 模式（配乐、数字人、发布包）。用于“做成解说视频”“知识科普短片”“用我的声音配音”。只要口播稿转 ray-kb，要封面转 ray-cover。
 ---
 
 # Ray Explainer
@@ -25,6 +25,8 @@ description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟�
 
 **两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
+**画幅**：默认竖屏 1080×1920（抖音、视频号）。Ray 要横屏时（YouTube、视频号 / 抖音横屏）才出 1920×1080：`new_project.sh <slug> --landscape`，即 `script.json` 顶层 `"aspect": "landscape"`。一个项目只出一种画幅，不同时出两版。横屏只能用语法片段或 HyperFrames 模式（手绘套路是竖屏坐标，`render.js` 会拒绝）；没有进度条，字幕白字黑描边，主持人是只在关键句出现的小圆窗、按幕在左下 / 右下之间换（[host.md](references/host.md)「横屏」）。尺寸、安全区、字幕和主持人版位都在 `assets/canvas.json`，各脚本从那里读。
+
 脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
 
 ## 0. 环境自检
@@ -40,7 +42,7 @@ $SK/scripts/check_setup.sh
 读完整素材（剪藏、候选选题卡、已有口播稿都算）。库里有 Ray 的已录口播稿时，先读一篇找语感。
 
 ```bash
-$SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explainer/YYYY-MM-DD-<slug>/
+$SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explainer/YYYY-MM-DD-<slug>/；横屏加 --landscape
 ```
 
 视频文件不要放进 Obsidian vault：vault 带 git 自动快照，大文件会进历史。
@@ -126,7 +128,8 @@ python3 $SK/scripts/host.py <project>             # 用户同意后：Kling 生�
 - **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
 - **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
 - **一期只用一种画法**：手绘套路、某一种语法、或整期 HyperFrames，三选一，开场和结尾也用它（开场结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒，确实要混写 `"mix": true` 并说明理由。
-- 安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290。默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放 y 300–1440，语法片段会自动让开；去掉 `host` 的片子字幕条回到 y 1560–1656，主舞台可用到 y 1520。
+- 横屏（`"aspect": "landscape"`，Ray 2026-10-14 定）：画面基本不被遮挡，四周留 5%。**不放进度条和小标题**；字幕白字黑描边、无底框，居中压底（y 946–1036）；主持人是左下角直径 164 的小圆窗（卡片色底 + 墨绿细圈），**只在关键句出现**：`host.show` 标 3–6 句（写法同 `big`，不花钱），其余时间不在画面上；主画面偏左的那一幕写 `"host_side": "right"` 换到右下（学小Lin说）。贴分镜表时附上选的关键句。语法片段自动让出上 60、下 150（有主持人时下 230）。深色版用 `"theme": "ray-ip-dark"`（深灰 + 墨绿，AI、科技题材优先考虑）。
+- 竖屏安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290。默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放 y 300–1440，语法片段会自动让开；去掉 `host` 的片子字幕条回到 y 1560–1656，主舞台可用到 y 1520。
 
 ## 5. 静帧检查（必做，不能跳过）
 
@@ -201,11 +204,11 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 - 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`；HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](references/hyperframes.md)
 - 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
 - 交付时提醒：平台的「AI 生成内容」声明要勾（复刻音色、数字人），CC 授权图片要在简介署名
-- 竖屏封面（抖音、视频号 9:16，小红书 3:4）交给 `ray-cover` 的视频封面流程：Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP；`cover.jpg`（成片里的一帧）只作备用
+- 横屏片的封面交给 `ray-cover` 的 `landscape`（16:9，1920×1080，另出一份 jpg 给 YouTube）；竖屏封面（抖音、视频号 9:16，小红书 3:4）交给 `ray-cover` 的视频封面流程：Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP；`cover.jpg`（成片里的一帧）只作备用
 
 ## 边界
 
 - 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或转视频模型。卡通数字人主持人是例外，见 [host.md](references/host.md)。
 - kit 的手写体依赖 macOS 自带的 Hannotate SC；语法片段和字幕用的是随 skill 带的思源黑体和霞鹜文楷，换机器也不会变样。
 - kit / 语法模式没接背景音乐和音效，要加的话用 FFmpeg 在合成时混入，音效时刻从 timeline.json 里取；专属风格模式（HyperFrames）自带配乐、给人声让路和逐幕音效。
-- `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。
+- `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动（横屏走上游原版版式）。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。

@@ -1,6 +1,6 @@
 ---
 name: ray-cover
-description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.33:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频竖封面（9:16 抖音 / 视频号、3:4 小红书）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，由 Codex CLI 调 Image 2 分平台生成。用于“做封面”“视频封面”“竖屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
+description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.33:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频封面（9:16 抖音 / 视频号、3:4 小红书、16:9 横屏视频）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，由 Codex CLI 调 Image 2 分平台生成。用于“做封面”“视频封面”“竖屏封面”“横屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
 ---
 
 # Ray Cover
@@ -11,7 +11,7 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 `$SK` 指本 skill 目录。
 
-**视频封面**（抖音、视频号、小红书的竖封面）走另一套：真人照片 + 大标题，三个风格和 9:16 / 3:4 的安全区见 [video-cover.md](references/video-cover.md)。下面第 2–7 步的文案、生成、验收、交付照常适用，第 3–4 步的选风格和编译提示词换成 video-cover.md 里的规则。
+**视频封面**（抖音、视频号、小红书的竖封面，以及 YouTube、视频号 / 抖音横屏视频的 16:9 横封面）走另一套：真人照片 + 大标题，风格和 9:16 / 3:4 / 16:9 的安全区见 [video-cover.md](references/video-cover.md)。下面第 2–7 步的文案、生成、验收、交付照常适用，第 3–4 步的选风格和编译提示词换成 video-cover.md 里的规则。
 
 ## 1. 读内容
 
@@ -29,7 +29,7 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 ## 4. 编译提示词
 
-每个平台一份，存到 `<封面目录>/prompts/<platform>.md`（文章：`wechat`、`x`、`x-article`；视频：`vertical`、`xhs`）：
+每个平台一份，存到 `<封面目录>/prompts/<platform>.md`（文章：`wechat`、`x`、`x-article`；视频：`vertical`、`xhs`、`landscape`）：
 
 1. 读选定风格的 `assets/punk/styles/<style-id>/META.md` 和 `STYLE.md`，以及 `assets/punk/punk-cover/references/cover-prompt-blueprint.md`。
 2. 按蓝图编译成一份完整的封面提示词：风格的材质、空间、标题处理、颜色和禁忌落到每个封面决定上，不把 STYLE.md 原文贴在后面。

@@ -40,7 +40,11 @@ out = [f"# 分镜表：{s.get('title', '')}", ""]
 if s.get("central_judgment"): out += [f"**核心判断**：{s['central_judgment']}", ""]
 out += ["| # | 幕 | 讲什么 | 画法 | 画面 | 卡点 | 时长 |", "|---|---|---|---|---|---|---|", *rows, ""]
 out += [f"**预计时长**：约 {total / 60:.0f} 分 {total % 60:02.0f} 秒（{sum(len(l) for sc in s['scenes'] for l in sc['lines'])} 字，按 {RATE:.1f} 字/秒估）",
-        f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}", ""]
+        f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}",
+        f"**画幅**：" + ("横屏 1920×1080" if s.get("aspect") == "landscape" else "竖屏 1080×1920"), ""]
+kit = [sc["id"] for sc in s["scenes"] if not sc.get("grammar")]
+if s.get("aspect") == "landscape" and kit and not os.path.exists(os.path.join(PROJ, "hf", "build.py")):
+    out += [f"**⚠ 横屏不支持手绘套路**：{'、'.join(kit)} 没写 grammar。横屏片只能用语法片段，或整期走 HyperFrames 模式。", ""]
 styles = sorted({sc.get("grammar") or "kit" for sc in s["scenes"]})   # one film, one style (Ray, 2026-10-13); kit patterns + custom kit code = one style
 if len(styles) > 1 and not s.get("mix"):
     out += [f"**⚠ 一期只用一种画法**：这条片子混了 {len(styles)} 种（" + "、".join("手绘" if x == "kit" else NAMES.get(x, x) for x in styles) +

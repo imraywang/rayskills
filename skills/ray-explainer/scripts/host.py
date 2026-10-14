@@ -5,6 +5,8 @@ script.json 顶层写：
   - avatar：~/.config/ray-explainer/avatars/<name>/ 里的形象（make_avatar.py 生成）
   - big：大机位的句子（line 从 0 数，和 cue 的 line 一致）。同一幕里相邻的句子合成一段
     可选 "pos": {"x": 660, "y": 1150, "w": 420} 让这一段换个位置 / 大小（默认 x 272, y 1010, w 536），避开这一幕居中的主画面
+    横屏（"aspect": "landscape"）的大机位是左下角小圆窗放大：pos 写 {"x", "y", "w", "h"}（默认 x 56, y 604, 420×420）
+  - show（横屏）：小圆窗出现的关键句 [{"scene": "hook", "line": 0}, …]，写法同 big、不花钱；大机位句子自动算在内。不在这些句子里时主持人不出现
   - model：pro（1080p，约 $0.115/秒，默认）或 standard（720p，约 $0.056/秒，偶尔生成出多余的贴纸，要抽帧检查）
 
 大机位的句子：形象图 + 这段配音 → Kling AI Avatar 生成说话视频（手势、表情），抠绿幕、拆成帧。
@@ -35,7 +37,10 @@ PROMPT = ("A friendly cartoon explainer host talking directly to the camera with
           "green background stays perfectly flat and unchanged.")
 OUT = os.path.join(PROJ, "host"); os.makedirs(OUT, exist_ok=True)
 FW, FH = 536, 960            # 大机位帧尺寸（画面里大机位就是这么大）
-LAYOUT = {"big": {"x": 272, "y": 1010, "w": 536}, "corner": {"x": -2, "y": 1560, "w": 386}, "trans": 0.4, "caption_y": 1470}
+# 版位按 script.json 的 aspect 从 assets/canvas.json 取：竖屏是左下角露头肩 + 大机位站在下半屏；横屏是 Screen Studio 式圆角气泡
+ASPECT = script.get("aspect", "portrait")
+CV = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "canvas.json")))[ASPECT]["host"]
+LAYOUT = {**{k: v for k, v in CV.items() if not k.startswith("_")}, "trans": 0.4}
 
 def zshrc_env(name):
     if os.environ.get(name): return os.environ[name]
@@ -131,7 +136,33 @@ while t < TL["duration"]: blinks.append(round(t, 2)); t += random.uniform(2.4, 4
 adir = os.path.join(OUT, "avatar"); os.makedirs(adir, exist_ok=True)
 meta = json.load(open(os.path.join(AV, "meta.json")))
 for f in ["base.png", *[k + ".png" for k in meta["patches"]]]: shutil.copy(os.path.join(AV, f), adir)
-plan = {**LAYOUT, "aspect": FH / FW,
+# 横屏气泡换边：script.json 某一幕写 "host_side": "right" / "left"，从这一幕开头起气泡换到那一角（主画面在哪边、气泡去另一边）
+sides = []
+if "bubble" in LAYOUT:
+    starts = {s["id"]: s["start"] for s in TL["scenes"]}
+    sides = [[0, "left"]]
+    for i, sc in enumerate(script["scenes"]):
+        sd = sc.get("host_side")
+        if sd not in (None, "left", "right"): sys.exit(f'幕 {sc["id"]}：host_side 只能是 "left" 或 "right"')
+        if not sd or sd == sides[-1][1]: continue
+        if i == 0: sides = [[0, sd]]                     # 第一幕就在右边：开场直接从右下滑入
+        else: sides.append([round(starts[sc["id"]], 3), sd])
+# 横屏小圆窗只在关键句出现：host.show 标的句子 + 大机位句子；同一幕相邻的句子、间隔不到 show_merge 秒的段合成一段
+show = None
+if "bubble" in LAYOUT:
+    th = script.get("theme"); th = th if isinstance(th, str) else (th or {}).get("name")
+    fill, ring = {"ray-ip-dark": ("#2A2C2C", "#0B6B69")}.get(th, ("#FFFFFF", "#054C4C"))   # 卡片色 + 墨绿细圈（深灰底上墨绿提亮一档）
+    LAYOUT["bubble"] = {**LAYOUT["bubble"], "fill": fill, "ring": ring}
+    marks = sorted({(b["scene"], int(b["line"])) for b in [*H.get("show", []), *H.get("big", [])]}, key=lambda x: (list(scenes).index(x[0]), x[1]))
+    show = []
+    for sid, li in marks:
+        if sid not in scenes or li >= len(scenes[sid]["lines"]): sys.exit(f"host.show：{sid} 第 {li} 句不存在（line 从 0 数）")
+        l = scenes[sid]["lines"][li]
+        if show and l["start"] - show[-1][1] < LAYOUT.get("show_merge", 1.2): show[-1][1] = round(l["end"], 3)
+        else: show.append([round(l["start"], 3), round(l["end"], 3)])
+    if not show: print("注意：横屏主持人只在关键句出现，host.show 和 host.big 都是空的 → 全片不出现。在 host.show 里标 3–6 句（钩子、金句、结尾）")
+    else: print(f"横屏小圆窗出现 {len(show)} 段，共 {sum(b - a for a, b in show):.1f} 秒")
+plan = {**LAYOUT, "aspect": FH / FW, **({"sides": sides} if sides else {}), **({"show": show} if show is not None else {}),
         "avatar": {"dir": "/host/avatar/", **meta},
         "segments": [{"start": s["a"], "end": s["b"], "dir": f"/host/frames/{s['key']}/", "count": s["count"], "fps": 30, **({"big": s["big"]} if s.get("big") else {})} for s in segs],
         "mouth": mouth, "blinks": blinks}

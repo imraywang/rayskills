@@ -1,0 +1,30 @@
+{
+ "_doc": "画布档案：script.json 顶层 \"aspect\" 选一档（不写 = portrait）。render.js / overlay.js / host.py / hf 的 build.py、host_build.py 都从这里读尺寸和版位，不各自写数字。坐标都是画布像素。",
+ "portrait": {
+  "W": 1080, "H": 1920,
+  "_safe": "抖音、视频号竖屏：y 200 以上被灵动岛和状态栏挡住，y 1680 以下被作者名、文案、互动栏盖住",
+  "safe": { "top": 290, "bottom": 380 }, "safe_host_bottom": 480,
+  "bar": { "x0": 80, "x1": 1000, "y": 252, "h": 8, "header_y": 222, "header_size": 30 },
+  "caption": { "y": 1560, "h": 96, "size": 54, "maxw": 15 },
+  "host": { "corner": { "x": -2, "y": 1560, "w": 386 }, "big": { "x": 272, "y": 1010, "w": 536 }, "caption_y": 1470 },
+  "hf": { "topbar_h": 300, "bar_x0": 74, "bar_x1": 1006, "no_y": 214, "title_y": 206, "title_size": 36, "seg_y": 268,
+          "cap_top": 1420, "cap_h": 150, "cap_size": 56, "cap_maxw": 980, "cap_chars": 13, "host_corner": { "x": 0, "y": 1520, "w": 380 } }
+ },
+ "landscape": {
+  "W": 1920, "H": 1080,
+  "_safe": "YouTube、视频号 / 抖音横屏：画面基本不被遮挡，只留 5% 标题安全边。横屏不放进度条和小标题（Ray 2026-10-14）；字幕白字黑描边、无底框，居中压底；主持人是角落气泡，按每一幕主画面在哪边换到左下或右下（学小Lin说）",
+  "safe": { "top": 60, "bottom": 150 }, "safe_host_bottom": 230,
+  "bar": { "show": false, "x0": 96, "x1": 1824, "y": 84, "h": 8, "header_y": 52, "header_size": 30 },
+  "caption": { "y": 946, "h": 90, "size": 54, "maxw": 24, "style": "outline", "stroke": 9 },
+  "host": {
+   "_bubble": "小圆窗（Ray 2026-10-14 定：小Lin说式 + 细墨绿圈，不加投影）：形象按 crop（以形象宽度为 1 的比例）只露头肩。只在关键句出现（script.json host.show 标的句子 + 大机位句子），开口前 0.3 秒弹出、说完 0.15 秒后淡出；按 host_side 在左下 / 右下之间换。fill / ring 按 theme 由 host.py 换成卡片色和墨绿。坐标按左下角写，右下是镜像",
+   "bubble": { "x": 56, "y": 860, "w": 164, "h": 164, "r": 0.5, "fill": "#FFFFFF", "ring": "#054C4C", "ring_w": 2, "shadow": "rgba(0,0,0,0)", "blur": 0, "dy": 0 },
+   "big_bubble": { "x": 56, "y": 604, "w": 420, "h": 420, "r": 0.5 },
+   "crop": { "x": 0.044, "y": 0.078, "w": 0.911 },
+   "switch": 0.35, "show_in": 0.3, "show_out": 0.3, "show_hold": 0.15, "show_merge": 1.2,
+   "caption_y": 946
+  },
+  "hf": { "topbar": false, "topbar_h": 120, "bar_x0": 96, "bar_x1": 1824, "no_y": 40, "title_y": 33, "title_size": 30, "seg_y": 84,
+          "cap_top": 930, "cap_h": 112, "cap_size": 54, "cap_maxw": 1500, "cap_chars": 22, "cap_style": "outline" }
+ }
+}

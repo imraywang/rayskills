@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render covers from compiled prompts with Codex CLI's image generation (Image 2), one independent image per platform.
 
-usage: python3 gen_cover.py <cover_dir> [--platforms wechat,x,x-article,vertical,xhs] [--jobs 3] [--ref <photo>]
+usage: python3 gen_cover.py <cover_dir> [--platforms wechat,x,x-article,vertical,xhs,landscape] [--jobs 3] [--ref <photo>]
 
 --ref: a reference image (e.g. Ray's identity photo for video covers). It is copied into <cover_dir> as ref.<ext> and passed
 to codex exec with -i; the prompt tells the image tool to use it as the identity reference. Only with Ray's consent.
@@ -17,7 +17,9 @@ from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 
 SIZES = {"wechat": (2100, 900), "x": (1600, 900), "x-article": (1600, 640),
-         "vertical": (1080, 1920), "xhs": (1080, 1440)}   # 9:16 抖音 / 视频号；3:4 小红书 / 视频号信息流
+         "vertical": (1080, 1920), "xhs": (1080, 1440),   # 9:16 抖音 / 视频号；3:4 小红书 / 视频号信息流
+         "landscape": (1920, 1080)}                       # 16:9 横屏视频：YouTube、视频号 / 抖音横屏
+JPEG = {"landscape"}   # 另存一份 jpg：YouTube 缩略图上限 2 MB，1920×1080 的 png 常常超
 RATIO_TOL = 0.02
 
 REF = None   # file name of the reference image inside cover_dir, when --ref is given
@@ -43,7 +45,8 @@ def run(cover_dir, plat):
     if abs(r - tr) / tr > RATIO_TOL:
         info.update(ok=False, error=f"ratio {r:.3f} ≠ target {tr:.3f}: regenerate this platform, do not crop")
         return plat, info
-    out = f"{plat}-cover.png"; im.convert("RGB").resize((tw, th), Image.LANCZOS).save(os.path.join(cover_dir, out))
+    out = f"{plat}-cover.png"; big = im.convert("RGB").resize((tw, th), Image.LANCZOS); big.save(os.path.join(cover_dir, out))
+    if plat in JPEG: big.save(os.path.join(cover_dir, f"{plat}-cover.jpg"), quality=90); info["jpg"] = f"{plat}-cover.jpg"
     thumb = im.convert("RGB"); thumb.thumbnail((420, 420)); thumb.save(os.path.join(cover_dir, f"{plat}-thumb.jpg"), quality=88)
     info.update(ok=True, file=out, size=[tw, th], thumb=f"{plat}-thumb.jpg")
     return plat, info

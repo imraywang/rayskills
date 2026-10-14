@@ -7,7 +7,7 @@
 //       number 的说明写 text 或 sub 都行（clip.js 已统一）；data.label 照样有
 // 两个以上的 point 页 = 一份清单：画进度轨（01/02/03，告诉观众第几个、一共几个；横屏右上、竖屏在下方）和背景巨型序号（低对比、斜向慢漂，data.num 可指定）。
 // data.palette = [[底色, 字色], ...] 换配色（写了就优先，盖过 spec.theme）。alpha 模式不画底，字白色带深色描边。safe：主词块在 top..H−bottom 之间居中，进度轨也在这一带里。
-// spec.theme（全片色板 ctx.pal）：页面轮换 [bg 底 ink 字] → [accent 底] → [ink 底 bg 字] → [accent2 底]（强调色页的字取 surface/ink/bg 里最清楚的那个）；
+// spec.theme（全片色板 ctx.pal）：页面轮换 [bg 底 ink 字] → [accent 底] → [ink 底 bg 字] → [accent2 底]（强调色页的字取 surface/ink/bg 里最清楚的那个；ray-explainer：深色色板只轮换 bg → accent → surface）；
 //   荧光笔、辅句关键词、换页色带都只从 bg / ink / accent / accent2 里挑和当前页底色不同的。
 CLIPS.y5_kinetic_type = (() => {
 const { clamp, lerp } = U;
@@ -17,7 +17,11 @@ const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 // 在候选色里挑一个和页底、字色都不同、压在页底上最清楚的
 const pick = (bg, fg, cands) => { const ok = cands.filter(x => !same(x, bg) && !same(x, fg)); return ok.length ? PAL.on(bg, ok) : cands[0]; };
 const accentOf = col => TP ? pick(col[0], col[1], [TP.accent, TP.accent2]) : col[0] === '#FFD23F' || col[0] === '#F4EFE6' || col[1] === '#FFD23F' ? '#FF5A36' : '#FFD23F';   // 字本身是黄的（深蓝页）就用橙，不然着色看不出来
-const fromPal = p => { const txt = bg => PAL.on(bg, [p.surface, p.ink, p.bg]); return [[p.bg, p.ink], [p.accent, txt(p.accent)], [p.ink, p.bg], [p.accent2, txt(p.accent2)]]; };
+const fromPal = p => { const txt = bg => PAL.on(bg, [p.surface, p.ink, p.bg]);
+  // ray-explainer: 深色色板（底色暗，如 ray-ip-dark、签名幕的墨绿）不轮换到亮底页（ink 反色页、浅色的 accent / accent2）——在深色片里像突然开了灯
+  if (PAL.dark(p)) { const pg = [[p.bg, p.ink], [p.accent, txt(p.accent)], [p.surface, txt(p.surface)], [p.accent2, txt(p.accent2)]].filter((x, i) => i === 0 || PAL.lum(x[0]) < 0.25);   // 亮底页一律跳过（签名幕色板的 accent 是白色）
+    return pg.length > 1 ? pg : [...pg, [p.surface, p.ink]]; }
+  return [[p.bg, p.ink], [p.accent, txt(p.accent)], [p.ink, p.bg], [p.accent2, txt(p.accent2)]]; };
 return {
   fonts: ['PuHui-Black', 'PuHui-Heavy', 'PuHui-Bold'],
   safe: true,
@@ -59,7 +63,7 @@ return {
     const N = pages[k + 1];
     if (N && !ctx.alpha) {
       const p = (t - (N.show - 0.3)) / 0.36; if (p > 0 && p < 1) {
-        const mid = (TP ? [TP.accent, TP.accent2, TP.ink, TP.bg] : ['#FFD23F', '#FF5A36', '#14213D', '#3A86FF']).find(x => !same(x, P.col[0]) && !same(x, N.col[0])), cols = [mid, N.col[0]], sk = H * 0.35;   // 两条：一条和前后底色都不同的强调色＋新底色（以前第一条是字色，白字页前会整屏闪一帧白）
+        const mid = (TP ? [TP.accent, TP.accent2, TP.ink, TP.bg].filter(x => !PAL.dark(TP) || PAL.lum(x) < 0.25 || x === TP.bg) : ['#FFD23F', '#FF5A36', '#14213D', '#3A86FF']).find(x => !same(x, P.col[0]) && !same(x, N.col[0])), cols = [mid, N.col[0]], sk = H * 0.35;   // 两条：一条和前后底色都不同的强调色＋新底色（以前第一条是字色，白字页前会整屏闪一帧白）
         const edge = q => lerp(-sk - 40, W + sk + 40, MO.expoInOut(clamp(q)));
         cols.forEach((col, i) => { const x = edge((p - i * 0.12) / 0.76); c.save(); c.beginPath(); c.moveTo(-sk - 60, 0); c.lineTo(x + sk, 0); c.lineTo(x, H); c.lineTo(-sk - 60, H); c.closePath(); c.clip(); c.fillStyle = col; c.fillRect(0, 0, W, H); c.restore(); });
       }
