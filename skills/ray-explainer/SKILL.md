@@ -51,7 +51,7 @@ $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explai
 
 ### 1b. 分镜关
 
-稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
+稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再从 [style-refs.md](references/style-refs.md) 挑一张参考卡定风格（Ray 指定了就用他的；他丢来新链接就按那里的方法抽帧建卡），`script.json` 顶层写 `"style_ref"`，再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
 
 - `beat`：这一幕讲什么，一句话
 - `visual`：画面按出现顺序依次是什么，用大白话写
