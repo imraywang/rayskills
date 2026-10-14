@@ -5,15 +5,22 @@
 ```json
 {
   "title": "片名", "source": "素材路径或 URL", "header": "一篇读懂 · 主题",
-  "voice": "Charon 或已注册的复刻音色名（如 ray）", "speed": 1.0,
+  "theme": "ray-ip",
+  "host": { "avatar": "ray", "big": [] },
+  "voice": "ray", "speed": 1.1,
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
-  "scenes": [ { "id": "hook", "lines": ["第一句", "第二句"] } ],
+  "scenes": [
+    { "id": "hook", "sig": true, "lines": ["第一句", "第二句"] },
+    { "id": "list", "grammar": "y5_kinetic_type", "lines": ["……"], "cues": [] }
+  ],
+  "chapters": [],
   "to_confirm": ["编补或存疑的说法，交付时列给 Ray"]
 }
 ```
 
+- 以上就是 `assets/template/script.template.json`，`new_project.sh` 拷的就是它。`voice` 默认 `ray`（复刻音色，走 fal），没注册时改成 Gemini 预置音色如 `Charon`；`host` 是左下角主持人（IP 默认），`big` 留空不调 Kling；`sig: true` 是墨绿签名幕；`chapters` 只在 HyperFrames 模式按章节分段，kit 模式忽略它、顶部画一条连续进度条；一期混用多种画法时才在顶层加 `"mix": true` 并写理由。
 - `id` 只用英文小写。kit 场景和 `scenes.js` 里的 `S.<id>` 一一对应；语法场景另写 `grammar` 和 `cues`，见 [grammars.md](grammars.md)。完整范例：`assets/template/script.example.json`。
-- 每句 12–50 字。整片实测语速（不含停顿）：Charon 约 5.7 字/秒，Ray 复刻音色约 6 字/秒。2.5 分钟大约需要 750–800 字、25 句左右。
+- 每句 12–50 字。估时统一按每秒约 5.8 字 × `speed`（不含停顿，和 `storyboard.py` 一致；实测 Charon 约 5.7、Ray 复刻音色约 6）。2.5 分钟大约需要 750–800 字、25 句左右。
 - 场景数 7–10 个，每场 1–4 句。一个场景只讲一件事、只配一个主画面。
 
 ## 写法（来自 Ray 的写作规则）

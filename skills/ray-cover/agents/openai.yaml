@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray Cover"
-  short_description: "按 Ray 的黑白灰 + 墨绿 IP，用 Punk 风格库为文章和视频生成三平台封面"
-  default_prompt: "Use $ray-cover to write cover copy, pick one Punk style and generate WeChat, X and X Article covers."
+  short_description: "按 Ray 的黑白灰 + 墨绿 IP，用 Punk 风格库做文章封面（公众号、X、X Article）和视频竖封面（9:16、3:4）"
+  default_prompt: "Use $ray-cover to write cover copy, pick one style and generate article covers (WeChat, X, X Article) or vertical video covers (9:16, 3:4)."

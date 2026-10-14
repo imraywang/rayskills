@@ -48,7 +48,7 @@
   const CAPS = TL.scenes.flatMap(s => s.lines.flatMap(chunks));
   const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 
-  // ---- 数字人主持人（可选）：大机位播 Kling 帧序列，其余时间左下角换嘴型图层 ----
+  // ---- 数字人主持人（角落是 IP 默认）：大机位播 Kling 帧序列，其余时间左下角换嘴型图层 ----
   let HOST = null; const HIMG = {}, FRAMES = new Map();
   const loadImg = u => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(u); im.src = u; });
   async function hostInit() {

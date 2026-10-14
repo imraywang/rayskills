@@ -1,4 +1,4 @@
-"""数字人主持人（可选能力）：只在用户确认要加数字人时用。
+"""数字人主持人：左下角换嘴型是 IP 默认（不花钱）；大机位（Kling）要先 --dry-run 报价、用户确认才生成。
 
 script.json 顶层写：
   "host": {"avatar": "ray", "big": [{"scene": "hook", "line": 0}, {"scene": "takeaway", "line": 2}], "model": "pro"}

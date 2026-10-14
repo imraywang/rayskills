@@ -2,15 +2,15 @@
 
 # rayskills · builder 实战工具箱
 
-**13 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
+**8 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
 
-本地知识库 · 内容生产 · 解说视频 · 趋势调研 · 企业咨询 · 多模型协作
+本地知识库 · 长文 · 口播 · 封面 · 解说视频 · 平台草稿
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-13%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录13)
-[![Evals](https://img.shields.io/badge/eval%20cases-93-2563eb)](#-实测与验证)
+[![Skills](https://img.shields.io/badge/skills-8%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录8)
+[![Evals](https://img.shields.io/badge/eval%20cases-66-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-13%2F13%20pass-3fb950)](#-实测与验证)
+[![Validate](https://img.shields.io/badge/结构校验-8%2F8%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 </div>
@@ -19,7 +19,7 @@
 
 rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
 
-不用先记住 13 个名字。把处境交给 `/ray`：
+不用先记住 8 个名字。把处境交给 `/ray`：
 
 - 下一步还不稳定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
@@ -41,7 +41,7 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 你：把这篇定稿继续做成一条口播视频
   → /ray-kb 重新选择一个视频判断
   → 以 Ray 口吻生成逐字稿，拿不准的内容列进「待确认」
-  → 需要拼贴画面时再交给 /ray-broll
+  → 要做成解说视频时再交给 /ray-explainer
 
 你：我刚有一个企业 AI 的灵感，查完资料就想直接录
   → /ray-kb 按需检索素材，以你的口吻直接写
@@ -56,16 +56,11 @@ rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具
 | 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、候选选题、写作任务、母稿、发布反馈与回流骨架 | `/ray-obsidian` |
 | 一个 idea、剪藏或旧草稿 | 读者收获、事实边界、Ray 语气、连续自然的中文长文 | `/ray-writer` |
 | 一个能在一条视频讲清的灵感，或一篇已经核验的长文 | 生成唯一快速口播母稿，或重新选角度生成完整口播内容包 | `/ray-kb` |
-| 一篇已经定稿的文章或视频 | 按内容写封面文案、选一种风格，按黑白灰 + 墨绿 IP 分别输出公众号、普通 X、X Article 封面 | `/ray-cover` |
+| 一篇已经定稿的文章或视频 | 文章：按内容写封面文案、选一种风格，按黑白灰 + 墨绿 IP 分别输出公众号、普通 X、X Article 封面；视频：Ray 真人照片 + 大标题的 9:16 / 3:4 竖封面 | `/ray-cover` |
 | 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
-| 几句口播文稿或一个完整选题 | 拼贴 B-roll，或 beat map 驱动的 45–60 秒带旁白字幕讲解片 | `/ray-broll` |
-| 一篇文章或剪藏，想做成知识讲解视频 | 1.5–3 分钟竖屏解说片：手绘套路、8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）和真实照片 / 历史影像按幕混排，Gemini 或本人复刻音色配音，Whisper 逐字卡点；确认后可加卡通数字人主持人（大机位 Kling 生成手势，角落按拼音对口型）。想要每期专属风格时走 HyperFrames 模式：真实截图当证据、本机实跑工具的真实输出、配乐与音效、并行做场景，发布包直接并进口播母稿 | `/ray-explainer` |
-| 一个想追的近期话题 | X、Reddit、YouTube、Hacker News、抖音、视频号与公开网页的近期讨论，严格标注日期与证据边界 | `/ray-trend-search` |
+| 一篇文章或剪藏，想做成知识讲解视频 | 1.5–3 分钟竖屏解说片：从手绘套路和 8 种解说语法（动态文字、Kurzgesagt、白板、3b1b……）里整期只选一种画法，可穿插真实照片 / 历史影像，本人复刻音色配音，Whisper 逐字卡点；左下角卡通数字人主持人默认按拼音对口型，大机位（Kling 生成手势）要先报价确认。想要每期专属风格时走 HyperFrames 模式：真实截图当证据、本机实跑工具的真实输出、配乐与音效、并行做场景，发布包直接并进口播母稿 | `/ray-explainer` |
 | 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
 | 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
-| 一个“能不能上 AI”的客户 | 诊断段：六维就绪度、病灶、风险等级与变绿条件 | `/ray-consult` |
-| 一份诊断结论 | 方案段：架构、选型、Phase 0–3、预算和运营责任 | `/ray-consult` |
-| 一个适合并行、复核或实时调研的大任务 | Grok、Claude、Codex 的最小充分分工；隔离检索 X、Reddit、网页并由主控验收 | `/ray-multimodel` |
 | **不知道从哪里开始** | 读取当前处境，替你选下一步或正式管线 | **`/ray`** |
 
 ## 🧭 一张图看懂
@@ -75,18 +70,14 @@ flowchart TD
     RAY(["/ray · 主路由与阶段编排"]):::hub
 
     RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · 译介） · kb（口播）<br/>cover · cover-editorial · wechat · x-article · broll · explainer"]
-    RAY --> CONSULT["🔍 咨询<br/>consult（诊断 → 方案）"]
-    RAY --> COLLAB["🤝 协作与调研<br/>multimodel · trend-search"]
+    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · 译介） · kb（口播）<br/>cover · wechat · x-article · explainer"]
 
     OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 候选 · 写作任务 · 母稿"] --> WRITER["ray-writer<br/>长文 · 译介"]
     WRITER --> COVER["ray-cover<br/>封面文案 · IP 风格 · 平台封面"]
     OBSIDIAN --> KB["ray-kb<br/>快速口播 · 长文再分发"]
     WRITER --> KB
-    KB --> BROLL["ray-broll<br/>口播画面 · 讲解片"]
-    OBSIDIAN --> EXPLAINER["ray-explainer<br/>解说视频 · 可选数字人"]
-    TREND["ray-trend-search<br/>近期趋势调研"] -.-> WRITER
-    TREND -.-> KB
+    OBSIDIAN --> EXPLAINER["ray-explainer<br/>解说视频 · 数字人主持"]
+    KB --> EXPLAINER
     COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
     COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
 
@@ -112,7 +103,7 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（13）
+## 🗂 Skill 全目录（8）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -120,14 +111,10 @@ flowchart TD
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；他人文章 → 译介稿 |
 | | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
-| | `/ray-cover` | 定稿文章或视频 → 公众号、普通 X、X Article 封面 |
-| | `/ray-broll` | 口播文稿 / 选题 → 拼贴 B-roll 或完整拼贴讲解片 |
-| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路或一种 huashu 解说语法，一期只用一种画法、复刻音色配音、逐字卡点、可选数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
+| | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面；视频 → 9:16 / 3:4 竖封面 |
+| | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路或一种 huashu 解说语法，一期只用一种画法、复刻音色配音、逐字卡点、左下角数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
 | | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
-| 🔍 咨询 | `/ray-consult` | 诊断段：就绪度评估与红黄绿评级；方案段：蓝图、分期与预算 |
-| 🤝 协作 | `/ray-multimodel` | Grok / Claude / Codex 分工、复核、竞赛；Grok 隔离检索 X、Reddit 与网页 |
-| 🔎 调研 | `/ray-trend-search` | 近期趋势调研：X、Reddit、YouTube、HN、Polymarket、抖音、视频号与公开网页，日期与证据边界严格 |
 
 `/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文，`ray-wechat` 只接收定稿并负责排版与草稿验收；三者不混用。
 
@@ -137,22 +124,23 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **13** | 包含 `/ray` 主路由与 12 个成员 |
-| 场景测试 | **93** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **13 / 13 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| Skill 数量 | **8** | 包含 `/ray` 主路由与 7 个成员 |
+| 场景测试 | **66** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **8 / 8 通过** | 名称、目录、frontmatter 与资源结构有效 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
 
-v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式。
+v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式（后已移除）。
 
-v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)（按需独立使用的 Skill 集，不依赖 `/ray` 路由）——它们自 v1 以来没有产生真实调用记录，与高频的内容生产管线也没有阶段交接；`ray-consult` 经复核保留为咨询线成员。方法论没有丢：移出的 Skill 完整保留全部流程与 eval 场景。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。老用户升级请看 [从旧版本升级](#从旧版本升级)。
+v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)（按需独立使用的 Skill 集，不依赖 `/ray` 路由）——它们自 v1 以来没有产生真实调用记录，与高频的内容生产管线也没有阶段交接；`ray-consult` 当时经复核保留。方法论没有丢：移出的 Skill 完整保留全部流程与 eval 场景。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。
+
+v4（2026-10-13）用同样的标准再收敛一轮：`ray-consult`、`ray-multimodel`、`ray-trend-search`、`ray-broll` 移到 [ray-skills](https://github.com/imraywang/ray-skills)。统计 Claude Code 与 Codex 的会话记录，它们近 30 天几乎没有真实调用（解说视频由 `ray-explainer` 接手，拼贴 B-roll 不再是主线）；`/ray` 在本机装了它们时仍会路由过去。老用户升级请看 [从旧版本升级](#从旧版本升级)。
 
 最能体现 Skill 价值的不是文风，而是防住真实损害：
 
 | Skill | 防住的问题 |
 |---|---|
-| `/ray-consult` | 不因老板想“一期全上”而抹掉红灯前提 |
 | `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
 | `/ray-writer` | 不在正文里自保，也不交付没有阅读锚点的长文 |
 | `/ray-writer` 译介模式 | 不把别人的文章洗成自己的原创，授权没落地不进平台草稿 |
@@ -201,8 +189,6 @@ npx -y skills add imraywang/rayskills -g --all
 /ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
 /ray-explainer 把这篇剪藏做成 2 分钟竖屏解说视频，用我的声音
 /ray-explainer 这期别套固定风格，要真实截图和录屏，配上数字人
-/ray-trend-search 过去 7 天大家在怎么讨论这个产品
-/ray-multimodel 让 Grok 和 Claude 独立给方案，由你验收
 ```
 
 第一次使用建议先看 [新手入门](docs/新手入门.md)。
@@ -211,22 +197,23 @@ npx -y skills add imraywang/rayskills -g --all
 
 ### 从旧版本升级
 
-装过 v1（21 个 skill）或 v2（14 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 13 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
+装过 v1（21 个 skill）、v2（14 个 skill）或 v3（13 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 8 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
 
 ```bash
-for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps ray-cover-editorial; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
+for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps ray-cover-editorial ray-consult ray-multimodel ray-trend-search ray-broll; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
 ```
 
 旧成员去向对照：
 
 | 旧成员 | 去处 |
 |---|---|
-| `ray-diagnose` / `ray-proposal` | v2 合并为 `/ray-consult`（诊断段 → 方案段），仍是正式成员 |
+| `ray-diagnose` / `ray-proposal` | v2 合并为 `ray-consult`（诊断段 → 方案段），v4 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
 | `ray-vpsinit` / `ray-nodecheck` | v2 合并为 `ray-vps`，v3 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
 | `ray-thread` | v2 曾并入 `/ray-writer`，现已移除；方法论保留在 git 历史，需要时直接向 Agent 描述任务即可 |
 | `ray-cover-editorial` | 2026-10-13 并入 `/ray-cover`：固定版画风格停用，封面改为 Punk 风格库 + Ray 的黑白灰 + 墨绿 IP |
 | `ray-tweet` · `ray-idea` · `ray-cleanup` · `ray-weekly` | v2 已删除，需要时直接向 Agent 描述任务即可 |
 | `ray-benchmark` · `ray-launch` · `ray-metrics` · `ray-report` · `ray-vps` | v3 按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用 |
+| `ray-consult` · `ray-multimodel` · `ray-trend-search` · `ray-broll` | v4（2026-10-13）按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留；需要时单独安装 |
 
 ### WorkBuddy
 
@@ -250,7 +237,7 @@ for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-p
 | 不越权 | 不自动发布；编补的经历和数据必须列进「待确认」由作者决定；删除与生产改动遵守确认边界 |
 | 构建门控 | `tools/build.sh` 校验目录名与 Skill 名称，beta Skill 不进入产物 |
 
-`ray-multimodel` 内置的 Grok 隔离搜索组件来自 [sudoHG/codex-grok-search](https://github.com/sudoHG/codex-grok-search)，按 MIT 协议保留原版权与许可；其余 rayskills 内容仍遵循仓库根目录的 CC BY-NC 4.0。
+`ray-cover` 内置的 Punk 风格库按 MIT 协议保留原版权与许可（见 `skills/ray-cover/assets/punk/NOTICE.md`）；其余 rayskills 内容遵循仓库根目录的 CC BY-NC 4.0。
 
 ## 📚 文档
 

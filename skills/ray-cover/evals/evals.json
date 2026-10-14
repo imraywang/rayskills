@@ -21,8 +21,8 @@
       "name": "只改标题重跑",
       "type": "revision",
       "prompt": "/ray-cover 公众号那张副标题换成「跟 Claude 说一句，它画出会转的机器」，其他不动。",
-      "expected_output": "只改 prompts/wechat.md 里的副标题文案，只重跑 wechat，新文件加 -v2，旧文件保留。",
-      "expectations": ["只重跑公众号一个平台", "其他平台文件不变", "保留旧版本"]
+      "expected_output": "先把公众号的旧文件（raw-wechat.png、wechat-cover.png、wechat-thumb.jpg、codex-wechat.log、manifest.json）改名加 -v1 留档、提示词另存 prompts/wechat-v1.md，再只改 prompts/wechat.md 里的副标题，只重跑 wechat。",
+      "expectations": ["只重跑公众号一个平台", "其他平台文件不变", "重跑前先把旧文件改名加 -v1 留档，不让脚本覆盖"]
     },
     {
       "id": 3,
@@ -39,6 +39,20 @@
       "prompt": "/ray-cover 我只知道想写 AI，文章还没写，先做一个很酷的封面。",
       "expected_output": "识别到没有定稿内容和核心判断，先转回 ray-writer，不生成通用 AI 海报。",
       "expectations": ["不生成封面", "转交 ray-writer"]
+    },
+    {
+      "id": 5,
+      "name": "视频竖封面",
+      "type": "happy-path",
+      "prompt": "/ray-cover 给这期口播视频做一张抖音竖封面，用我的照片。",
+      "expected_output": "读这期口播母稿或 script.json，写主标题（6–10 字断两行）+ 一行小字并备 1–2 组备选，从 S1–S7 按内容选一个风格，从 ~/.config/ray-cover/identity/ 按风格挑一张和上一期不同的照片，按 video-cover.md 的提示词结构写 prompts/vertical.md，用 gen_cover.py --platforms vertical --ref <照片> 生成 1080×1920，验收文字、颜色和中间 3:4 安全区后交付。",
+      "expectations": [
+        "用 Ray 的真人照片，经 --ref 传入，不用卡通形象",
+        "只有主标题和一行小字，没有副标题",
+        "标题、小字、人脸都在中间 3:4 区域内，顶部 10%、底部 20% 只放背景",
+        "颜色只有黑白灰加暗墨绿 #054C4C，禁止亮青、荧光绿",
+        "不用 8 月 10 日以前的旧照片，不用别人的照片"
+      ]
     }
   ]
 }

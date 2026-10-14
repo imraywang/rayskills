@@ -164,6 +164,8 @@ python3 scripts/wechat_draft.py create \
 
 `update` 必须先读取原草稿，保留作者、封面和评论设置；文章 frontmatter 的正确标题优先于后台旧标题。`create` 必须有封面和摘要。两个动作都必须在写入后再次读取草稿并验收，只有验收通过才允许 `--record` 回写本地状态。
 
+只回读核对、不写入时用 `python3 scripts/wechat_draft.py verify --article <文章.md> --html <公众号正文.html> --config ~/.wewrite/config.yaml`（读 frontmatter 里的 media ID，只读）。
+
 ## 5. 最终验收
 
 以下条件同时满足才算完成：

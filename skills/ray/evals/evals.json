@@ -6,12 +6,12 @@
       "name": "eval-route-clear-diagnose",
       "type": "happy-path",
       "prompt": "/ray 有个客户是做母婴用品的连锁,门店 200 家,老板想搞个 AI 让导购随时能查商品知识和话术,问我能不能做。",
-      "expected_output": "应识别这是企业能否上 AI 的就绪度问题,分发到 ray-consult 并从诊断段开始,说明为什么是它。只选一个 skill;可提示诊断出结论后通常继续进 ray-consult 的方案段。不该自己就地开始做诊断的全部工作而跳过 skill,也不该同时启动多个 skill。",
+      "expected_output": "应识别这是企业能否上 AI 的就绪度问题。ray-consult 已移到独立仓库 ray-skills：本机装了就分发到 ray-consult 并从诊断段开始，说明为什么是它；没装就直接说明它在 ray-skills、可单独安装，不假装调用。只选一个 skill，不该同时启动多个。",
       "expectations": [
-        "分发到 ray-consult 并从诊断段开始",
+        "识别为企业 AI 就绪度诊断",
+        "装了 ray-consult 时分发过去并从诊断段开始，没装时说明去哪装",
         "说明选择理由(就绪度评估)",
-        "只选一个 skill,不一次启动多个",
-        "可提示诊断结论出来后接方案段"
+        "只选一个 skill,不一次启动多个"
       ]
     },
     {
@@ -19,7 +19,7 @@
       "name": "eval-ambiguous-ask-clarify",
       "type": "boundary",
       "prompt": "/ray 帮我看看这个",
-      "expected_output": "边界用例:信息严重不足,无法判断意图。合格行为是不硬猜、不随便分发,而是问一个最关键的澄清问题(你想处理的是什么——一个站/一家企业/一段经历/一台服务器/一批数据?)。不该凭空选一个 skill 硬跑。",
+      "expected_output": "边界用例:信息严重不足,无法判断意图。合格行为是不硬猜、不随便分发,而是问一个最关键的澄清问题(你想处理的是什么——一个写作想法/一篇定稿/一条视频/一个知识库?)。不该凭空选一个 skill 硬跑。",
       "expectations": [
         "不硬猜、不随便分发到某个 skill",
         "问一个最关键的澄清问题以定位意图",
@@ -59,10 +59,10 @@
       "name": "eval-route-longform-to-oral-video",
       "type": "happy-path",
       "prompt": "/ray 这篇长文已经定稿了，接下来做一次素材多次分发。先给我做成一条 2 到 3 分钟、真人出镜加录屏的口播视频，图片长文以后再说。",
-      "expected_output": "应分发到 ray-kb，从定稿里选一个视频判断，以 Ray 口吻生成带来源指纹的逐字稿、待确认和素材与来源；需要拼贴画面时才接 ray-broll，图片长文以后再说。",
+      "expected_output": "应分发到 ray-kb，从定稿里选一个视频判断，以 Ray 口吻生成带来源指纹的逐字稿、待确认和素材与来源；要做成解说视频时才接 ray-explainer，图片长文以后再说。",
       "expectations": [
         "分发到 ray-kb",
-        "不把任务直接交给只负责画面的 ray-broll",
+        "不把任务直接交给只负责画面的 ray-explainer",
         "衍生稿记录母稿路径与内容指纹",
         "交付逐字稿、待确认和素材与来源",
         "图片长文本轮不抢占口播重点"

@@ -1,6 +1,6 @@
 ---
 name: ray-cover
-description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.35:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频竖封面（9:16 抖音 / 视频号、3:4 小红书）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，由 Codex CLI 调 Image 2 分平台生成。用于“做封面”“视频封面”“竖屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
+description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.33:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频竖封面（9:16 抖音 / 视频号、3:4 小红书）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，由 Codex CLI 调 Image 2 分平台生成。用于“做封面”“视频封面”“竖屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
 ---
 
 # Ray Cover
@@ -15,7 +15,7 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 ## 1. 读内容
 
-读完整正文；有成稿包时同时读一句话判断、核心冲突和传播句；给的是视频项目就读 `script.json` 的 `title`、`central_judgment` 和 `publish`。判断还没定的内容先交回 `ray-writer`，不用封面替文章拍板。
+读完整正文；有成稿包时同时读一句话判断、核心冲突和传播句；视频封面读这期的口播母稿（vault 的 `40-发布/50-口播视频/`）或 ray-explainer 项目的 `script.json`（`title`、`central_judgment`、`publish`），两处任一即可。判断还没定的内容先交回 `ray-writer`，不用封面替文章拍板。
 
 ## 2. 写封面文案
 
@@ -29,7 +29,7 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 ## 4. 编译提示词
 
-每个平台一份，存到 `<封面目录>/prompts/<platform>.md`（`wechat`、`x`、`x-article`）：
+每个平台一份，存到 `<封面目录>/prompts/<platform>.md`（文章：`wechat`、`x`、`x-article`；视频：`vertical`、`xhs`）：
 
 1. 读选定风格的 `assets/punk/styles/<style-id>/META.md` 和 `STYLE.md`，以及 `assets/punk/punk-cover/references/cover-prompt-blueprint.md`。
 2. 按蓝图编译成一份完整的封面提示词：风格的材质、空间、标题处理、颜色和禁忌落到每个封面决定上，不把 STYLE.md 原文贴在后面。
@@ -60,7 +60,7 @@ python3 $SK/scripts/gen_cover.py <封面目录> --platforms wechat,x,x-article
 
 ## 7. 交付
 
-用 SendUserFile 发成品，回复里写：用的风格和一句话视觉隐喻、这组文案、1–2 组备选文案、验收发现的问题（模型自加的字、颜色偏差）。Ray 要调整时，只改对应平台的提示词重跑那几个平台，旧文件保留（新文件加 `-v2`）。
+用 SendUserFile 发成品，回复里写：用的风格和一句话视觉隐喻、这组文案、1–2 组备选文案、验收发现的问题（模型自加的字、颜色偏差）。Ray 要调整时，先把那几个平台的旧文件（`raw-<p>.png`、`<p>-cover.png`、`<p>-thumb.jpg`、`codex-<p>.log`、`manifest.json`）改名加 `-v1`、`-v2` 留档、提示词另存 `prompts/<p>-v1.md`，再只改对应平台的提示词重跑；脚本会覆盖同名文件。
 
 ## 边界
 

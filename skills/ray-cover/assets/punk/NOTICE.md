@@ -4,7 +4,7 @@
 
 ## 只拷贝了什么
 
-- `punk-cover/`：封面工作流 `SKILL.md` 与 `references/`（风格目录 `style-catalog.md`、封面提示词蓝图 `cover-prompt-blueprint.md`）
+- `punk-cover/`：封面工作流 `SKILL.md`（改名为 `PUNK-COVER.md`，免得递归安装器把它当成独立 skill）与 `references/`（风格目录 `style-catalog.md`、封面提示词蓝图 `cover-prompt-blueprint.md`）
 - `styles/`：`META.md` 的 `outputs` 含 cover 或 poster 的 31 个风格（每个风格一份 `META.md` + `STYLE.md`）
 
 头像、肖像类风格和 `punk-avatar` 没有拷贝。

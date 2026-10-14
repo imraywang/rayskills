@@ -19,7 +19,7 @@ const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/M
 const HUASHU = path.resolve(__dirname, '..', 'assets', 'huashu');
 const TEMPLATE = path.resolve(__dirname, '..', 'assets', 'template');
 const [projArg, mode = 'sheet', arg] = process.argv.slice(2);
-if (!projArg) { console.error('usage: node render.js <project> stills|sheet|video|serve [arg]'); process.exit(2); }
+if (!projArg) { console.error('usage: node render.js <project> stills|sheet|video|gate|serve [arg]'); process.exit(2); }
 const PROJ = path.resolve(projArg);
 const SCRIPT = JSON.parse(fs.readFileSync(path.join(PROJ, 'script.json')));
 const TL = JSON.parse(fs.readFileSync(path.join(PROJ, 'timeline.json')));

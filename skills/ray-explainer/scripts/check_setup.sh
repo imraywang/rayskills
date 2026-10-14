@@ -16,14 +16,14 @@ if [ ! -d "$DEPS/node_modules/puppeteer-core" ]; then
 else echo "ok   puppeteer-core"; fi
 system_profiler SPFontsDataType 2>/dev/null | grep -q "Hannotate SC" && echo "ok   font Hannotate SC" || echo "WARN font Hannotate SC missing — handwritten look falls back to PingFang"
 command -v uv >/dev/null && echo "ok   uv (film_gate motion check)" || echo "WARN uv missing — brew install uv (only for the post-render film_gate report)"
-python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || echo "WARN fal_client missing — pip3 install fal-client (only needed for the cloned voice / digital host)"
+python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || { echo "MISS fal_client — pip3 install fal-client (template default: voice ray via fal)"; ok=0; }
 [ -d "$DIR/../assets/huashu/clips" ] && echo "ok   huashu grammars ($(ls "$DIR/../assets/huashu/clips" | wc -l | tr -d ' '))" || { echo "MISS assets/huashu (explainer grammars)"; ok=0; }
 VOICES="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/voices.json"
 [ -f "$VOICES" ] && echo "ok   voices: $(python3 -c "import json;print(', '.join(json.load(open('$VOICES'))))")" || echo "info no cloned voice yet (scripts/clone_voice.py) — Gemini prebuilt voices only"
-AV="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/avatars"; [ -d "$AV" ] && echo "info digital-host avatars (optional): $(ls "$AV" | tr '\n' ' ')"; python3 -c "import pypinyin" 2>/dev/null || echo "info pypinyin missing — pip3 install pypinyin (only for the optional digital host)"
+AV="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/avatars"; [ -d "$AV" ] && echo "info digital-host avatars: $(ls "$AV" | tr '\n' ' ')"; python3 -c "import pypinyin" 2>/dev/null && echo "ok   pypinyin" || { echo "MISS pypinyin — pip3 install pypinyin (corner host lip-sync, template default)"; ok=0; }
 if [ -z "${FAL_KEY:-}" ]; then eval "$(grep -E '^\s*export\s+FAL_KEY=' ~/.zshrc 2>/dev/null)"; fi
 ACE="${ACESTEP_DIR:-$HOME/projects/ACE-Step-1.5}"; if [ -d "$ACE/.venv" ] && [ -d "$ACE/checkpoints/acestep-v15-turbo" ]; then echo "ok   ACE-Step 1.5 (local BGM: gen_bgm.py)"; elif [ -d "$ACE" ]; then echo "info ACE-Step at $ACE but models not reachable — external drive unplugged? (only for gen_bgm.py)"; else echo "info ACE-Step not installed — only needed for local BGM (see scripts/gen_bgm.py)"; fi
-[ -n "${FAL_KEY:-}" ] && echo "ok   FAL_KEY present" || echo "info FAL_KEY missing — needed only for the cloned voice"
+[ -n "${FAL_KEY:-}" ] && echo "ok   FAL_KEY present" || { echo "MISS FAL_KEY — template default voice ray needs it (fal MiniMax)"; ok=0; }
 # API key: shell env first, then ~/.zshrc export
 if [ -z "${GEMINI_API_KEY:-}" ]; then eval "$(grep -E '^\s*export\s+GEMINI_API_KEY=' ~/.zshrc 2>/dev/null)"; fi
 if [ -n "${GEMINI_API_KEY:-}" ]; then

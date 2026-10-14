@@ -296,7 +296,7 @@ S.takeaway = (t, sc) => {
   Q.forEach(([a, b, ph], i) => {
     const s0 = i === 0 ? at(sc, 0, '三个问题') : at(sc, 1, ph);   // first box as soon as「三个问题」is said
     const y = lerp(520 + i * 300, 450 + i * 210, shrink), p = ap(t, s0 - .2, .5);
-    rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: '#fffaf1', seed: 401 + i, w: 6 });
+    rrect(140, y - 110 + shrink * 30, 800, 230 - shrink * 60, { p, fill: C.card, seed: 401 + i, w: 6 });
     rrect(185, y - 40, 80, 80, { p, seed: 411 + i, w: 6 });
     const ck = ap(t, s0 + .9, .4);
     rpath([[200, y], [225, y + 28], [275, y - 50]], { p: ck, color: C.green, w: 11, seed: 421 + i });
@@ -304,9 +304,16 @@ S.takeaway = (t, sc) => {
     text(b, 310, lerp(y + 40, y + 5, shrink), { size: 66, align: 'left', scale: pop(t, s0 + .3) });
   });
   if (t > l2.start) {
-    const yp = at(sc, 2, '包括你自己');
-    text('看任何一家公司都好用', W / 2, 1150, { size: 60, alpha: ap(t, l2.start + .5, .5) });
-    text('包括你自己', W / 2, 1320, { size: 120, color: C.orange, scale: pop(t, yp, .6), rot: -.03 });
-    rarrow(W / 2 + 280, 1420, W / 2 + 150, 1480, { p: ap(t, yp + .5, .5), color: C.orange, w: 8, seed: 431 });
+    // the conclusion goes on an object with an action (a sticky note slaps onto the checklist), not a centred quote card;
+    // everything stays above y 1440 so the corner host and captions keep clear
+    const yp = at(sc, 2, '包括你自己'), np = ap(t, yp - .1, .35);
+    text('看任何一家公司都好用', W / 2, 1080, { size: 52, color: C.soft, alpha: ap(t, l2.start + .8, .4) });   // after the boxes have shrunk
+    if (np > 0) {
+      const k = lerp(1.5, 1, eOut(np));
+      ctx.save(); ctx.translate(680, 1250); ctx.rotate(-.05); ctx.scale(k, k); ctx.globalAlpha *= clamp(np * 2);
+      rrect(-210, -85, 420, 170, { fill: C.tint, color: C.orange, seed: 431, w: 5 });
+      text('包括你自己', 0, 0, { size: 64, color: C.ink });
+      ctx.restore();
+    }
   }
 };

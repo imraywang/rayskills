@@ -41,16 +41,17 @@
     },
     {
       "id": 4,
-      "name": "混合语法 + 复刻音色",
+      "name": "一期一种画法 + 复刻音色",
       "type": "happy-path",
       "prompt": "/ray-explainer 用我的复刻音色把这篇剪藏做成解说视频，清单那段用动态文字，讲机制那段用 Kurzgesagt。",
-      "expected_output": "check_setup 确认 voices.json 里有 ray；script.json 设 voice 为 ray，对应场景写 grammar 和 cues，cue 时间用 {line, phrase}；tts.py 走 MiniMax，qa_tts.py 达到 bad: 0 并写入逐字时间；看过 contact sheet，确认语法场景的 cue 和旁白对得上、字幕不被遮挡后出片；交付说明列出每一幕的画法和配音费用。",
+      "expected_output": "按 grammars.md「一期一种画法」指出动态文字和 Kurzgesagt 不该混在一期里，建议整期选一种（给出理由让用户挑）；用户坚持要混，才在 script.json 顶层写 \"mix\": true 并写明理由。check_setup 确认 voices.json 里有 ray；script.json 设 voice 为 ray，场景写 grammar 和 cues，cue 时间用 {line, phrase}；tts.py 走 MiniMax，qa_tts.py 达到 bad: 0 并写入逐字时间；看过 contact sheet，确认 cue 和旁白对得上、字幕不被遮挡后出片；交付说明列出画法和配音费用。",
       "expectations": [
+        "动手前按一期一种画法提出异议，并建议选一种",
+        "只有用户坚持时才写 \"mix\": true 并附理由，否则全片只用一种画法",
         "voice 使用已注册的复刻音色，而非 Gemini 预置音色",
         "语法场景只写 cues，不改 assets/huashu 下的代码",
         "cue 用 phrase 定位时间",
-        "出片前看过 contact.jpg",
-        "交付说明列出每一幕的画法"
+        "出片前看过 contact.jpg"
       ]
     },
     {
@@ -79,12 +80,13 @@
     },
     {
       "id": 7,
-      "name": "数字人主持人：确认后才加，先报价再生成",
+      "name": "数字人主持人：角落默认，大机位先报价再生成",
       "type": "boundary",
       "prompt": "/ray-explainer 这条片子加上我的数字人形象，开头和结尾让他出镜讲。",
-      "expected_output": "用户明确要加，才在 script.json 写 host（avatar、big 句子、model）；配音校对通过后先跑 host.py --dry-run，把大机位段落和预计费用贴给用户，等同意后再正式生成；其余时间主持人在角落换嘴型，不花钱。没提数字人的片子不写 host，只在分镜关问一句。",
+      "expected_output": "角落主持人是 IP 默认：script.json 照模板保留 host（avatar: ray），全片左下角换嘴型，不花钱，不用问。用户要开头和结尾出镜，才在 host.big 写这几句（选直接对观众说话的句子）；配音校对通过后先跑 host.py --dry-run，把大机位段落和预计费用贴给用户，等同意后再正式生成。用户没要大机位时 big 留空，不调用 Kling。",
       "expectations": [
-        "用户没提数字人时不主动加，只在分镜关问一句",
+        "script.json 默认带 host（角落主持人），不需要用户另外要求",
+        "没有确认和报价时 big 留空，不调用 Kling",
         "正式调用 Kling 之前先给出 --dry-run 的段落与费用并等确认",
         "大机位只用在直接对观众说话的句子，图表细节留给角落"
       ]

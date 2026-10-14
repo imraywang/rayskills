@@ -85,7 +85,7 @@ description: 把灵感、剪藏、调研或草稿写成有 Ray 态度的中文�
 python3 scripts/article_check.py <文章路径>
 ```
 
-脚本只查格式和篇幅。错误必须修改并重跑；提醒逐项判断，可以保留。
+脚本只查格式和篇幅。错误必须修改并重跑；提醒逐项判断，可以保留。`--profile` 只调篇幅档位，是旧文章原型的遗留参数，一般不用传。
 
 ### 5. 落盘与回流
 
@@ -98,7 +98,7 @@ python3 scripts/article_check.py <文章路径>
 
 ### 6. 封面与平台交接
 
-需要公众号或 X 封面时转交 `ray-cover`，提供正文路径、成稿包路径和一句话判断。
+需要公众号、X 或 X Article 封面时转交 `ray-cover`，提供正文路径、成稿包路径和一句话判断。
 
 用户明确要求把成稿送入 X Articles 后台时，把文章与 5:2 `x-article-cover` 交给 `ray-x-article`。它只保存并验证草稿，不自动发布。
 

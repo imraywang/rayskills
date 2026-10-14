@@ -18,7 +18,7 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 
 ## 工作台任务队列
 
-知识工作台（ray-dashboard）会把用户排队的 AI 协作请求写进 vault 的 `50-系统/40-自动化/AI任务队列.md`（frontmatter `kind: ai-task-queue`，「## 待处理」下每行 `- [ ] 时间 · 动作 · [[目标笔记]]`）。`/ray` 读上下文时顺手看一眼这个文件；文件不存在或没有未勾选项就静默跳过，不提它。
+知识工作台（ray-dashboard，随 [rays-brain-kit](https://github.com/imraywang/rays-brain-kit) 安装，不在本仓库）会把用户排队的 AI 协作请求写进 vault 的 `50-系统/40-自动化/AI任务队列.md`（frontmatter `kind: ai-task-queue`，「## 待处理」下每行 `- [ ] 时间 · 动作 · [[目标笔记]]`）。`/ray` 读上下文时顺手看一眼这个文件；文件不存在或没有未勾选项就静默跳过，不提它。
 
 - 有待处理项、且用户本轮没有给出其他任务 → 把队列摆出来，得到确认后认领：「起草」按目标写作任务的成稿包走 `ray-writer`。
 - 用户本轮有明确任务 → 先办本轮的事，收尾时提一句队列里还有几条待处理。
@@ -52,36 +52,31 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 | 把 idea、资料或草稿写成有 Ray 态度和传播力的中文长文 | `ray-writer` |
 | 翻译外文文章或转载别人的中文文章 | `ray-writer`（译介模式，先过授权与署名两道门） |
 | 从灵感与检索直接做快速口播；从定稿长文再分发口播；审读或对照实际录制稿 | `ray-kb` |
-| 给定稿文章或视频生成公众号、X 与 X Article 封面，换风格、改封面标题 | `ray-cover` |
-| 给口播文稿或选题做拼贴 B-roll / 讲解片 | `ray-broll` |
+| 给定稿文章生成公众号、X 与 X Article 封面，给视频做 9:16 / 3:4 竖封面，换风格、改封面标题 | `ray-cover` |
 | 把文章、剪藏或观点做成无人出镜的知识解说视频（代码绘制画面、复刻音色配音） | `ray-explainer`（先出分镜表给 Ray 确认，再配音和画） |
 | 把定稿文章排版并保存到微信公众号草稿箱 | `ray-wechat` |
 | 把定稿文章和 5:2 封面保存到 X Articles 草稿箱 | `ray-x-article` |
 | 从 idea/草稿一路做到文章、封面与 X Article 草稿 | [内容生产管线](references/content-pipeline.md) |
 
-### 咨询 Consulting
-| 用户想做的 | 分发到 |
-|---|---|
-| 评估企业能不能上知识库/AI(就绪度诊断) | `ray-consult`(诊断段) |
-| 有了诊断结论,出方案蓝图/分期/报价 | `ray-consult`(方案段) |
+### 独立仓库成员（ray-skills，装了才路由）
+咨询、多模型协作、趋势调研和拼贴 B-roll 已按使用频率移到 [ray-skills](https://github.com/imraywang/ray-skills)。本机装了对应 skill 时照常分发；没装就直接说明并按普通任务处理，不假装调用。
 
-### 协作与调研 Orchestration
 | 用户想做的 | 分发到 |
 |---|---|
+| 评估企业能不能上知识库/AI，或据诊断出方案蓝图、分期、报价 | `ray-consult` |
 | 让 Grok / Claude / Codex 分工、独立复核、竞赛，或实时查 X / Reddit / 网页 | `ray-multimodel` |
-| 查某个话题最近 N 天的讨论、热门视频、社区风向，要跨 X、Reddit、YouTube、HN、抖音、视频号等多个平台并标清日期和证据 | `ray-trend-search`（只查一两个平台的快速核实仍可用 `ray-multimodel` scout） |
+| 查某个话题最近 N 天跨平台的讨论、热门视频、社区风向，并标清日期和证据 | `ray-trend-search` |
+| 给口播文稿或选题做拼贴 B-roll / 拼贴讲解片 | `ray-broll` |
 
 ## 常见衔接(供判断下一步)
 
 这些不是固定流水线,是"上一个结果出来后,通常接哪个"的经验参考:
 
-- `ray-consult` 诊断段出了结论 → 通常直接进方案段;若结论是红灯,方案的 Phase 0 就是补齐前提。
 - 用户没有兼容的本地知识库、但希望内容长期积累 → 先接 `ray-obsidian` 安全初始化，再把根目录和材料交给 `ray-writer`。
 - `ray-writer` 完成、Ray 处理完「待确认」并通过移动端可浏览性检查 → 接 `ray-cover` 生成平台封面；需要进入公众号草稿箱时接 `ray-wechat`，需要进入 X 后台时接 `ray-x-article`，两者默认只保存草稿。用户明确要求“走完整条管线”时按 [content-pipeline.md](references/content-pipeline.md) 连续执行。
 - 灵感、现场观察或对话中的判断已经能在一条视频里讲清 → `ray-kb` 使用 `fast-oral`：按需检索素材，以 Ray 口吻直接写，只建立一份口播母稿，不强制补候选卡、写作任务或长文。
-- 长文要做一次素材多次分发 → `ray-kb` 生成绑定母稿指纹的口播内容包；需要拼贴 B-roll 时再接 `ray-broll`。图片长文只在用户明确要求时进入后续视觉阶段。
-- 清晰的大体量任务、关键复核或 X / Reddit / 网页实时调研 → 可接 `ray-multimodel`,由当前主控选择最小充分的外部通道并验收。
-- 选题或写作前要知道某个话题近期在各平台怎么被讨论 → 先接 `ray-trend-search`，把带日期和证据的结论交给 `ray-writer` 或 `ray-kb`。
+- 长文要做一次素材多次分发 → `ray-kb` 生成绑定母稿指纹的口播内容包；要做成解说视频时再接 `ray-explainer`。图片长文只在用户明确要求时进入后续视觉阶段。
+- 选题或写作前要知道某个话题近期怎么被讨论 → 装了 `ray-trend-search` 时先调研，把带日期和证据的结论交给 `ray-writer` 或 `ray-kb`。
 
 ## 边界与纪律
 

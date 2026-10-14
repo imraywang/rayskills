@@ -55,10 +55,10 @@ Ray 定下的方向：形象和声音统一（形象在左下角全片陪着，�
 - `"host"` 的 `big` 留空：配音和 Whisper 校对之后跑一次 `host.py <project>`，生成左下角口型，不花钱。
 - 新项目模板（`new_project.sh`）已经写好 `theme`、`host` 和首幕 `sig`；最后一幕的 `"sig": true` 自己加。
 - 旧项目自己目录里的 `kit.js`、`patterns.js`、`scenes.js` 里写死的颜色不跟这套走；要用 IP 规范重渲旧片，先换成模板里的新版 `kit.js`、`patterns.js`，`scenes.js` 里写死的色值逐个改。
+- 封面不在这里做：走 `ray-cover`，文章封面用 Punk 风格库、视频竖封面用 Ray 真人照片，都按这套黑白灰 + 墨绿编提示词。
 
 ## 还没覆盖的
 
-- HyperFrames 专属风格模式（Ray 近几期大多走它）：签名层还没接进 `assets/hf-template/`，现在要手动照这份规范做开场和结尾。
-- 封面：Ray 打算换掉现在的编辑版画封面，新封面可以照这份规范的颜色和形象来做。
+- HyperFrames 专属风格模式（Ray 近几期大多走它）：`script.json` 里 `sig: true` 的幕，`build.py` 自动把顶栏换成墨绿底暖白字；场景底色换墨绿 `#054C4C` 还要在场景里手动做。
 - 片头 1 秒标识、声音 logo：还没设计。
 - 形象的黑白版（白脸、黑衣、高反差）：试过，留作以后白底上的备用，还没做成素材。

@@ -390,7 +390,7 @@ def add_common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--digest")
     parser.add_argument("--cover", type=Path)
     parser.add_argument("--cover-media-id")
-    parser.add_argument("--theme", default="ray-editorial")
+    parser.add_argument("--theme", default="ray-judgment")
     parser.add_argument("--signature", choices=("absent", "present", "inherit"), default="inherit")
     parser.add_argument("--record", action="store_true")
 

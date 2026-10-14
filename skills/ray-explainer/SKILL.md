@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟，配音 + 字幕）：画面由代码逐帧绘制，可用 Ray 的复刻音色；要真实截图、录屏或专属风格时走 HyperFrames 模式（配乐、数字人、发布包）。用于“做成解说视频”“知识科普短片”“用我的声音配音”。拼贴风格转 ray-broll，只要口播稿转 ray-kb。
+description: 把文章或观点做成竖屏知识解说视频（1.5–3 分钟，配音 + 字幕）：画面由代码逐帧绘制，可用 Ray 的复刻音色；要真实截图、录屏或专属风格时走 HyperFrames 模式（配乐、数字人、发布包）。用于“做成解说视频”“知识科普短片”“用我的声音配音”。只要口播稿转 ray-kb，要封面转 ray-cover。
 ---
 
 # Ray Explainer
@@ -72,7 +72,7 @@ python3 -I $SK/scripts/tts.py <project>
 **选音色**（`script.json` 的 `"voice"`）：
 
 - `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，走 fal 上的 MiniMax `speech-2.8-hd`，每千字 0.1 美元。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
-- 其他值都当作 Gemini 预置音色：Charon（男、利落，默认）、Puck（男、活泼）、Kore（女）。
+- 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
 - `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
 
 **还没有复刻音色时**：请用户提供 1–3 分钟干净的口播录音（手机录音或已发视频的原片都行），然后：
@@ -126,7 +126,7 @@ python3 $SK/scripts/host.py <project>             # 用户同意后：Kling 生�
 - **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
 - **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
 - **一期只用一种画法**：手绘套路、某一种语法、或整期 HyperFrames，三选一，开场和结尾也用它（开场结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒，确实要混写 `"mix": true` 并说明理由。
-- 安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290，字幕条在 y 1560–1656；语法片段默认就会让开这两块；kit 场景的主舞台用 y 300–1520。
+- 安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290。默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放 y 300–1440，语法片段会自动让开；去掉 `host` 的片子字幕条回到 y 1560–1656，主舞台可用到 y 1520。
 
 ## 5. 静帧检查（必做，不能跳过）
 

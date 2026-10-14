@@ -51,6 +51,7 @@ def run(cover_dir, plat):
 def main():
     a = sys.argv[1:]
     if not a: sys.exit(__doc__)
+    if "-h" in a or "--help" in a: print(__doc__); sys.exit(0)
     cover_dir = os.path.abspath(a[0])
     plats = (a[a.index("--platforms") + 1] if "--platforms" in a else "wechat,x,x-article").split(",")
     jobs = int(a[a.index("--jobs") + 1]) if "--jobs" in a else 3
