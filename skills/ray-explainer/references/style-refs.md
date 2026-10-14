@@ -14,6 +14,7 @@
 | AI 产品、硬件、技术原理（偏工程） | `chaping` | HyperFrames（窗口卡片节点图）或 `y3` 白板 | `ray-ip-dark` |
 | 数学、算法、模型原理的推导 | `manshi`、`3b1b` | `t1_3b1b`（横屏左右分栏） | `ray-ip-dark` |
 | AI 历史、论文、经典实验 | `welchlabs` | `y2_vox` 拼贴（论文截图当实物摆） | `ray-ip` |
+| 零基础教程、工具上手、开源项目介绍 | `muzi` | HyperFrames（录屏为主 + 章节标签 + 小贴士） | `ray-ip-dark` |
 | 工具 / 开源项目快评、新闻 | `fireship` | `y2_vox` 或 HyperFrames（真实截图 + 贴纸标签） | `ray-ip-dark` |
 | 一个机制、系统里有什么 | `kurzgesagt`（只学构图） | `y1_kurzgesagt` | 任一，禁蓝紫 |
 
