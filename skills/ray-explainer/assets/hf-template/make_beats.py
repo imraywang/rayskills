@@ -11,6 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 T = json.load(open(os.path.join(HERE, "..", "timeline.json")))
 SCRIPT = json.load(open(os.path.join(HERE, "..", "script.json")))
 PUNCT = "，。？！：；、,.?!:;"
+SEP = re.compile(r"[，。？！：；、?!:;]|(?<!\d)[,.]|[,.](?!\d)")   # 半角 , . 夹在两个数字中间（2.5%、100,000）不算断句
 _cv = next(p for p in (os.path.join(HERE, "canvas.json"), os.path.expanduser("~/.claude/skills/ray-explainer/assets/canvas.json")) if os.path.exists(p))
 MAXW = json.load(open(_cv))[SCRIPT.get("aspect", "portrait")]["hf"]["cap_chars"]   # 一条字幕的最大视觉宽度（中文 1，拉丁 0.55）：竖屏 13，横屏 22
 FORCE = {          # 手工断句：整段原文 → 各段原文（按顺序、首尾相接）
@@ -45,9 +46,10 @@ for n, s in enumerate(T["scenes"]):
         tx, ch = l["text"], l["chars"]
         lines.append({"text": tx, "start": round(l["start"] - S, 3), "end": round(l["end"] - S, 3), "chars": [round(c - S, 3) for c in ch]})
         segs = []
-        for m in re.finditer(r"[^%s]+" % re.escape(PUNCT), tx):
-            seg = m.group(0).strip()
-            if seg: segs += split_long(seg, m.start() + (len(m.group(0)) - len(m.group(0).lstrip())))
+        cuts = [0] + [x for m in SEP.finditer(tx) for x in (m.start(), m.end())] + [len(tx)]
+        for p0, p1 in zip(cuts[::2], cuts[1::2]):
+            raw = tx[p0:p1]; seg = raw.strip()
+            if seg: segs += split_long(seg, p0 + (len(raw) - len(raw.lstrip())))
         for k, (seg, at) in enumerate(segs):
             a = ch[min(at, len(ch) - 1)] - S
             b = (ch[min(segs[k + 1][1], len(ch) - 1)] - S) if k + 1 < len(segs) else l["end"] - S

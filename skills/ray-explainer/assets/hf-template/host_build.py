@@ -24,6 +24,7 @@ if BUB:
 else:
     X, Y, W = 0, 1520, 380            # 角落：左下只露头肩；字幕带顶要 ≤1420
 k = W / W0
+H = H0 * k   # 大机位 h3 的 pad 也要用，必须在段落循环之前算好
 
 # 形象图层拷进 assets/host/
 AD = os.path.join(HERE, "assets", "host"); os.makedirs(AD, exist_ok=True)
@@ -48,8 +49,12 @@ vids = []
 OPEN = 'tl.fromTo("#hs-wrap", { y: 360 }, { y: 0, duration: 0.6, ease: "back.out(1.4)" }, 0.1);'
 SIDES = plan.get("sides") or [[0, "left"]]
 def side_at(t): return [v for a, v in SIDES if a <= t][-1] if any(a <= t for a, _ in SIDES) else "left"
-for i, seg in enumerate(plan.get("segments", [])):
+SEGS = plan.get("segments", [])
+CHAIN = 0.15 + 0.8 + 0.6   # 两段大机位间隔小于「停 0.15 + 缩回 0.8 + 再放大 0.6」时不回角落，直接接到下一段
+for i, seg in enumerate(SEGS):
     a, b = seg["start"], seg["end"]
+    chained_in = i > 0 and a - SEGS[i - 1]["end"] < CHAIN
+    chained_out = i + 1 < len(SEGS) and SEGS[i + 1]["start"] - b < CHAIN
     key = seg["dir"].rstrip("/").split("/")[-1]
     webm = os.path.join(AD, f"big_{key}.webm")
     if not os.path.exists(webm):   # 抠好绿幕的 RGBA 帧 → 带透明通道的 VP9
@@ -76,12 +81,18 @@ for i, seg in enumerate(plan.get("segments", [])):
         OPEN = f'tl.fromTo("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, opacity: 0 }}, {{ opacity: 1, duration: 0.35, ease: "power1.out" }}, 0.05);'
     else:
         bx, by, sc = big["x"], big["y"], big["w"] / W
-        tw.append(f'tl.to("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, duration: 0.6, ease: "power2.inOut" }}, {round(a - 0.6, 3)});')
+        if chained_in:   # 紧接上一段：在两段之间直接移到这一段的位置（位置相同就不动）
+            pb_ = SEGS[i - 1].get("big") or plan.get("big")
+            if (pb_["x"], pb_["y"], pb_["w"]) != (bx, by, big["w"]):
+                gap = max(0.2, a - SEGS[i - 1]["end"])
+                tw.append(f'tl.to("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, duration: {gap:.3f}, ease: "power2.inOut" }}, {SEGS[i - 1]["end"]});')
+        else:
+            tw.append(f'tl.to("#hs-wrap", {{ x: {bx - X}, y: {by - Y}, scale: {sc:.4f}, duration: 0.6, ease: "power2.inOut" }}, {round(a - 0.6, 3)});')
     tw.append(f'tl.set("#hs-body", {{ opacity: 0 }}, {a}); tl.set("#hs-v{i}", {{ opacity: 1 }}, {a});')
     tw.append(f'tl.set("#hs-v{i}", {{ opacity: 0 }}, {b}); tl.set("#hs-body", {{ opacity: 1 }}, {b});')
     if BUB:
         tw.append(f'tl.to(".hs-fr", {{ {back_fr}, duration: 0.8, ease: "power2.inOut" }}, {round(b + 0.15, 3)}); tl.to("#hs-wrap", {{ x: 0, y: 0, scale: 1, duration: 0.8, ease: "power2.inOut" }}, {round(b + 0.15, 3)});')
-    else:
+    elif not chained_out:
         tw.append(f'tl.to("#hs-wrap", {{ x: 0, y: 0, scale: 1, duration: 0.8, ease: "power2.inOut" }}, {round(b + 0.15, 3)});')
 
 if BUB and plan.get("show") is not None and OPEN.startswith('tl.fromTo("#hs-wrap", { y: 360 }'): OPEN = ""   # 只在关键句出现：不做开场滑入
@@ -113,7 +124,6 @@ if BUB:   # 气泡：#hs-frame 裁出头肩（墨绿底 + 投影），#hs-ring �
     BUB_OPEN = '\n        <div id="hs-side" data-layout-ignore>\n        <div id="hs-vis" data-layout-ignore>\n        <div id="hs-frame" class="hs-fr" data-layout-ignore>'
     BUB_CLOSE = '\n        </div>\n        <div id="hs-ring" class="hs-fr" data-layout-ignore></div>\n        </div>\n        </div>'
 reps = max(0, int(TOTAL // period) - 1)
-H = H0 * k
 doc = f'''<!doctype html>
 <html>
   <head><meta charset="UTF-8" /></head>

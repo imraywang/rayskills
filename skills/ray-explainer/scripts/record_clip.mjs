@@ -105,7 +105,10 @@ for (const job of jobs) {
     }
     await page.evaluate((ms) => window.__step(ms), dt);
     await page.evaluate(() => window.__painted());
-    if (t >= -1e-6) await page.screenshot({ path: join(dir, `f${String(f - Math.round(warm * fps)).padStart(4, "0")}.png`), clip: { x: box.x, y: box.y, width: box.w, height: box.h } });
+    // box is viewport-relative (getBoundingClientRect), but screenshot clips are document-relative: add the scroll
+    // offset, or a page that scrolls during the clip keeps capturing the same strip at the top of the document
+    const [sx, sy] = await page.evaluate(() => [window.scrollX, window.scrollY]);
+    if (t >= -1e-6) await page.screenshot({ path: join(dir, `f${String(f - Math.round(warm * fps)).padStart(4, "0")}.png`), clip: { x: box.x + sx, y: box.y + sy, width: box.w, height: box.h } });
   }
   const ow = job.ow ?? 1000;
   const mp4 = join(OUT, job.name + ".mp4");

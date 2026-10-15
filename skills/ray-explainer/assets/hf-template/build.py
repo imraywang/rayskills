@@ -21,6 +21,7 @@ ASPECT = SCRIPT.get("aspect", "portrait"); CV = json.load(open(_cv))[ASPECT]; CW
 
 # ───────────── 本片专属（每片改这一段，其余不动）─────────────
 BG, FG = "#F3F3F0", "#111111"                     # 与 assets/style.css 的底色、正文色一致（默认 Ray IP：暖白底、黑字）
+TB_INK, TB_DIM, TB_TRACK = "#111111", "#8C8C8C", "rgba(17,17,17,0.14)"   # 顶栏字 / 次字 / 进度槽；深色版（ray-ip-dark）改成 "#F3F3F0", "#9A9A96", "rgba(243,243,240,0.18)"
 TOPBAR_RIGHT = ""                                 # 顶栏右侧的小字（栏目名 / 本期名），留空不显示
 EXTRA_JS = []                                     # 场景要用的全局数据脚本，如 ["assets/data.js"]（window.DATA）
 CAP_TOP = None                                    # 字幕带顶；None = 画布默认（竖屏 1420，带高 150，有角落数字人时 ≤1420、没有可放到 1500；横屏 930）
@@ -45,7 +46,7 @@ X0, X1, GAP = HFV["bar_x0"], HFV["bar_x1"], 10
 span = X1 - X0 - GAP * (len(CHAPS) - 1)
 named = any(t for t, _, _ in CHAPS)
 CHROME_CSS = """
-#topbar { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; z-index: 50; --tb-ink: #111111; --tb-dim: #8C8C8C; --tb-track: rgba(17,17,17,0.14); --tb-bg: %(bg)s; }
+#topbar { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; z-index: 50; --tb-ink: %(ink)s; --tb-dim: %(dim)s; --tb-track: %(track)s; --tb-bg: %(bg)s; }
 #topbar .tb-back { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; background: var(--tb-bg); }
 #topbar .tb-no { position: absolute; left: %(x0)spx; top: %(noy)spx; font-family: "JetBrains Mono", monospace; font-size: 26px; letter-spacing: .08em; color: var(--tb-dim); }
 #topbar .tb-t { position: absolute; left: %(tx)spx; top: %(ty)spx; font-family: "HeiBold", sans-serif; font-weight: 700; font-size: %(ts)spx; color: var(--tb-ink); opacity: 0; white-space: nowrap; }
@@ -53,7 +54,7 @@ CHROME_CSS = """
 #topbar .tb-seg { position: absolute; top: %(segy)spx; height: 8px; border-radius: 4px; background: var(--tb-track); overflow: hidden; }
 #topbar .tb-seg i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%%; background: var(--tb-ink); transform-origin: left center; }
 .cap span small { display: block; font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 26px; line-height: 1.35; color: #BDBDB8; margin-top: 6px; }
-""" % {"bg": BG, "tbh": HFV["topbar_h"], "x0": X0, "noy": HFV["no_y"], "tx": X0 + 108, "ty": HFV["title_y"], "ts": HFV["title_size"], "segy": HFV["seg_y"]}
+""" % {"bg": BG, "ink": TB_INK, "dim": TB_DIM, "track": TB_TRACK, "tbh": HFV["topbar_h"], "x0": X0, "noy": HFV["no_y"], "tx": X0 + 108, "ty": HFV["title_y"], "ts": HFV["title_size"], "segy": HFV["seg_y"]}
 segs, titles, x = [], [], X0
 for k, (t, a0, a1) in enumerate(CHAPS):
     w = span * (a1 - a0) / TOTAL
@@ -75,7 +76,7 @@ for k, (t, a0, a1) in enumerate(CHAPS if TOPBAR else []):
 for sid in sorted(SIG, key=starts.get) if TOPBAR else []:   # 签名幕（整屏墨绿）：顶栏换暖白（按时间排，输出稳定）
     CHROME_TWEENS.append(f'tl.set("#topbar", {{ "--tb-ink": "#F3F3F0", "--tb-dim": "#9CC2BF", "--tb-track": "rgba(243,243,240,0.22)", "--tb-bg": "#054C4C" }}, {starts[sid]:.3f});')
     if ends[sid] < TOTAL - 0.01:
-        CHROME_TWEENS.append(f'tl.set("#topbar", {{ "--tb-ink": "#111111", "--tb-dim": "#8C8C8C", "--tb-track": "rgba(17,17,17,0.14)", "--tb-bg": "{BG}" }}, {ends[sid]:.3f});')
+        CHROME_TWEENS.append(f'tl.set("#topbar", {{ "--tb-ink": "{TB_INK}", "--tb-dim": "{TB_DIM}", "--tb-track": "{TB_TRACK}", "--tb-bg": "{BG}" }}, {ends[sid]:.3f});')
 
 
 def sfx_time(s, t):
