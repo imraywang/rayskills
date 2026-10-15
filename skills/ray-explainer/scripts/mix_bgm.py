@@ -10,6 +10,9 @@ build.py then plays it at BGM_VOL (default 0.35) and carves it under the narrati
                                   scene ranges played quieter / louder than 1.0
   "end_at": {"scene": "end", "line": 0, "phrase": "那一毫秒"}    music fades out from this word to the end
                                   (default: the last 3 s)
+  "loop": {"from": 30, "at": 170, "xfade": 4}
+                                  only when the track is shorter than the film: play to "at", crossfade back to "from",
+                                  repeat until long enough (defaults: at = length − 10 s, from = min(30 s, 20 %), 4 s)
 """
 import json, os, subprocess, sys
 
@@ -25,7 +28,17 @@ TL = json.load(open(os.path.join(PROJ, "timeline.json")))
 SC = {s["id"]: s for s in TL["scenes"]}
 TOTAL = TL["scenes"][-1]["end"] + 0.4          # same as make_beats.py "total"
 x, sr = sf.read(SRC, always_2d=True)
-if len(x) < TOTAL * sr: print(f"WARN: bgm {len(x) / sr:.1f}s shorter than film {TOTAL:.1f}s — set BGM_LEN in build.py or regenerate longer")
+need = int(TOTAL * sr) + 1
+if len(x) < need:   # track shorter than the film: loop a middle section with an equal-power crossfade
+    L = len(x) / sr; lp = cfg.get("loop") or {}
+    at, frm, xf = lp.get("at", L - 10), lp.get("from", min(30.0, L * 0.2)), lp.get("xfade", 4.0)
+    a, f, n = int(at * sr), int(frm * sr), int(xf * sr)
+    if not (0 <= f < a - n <= len(x) - n): sys.exit(f"bad loop points from={frm} at={at} xfade={xf} for a {L:.1f}s track")
+    k = np.linspace(0, np.pi / 2, n)[:, None]; seg, y, loops = x[f:a + n], x[:a + n], 0
+    while len(y) < need:
+        y = np.concatenate([y[:-n], y[-n:] * np.cos(k) + seg[:n] * np.sin(k), seg[n:]]); loops += 1
+    print(f"bgm {L:.1f}s < film {TOTAL:.1f}s: looped {frm:.0f}s–{at:.0f}s ×{loops} with {xf:.0f}s crossfades")
+    x = y
 x = x[: int(TOTAL * sr)]
 t = np.arange(len(x)) / sr
 env = np.ones(len(x))

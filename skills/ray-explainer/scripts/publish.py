@@ -1,6 +1,6 @@
 """Build the publish package after out.mp4 is approved: cover frame, Douyin copy, and the vault note.
 
-usage: python3 publish.py <project> [--vault <vault root>] [--force]
+usage: python3 publish.py <project> [--vault <vault root>] [--force] [--cover <image> …]
 
 Reads script.json:
   title, source, central_judgment, to_confirm[], cover_t (seconds; that frame becomes cover.jpg)
@@ -9,8 +9,10 @@ Reads script.json:
     created in the vault: the 母稿 gets video_* frontmatter keys and a「## 发布文案」section (replaced on re-runs).
 HyperFrames projects (<project>/hf/ with build.py, see references/hyperframes.md): the cover is rendered with
   COVER=1 hf/build.py (no captions / presenter, cover overlay on) + `npx hyperframes snapshot`, then index.html is rebuilt.
+Covers made with ray-cover (cover_9x16.png / cover_3x4.png / cover_16x9.png copied into the project) are picked up
+automatically, or pass --cover; the first one becomes the note's video_cover. Without any, cover_t picks a frame.
 Writes:
-  <project>/cover.jpg           the frame at cover_t (via render.js)
+  <project>/cover.jpg           the frame at cover_t (via render.js), only when there is no ray-cover cover
   <project>/publish.md          titles / description / tags / cover path, ready to paste
   <vault>/10-创作/25-口播草稿/<date>-<title>.md   frontmatter + storyboard + script + copy + 待确认 (video stays in the project)
 The vault note is regenerated only if nobody edited it since the last publish.py run (hash kept in
@@ -19,6 +21,7 @@ The vault note is regenerated only if nobody edited it since the last publish.py
 import argparse, datetime, hashlib, json, os, re, subprocess, sys
 
 ap = argparse.ArgumentParser(); ap.add_argument("project"); ap.add_argument("--vault", default=os.environ.get("RAY_VAULT")); ap.add_argument("--force", action="store_true")
+ap.add_argument("--cover", nargs="+", default=[])
 a = ap.parse_args()
 PROJ, SK = os.path.abspath(a.project), os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 s = json.load(open(os.path.join(PROJ, "script.json")))
@@ -30,9 +33,11 @@ if not a.vault or not os.path.isdir(os.path.join(a.vault, "10-创作", "25-口�
     sys.exit("vault not found: pass --vault <root> (must contain 10-创作/25-口播草稿) or set RAY_VAULT")
 dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
 
-# cover frame
-cover = None
-if s.get("cover_t") is not None and HF:
+# cover: ray-cover images in the project (or --cover) win over a frame grab
+COVER_LABEL = {"cover_9x16.png": "9:16 抖音 / 视频号", "cover_3x4.png": "3:4 小红书", "cover_16x9.png": "16:9 横屏"}
+covers = [os.path.abspath(c) for c in a.cover] or [os.path.join(PROJ, f) for f in COVER_LABEL if os.path.exists(os.path.join(PROJ, f))]
+cover = covers[0] if covers else None
+if not covers and s.get("cover_t") is not None and HF:
     import shutil, tempfile
     t = float(s["cover_t"]); tmp = tempfile.mkdtemp()
     try:
@@ -44,7 +49,7 @@ if s.get("cover_t") is not None and HF:
     finally:
         subprocess.run([sys.executable, "build.py"], cwd=HF, check=True, capture_output=True)   # back to the normal index
         shutil.rmtree(tmp, ignore_errors=True)
-elif s.get("cover_t") is not None:
+elif not covers and s.get("cover_t") is not None:
     t = float(s["cover_t"])
     subprocess.run(["node", os.path.join(SK, "scripts", "render.js"), PROJ, "stills", str(t)], check=True, capture_output=True, env={**os.environ, "RX_CLEAN": "1"})
     src = os.path.join(PROJ, "stills", "t" + f"{t:.1f}".rjust(5, "0") + ".jpg")   # same name render.js writes
@@ -58,7 +63,8 @@ copy = ["## 发布文案（抖音）", ""]
 if pub.get("titles"): copy += ["**标题备选**", *[f"{i}. {x}" for i, x in enumerate(pub["titles"], 1)], ""]
 if pub.get("description"): copy += ["**描述**", "", pub["description"].strip(), ""]
 if pub.get("tags"): copy += [" ".join("#" + x.lstrip("#") for x in pub["tags"]), ""]
-if cover: copy += [f"**封面**：`{cover}`（第 {s['cover_t']} 秒那一帧）", ""]
+if covers: copy += ["**封面**", *[f"- {COVER_LABEL.get(os.path.basename(c), os.path.basename(c))}：`{c}`" for c in covers], ""]
+elif cover: copy += [f"**封面**：`{cover}`（第 {s['cover_t']} 秒那一帧）", ""]
 open(os.path.join(PROJ, "publish.md"), "w").write(f"# {s.get('title', '')}\n\n视频：`{video}`（{dur:.0f} 秒）\n\n" + "\n".join(copy))
 
 # existing 母稿: add the video fields and the publish copy to it instead of creating a second note
@@ -69,6 +75,7 @@ if s.get("draft"):
     keys = {"video_status": "rendered", "video_path": video, "video_cover": cover or "", "video_publish_pack": os.path.join(PROJ, "publish.md"),
             "video_duration_s": round(dur)}
     head, sep, rest = txt.partition("\n---\n") if txt.startswith("---\n") else ("", "", txt)
+    if re.search(r"^target_duration_seconds:", head, flags=re.M): keys["target_duration_seconds"] = round(dur)   # plan → actual
     if sep:
         lines = [l for l in head.split("\n") if l.split(":", 1)[0] not in keys]
         head = "\n".join(lines + [f"{k}: {json.dumps(v, ensure_ascii=False)}" for k, v in keys.items()])

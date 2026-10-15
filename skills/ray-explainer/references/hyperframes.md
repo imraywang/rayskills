@@ -8,7 +8,7 @@
 
 ```
 口播母稿（ray-kb）─▶ script.json（含 display 映射、chapters、clips）─▶ ② tts.py ─▶ ③ qa_tts.py + check_numbers.py
-  ─▶ ③c 有原声：splice_clips.py ─▶ host.py
+  ─▶ ③c 有原声：cut_clips.py → splice_clips.py ─▶ host.py
   ─▶ 取材（下文）─▶ hyperframes intent → general-video，storyboard: yes
   ─▶ STORYBOARD.md + storyboard.html 草图【Ray 确认】
   ─▶ hf/ 骨架：make_beats.py → beats.json + assets/beats.js；build.py → index.html
@@ -22,7 +22,7 @@
 2. 走 `/hyperframes` 的 intent 流程（路由到 `general-video`，`storyboard: yes`）。先在对话里给分镜表，Ray 点头后出 `storyboard.html` 草图（每幕一张关键帧，真实截图直接嵌进去，缺的素材画虚线框），再确认一次才做成片。
 3. 搭骨架：`npx hyperframes init hf --non-interactive --example=blank --skill=general-video`（横屏加 `--resolution landscape`），然后把 `assets/hf-template/` 里的 `make_beats.py`、`build.py`、`host_build.py`、`WORKER.md` 和 `assets/canvas.json` 拷进 `hf/`（三个脚本按 `script.json` 的 `aspect` 从 `canvas.json` 取画布尺寸、顶栏、字幕带和主持人版位）；字体从 `assets/huashu/lib/fonts/NotoSansSC-{500,700,900}.woff` 拷到 `hf/assets/fonts/`；`style.example.css` 是上一期的设计系统，只当写法参考，**每期重写 `hf/assets/style.css`**；音频 `ffmpeg -i ../narration.wav -c:a aac -b:a 192k hf/assets/audio/narration.m4a`。
 4. `build.py` 顶部“本片专属”一段写这期的底色、顶栏右侧小字、字幕带位置、要加载的数据脚本（`EXTRA_JS`）、配乐音量；其余不动。顶栏默认就是**按章节分段的视频进度条 + 当前章节小标题**（Ray 的偏好），章节写在 `script.json` 的 `"chapters": [{"title": "那场日食", "scenes": ["eclipse", "photos"]}, …]`，按剧情分 5–7 段；不写就每幕一段、不显示小标题。签名幕里顶栏自动换成墨绿底暖白字。配乐给人声让路要在项目里 `npm i -D @hyperframes/core`。
-5. 填好 `WORKER.md` 的四处 `{{…}}`，按 general-video 的派发规则开子任务：每个 2–3 幕、一次派完。子任务读节拍用 `window.BEATS`，**不把时间抄进场景文件**，音效时刻也写成锚点（`{"line": 0, "phrase": "拍到"}` / `{"clip": "c1", "t": 2.8}` / `{"cap": 3}`）——改配音后只重跑 `make_beats.py && build.py`，画面和音效都跟着走。**音效要少**：全片十几个，只标关键节点；`build.py` 超过 15 个会提醒。子任务交回后检查它们自己补写的说明文字（“单一目击”“月球背面”这类没有出处的描述），不实的改掉。
+5. 填好 `WORKER.md` 的四处 `{{…}}`，按 general-video 的派发规则开子任务：每个 2–3 幕、一次派完。子任务读节拍用 `window.BEATS`，**不把时间抄进场景文件**，音效时刻也写成锚点（`{"line": 0, "phrase": "拍到"}` / `{"clip": "c1", "t": 2.8}` / `{"cap": 3}`）——改配音后只重跑 `make_beats.py && build.py`，画面和音效都跟着走。**音效要少**：全片十几个，只标关键节点；`build.py` 超过 15 个会提醒。子任务交回后，`build.py` 会跑 `scripts/screen_text_check.py`，列出画面里所有在 `script.json`、`STORYBOARD.md` 里找不到出处的中文（“单一目击”“月球背面”就是这样混进上一期的）：逐条核实，不实的改掉，确认无误的加进 `script.json` 的 `"screen_text"`，直到它报 ok 再渲染。
 6. `npx hyperframes check` 必须 0 错误；再 `npx hyperframes snapshot --at <每幕 2–3 个时刻>` 用 Read 看图，查遮挡、空镜、标注有没有落在对的位置。
 7. `npx hyperframes render -o ../out.mp4 --quality delivery`（约 1:1 实时；改动后先用 snapshot 抽帧确认再整片渲）。渲完跑 `python3 $SK/scripts/audio_check.py <project>`：人声和配乐的音量差、原声下面的配乐、音效数量，有一项不对就先修再交付——不能只看画面。成片 >30 MB 按 SKILL.md 第 6 步压手机版一起交付。
 
@@ -35,8 +35,8 @@
 - **Wikimedia Commons**：用 API 查 `imageinfo&iiurlwidth=1920` 拿 `thumburl`（只有标准尺寸能下），curl 必须带 User-Agent，否则返回 HTML 报错页。授权和作者写进项目的 `credits.json`，CC BY-SA 的发布时在简介里署名。
 - **会动的网页（交互图解、WebGL 演示、Anatomy 作品、看板）录成确定的片段**：`node $SK/scripts/record_clip.mjs jobs.json`。它把页面的时钟（performance.now、Date.now、rAF、定时器）换成虚拟时钟，每截一帧推进 1/fps，所以再慢的截图也录出均匀、每次一样的 30fps 视频，WebGL 效果照录；`actions` 可以在指定秒点击按钮、移鼠标、按键（点火、拆开、打字、关机），`crop: "auto"` 自动裁到画面本体。产出 `clips/<name>.mp4`（无声）和首尾帧 PNG，给子任务看图定位。第一次实战：《一句话造一台机器》（2026-10-13）录了 21 段 Anatomy 作品。
 - **页面自己能定位时间（`window.__seek(t)`）的，按旁白重映射时间逐帧截**：用几个“开口词 → 页面时刻”的锚点做分段线性映射，旁白说到“落刀”刀就落下；一段 30 秒的演示能压进一句话。片段的 0 秒对齐第一个锚点，场景里 `data-start` 填那个时刻。
-- **原声**（采访、任务录音、档案音频）：先用词级 Whisper 找准起止，`ffmpeg -ss … -t … -af "afade…,loudnorm=I=-17:TP=-1.5" -ac 1 -ar 24000 -sample_fmt s16` 切成 `clips/<id>.wav`，在 `script.json` 写 `"clips"`（字段见 `scripts/splice_clips.py` 文件头：插在哪句后面、说话人、`segs` 逐句原文 + 中文、`caps` 更短的字幕句）。配音和校对之后跑 `splice_clips.py <project>`，再 `host.py <project> --plan-only`（原声期间主持人闭嘴）。原声字幕是“中文大字 + 英文原句小字”，中文每条 ≤ 14 字，长的在 `caps` 里拆短。旁白一个字不改，原声是加进来的真实证据。
-- **配乐（默认本地生成）**：`python3 $SK/scripts/gen_bgm.py <project>` 用 ACE-Step 1.5 在本机生成 3 首（MIT，可商用，约 4 分钟；安装见脚本文件头），`bgm/listen/*.m4a` 发给 Ray 挑。风格写在 `script.json` 的 `"bgm": {"caption": "…", "bpm": 70}`；参考某部电影的配乐时只描述配器和走向，不写片名和作曲家。挑中后 `python3 $SK/scripts/mix_bgm.py <project> bgm/<pick>.wav`：按 `"bgm"` 里的 `silent_clips`（关键原声完全静音）、`duck`（其余原声下压）、`sections`（哪几幕收弱 / 抬起）、`end_at`（从哪个字开始收）把包络烧进 `hf/assets/audio/bgm.m4a`，`build.py` 里 `BGM_LEN = 0`、`BGM_VOL = 0.35`。不要再沿用上期配乐了事：旧配乐音量 0.18、又被人声压低，Ray 看片时等于没有。
+- **原声**（采访、任务录音、档案音频）：先 `python3 $SK/scripts/cut_clips.py --words <录音> --from <h:m:s> --to <h:m:s>` 拿词级时间戳找准起止，把来源文件和片段写进 `clips[].cut`（`file`、`base`、`segs`，见脚本文件头），再 `cut_clips.py <project>` 一次切好全部 `clips/<id>.wav`（淡入淡出、拼接、响度统一）；改片段只改 `segs` 重跑。`"clips"` 的其余字段见 `scripts/splice_clips.py` 文件头：插在哪句后面、说话人、`segs` 逐句原文 + 中文、`caps` 更短的字幕句。配音和校对之后跑 `splice_clips.py <project>`，再 `host.py <project> --plan-only`（原声期间主持人闭嘴）。原声字幕是“中文大字 + 英文原句小字”，中文每条 ≤ 14 字，长的在 `caps` 里拆短。旁白一个字不改，原声是加进来的真实证据。
+- **配乐（默认本地生成）**：`python3 $SK/scripts/gen_bgm.py <project>` 用 ACE-Step 1.5 在本机生成 3 首（MIT，可商用，约 4 分钟；安装见脚本文件头），`bgm/listen/*.m4a` 发给 Ray 挑。风格写在 `script.json` 的 `"bgm": {"caption": "…", "bpm": 70}`；参考某部电影的配乐时只描述配器和走向，不写片名和作曲家。挑中后 `python3 $SK/scripts/mix_bgm.py <project> bgm/<pick>.wav`：按 `"bgm"` 里的 `silent_clips`（关键原声完全静音）、`duck`（其余原声下压）、`sections`（哪几幕收弱 / 抬起）、`end_at`（从哪个字开始收）把包络烧进 `hf/assets/audio/bgm.m4a`，`build.py` 里 `BGM_LEN = 0`、`BGM_VOL = 0.35`。配乐比片子短时 `mix_bgm.py` 自动把中段交叉淡化循环接长（默认从倒数 10 秒接回第 30 秒，`"bgm": {"loop": {…}}` 可改）。不要再沿用上期配乐了事：旧配乐音量 0.18、又被人声压低，Ray 看片时等于没有。
 
 ## 安全区
 
@@ -50,4 +50,4 @@
 
 ## 发布包
 
-`script.json` 写 `cover_t`、`publish`（含 `video` 指向最终成片文件名）和 `draft`（vault 里口播母稿的相对路径），`build.py` 写好 `COVER_HTML`，然后 `publish.py <project> --vault <root>`：封面用 COVER 版单独渲一帧（不带字幕和数字人），文案并进母稿的「发布文案」，不新建同名笔记。发布前提醒 Ray 勾选平台的「AI 生成内容」声明（复刻音色、数字人）和图片署名。
+`script.json` 写 `cover_t`、`publish`（含 `video` 指向最终成片文件名）和 `draft`（vault 里口播母稿的相对路径），`build.py` 写好 `COVER_HTML`，然后 `publish.py <project> --vault <root>`：封面优先用 ray-cover 做好、拷进项目根的 `cover_9x16.png` / `cover_3x4.png`（自动识别，写进 `video_cover`），没有才用 COVER 版单独渲一帧（不带字幕和数字人），文案并进母稿的「发布文案」，不新建同名笔记。发布前提醒 Ray 勾选平台的「AI 生成内容」声明（复刻音色、数字人）和图片署名。

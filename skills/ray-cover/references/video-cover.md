@@ -95,4 +95,5 @@ python3 $SK/scripts/gen_cover.py <封面目录> --platforms vertical --ref ~/.co
 
 - 用 Read 逐张看：字逐字对（缺字、错字、多出来的字）；颜色只有黑白灰加暗墨绿（拿不准就用 PIL 取样墨绿处的像素，明显偏亮偏青就重跑）；标题、人脸、主道具在中间 3:4 里完整可读；人一眼认得出是 Ray。
 - 重跑前先把旧文件改名留档：`raw-vertical`、`vertical-cover`、`vertical-thumb`、`codex-vertical.log`、`manifest.json`、`ref.jpg` 加 `-v1`、`-v2` 后缀，提示词也存一份 `prompts/vertical-v1.md`。只改出问题那期的提示词。
+- 给 ray-explainer 成片做的封面，把成品拷进视频项目根目录，命名 `cover_9x16.png` / `cover_3x4.png` / `cover_16x9.png`：`publish.py` 会自动写进发布包和母稿的 `video_cover`。
 - 用 SendUserFile 发成品，回复里写：每期用的风格、照片和一句话视觉隐喻；这组文案和 1–2 组备选；验收发现的问题和处理（重跑了什么、哪些小问题按「中心视觉完整」放过）。

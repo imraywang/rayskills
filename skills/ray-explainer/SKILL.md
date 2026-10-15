@@ -71,6 +71,8 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 story
 python3 -I $SK/scripts/tts.py <project>
 ```
 
+旁白整体响度统一到 −21 LUFS（Ray 认可的云端版水平，原声片段切在 −17），换哪个音色都一样，不用再手动调；要改就写 `script.json` 的 `"loudness"`。
+
 **选音色**（`script.json` 的 `"voice"`）：
 
 - `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，走 fal 上的 MiniMax `speech-2.8-hd`，每千字 0.1 美元。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
@@ -170,10 +172,10 @@ python3 $SK/scripts/audio_check.py <project> [out.mp4]
 - **中段空画面**：连续 0.3 秒以上几乎没有任何边缘的帧。红灯就是真问题，去看报出的时间码。纸纹桌面这类有纹理的空镜它查不出，第 5 步静帧检查要自己看。
 - **蓝紫占比**：蓝紫底画面占全片的比例。黄、红灯说明用了深紫星空一类的底，换底色。
 
-SendUserFile 发到手机 / 网页端的上限是 30 MB，超过只在本机桌面端可见。成片超过 30 MB 时同时压一份手机版一起交付（3–4 分钟的片子约 27 MB）：
+SendUserFile 发到手机 / 网页端的上限是 30 MB，超过只在本机桌面端可见。成片超过 30 MB 时同时压一份手机版一起交付，码率按时长算，保证不超过 28 MB（固定 900k 时 4 分钟的片子压出过 30.4 MB）：
 
 ```bash
-ffmpeg -i out.mp4 -c:v libx264 -preset slow -b:v 900k -maxrate 1100k -bufsize 2200k -vf scale=720:-2 -c:a aac -b:a 96k out_phone.mp4
+python3 $SK/scripts/phone_export.py <project>          # → out_phone.mp4
 ```
 
 ## 7. 交付说明

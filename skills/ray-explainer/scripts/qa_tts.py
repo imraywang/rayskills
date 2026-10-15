@@ -8,6 +8,7 @@ usage: python3 qa_tts.py <project_dir>      (run after tts.py)
    script character (punctuation interpolated). kit at() and grammar cues use it to land on the exact syllable.
 3. script.json "display" ({"二零一九年": "2019 年"}): lines are voiced as written (years digit by digit),
    then the timeline text and chars are mapped to the display form, so captions and at() see "2019 年".
+   Spaces between the digits and neighbouring hanzi are added automatically; don't pad the display value.
    Lines whose voiced text still has 3+ Arabic digits get a WARN: TTS reads them as quantities
    (2019 → 两千零一十九); write them in hanzi and add a display entry. check_numbers.py verifies the reading.
 """
@@ -48,11 +49,20 @@ def char_times(line, words):
     return out, len(known) / max(1, len(idx))
 
 
+CJK = lambda c: "\u3400" <= c <= "\u9fff"
+ASCII = lambda c: c.isascii() and c.isalnum()
+
+
 def to_display(text, chars):
-    """Voiced text → display text; each mapped span's char times are spread evenly over the same interval."""
-    for sp, dp in DISPLAY.items():
+    """Voiced text → display text; each mapped span's char times are spread evenly over the same interval.
+    A space is added where the mapped Latin/digits meet hanzi (从二零零六年起 + "2006 年" → 从 2006 年起)."""
+    for sp, dp0 in DISPLAY.items():
         i = text.find(sp)
         while i >= 0:
+            dp = dp0.strip()
+            if i > 0 and CJK(text[i - 1]) and ASCII(dp[0]): dp = " " + dp
+            j = i + len(sp)
+            if j < len(text) and CJK(text[j]) and ASCII(dp[-1]): dp += " "
             seg = chars[i:i + len(sp)] if chars else []
             if seg:
                 a, b = seg[0], seg[-1]

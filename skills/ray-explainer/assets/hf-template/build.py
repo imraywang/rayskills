@@ -8,7 +8,7 @@
     12.4                                         幕内秒（不推荐：重新配音后会错位）
   文件在 assets/audio/<name>.mp3。
 用法：python3 make_beats.py && python3 build.py        COVER=1 python3 build.py → 封面版（无字幕、无数字人、加封面字）"""
-import json, os, html, subprocess
+import json, os, html, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 B = json.load(open(os.path.join(HERE, "beats.json")))
@@ -184,3 +184,7 @@ CARVE = os.path.expanduser("~/.claude/skills/hyperframes-audio/scripts/carve.mjs
 for bed in ([b.split('"')[1] for b in bgm] if os.path.exists(CARVE) else []):
     r = subprocess.run(["node", CARVE, "--comp", os.path.join(HERE, "index.html"), "--bed", bed, "--voice", "narration", "--strength", "0.7"], capture_output=True, text=True)
     print(f"carve {bed}: " + ("ok" if r.returncode == 0 else "FAILED（项目里先 npm i -D @hyperframes/core）"))
+
+# 画面文字溯源：场景里的中文必须出自 script.json / STORYBOARD.md，子任务自己编的说明会列出来（只提醒，不拦）
+STC = os.path.expanduser("~/.claude/skills/ray-explainer/scripts/screen_text_check.py")
+if os.path.exists(STC): subprocess.run([sys.executable, STC, os.path.dirname(HERE)])

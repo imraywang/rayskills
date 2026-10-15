@@ -69,6 +69,7 @@ Audit hygiene (`npx hyperframes check` must end with 0 errors)
 - Real content stays readable: ≥24 px, contrast ≥3:1 for large text.
 
 Truthfulness
+- **On-screen Chinese comes from the script.** Labels, headings and annotations reuse wording from `beats.json` / `STORYBOARD.md` / `../script.json`. Don't add your own characterisations ("single witness", "far side", "first ever") — in a documentary that is a factual claim. If a scene needs a label that isn't there, keep it neutral (what is shown, not what it means) and list it in your report; `build.py` flags every Chinese phrase it can't trace to the script.
 - **Don't invent specific numbers or names.** Drawn bills, documents, dashboards and stand-ins use numbers from the brief/beats/real data, or placeholders (`¥ •••`, `v•.•`). Product and repo names follow the current primary source given below (if a repo was renamed, use the new name). If you need a figure you don't have, use a placeholder and say so in your report.
 - Real products (GitHub, X, the tool being explained) are always the provided screenshots or real output, never redrawn UI. Drawn mock UI only for generic things (an editor, a bill, an app icon, a terminal, an installer box).
 

@@ -5,7 +5,7 @@ usage: python3 splice_clips.py <project>        run after tts.py + qa_tts.py (an
 script.json top level:
   "clips": [{
     "id": "c1", "after": ["<scene id>", <line index>],   # the clip plays right after that narration line
-    "src": "clips/c1.wav",                               # 24 kHz mono s16 WAV (cut + loudnorm with ffmpeg first)
+    "src": "clips/c1.wav",                               # 24 kHz mono s16 WAV — cut_clips.py writes it from "cut"
     "speaker": "Reid Wiseman · 指令长", "utc": "2026-04-07 00:41:00 UTC",   # optional labels for the scene
     "segs": [[t, "english", "中文"], ...],              # clip-local seconds: what is said when (scenes type this)
     "caps": [[t, "english", "中文"], ...]               # optional: shorter caption lines (make_beats prefers them)

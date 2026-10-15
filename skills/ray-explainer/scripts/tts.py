@@ -11,10 +11,14 @@ Voice is chosen by script.json "voice":
 Clips are cached by (provider, model, voice, speed, text) in <project>/audio/, so editing one line only
 re-synthesizes that line. Per-clip usage goes to audio/usage.json for cost.py.
 
+narration.wav is gain-matched (one linear gain, no compression, peak-limited) to script.json "loudness", default
+−21 LUFS: the level of the MiniMax narration Ray approved against source clips cut at −17 (cut_clips.py). Every voice
+lands there — local VoxCPM2 came out 7 dB hotter and drowned the clips before this existed.
+
 Gemini TTS reads ANY text you send aloud — including "say this in a cheerful tone:" style
 instructions, in Chinese or English. Send only the spoken line.
 """
-import array, base64, datetime, hashlib, json, os, subprocess, sys, tempfile, time, urllib.request, wave
+import array, base64, math, datetime, hashlib, json, os, subprocess, sys, tempfile, time, urllib.request, wave
 from concurrent.futures import ThreadPoolExecutor
 
 PROJ = os.path.abspath(sys.argv[1])
@@ -157,8 +161,31 @@ for si, sc in enumerate(script["scenes"]):
         buf += silence(gap); t += gap
     scene["end"] = round(t, 3); timeline.append(scene)
 
-with wave.open(os.path.join(PROJ, "narration.wav"), "wb") as w:
-    w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(bytes(buf))
+
+
+def lufs(path):
+    r = subprocess.run(["ffmpeg", "-nostats", "-i", path, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
+    vals = [float(l.split()[1]) for l in r.splitlines() if l.strip().startswith("I:") and "LUFS" in l]
+    return vals[-1] if vals else None
+
+
+def write_wav(path, data):
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(bytes(data))
+
+
+NAR = os.path.join(PROJ, "narration.wav")
+write_wav(NAR, buf)
+target = float(script.get("loudness", -21.0))
+cur = lufs(NAR)
+if cur is not None and abs(cur - target) > 0.3:
+    a = array.array("h", bytes(buf)); peak = max(1, max(abs(min(a)), max(a)))
+    g = 10 ** ((target - cur) / 20)
+    if peak * g > 0.95 * 32767:
+        g = 0.95 * 32767 / peak
+        if target - (cur + 20 * math.log10(g)) > 1: print(f"WARN: peaks limit the gain — narration ends at {cur + 20 * math.log10(g):.1f} LUFS, not {target:.1f}")
+    a = array.array("h", (int(round(s * g)) for s in a)); write_wav(NAR, a)
+    print(f"loudness {cur:.1f} → {cur + 20 * math.log10(g):.1f} LUFS (target {target:.0f})")
 tl = {"duration": round(t, 3), "voice": VOICE, "provider": PROVIDER, "scenes": timeline}
 json.dump(tl, open(os.path.join(PROJ, "timeline.json"), "w"), ensure_ascii=False, indent=1)
 open(os.path.join(PROJ, "timeline.js"), "w").write("window.TIMELINE=" + json.dumps(tl, ensure_ascii=False) + ";")
