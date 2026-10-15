@@ -97,11 +97,17 @@ for sc in tl["scenes"]:
         ok = ratio > .8
         bad += not ok
         line["chars"], cover = char_times(line, words) if words else ([], 0)
+        for prompt in ("以下是普通话的句子，使用简体中文。", None):   # the timing pass sometimes loops or drifts on long real recordings: retry, keep the best alignment
+            if cover >= .9: break
+            r = mlx_whisper.transcribe(f, path_or_hf_repo=MODEL, language="zh", initial_prompt=prompt, word_timestamps=True, condition_on_previous_text=False)
+            w2 = [w for s in r["segments"] for w in s.get("words", [])]
+            c2, cov2 = char_times(line, w2) if w2 else ([], 0)
+            if cov2 > cover: line["chars"], cover = c2, cov2
         line["qa"] = round(ratio, 2)
         print(f"{'OK ' if ok else 'BAD'} {ratio:.2f} align {cover:.0%} | {line['text'][:22]} | {heard[:30]}")
         if re.search(r"\d{3,}", line["text"]):
             print(f"WARN 数字会按数值念（2019 → 两千零一十九）：{line['text'][:30]}  年份/编号写成汉字逐位，并在 script.json 的 display 里映射回数字")
-        if not ok: os.rename(f, f + ".bad")
+        if not ok and tl.get("provider") != "recorded": os.rename(f, f + ".bad")   # a recorded take can't be re-synthesized: check the take / fix the line text
         if DISPLAY: line["spoken"] = line["text"]; line["text"], line["chars"] = to_display(line["text"], line["chars"])
 
 json.dump(tl, open(TL_F, "w"), ensure_ascii=False, indent=1)

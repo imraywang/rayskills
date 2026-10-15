@@ -27,11 +27,16 @@ script = json.load(open(os.path.join(PROJ, "script.json")))
 RATE = 24000
 gaps = script.get("gaps") or {}
 LEAD, LINE_GAP, SCENE_GAP, TAIL = gaps.get("lead", .6), gaps.get("line", .32), gaps.get("scene", .8), gaps.get("tail", 1.6)
+CONTINUOUS = bool((script.get("recording") or {}).get("continuous"))   # Ray's own edit is the soundtrack: lines tile it back to back, no gaps, no trimming
+if CONTINUOUS: LEAD = LINE_GAP = SCENE_GAP = 0
 VOICES_F = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "ray-explainer", "voices.json")
 voices = json.load(open(VOICES_F)) if os.path.exists(VOICES_F) else {}
 VOICE = script.get("voice", "Charon")
 SPEED = float(script.get("speed", 1.0))
-if VOICE in voices:
+REC = script.get("recording")   # Ray's own recording as the voice: {"src": <video/audio>, "takes": {"<scene>.<line>": [[a, b], ...]}}
+if REC:
+    V = {"provider": "recorded", "model": "take", "voice_id": os.path.basename(REC["src"])}
+elif VOICE in voices:
     V = {"provider": "minimax", **voices[VOICE]}
 else:
     V = {"provider": "gemini", "voice_id": VOICE, "model": script.get("tts_model", "gemini-3.8-flash-tts")}
@@ -53,7 +58,21 @@ def zshrc_env(name):
     sys.exit(f"{name} not set")
 
 
+TAKES = {t: REC["takes"][f"{sc['id']}.{i}"] for sc in script["scenes"] for i, t in enumerate(sc["lines"])} if REC else {}
+
+
+def cut_take(text, out):
+    """Cut a line from the recording: its segments in order, 20 ms fades at each join, 24 kHz mono."""
+    segs = TAKES[text]
+    fade = lambda a, b: f",afade=t=in:d=0.02,afade=t=out:st={b - a - 0.02:.3f}:d=0.02" if len(segs) > 1 else ""   # one segment = a sample-exact slice, so back-to-back lines rejoin seamlessly
+    f = "".join(f"[0:a]atrim={a}:{b},asetpts=PTS-STARTPTS{fade(a, b)}[s{i}];" for i, (a, b) in enumerate(segs))
+    f += "".join(f"[s{i}]" for i in range(len(segs))) + f"concat=n={len(segs)}:v=0:a=1[o]"
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", REC["src"], "-filter_complex", f, "-map", "[o]", "-ac", "1", "-ar", str(RATE), "-sample_fmt", "s16", out], check=True)
+    return {"chars": 0}
+
+
 def clip_key(text):
+    if PROVIDER == "recorded": return hashlib.sha1(f"recorded|{REC['src']}|{TAKES[text]}|{text}".encode()).hexdigest()[:16]
     # Gemini at speed 1.0 keeps the original key format so existing caches stay valid
     tag = f"{MODEL}|{VOICE_ID}|{text}" if PROVIDER == "gemini" and SPEED == 1.0 else f"{PROVIDER}|{MODEL}|{VOICE_ID}|{SPEED}|{text}"
     return hashlib.sha1(tag.encode()).hexdigest()[:16]
@@ -122,6 +141,8 @@ def synth(text):
         return out
     if PROVIDER == "voxcpm2":
         raise RuntimeError("VoxCPM2 clip missing after batch: " + text)
+    if PROVIDER == "recorded":
+        cut_take(text, out); return out
     for attempt in range(8):
         try:
             u = (synth_minimax if PROVIDER == "minimax" else synth_gemini)(text, out)
@@ -162,7 +183,7 @@ for si, sc in enumerate(script["scenes"]):
     scene = {"id": sc["id"], "start": round(t, 3), "lines": []}
     if sc.get("grammar"): scene["grammar"] = sc["grammar"]
     for li, text in enumerate(sc["lines"]):
-        clip, cut = trim(pcm(paths[text])); dur = len(clip) / 2 / RATE
+        clip, cut = (pcm(paths[text]), 0.0) if CONTINUOUS else trim(pcm(paths[text])); dur = len(clip) / 2 / RATE
         scene["lines"].append({"text": text, "start": round(t, 3), "end": round(t + dur, 3), "clip": os.path.basename(paths[text]), "cut": round(cut, 3)})
         buf += clip; t += dur
         gap = LINE_GAP if li < len(sc["lines"]) - 1 else (SCENE_GAP if si < len(script["scenes"]) - 1 else TAIL)

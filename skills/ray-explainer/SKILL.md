@@ -80,6 +80,8 @@ python3 -I $SK/scripts/tts.py <project>
 - 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
 - `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
 
+**用 Ray 自己录的口播当配音**（他先录一遍、自己剪掉气口，Claude 按句对上画面）：`script.json` 写 `"recording": {"src": "<视频或音频>", "continuous": true, "takes": {"<幕>.<句>": [[起, 止]]}}`。先用 Whisper（`mlx_whisper` 带词级时间）转写整条，按句定起止，`lines` 改成他实际说的话（只修听错的字），整条连续切开、首尾相接，不加停顿、不裁边；没剪过的原始录音可去掉 `continuous`，每句可拼几段（接口 20 ms 淡入淡出）。之后照常 qa_tts → host.py --plan-only → make_beats → build。出镜：从同一个源按句切竖屏片段，裁肩部以上的方块，在画面左下 / 右下空着的句子里放圆形小窗。
+
 **还没有复刻音色时**：请用户提供 1–3 分钟干净的口播录音（手机录音或已发视频的原片都行），然后：
 
 ```bash
