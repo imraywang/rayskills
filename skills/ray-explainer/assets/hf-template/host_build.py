@@ -2,7 +2,7 @@
 """../host/plan.json（ray-explainer 的 host.py 算出的角落口型、眨眼、Kling 大机位段落）→ compositions/s-host.html。
 
 - 角落（免费）：Ray 的卡通形象 + 按逐字时间切换的口型图层 + 眨眼 + 轻微摆动。
-- 大机位（Kling，可选）：段落开始前 0.4 秒从角落放大到大机位位置，播透明 WebM（自动从 host/frames 转出），说完缩回。
+- 大机位（MiniMax H3 / Kling，可选）：段落开始前 0.4 秒从角落放大到大机位位置，播透明 WebM（自动从 host/frames 转出），说完缩回。
   段落自带 "big": {x, y, w}（host.py 的 big[].pos）时用它，避开这一幕居中的主画面。
 - 横屏（script.json "aspect": "landscape"）：Screen Studio 式圆角气泡，左下角墨绿方块里只露头肩；大机位是气泡放大露出半身，
   段落的 "big" 写 {x, y, w, h}。版位在 canvas.json（和 build.py 读同一份）。
@@ -62,7 +62,9 @@ for i, seg in enumerate(plan.get("segments", [])):
         fr = f'x: {(BUB["x"] + BUB["w"] - bb["x"] - bb["w"]) if right else (bb["x"] - BUB["x"])}, y: {bb["y"] - BUB["y"]}, width: {bb["w"]}, height: {bb["h"]}, borderRadius: {bb.get("r", BIG0["r"]) * bb["w"]:.1f}'   # 位移用 transform，不补间 left/top
         wr = f'x: {X * (s_ - 1):.1f}, y: {Y * (s_ - 1):.1f}, scale: {s_:.4f}'
         back_fr = f'x: 0, y: 0, width: {BUB["w"]}, height: {BUB["h"]}, borderRadius: {BUB["r"] * BUB["w"]:.1f}'
-    vids.append(f'<video id="hs-v{i}" class="hs-v" src="assets/host/big_{key}.webm" muted playsinline data-start="{a}" data-duration="{round(b - a, 3)}" data-track-index="{40 + i}"></video>')
+    pl, pt, pr, pb = seg.get("pad") or [0, 0, 0, 0]   # 帧四周比形象图多出的边（h3 左右各补绿边）：视频往外放，形象和角落图层对齐
+    pad_css = f' style="left:{-pl * W:.1f}px;top:{-pt * H:.1f}px;width:{W * (1 + pl + pr):.1f}px;height:{H * (1 + pt + pb):.1f}px"' if seg.get("pad") else ""
+    vids.append(f'<video id="hs-v{i}" class="hs-v" src="assets/host/big_{key}.webm"{pad_css} muted playsinline data-start="{a}" data-duration="{round(b - a, 3)}" data-track-index="{40 + i}"></video>')
     if BUB:
         if i == 0 and a < 1.0:
             OPEN = (f'tl.set(".hs-fr", {{ {fr} }}, 0); tl.set("#hs-wrap", {{ {wr} }}, 0);'

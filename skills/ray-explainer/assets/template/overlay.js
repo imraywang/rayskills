@@ -107,7 +107,8 @@
     if (sc < 1) ctx.restore();
   }
   function drawBody(ctx, t, s, x, y, w, h) {   // 大机位帧（有就画它），否则形象底图 + 口型 + 眨眼，带轻微摆动
-    if (s) { const im = FRAMES.get(frameUrl(s, t)); if (im) { ctx.drawImage(im, x, y, w, h); return; } }
+    if (s) { const im = FRAMES.get(frameUrl(s, t)); if (im) {   // pad：帧四周比形象图多出的边（占形象宽 / 高），往外画，形象和角落图层对齐
+      const [l, tp, r, b] = s.pad || [0, 0, 0, 0]; ctx.drawImage(im, x - l * w, y - tp * h, w * (1 + l + r), h * (1 + tp + b)); return; } }
     const A = HOST.avatar, sc = w / A.size[0];
     ctx.save(); ctx.translate(x + w / 2, y + h); ctx.rotate(Math.sin(t / 1.6 * Math.PI) * .02); ctx.translate(-(x + w / 2), -(y + h));
     ctx.drawImage(HIMG.base, x, y, w, h);

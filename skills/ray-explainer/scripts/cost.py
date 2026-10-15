@@ -4,7 +4,8 @@ Prices as listed 2026-10 — re-check before quoting budgets:
   MiniMax speech-2.8-hd (direct API or fal): $0.10 per 1000 characters; turbo $0.06 — check the MiniMax pricing page
   (voice clone: one-time fee per voice; fal charged $1.50)
   voxcpm2 (local MLX): $0 — only machine time
-  fal-ai/kling-video/ai-avatar/v2: pro $0.115/s, standard $0.0562/s of output (digital host, host.py)"""
+  fal-ai/kling-video/ai-avatar/v2: pro $0.115/s, standard $0.0562/s of output (digital host, host.py)
+  MiniMax-H3: ≈ $0.08/s of generated video (estimate; official China price not published, host.py default)"""
 import json, os, sys
 GEMINI = {"gemini-3.8-flash-tts": (0.50, 9.00), "gemini-3.8-flash-lite-tts": (0.25, 4.50)}
 MINIMAX = {"speech-2.8-hd": 0.10, "speech-2.8-turbo": 0.06, "fal-ai/minimax/speech-2.8-hd": 0.10, "fal-ai/minimax/speech-2.8-turbo": 0.06}
@@ -27,7 +28,7 @@ if x: print(f"VoxCPM2 local calls {len(x)}  {sum(v.get('chars', 0) for v in x)} 
 print(f"TTS total ≈ ${total:.3f}  (includes re-synthesized clips; cached clips cost nothing)")
 hf = os.path.join(sys.argv[1], "host", "usage.json")
 if os.path.exists(hf):
-    KLING = {"fal-ai/kling-video/ai-avatar/v2/pro": 0.115, "fal-ai/kling-video/ai-avatar/v2/standard": 0.0562}
+    KLING = {"fal-ai/kling-video/ai-avatar/v2/pro": 0.115, "fal-ai/kling-video/ai-avatar/v2/standard": 0.0562, "MiniMax-H3": 0.08}
     h = json.load(open(hf)).values(); sec = sum(v.get("billed") or v["seconds"] for v in h); c = sum((v.get("billed") or v["seconds"]) * KLING.get(v["model"], 0.115) for v in h)
-    print(f"Kling host  calls {len(h)}  {sec:.1f}s video  ≈ ${c:.3f}  (cached segments cost nothing)")
+    print(f"Big-shot host  calls {len(h)}  {sec:.1f}s video  ≈ ${c:.3f}  (cached segments cost nothing)")
     print(f"TTS + host ≈ ${total + c:.3f}")
