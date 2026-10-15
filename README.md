@@ -13,6 +13,8 @@
 [![Validate](https://img.shields.io/badge/结构校验-8%2F8%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
+[GitHub](https://github.com/imraywang/rayskills) · [Gitee（国内镜像）](https://gitee.com/imraywang/rayskills)
+
 </div>
 
 ---
@@ -173,6 +175,12 @@ v4（2026-10-13）用同样的标准再收敛一轮：`ray-consult`、`ray-multi
 
 ```bash
 npx -y skills add imraywang/rayskills -g --all
+```
+
+国内访问 GitHub 慢时，可以从 Gitee 镜像拿代码（与 GitHub 同步更新）：
+
+```bash
+git clone https://gitee.com/imraywang/rayskills.git
 ```
 
 安装后可以从 `/ray` 开始，也可以直接调用具体 Skill：
