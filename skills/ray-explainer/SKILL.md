@@ -74,6 +74,7 @@ python3 -I $SK/scripts/tts.py <project>
 **选音色**（`script.json` 的 `"voice"`）：
 
 - `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，走 fal 上的 MiniMax `speech-2.8-hd`，每千字 0.1 美元。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
+- `"ray-local"`：Ray 的本地复刻音色，走 VoxCPM2（MLX 8bit；2026-10-14 两轮盲听，12 句里赢了 MiniMax 9 句），不花钱，样本也不出本机。`voices.json` 条目写 `"provider": "voxcpm2"`，记录模型目录（外置盘 `/Volumes/协作/ai-models/VoxCPM2-8bit`，盘没挂上会直接报错）、参考片段、`cfg` 3.0、`takes` 3。每句合成 3 遍，由 Whisper 挑最贴稿的一遍（VoxCPM2 每次输出不同，常见问题是英文词念坏、句首吞字）。它不能直接调语速，靠后期变速；`native_speed` 1.1 表示原速就相当于 MiniMax 的 1.1，所以模板的 `speed` 1.1 不会再加速。速度约 1.3 倍实时，一期 3 分钟要合 10 分钟上下。运行环境在 `~/.local/share/ray-explainer/voxcpm-env`（`uv venv -p 3.12`，装 `mlx-audio==0.5.9 soundfile mlx-whisper`）。
 - 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
 - `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
 

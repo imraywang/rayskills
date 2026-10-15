@@ -2,6 +2,7 @@
 Prices as listed 2026-10 — re-check before quoting budgets:
   gemini-3.8-flash-tts (standard tier): $0.50/M text-in tokens, $9/M audio-out tokens; free-tier AI Studio keys bill $0
   fal-ai/minimax/speech-2.8-hd: $0.10 per 1000 characters (voice-clone itself: $1.50 once per voice)
+  voxcpm2 (local MLX): $0 — only machine time
   fal-ai/kling-video/ai-avatar/v2: pro $0.115/s, standard $0.0562/s of output (digital host, host.py)"""
 import json, os, sys
 GEMINI = {"gemini-3.8-flash-tts": (0.50, 9.00), "gemini-3.8-flash-lite-tts": (0.25, 4.50)}
@@ -20,6 +21,8 @@ if m:
     ch = sum(v.get("chars", 0) for v in m); sec = sum(v.get("ms", 0) for v in m) / 1000
     c = ch / 1000 * MINIMAX.get(m[0]["model"], 0.10); total += c
     print(f"MiniMax TTS calls {len(m)}  {ch} chars (~{sec:.0f}s)  ≈ ${c:.3f}")
+x = [v for v in u.values() if v.get("provider") == "voxcpm2"]
+if x: print(f"VoxCPM2 local calls {len(x)}  {sum(v.get('chars', 0) for v in x)} chars  {sum(v.get('takes', 1) for v in x)} takes  $0")
 print(f"TTS total ≈ ${total:.3f}  (includes re-synthesized clips; cached clips cost nothing)")
 hf = os.path.join(sys.argv[1], "host", "usage.json")
 if os.path.exists(hf):

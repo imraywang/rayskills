@@ -4,7 +4,8 @@ usage: python3 tts.py <project_dir>
 
 Voice is chosen by script.json "voice":
   - a name registered in ~/.config/ray-explainer/voices.json (clone_voice.py writes it) → that provider,
-    e.g. MiniMax speech-2.8-hd on fal with Ray's cloned voice_id
+    e.g. MiniMax speech-2.8-hd on fal with Ray's cloned voice_id, or provider "voxcpm2": local VoxCPM2
+    (MLX) cloning from a reference clip, run through voxcpm_worker.py in its own venv
   - otherwise a Gemini prebuilt voice name (Charon / Puck / Kore …)
 
 Clips are cached by (provider, model, voice, speed, text) in <project>/audio/, so editing one line only
@@ -83,10 +84,32 @@ def synth_minimax(text, out):
     return {"chars": len(text), "ms": r.get("duration_ms", 0)}
 
 
+def synth_voxcpm_batch(texts):
+    """Local VoxCPM2: one worker process loads the model once and synthesizes every uncached line (best of N takes)."""
+    todo = [{"text": t, "out": os.path.join(AUDIO, clip_key(t) + ".wav")} for t in dict.fromkeys(texts)]
+    todo = [it for it in todo if not os.path.exists(it["out"])]
+    if not todo: return
+    py = os.path.expanduser(V.get("python", "~/.local/share/ray-explainer/voxcpm-env/bin/python"))
+    job = {"model": MODEL, "ref": os.path.expanduser(V["ref"]), "cfg": V.get("cfg", 3.0), "steps": V.get("steps", 10),
+           "takes": V.get("takes", 3), "max_takes": V.get("max_takes", 6), "rate": RATE, "speed": round(SPEED / V.get("native_speed", 1.0), 3), "items": todo}
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f: json.dump(job, f, ensure_ascii=False); jf = f.name
+    print(f"VoxCPM2 local: {len(todo)} lines × up to {job['takes']} takes (≈{sum(len(it['text']) for it in todo) * .5 / 60:.0f} min on M4 Pro)")
+    try:
+        p = subprocess.Popen([py, "-I", os.path.join(os.path.dirname(os.path.abspath(__file__)), "voxcpm_worker.py"), jf],
+                             stdout=subprocess.PIPE, text=True)
+        for line in p.stdout:
+            r = json.loads(line); usage[os.path.basename(r["out"])] = {"provider": PROVIDER, "model": MODEL, "chars": len(next(it["text"] for it in todo if it["out"] == r["out"])), "takes": r["takes"]}
+            print(f"  {r['score']:.2f} ×{r['takes']} {r['wall']:5.1f}s  {os.path.basename(r['out'])}")
+        if p.wait(): sys.exit("voxcpm_worker failed (see stderr above)")
+    finally: os.unlink(jf)
+
+
 def synth(text):
     out = os.path.join(AUDIO, clip_key(text) + ".wav")
     if os.path.exists(out):
         return out
+    if PROVIDER == "voxcpm2":
+        raise RuntimeError("VoxCPM2 clip missing after batch: " + text)
     for attempt in range(8):
         try:
             u = (synth_minimax if PROVIDER == "minimax" else synth_gemini)(text, out)
@@ -114,6 +137,7 @@ def trim(raw, thresh=300):
 
 
 lines = [l for sc in script["scenes"] for l in sc["lines"]]
+if PROVIDER == "voxcpm2": synth_voxcpm_batch(lines)
 with ThreadPoolExecutor(2 if PROVIDER == "gemini" else 4) as ex:
     paths = dict(zip(lines, ex.map(synth, lines)))
 json.dump(usage, open(USAGE_F, "w"), indent=1)
