@@ -4,7 +4,8 @@ usage: python3 tts.py <project_dir>
 
 Voice is chosen by script.json "voice":
   - a name registered in ~/.config/ray-explainer/voices.json (clone_voice.py writes it) → that provider,
-    e.g. MiniMax speech-2.8-hd on fal with Ray's cloned voice_id, or provider "voxcpm2": local VoxCPM2
+    e.g. MiniMax speech-2.8-hd with Ray's cloned voice_id (direct MiniMax API via minimax_api.py; a model
+    starting with "fal-ai/" means a voice cloned through fal — fal-hosted only), or provider "voxcpm2": local VoxCPM2
     (MLX) cloning from a reference clip, run through voxcpm_worker.py in its own venv
   - otherwise a Gemini prebuilt voice name (Charon / Puck / Kore …)
 
@@ -78,6 +79,13 @@ def synth_gemini(text, out):
 
 
 def synth_minimax(text, out):
+    if not MODEL.startswith("fal-ai/"):   # direct MiniMax API
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import minimax_api
+        mp3, info = minimax_api.tts(text, VOICE_ID, MODEL, SPEED, V.get("emotion"))
+        to_wav24k(mp3, out)
+        return {"chars": info.get("usage_characters", len(text)), "ms": info.get("audio_length", 0)}
+    # legacy: voice cloned through fal lives in fal's MiniMax account, so it can only be used via fal
     os.environ["FAL_KEY"] = zshrc_env("FAL_KEY")
     import fal_client
     vs = {"voice_id": VOICE_ID, "speed": SPEED, "vol": 1, "pitch": 0}

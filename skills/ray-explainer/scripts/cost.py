@@ -1,12 +1,13 @@
 """Report TTS usage and cost for a project. usage: python3 cost.py <project_dir>
 Prices as listed 2026-10 — re-check before quoting budgets:
   gemini-3.8-flash-tts (standard tier): $0.50/M text-in tokens, $9/M audio-out tokens; free-tier AI Studio keys bill $0
-  fal-ai/minimax/speech-2.8-hd: $0.10 per 1000 characters (voice-clone itself: $1.50 once per voice)
+  MiniMax speech-2.8-hd (direct API or fal): $0.10 per 1000 characters; turbo $0.06 — check the MiniMax pricing page
+  (voice clone: one-time fee per voice; fal charged $1.50)
   voxcpm2 (local MLX): $0 — only machine time
   fal-ai/kling-video/ai-avatar/v2: pro $0.115/s, standard $0.0562/s of output (digital host, host.py)"""
 import json, os, sys
 GEMINI = {"gemini-3.8-flash-tts": (0.50, 9.00), "gemini-3.8-flash-lite-tts": (0.25, 4.50)}
-MINIMAX = {"fal-ai/minimax/speech-2.8-hd": 0.10, "fal-ai/minimax/speech-2.8-turbo": 0.06}
+MINIMAX = {"speech-2.8-hd": 0.10, "speech-2.8-turbo": 0.06, "fal-ai/minimax/speech-2.8-hd": 0.10, "fal-ai/minimax/speech-2.8-turbo": 0.06}
 f = os.path.join(sys.argv[1], "audio", "usage.json")
 u = json.load(open(f)) if os.path.exists(f) else {}
 if not u: print("no audio/usage.json — TTS clips were cached or made outside tts.py")

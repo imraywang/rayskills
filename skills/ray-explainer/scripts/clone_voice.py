@@ -1,4 +1,4 @@
-"""Clone a voice with MiniMax (via fal) and register it for tts.py.
+"""Clone a voice with the MiniMax API (direct, see minimax_api.py) and register it for tts.py.
 
 usage:
   python3 clone_voice.py <recording> [--name ray] [--start 0] [--max 180]          # prepare + inspect only
@@ -17,7 +17,7 @@ import argparse, datetime, hashlib, json, os, subprocess, sys, urllib.request
 
 CFG = os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config")), "ray-explainer")
 VOICES_F, SAMPLES = os.path.join(CFG, "voices.json"), os.path.join(CFG, "samples")
-TTS_MODEL = "fal-ai/minimax/speech-2.8-hd"
+TTS_MODEL = "speech-2.8-hd"
 TEST = "大家好，这是我的复刻音色。我们今天来聊一个问题：AI 公司到底靠什么赢？"
 
 ap = argparse.ArgumentParser()
@@ -38,27 +38,25 @@ if dur < 30: print("WARN: under 30 s — clone quality improves a lot with 1–3
 if not a.upload:
     print("not uploaded. Listen to the prepared sample, then re-run with --upload once the owner agrees."); sys.exit(0)
 
-if not os.environ.get("FAL_KEY"):
-    for line in open(os.path.expanduser("~/.zshrc")):
-        if line.strip().startswith("export FAL_KEY="): os.environ["FAL_KEY"] = line.split("=", 1)[1].strip().strip('"\'')
-import fal_client
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import minimax_api
 
-url = fal_client.upload_file(prepared)
-print("uploaded sample to fal storage")
-r = fal_client.subscribe("fal-ai/minimax/voice-clone", arguments={
-    "audio_url": url, "noise_reduction": True, "need_volume_normalization": True, "text": TEST, "model": "speech-02-hd"})
-vid = r["custom_voice_id"]
+today = datetime.date.today().isoformat()
+vid = f"{a.name.replace('-', '_')}_{today.replace('-', '')}_{sha[:6]}"   # must be unique per account, start with a letter
+fid = minimax_api.upload(prepared, "voice_clone")
+print(f"uploaded sample to MiniMax ({minimax_api.HOST}) file_id {fid}")
+demo = minimax_api.clone(fid, vid, TEST, TTS_MODEL)
 print("voice_id", vid)
-if r.get("audio"):
-    urllib.request.urlretrieve(r["audio"]["url"], os.path.join(SAMPLES, f"{a.name}_preview.mp3"))
+if demo: urllib.request.urlretrieve(demo, os.path.join(SAMPLES, f"{a.name}_preview.mp3"))
 
 # use it once with the production model right away (keeps the clone from expiring) and save the check clip
-t = fal_client.subscribe(TTS_MODEL, arguments={"prompt": TEST, "voice_setting": {"voice_id": vid, "speed": 1, "vol": 1, "pitch": 0},
-                                               "language_boost": "Chinese", "output_format": "url"})
-check = os.path.join(SAMPLES, f"{a.name}_check.mp3"); urllib.request.urlretrieve(t["audio"]["url"], check)
+mp3, _ = minimax_api.tts(TEST, vid, TTS_MODEL)
+check = os.path.join(SAMPLES, f"{a.name}_check.mp3"); open(check, "wb").write(mp3)
 
 voices = json.load(open(VOICES_F)) if os.path.exists(VOICES_F) else {}
-today = datetime.date.today().isoformat()
+old = voices.get(a.name)
+if old and old.get("model", "").startswith("fal-ai/"):   # keep the fal-hosted clone usable under another name
+    voices[f"{a.name}-fal"] = old; print(f"previous fal clone kept as '{a.name}-fal'")
 voices[a.name] = {"provider": "minimax", "model": TTS_MODEL, "voice_id": vid, "created": today, "last_used": today,
                   "sample": prepared, "sample_sha": sha, "sample_seconds": round(dur, 1)}
 json.dump(voices, open(VOICES_F, "w"), ensure_ascii=False, indent=1)
