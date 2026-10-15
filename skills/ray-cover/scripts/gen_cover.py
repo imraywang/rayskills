@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render covers from compiled prompts with Codex CLI's image generation (Image 2), one independent image per platform.
 
-usage: python3 gen_cover.py <cover_dir> [--platforms wechat,x,x-article,vertical,xhs,landscape] [--jobs 3] [--ref <photo>]
+usage: python3 gen_cover.py <cover_dir> [--platforms wechat,x,x-article,vertical,xhs,landscape,channels] [--jobs 3] [--ref <photo>]
 
 --ref: a reference image (e.g. Ray's identity photo for video covers). It is copied into <cover_dir> as ref.<ext> and passed
 to codex exec with -i; the prompt tells the image tool to use it as the identity reference. Only with Ray's consent.
@@ -18,7 +18,9 @@ from PIL import Image
 
 SIZES = {"wechat": (2100, 900), "x": (1600, 900), "x-article": (1600, 640),
          "vertical": (1080, 1920), "xhs": (1080, 1440),   # 9:16 抖音 / 视频号；3:4 小红书 / 视频号信息流
-         "landscape": (1920, 1080)}                       # 16:9 横屏视频：YouTube、视频号 / 抖音横屏
+         "landscape": (1920, 1080),                       # 16:9 横屏视频：YouTube、视频号 / 抖音横屏
+         "channels": (1080, 1260)}                        # 6:7 视频号卡片 / 主页（横屏视频的竖版封面）
+PAD = {"channels": 1.0}   # Image 2 has no 6:7: generate this ratio, then extend the plain background top and bottom (never crops)
 JPEG = {"landscape"}   # 另存一份 jpg：YouTube 缩略图上限 2 MB，1920×1080 的 png 常常超
 RATIO_TOL = 0.02
 
@@ -41,10 +43,22 @@ def run(cover_dir, plat):
     if p.returncode != 0 or not os.path.exists(rp):
         return plat, {"ok": False, "error": f"codex exit {p.returncode}, no {raw} (see codex-{plat}.log)"}
     im = Image.open(rp); tw, th = SIZES[plat]; r, tr = im.width / im.height, tw / th
-    info = {"raw": raw, "raw_size": list(im.size), "seconds": round(time.time() - t0)}
+    info = {"raw": raw, "raw_size": list(Image.open(rp).size), "seconds": round(time.time() - t0)}
+    if plat in PAD and abs(r - PAD[plat]) / PAD[plat] <= RATIO_TOL:
+        # extend with the plain paper colour of the corners plus matching grain (no mirroring: content may sit close to the edge)
+        import numpy as np
+        w = im.width; h = round(w / tr); extra = h - im.height; top = extra // 2
+        src = im.convert("RGB"); a = np.asarray(src).astype(float)
+        patch = np.concatenate([a[:24, :24].reshape(-1, 3), a[:24, -24:].reshape(-1, 3), a[-24:, :24].reshape(-1, 3), a[-24:, -24:].reshape(-1, 3)])
+        bg, sd = np.median(patch, 0), patch.std(0).mean()
+        band = lambda n: Image.fromarray(np.clip(bg + np.random.default_rng(n).normal(0, sd, (n, w, 1)), 0, 255).astype("uint8"))
+        canvas = Image.new("RGB", (w, h)); canvas.paste(band(top), (0, 0)); canvas.paste(src, (0, top)); canvas.paste(band(extra - top), (0, top + im.height))
+        im = canvas; r = w / h; info_pad = f"padded {extra}px of background"
+    else: info_pad = None
     if abs(r - tr) / tr > RATIO_TOL:
         info.update(ok=False, error=f"ratio {r:.3f} ≠ target {tr:.3f}: regenerate this platform, do not crop")
         return plat, info
+    if info_pad: info["pad"] = info_pad
     out = f"{plat}-cover.png"; big = im.convert("RGB").resize((tw, th), Image.LANCZOS); big.save(os.path.join(cover_dir, out))
     if plat in JPEG: big.save(os.path.join(cover_dir, f"{plat}-cover.jpg"), quality=90); info["jpg"] = f"{plat}-cover.jpg"
     thumb = im.convert("RGB"); thumb.thumbnail((420, 420)); thumb.save(os.path.join(cover_dir, f"{plat}-thumb.jpg"), quality=88)
