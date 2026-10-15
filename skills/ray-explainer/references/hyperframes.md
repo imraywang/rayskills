@@ -29,7 +29,7 @@
 ## 取材
 
 - **先列真实素材清单，再写画面**：分镜关之前，按「真实画面优先」（SKILL.md）给每一幕找素材，写进 `footage`。找的顺序：
-  1. **动态**：Ray 自己的录屏 / 口播 / 已发视频；本机实跑（终端、网页操作用 `record_clip.mjs` 或 puppeteer 录屏）；产品官方演示和发布会片段；新闻画面；被讨论的那条视频本身的片段。B 站视频 `yt-dlp` 一般能下；YouTube 片段会 403，就在 Ray 的 Chrome 里用页面内 `video.captureStream()` + `MediaRecorder` 录下要的那几秒（同 `ref_frames.py` 的页面内思路）。
+  1. **动态**：Ray 自己的录屏 / 口播 / 已发视频；本机实跑（终端、网页操作用 `record_clip.mjs` 或 puppeteer 录屏）；产品官方演示和发布会片段；新闻画面；被讨论的那条视频本身的片段。B 站视频 `yt-dlp` 一般能下；YouTube 片段会 403，就用 `scripts/web_clip.py`：本机起接收服务 `python3 $SK/scripts/web_clip.py <项目>/hf/assets/video`（后台跑，端口 8766），在 Ray 的 Chrome 打开视频页，把 `web_clip.py --js <名字> <起点 m:ss> <秒数>` 打印的 JS 交给 Claude in Chrome 执行：它等广告、请求 1080p、缓冲好再实时录这一段（画面 + 声音），立即返回，之后轮询 `JSON.stringify(window.__clip)` 到 `done`；接收端转成 `<名字>.mp4`（H.264 + AAC，30fps）和记着链接、标题、起止的 `<名字>.json`。录的时候那个标签页会出声。2026-10-15 在 3Blue1Brown 视频上实测：1920×1080、6 秒、有声。
   2. **静态**：真实截图、原文、推文、照片、数据后台截图。
   3. 都没有才画。
   素材一律存进项目的 `hf/assets/`，来源（链接、作者、日期、授权）记进 `credits.json`；画面里标「来源 · 日期」。缺的素材在分镜表里写明，问 Ray 要（他手机里的截图、录屏常常就有）。
