@@ -28,6 +28,11 @@
 
 ## 取材
 
+- **先列真实素材清单，再写画面**：分镜关之前，按「真实画面优先」（SKILL.md）给每一幕找素材，写进 `footage`。找的顺序：
+  1. **动态**：Ray 自己的录屏 / 口播 / 已发视频；本机实跑（终端、网页操作用 `record_clip.mjs` 或 puppeteer 录屏）；产品官方演示和发布会片段；新闻画面；被讨论的那条视频本身的片段。B 站视频 `yt-dlp` 一般能下；YouTube 片段会 403，就在 Ray 的 Chrome 里用页面内 `video.captureStream()` + `MediaRecorder` 录下要的那几秒（同 `ref_frames.py` 的页面内思路）。
+  2. **静态**：真实截图、原文、推文、照片、数据后台截图。
+  3. 都没有才画。
+  素材一律存进项目的 `hf/assets/`，来源（链接、作者、日期、授权）记进 `credits.json`；画面里标「来源 · 日期」。缺的素材在分镜表里写明，问 Ray 要（他手机里的截图、录屏常常就有）。
 - **标题和钩子里的数字先核一手数据**：GitHub 星数用 OSS Insight `https://api.ossinsight.io/v1/repos/<owner>/<repo>/stargazers/history?per=day&from=YYYY-MM-DD&to=YYYY-MM-DD`（累计值，末日和 GitHub 实时值对得上就可信）。核出来和 Ray 的标题不一样（“三天 3w”实际是 8 万），在对话里提出并给替代标题，由 Ray 定。
 - **工具类选题，在本机实跑一遍**：真实终端输出是最有说服力的画面（这期用 REA 拆本机 Obsidian：75 个文件、384 万语法节点、1,063 条调用关系、3 分 05 秒）。输出存成 `hf/assets/data/*.json`，场景内联需要的几行，画面标“真实运行 · 对象 · 日期”。跑第三方 npm 包前确认是 Ray 要的那一个。
 - **网页截图**：puppeteer-core（`~/.cache/ray-explainer`）+ 本机 Chrome，`deviceScaleFactor: 2`，GitHub 用 dark 配色；组织页、列表页视口宽度至少 1300，否则会变成手机布局。
