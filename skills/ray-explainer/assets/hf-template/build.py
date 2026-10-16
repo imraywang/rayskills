@@ -7,8 +7,11 @@
     {"cap": 3, "off": 0}                         这一幕第 cap 条字幕出现的时刻 + off
     12.4                                         幕内秒（不推荐：重新配音后会错位）
   文件在 assets/audio/<name>.mp3。
+场景里 <video>/<audio> 的 data-start 也写锚点，每次构建换算成幕内秒（写回场景文件，标签里留着 data-anchor-start 供下次重算）：
+    data-start="{{line:2}}"  {{phrase:1:订金}}  {{clip:c1}}  {{clip:c1:end}}  {{cap:4}}   可带偏移 {{line:2+0.3}}
+narration.wav 比 assets/audio/narration.m4a 新（删幕、重配音之后）会自动重新编码。
 用法：python3 make_beats.py && python3 build.py        COVER=1 python3 build.py → 封面版（无字幕、无数字人、加封面字）"""
-import json, os, html, subprocess, sys
+import json, os, html, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 B = json.load(open(os.path.join(HERE, "beats.json")))
@@ -34,6 +37,14 @@ BGM_LEN, BGM_VOL = 0.0, 0.35                      # 配乐长度（0 = 和片子
 
 if BGM and not os.path.exists(os.path.join(HERE, BGM)):
     print(f"WARN: {BGM} 不存在，这次不带配乐（先跑 gen_bgm.py / mix_bgm.py）"); BGM = None
+
+# 旁白音频跟着配音走：2026-10-15 删幕重配后 m4a 还是旧的，音画错位，audio_check 还误报“配乐太响”
+WAV, M4A = os.path.join(HERE, "..", "narration.wav"), os.path.join(HERE, "assets", "audio", "narration.m4a")
+if os.path.exists(WAV) and (not os.path.exists(M4A) or os.path.getmtime(WAV) > os.path.getmtime(M4A)):
+    os.makedirs(os.path.dirname(M4A), exist_ok=True)
+    r = subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", WAV, "-c:a", "aac", "-b:a", "192k", M4A], capture_output=True, text=True)
+    if r.returncode: raise SystemExit(f"narration.wav 比 narration.m4a 新，重新编码失败：{r.stderr.strip()[-300:]}")
+    print("narration.m4a: 已按新的 narration.wav 重新编码")
 
 # ── 顶栏：按章节分段的视频进度条 + 当前章节小标题（script.json 的 "chapters"；没写就每幕一段、不显示小标题）──
 SIG = {sc["id"] for sc in SCRIPT["scenes"] if sc.get("sig")}
@@ -94,11 +105,49 @@ def sfx_time(s, t):
     return ln["chars"][min(i, len(ln["chars"]) - 1)] + off
 
 
+ANCHOR = re.compile(r'data-start="\{\{([^}]+)\}\}"|data-anchor-start="([^"]+)" data-start="[^"]*"')
+
+
+def anchor_time(s, spec):
+    """data-start 锚点（见文件头）→ 幕内秒。"""
+    m = re.fullmatch(r"\s*(.+?)\s*(?:([+-])\s*(\d+(?:\.\d+)?))?\s*", spec)
+    off = float(m.group(3) or 0) * (-1 if m.group(2) == "-" else 1)
+    kind, *a = m.group(1).split(":", 2)
+    if kind == "line" and len(a) == 1: t = {"line": a[0]}
+    elif kind == "phrase" and len(a) == 2: t = {"line": a[0], "phrase": a[1]}
+    elif kind == "cap" and len(a) == 1: t = {"cap": a[0]}
+    elif kind == "clip" and a and a[1:] in ([], ["end"]):
+        t = {"clip": a[0]}
+        if a[1:]:   # 原声结束
+            c = next((c for c in s.get("clips", []) if c["id"] == a[0]), None)
+            if not c: raise SystemExit(f'data-start 锚点找不到：原声 {a[0]} 不在幕 {s["id"]} 里')
+            return c["end"] + off
+    else: raise SystemExit(f'data-start 锚点写错了：幕 {s["id"]} 的 {{{{{spec}}}}}（可用 line:N / phrase:N:词 / clip:id / clip:id:end / cap:N，可加 +0.3）')
+    return sfx_time(s, t) + off
+
+
+def resolve_anchors(s, path):
+    """把场景文件里视频的 data-start 锚点换成这次配音的幕内秒；写死数字的、慢放过头的列出来。"""
+    src = open(path).read()
+    out = ANCHOR.sub(lambda m: f'data-anchor-start="{m.group(1) or m.group(2)}" data-start="{anchor_time(s, m.group(1) or m.group(2)):.3f}"', src)
+    if out != src: open(path, "w").write(out)
+    fixed, slow = [], []
+    for tag in re.findall(r"<(?:video|audio)\b[^>]*>", out):
+        vid = (re.search(r'id="([^"]+)"', tag) or [None, "?"])[1]
+        st, rate = re.search(r'data-start="([\d.]+)"', tag), re.search(r'data-playback-rate="([\d.]+)"', tag)
+        if st and "data-anchor-start" not in tag and float(st[1]) > 0: fixed.append(vid)
+        if rate and float(rate[1]) < 0.35: slow.append(f"{vid} {rate[1]}")
+    name = os.path.basename(path)
+    if fixed: print(f"WARN: {name} 有 {len(fixed)} 个视频 data-start 写死秒数，改配音会错位，改成 {{{{line:N}}}} / {{{{clip:id}}}} 锚点：{' '.join(fixed)}")
+    if slow: print(f"WARN: {name} 慢放低于 0.35 倍会一卡一卡，换一段素材或循环：{'、'.join(slow)}")
+
+
 slots, caps, sfx, tweens = [], [], [], list(CHROME_TWEENS)
 for i, s in enumerate(SC):
     start, end = s["start"], (SC[i + 1]["start"] if i + 1 < len(SC) else TOTAL)
     sid = f"s-{s['id']}"
     if os.path.exists(os.path.join(HERE, "compositions", sid + ".html")):
+        resolve_anchors(s, os.path.join(HERE, "compositions", sid + ".html"))
         slots.append(f'    <div id="{sid}" data-composition-id="{sid}" data-composition-src="compositions/{sid}.html" '
                      f'data-start="{start:.3f}" data-duration="{end - start:.3f}" data-track-index="1" data-width="{CW}" data-height="{CH}"></div>')
     for c in ([] if COVER else s["caps"]):
