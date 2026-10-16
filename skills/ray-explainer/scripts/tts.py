@@ -46,6 +46,13 @@ USAGE_F = os.path.join(AUDIO, "usage.json")
 usage = json.load(open(USAGE_F)) if os.path.exists(USAGE_F) else {}
 if script.get("style"):
     print("WARN: script.json 'style' is ignored — TTS would read it aloud.", file=sys.stderr)
+if not REC:   # catch a16z / 23% / 2019 before paying for them; --allow-readings once the readings are known to be fine
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import lint_readings
+    _bad = lint_readings.lint(script)
+    lint_readings.report(_bad, sys.stderr)
+    if _bad and "--allow-readings" not in sys.argv:
+        sys.exit("改稿后重跑；确认这些读法没问题就加 --allow-readings")
 
 
 def zshrc_env(name):

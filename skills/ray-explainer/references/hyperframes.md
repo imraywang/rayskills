@@ -21,9 +21,9 @@
 1. 配音照常做；年份、编号按 [script-rules.md](script-rules.md) 写汉字逐位 + `display`。
 2. 走 `/hyperframes` 的 intent 流程（路由到 `general-video`，`storyboard: yes`）。先在对话里给分镜表，Ray 点头后出 `storyboard.html` 草图（每幕一张关键帧，真实截图直接嵌进去，缺的素材画虚线框），再确认一次才做成片。
 3. 搭骨架：`npx hyperframes init hf --non-interactive --example=blank --skill=general-video`（横屏加 `--resolution landscape`），然后把 `assets/hf-template/` 里的 `make_beats.py`、`build.py`、`host_build.py`、`WORKER.md` 和 `assets/canvas.json` 拷进 `hf/`（三个脚本按 `script.json` 的 `aspect` 从 `canvas.json` 取画布尺寸、顶栏、字幕带和主持人版位）；字体从 `assets/huashu/lib/fonts/NotoSansSC-{500,700,900}.woff` 拷到 `hf/assets/fonts/`；`style.example.css` 是上一期的设计系统，只当写法参考，**每期重写 `hf/assets/style.css`**；音频 `ffmpeg -i ../narration.wav -c:a aac -b:a 192k hf/assets/audio/narration.m4a`。之后改了配音（删幕、重配、重插原声）不用手动重编：`build.py` 发现 `../narration.wav` 比 `narration.m4a` 新就自动重编（2026-10-15 删幕后 m4a 还是旧的，音画错位，`audio_check.py` 还误报“配乐太响”）。
-4. `build.py` 顶部“本片专属”一段写这期的底色、顶栏右侧小字、字幕带位置、要加载的数据脚本（`EXTRA_JS`）、配乐音量；其余不动。顶栏默认就是**按章节分段的视频进度条 + 当前章节小标题**（Ray 的偏好），章节写在 `script.json` 的 `"chapters": [{"title": "那场日食", "scenes": ["eclipse", "photos"]}, …]`，按剧情分 5–7 段；不写就每幕一段、不显示小标题。签名幕里顶栏自动换成墨绿底暖白字。配乐给人声让路要在项目里 `npm i -D @hyperframes/core`。
+4. `build.py` 顶部“本片专属”一段写这期的顶栏右侧小字、字幕带位置、要加载的数据脚本（`EXTRA_JS`）、配乐音量；其余不动。底色和顶栏颜色按 `script.json` 的 `theme` 自动取（`ray-ip-dark` 深底浅字），不用手改。顶栏默认就是**按章节分段的视频进度条 + 当前章节小标题**（Ray 的偏好），章节写在 `script.json` 的 `"chapters": [{"title": "那场日食", "scenes": ["eclipse", "photos"]}, …]`，按剧情分 5–7 段；不写就每幕一段、不显示小标题。签名幕里顶栏自动换成墨绿底暖白字。配乐给人声让路要在项目里 `npm i -D @hyperframes/core`。
 5. 填好 `WORKER.md` 的四处 `{{…}}`，按 general-video 的派发规则开子任务：每个 2–3 幕、一次派完。子任务读节拍用 `window.BEATS`，**不把时间抄进场景文件**，音效时刻也写成锚点（`{"line": 0, "phrase": "拍到"}` / `{"clip": "c1", "t": 2.8}` / `{"cap": 3}`）——改配音后只重跑 `make_beats.py && build.py`，画面和音效都跟着走。场景里 `<video>` 的 `data-start` 同样写锚点（`{{line:2}}`、`{{phrase:1:订金}}`、`{{clip:c1}}` / `{{clip:c1:end}}`、`{{cap:4}}`，可带 `+0.3` 偏移），`build.py` 每次构建换算成幕内秒（第一次把标签改写成 `data-anchor-start="…" data-start="秒数"`，之后按它更新）；写死数字的会被 `build.py` 列出来（2026-10-15 改配音后一个个手算 data-start）。子任务首轮交回先对照 WORKER.md 的竖屏硬下限（内容铺满 y 300–1400、正文 ≥32px、标签 ≥34px、关键数字 ≥64px）抽查，不达标当场退回。**音效要少**：全片十几个，只标关键节点；`build.py` 超过 15 个会提醒。子任务交回后，`build.py` 会跑 `scripts/screen_text_check.py`，列出画面里所有在 `script.json`、`STORYBOARD.md` 里找不到出处的中文（“单一目击”“月球背面”就是这样混进上一期的）：逐条核实，不实的改掉，确认无误的加进 `script.json` 的 `"screen_text"`，直到它报 ok 再渲染。
-6. `npx hyperframes check` 必须 0 错误；再 `npx hyperframes snapshot --at <每幕 2–3 个时刻>` 用 Read 看图，查遮挡、空镜、标注有没有落在对的位置。
+6. `npx hyperframes check` 必须 0 错误；再跑 `python3 $SK/scripts/cap_sheet.py <project>`：**每条字幕抽一帧**（取这条字幕 75% 处，即这个节拍的落定画面），带时间和字幕拼成每张 12 格的对照图，用 Read 逐张看：新字幕出来画面没变、空镜、元素重叠、字压在字幕条或主持人上。只看几幕加 `--scene a,b`。均匀抽帧会整拍漏掉：《AI 游客》均匀 18 帧既没抓到 100 元 / 77 元叠在一起，也没抓到妙鸭开头 3 秒几乎是空的。单个时刻细看仍用 `npx hyperframes snapshot --at <秒>`。`make_beats.py` 发现字幕把数字切成两条（「2」|「5%」）会打 WARN，在 `FORCE` 里手工断句。
 7. `npx hyperframes render -o ../out.mp4 --quality delivery`（约 1:1 实时；改动后先用 snapshot 抽帧确认再整片渲）。渲完跑 `python3 $SK/scripts/audio_check.py <project>`：人声和配乐的音量差、原声下面的配乐、音效数量，有一项不对就先修再交付——不能只看画面。成片 >30 MB 按 SKILL.md 第 6 步压手机版一起交付。
 
 ## 取材
@@ -39,6 +39,11 @@
 - **工具类选题，在本机实跑一遍**：真实终端输出是最有说服力的画面（这期用 REA 拆本机 Obsidian：75 个文件、384 万语法节点、1,063 条调用关系、3 分 05 秒）。输出存成 `hf/assets/data/*.json`，场景内联需要的几行，画面标“真实运行 · 对象 · 日期”。跑第三方 npm 包前确认是 Ray 要的那一个。
 - **网页截图**：puppeteer-core（`~/.cache/ray-explainer`）+ 本机 Chrome，`deviceScaleFactor: 2`，GitHub 用 dark 配色；组织页、列表页视口宽度至少 1300，否则会变成手机布局。
 - **X / 被拦的站点**：X 和 Adobe 帮助页会拒绝无头浏览器。X 用 chrome-devtools MCP（未登录也能看文章正文和推文）；它的截图只能写进工作区（vault）里，存成 vault 根目录下的 `.tmp-*.png` 再 `mv` 到项目目录，别留在 vault。拦死的页面改成代码绘制，内容用规则原文，具体金额用占位。
+- **取材失败按固定顺序兜底**，不要每次现查（2026-10-15《AI 游客》一期四处卡住都是这几类）：
+  - **视频**：`uvx --from yt-dlp@latest yt-dlp` → 失败（412 / 403 / 要登录）就用 `web_clip.py` 在 Ray 的 Chrome 里录 → 还不行就截视频页的封面帧当静态素材。
+  - **书封**：先按 ISBN 取 Amazon 图片 CDN `https://images-na.ssl-images-amazon.com/images/P/<ISBN-10>.01.L.jpg`（要 ISBN-10；拿到 1×1 的空图说明这一版没有，换版次的 ISBN）→ 再试出版社官网 → 最后 Open Library。archive.org、covers.openlibrary.org 在本机常被代理规则走直连后断开（`SSL_ERROR_SYSCALL`），先 `surge-cli rule explain <host>` 看命中哪条规则，不要改代理配置。
+  - **带弹窗的新闻页**（广告拦截提示、订阅墙、Cookie 横幅）：不要整页截图，改成对正文段落、图表的元素截图（`el.screenshot()`）；只隐藏弹窗本身和 `body` 的滚动锁，不要按 class 批量隐藏，a16z 页面就因为隐藏过头把正文也藏没了。
+  - **每张截图存下来立刻用 Read 看一眼**：空白、只剩弹窗、被裁到半句的当场重截，别等到草图或成片才发现。
 - **Wikimedia Commons**：用 API 查 `imageinfo&iiurlwidth=1920` 拿 `thumburl`（只有标准尺寸能下），curl 必须带 User-Agent，否则返回 HTML 报错页。授权和作者写进项目的 `credits.json`，CC BY-SA 的发布时在简介里署名。
 - **会动的网页（交互图解、WebGL 演示、Anatomy 作品、看板）录成确定的片段**：`node $SK/scripts/record_clip.mjs jobs.json`。它把页面的时钟（performance.now、Date.now、rAF、定时器）换成虚拟时钟，每截一帧推进 1/fps，所以再慢的截图也录出均匀、每次一样的 30fps 视频，WebGL 效果照录；`actions` 可以在指定秒点击按钮、移鼠标、按键（点火、拆开、打字、关机），`crop: "auto"` 自动裁到画面本体。产出 `clips/<name>.mp4`（无声）和首尾帧 PNG，给子任务看图定位。第一次实战：《一句话造一台机器》（2026-10-13）录了 21 段 Anatomy 作品。
 - **页面自己能定位时间（`window.__seek(t)`）的，按旁白重映射时间逐帧截**：用几个“开口词 → 页面时刻”的锚点做分段线性映射，旁白说到“落刀”刀就落下；一段 30 秒的演示能压进一句话。片段的 0 秒对齐第一个锚点，场景里 `data-start` 填那个时刻。
@@ -58,3 +63,7 @@
 ## 发布包
 
 `script.json` 写 `cover_t`、`publish`（含 `video` 指向最终成片文件名）和 `draft`（vault 里口播母稿的相对路径），`build.py` 写好 `COVER_HTML`，然后 `publish.py <project> --vault <root>`：封面优先用 ray-cover 做好、拷进项目根的 `cover_9x16.png` / `cover_3x4.png`（自动识别，写进 `video_cover`），没有才用 COVER 版单独渲一帧（不带字幕和数字人），文案并进母稿的「发布文案」，不新建同名笔记。发布前提醒 Ray 勾选平台的「AI 生成内容」声明（复刻音色、数字人）和图片署名。
+
+## 改模板之后
+
+改了 `assets/hf-template/` 里的 `make_beats.py`、`build.py`、`host_build.py`，先跑 `python3 $SK/scripts/test_hf_template.py`（离线、约 1 秒）：深色主题、带绿边的大机位、两段相邻大机位、小数字幕各造一份假项目跑一遍。用例都是真片里踩过的坑，新踩到的坑也加一条进去。

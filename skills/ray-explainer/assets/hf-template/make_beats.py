@@ -65,6 +65,9 @@ for n, s in enumerate(T["scenes"]):
             sc_clips.append({"id": c["id"], "start": round(c["start"] - S, 3), "end": round(c["end"] - S, 3), "speaker": c["speaker"], "utc": c["utc"],
                              "segs": [[round(a - S, 3), en, zh] for a, en, zh in c["segs"]]})
     caps.sort(key=lambda c: c["a"])
+    for p, q in zip(caps, caps[1:]):   # 数字被切成两条字幕（2 | 5%）：2026-10-15 是 Ray 看片才发现的，现在重建就报
+        if re.search(r"\d$", p["s"]) and re.match(r"[\d.,%]", q["s"]):
+            print(f"WARN: 字幕把数字切开了：「{p['s']}」|「{q['s']}」（{s['id']} {p['a']:.2f}s），在 FORCE 里手工断句")
     out.append({"id": s["id"], "start": round(S, 3), "end": round(s["end"], 3), "lines": lines, "caps": caps, "clips": sc_clips})
 
 B = {"scenes": out, "total": round(T["scenes"][-1]["end"] + 0.4, 3), "narration": round(T["duration"], 3)}

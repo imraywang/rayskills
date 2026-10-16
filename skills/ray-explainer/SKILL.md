@@ -73,6 +73,8 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 story
 python3 -I $SK/scripts/tts.py <project>
 ```
 
+**配音前先查念法**：`tts.py` 开头会跑 `scripts/lint_readings.py`（离线、不花钱），把容易念错的写法列出来并停下：字母数字混写（a16z、M3、GPT-4o）、三位以上数字、小数、百分号、`~ × /` 这类符号。改法是正文写读法、顶层 `display` 映射回屏幕写法（`"A 十六 Z": "a16z"`、`"百分之二十三": "23%"`）；确认没问题的加 `--allow-readings`。稿子阶段可以单独跑 `python3 $SK/scripts/lint_readings.py <project>`。2026-10-15 那期 a16z 和 23% 都是配完才发现，各重配了一次。
+
 旁白整体响度统一到 −21 LUFS（Ray 认可的云端版水平，原声片段切在 −17），换哪个音色都一样，不用再手动调；要改就写 `script.json` 的 `"loudness"`。
 
 **选音色**（`script.json` 的 `"voice"`）：

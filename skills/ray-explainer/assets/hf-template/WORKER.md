@@ -1,6 +1,6 @@
 # Scene worker brief — 《{{片名}}》
 
-> 模板：编排者复制到 `hf/WORKER.md`，填好 `{{…}}` 的四处（片名、设计真相、图片清单、本片额外规则），硬规则一字不改。
+> 模板：编排者复制到 `hf/WORKER.md`，填好四处双花括号占位（片名、设计真相、图片清单、本片额外规则；这行说明里不写占位符本身，填完后全文不应再有双花括号），硬规则一字不改。
 
 You build HyperFrames scene sub-compositions for a vertical 1080×1920 narrated explainer (Chinese) — or 1920×1080 when `../script.json` has `"aspect": "landscape"` (then use the landscape layout rules below and `data-width="1920" data-height="1080"`). The project root is `PROJECT_DIR` (the folder holding this file). Read this whole file, then `STORYBOARD.md` (only your frames + the 设计 section), then `beats.json` (only your scenes). Look at every image you use (Read tool) before placing it, so annotations land on the right spot.
 

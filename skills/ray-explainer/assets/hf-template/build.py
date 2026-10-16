@@ -23,8 +23,9 @@ _cv = next(p for p in (os.path.join(HERE, "canvas.json"), os.path.expanduser("~/
 ASPECT = SCRIPT.get("aspect", "portrait"); CV = json.load(open(_cv))[ASPECT]; CW, CH, HFV = CV["W"], CV["H"], CV["hf"]
 
 # ───────────── 本片专属（每片改这一段，其余不动）─────────────
-BG, FG = "#F3F3F0", "#111111"                     # 与 assets/style.css 的底色、正文色一致（默认 Ray IP：暖白底、黑字）
-TB_INK, TB_DIM, TB_TRACK = "#111111", "#8C8C8C", "rgba(17,17,17,0.14)"   # 顶栏字 / 次字 / 进度槽；深色版（ray-ip-dark）改成 "#F3F3F0", "#9A9A96", "rgba(243,243,240,0.18)"
+DARK = SCRIPT.get("theme") == "ray-ip-dark"      # 底色、顶栏按 script.json 的 theme 取；2026-10-15 深色片沿用浅色顶栏，整条看不见
+BG, FG = ("#1C1D1D", "#F3F3F0") if DARK else ("#F3F3F0", "#111111")   # 与 assets/style.css 的底色、正文色一致
+TB_INK, TB_DIM, TB_TRACK = ("#F3F3F0", "#9A9A96", "rgba(243,243,240,0.18)") if DARK else ("#111111", "#8C8C8C", "rgba(17,17,17,0.14)")   # 顶栏字 / 次字 / 进度槽
 TOPBAR_RIGHT = ""                                 # 顶栏右侧的小字（栏目名 / 本期名），留空不显示
 EXTRA_JS = []                                     # 场景要用的全局数据脚本，如 ["assets/data.js"]（window.DATA）
 CAP_TOP = None                                    # 字幕带顶；None = 画布默认（竖屏 1420，带高 150，有角落数字人时 ≤1420、没有可放到 1500；横屏 930）
