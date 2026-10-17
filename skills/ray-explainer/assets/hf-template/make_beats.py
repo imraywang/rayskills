@@ -14,19 +14,36 @@ PUNCT = "，。？！：；、,.?!:;"
 SEP = re.compile(r"[，。？！：；、?!:;]|(?<!\d)[,.]|[,.](?!\d)")   # 半角 , . 夹在两个数字中间（2.5%、100,000）不算断句
 _cv = next(p for p in (os.path.join(HERE, "canvas.json"), os.path.expanduser("~/.claude/skills/ray-explainer/assets/canvas.json")) if os.path.exists(p))
 MAXW = json.load(open(_cv))[SCRIPT.get("aspect", "portrait")]["hf"]["cap_chars"]   # 一条字幕的最大视觉宽度（中文 1，拉丁 0.55）：竖屏 13，横屏 22
-FORCE = {          # 手工断句：整段原文 → 各段原文（按顺序、首尾相接）
+FORCE = {          # 手工断句：整段原文 → 各段原文（按顺序、首尾相接）。写稿子原文（二零一九年）或字幕文本（2019 年）都行，空格不算
     # "以前逆向工程师就是对着这一大坨东西": ["以前逆向工程师", "就是对着这一大坨东西"],
 }
+DISPLAY = SCRIPT.get("display", {})
+
+
+def _norm(t):
+    """Compare FORCE keys the way captions read: display-mapped, whitespace ignored (qa_tts adds spaces around digits)."""
+    for k, v in DISPLAY.items(): t = t.replace(k, v)
+    return re.sub(r"\s+", "", t)
+
+
+FN = {_norm(k): (k, [_norm(x) for x in v]) for k, v in FORCE.items()}
+USED = set()
 
 
 def w(s): return sum(1 if ord(c) > 0x2e80 else 0.55 for c in s)
 
 
 def split_long(text, i0):
-    if text in FORCE:
-        out, p = [], 0
-        for piece in FORCE[text]:
-            q = text.index(piece, p); out.append((piece, i0 + q)); p = q + len(piece)
+    if _norm(text) in FN:
+        key, pieces = FN[_norm(text)]; USED.add(key)
+        out, j, cnt = [], 0, 0
+        for piece in pieces:
+            while j < len(text) and text[j].isspace(): j += 1
+            start, need = j, len(piece)
+            while j < len(text) and need:
+                if not text[j].isspace(): need -= 1
+                j += 1
+            out.append((text[start:j].strip(), i0 + start))
         return out
     if w(text) <= MAXW: return [(text, i0)]
     best, bi = None, None
@@ -70,6 +87,8 @@ for n, s in enumerate(T["scenes"]):
             print(f"WARN: 字幕把数字切开了：「{p['s']}」|「{q['s']}」（{s['id']} {p['a']:.2f}s），在 FORCE 里手工断句")
     out.append({"id": s["id"], "start": round(S, 3), "end": round(s["end"], 3), "lines": lines, "caps": caps, "clips": sc_clips})
 
+for k in FORCE:
+    if k not in USED: print(f"WARN: FORCE 断句没用上：「{k}」——和字幕里的整段文本对不上（是不是跨了标点，或文字改过）")
 B = {"scenes": out, "total": round(T["scenes"][-1]["end"] + 0.4, 3), "narration": round(T["duration"], 3)}
 json.dump(B, open(os.path.join(HERE, "beats.json"), "w"), ensure_ascii=False)
 os.makedirs(os.path.join(HERE, "assets"), exist_ok=True)

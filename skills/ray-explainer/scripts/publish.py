@@ -5,7 +5,8 @@ usage: python3 publish.py <project> [--vault <vault root>] [--force] [--cover <i
 Reads script.json:
   title, source, central_judgment, to_confirm[], cover_t (seconds; that frame becomes cover.jpg)
   publish: { "titles": ["…", …], "description": "…", "tags": ["AI", …], "video": "out_v3.mp4" (optional, default out.mp4) }
-  draft (optional): vault-relative path of the existing 母稿 (e.g. a ray-kb fast-oral note). When set, nothing new is
+  draft (optional): vault-relative path of the existing 母稿 (e.g. a ray-kb fast-oral note); if it has moved (archived
+    after publishing) it is found again by file name (kind: oral-script only) and script.json is updated. When set, nothing new is
     created in the vault: the 母稿 gets video_* frontmatter keys and a「## 发布文案」section (replaced on re-runs).
 HyperFrames projects (<project>/hf/ with build.py, see references/hyperframes.md): the cover is rendered with
   COVER=1 hf/build.py (no captions / presenter, cover overlay on) + `npx hyperframes snapshot`, then index.html is rebuilt.
@@ -70,7 +71,21 @@ open(os.path.join(PROJ, "publish.md"), "w").write(f"# {s.get('title', '')}\n\n�
 # existing 母稿: add the video fields and the publish copy to it instead of creating a second note
 if s.get("draft"):
     note = os.path.join(a.vault, s["draft"])
-    if not os.path.exists(note): sys.exit(f"draft not found in vault: {s['draft']}")
+    if not os.path.exists(note):
+        # the 母稿 moved (archived after publishing, 2026-10-16): find it by file name — the published note in
+        # 40-发布 has the same name, so only a file whose frontmatter says kind: oral-script counts
+        name, hits = os.path.basename(s["draft"]), []
+        for root, dirs, files in os.walk(a.vault):
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
+            if name in files:
+                f = os.path.join(root, name)
+                if re.search(r"^kind:\s*oral-script\s*$", open(f).read(2000), re.M): hits.append(f)
+        if len(hits) != 1: sys.exit(f"draft not found in vault: {s['draft']}" + (f" (several candidates: {hits})" if hits else ""))
+        note, old = hits[0], s["draft"]; rel = os.path.relpath(note, a.vault)
+        s["draft"] = rel
+        if s.get("source") == old: s["source"] = rel
+        json.dump(s, open(os.path.join(PROJ, "script.json"), "w"), ensure_ascii=False, indent=2)
+        print(f"draft moved → {rel} (script.json updated)")
     txt = open(note).read()
     keys = {"video_status": "rendered", "video_path": video, "video_cover": cover or "", "video_publish_pack": os.path.join(PROJ, "publish.md"),
             "video_duration_s": round(dur)}

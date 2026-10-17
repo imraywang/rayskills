@@ -15,7 +15,8 @@ Per scene, script.json carries (besides id / lines):
            (whole landscape frame across the stage, the same clip blurred and darkened above and below). Use band when
            the subject is a whole device or a wide composition — 2026-10-16 a cover-cropped clip of hands holding a
            landscape iPhone lost the phone and Ray asked for it to be redone.
-Top level: title, central_judgment, to_confirm[], cover_t (optional, seconds; frame used as cover)
+Top level: title, central_judgment, to_confirm[], cover_t (optional, seconds; frame used as cover),
+           design (optional {shell, audio, boundary}: the IP-themed shell, printed under the table)
 """
 import json, os, sys
 
@@ -64,6 +65,9 @@ out += [f"**预计时长**：约 {total / 60:.0f} 分 {total % 60:02.0f} 秒（{
         f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}",
         f"**画幅**：" + ("横屏 1920×1080" if s.get("aspect") == "landscape" else "竖屏 1080×1920"),
         *([f"**风格参考**：{s['style_ref']}（references/style-refs.md）"] if s.get("style_ref") else []), ""]
+if s.get("design"):   # IP-themed shell (SKILL.md 1b): show it with the table so Ray confirms it in the same pass
+    d = s["design"]; lab = {"shell": "外壳", "audio": "声音", "boundary": "边界"}
+    out += ["**主题外壳**", *[f"- {lab.get(k, k)}：{v}" for k, v in d.items()], ""]
 n = len(s["scenes"])
 out += [f"**真实素材**：{real_n}/{n} 幕有真实素材，其中 {motion_n} 幕是动态的（录屏 / 视频 / 实跑）", ""]
 if motion_n * 2 < n:   # Ray 2026-10-15: audiences tire of drawn animation; most scenes should carry moving real footage
