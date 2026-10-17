@@ -51,6 +51,7 @@ if not REC:   # catch a16z / 23% / 2019 before paying for them; --allow-readings
     import lint_readings
     _bad = lint_readings.lint(script)
     lint_readings.report(_bad, sys.stderr)
+    lint_readings.report_poly(lint_readings.poly(script), sys.stderr)   # warnings only; check_numbers.py listens to them
     if _bad and "--allow-readings" not in sys.argv:
         sys.exit("改稿后重跑；确认这些读法没问题就加 --allow-readings")
 

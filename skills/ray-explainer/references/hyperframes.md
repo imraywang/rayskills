@@ -33,7 +33,7 @@
   2. **静态**：真实截图、原文、推文、照片、数据后台截图。
   3. 都没有才画。
   **下载的别人的视频先听音轨再用**：`whisper`（或 `cut_clips.py --words`）把音轨转一遍，配了版权音乐（2026-10-15 马斯克那条带《In the Air Tonight》）就静音——`ffmpeg -i in.mp4 -an -c:v copy out.mp4`，要用的原声单独切进 `clips/`；成片里只能出现原声讲话，不出现别人的配乐。
-  **真实视频默认全屏**（SKILL.md「真实画面优先」）：`footage` 每条写 `"fullscreen": true/false`。视频素材默认 `true`，场景用 `.fullshot` 铺满 1080×1920 播放（竖屏原片直接铺；横屏裁成竖屏，`object-position` 跟主体），来源和角标压在顶栏下面（y ≥ 300）；`false` 只给截图、原帖、静态图和需要两段并排对比的视频。旁白抛出问题之后可以 `splice_clips.py` 插一段原声全屏插片，播完硬切回画板。素材时长不够就换一段或循环，不要慢放到 0.35 倍以下（2026-10-15 有几段放到 0.1–0.15 倍，一卡一卡的）。
+  **真实视频默认全屏**（SKILL.md「真实画面优先」）：`footage` 每条写 `"fullscreen": true/false`。视频素材默认 `true`，场景用 `.fullshot` 铺满 1080×1920 播放（竖屏原片直接铺；横屏裁成竖屏，`object-position` 跟主体），来源和角标压在顶栏下面（y ≥ 300）；`false` 只给截图、原帖、静态图和需要两段并排对比的视频。全屏还分两种构图（`footage` 的 `framing`）：默认 `cover` 是裁成竖屏跟主体；主体是整台设备（手持手机 / 平板 / 掌机）或超宽画面时用 `band`：原片按原比例横贯舞台中部（宽 1080，16:9 高 608，y 约 546–1154），上下是同一段视频 `cover` 铺满后 `blur(36px) brightness(0.45)` 垫底，标签放在横条上下的空处（style.example.css 的 `.bandshot`）。2026-10-16 双手横握 iPhone 的素材按 cover 裁掉了手机，换成 band 才对。旁白抛出问题之后可以 `splice_clips.py` 插一段原声全屏插片，播完硬切回画板。素材时长不够就换一段或循环，不要慢放到 0.35 倍以下（2026-10-15 有几段放到 0.1–0.15 倍，一卡一卡的）。
   素材一律下到 `~/Movies/ray-explainer/<项目>/hf/assets/`（视频工程里），不进 Obsidian vault；来源（链接、作者、日期、授权）记进 `credits.json`；画面里标「来源 · 日期」。缺的素材在分镜表里写明，问 Ray 要（他手机里的截图、录屏常常就有）。
 - **标题和钩子里的数字先核一手数据**：GitHub 星数用 OSS Insight `https://api.ossinsight.io/v1/repos/<owner>/<repo>/stargazers/history?per=day&from=YYYY-MM-DD&to=YYYY-MM-DD`（累计值，末日和 GitHub 实时值对得上就可信）。核出来和 Ray 的标题不一样（“三天 3w”实际是 8 万），在对话里提出并给替代标题，由 Ray 定。
 - **工具类选题，在本机实跑一遍**：真实终端输出是最有说服力的画面（这期用 REA 拆本机 Obsidian：75 个文件、384 万语法节点、1,063 条调用关系、3 分 05 秒）。输出存成 `hf/assets/data/*.json`，场景内联需要的几行，画面标“真实运行 · 对象 · 日期”。跑第三方 npm 包前确认是 Ray 要的那一个。
