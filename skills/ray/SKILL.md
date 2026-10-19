@@ -51,10 +51,12 @@ rayskills 是一套在真实业务里锤炼出来的 builder 工具箱。用户�
 | 新建、检查或适配本地 Obsidian 内容知识库 | `ray-obsidian` |
 | 把 idea、资料或草稿写成有 Ray 态度和传播力的中文长文 | `ray-writer` |
 | 翻译外文文章或转载别人的中文文章 | `ray-writer`（译介模式，先过授权与署名两道门） |
+| 用 Ray 的口吻写或改短内容（X 推文、微博、小红书短文） | 本机装了 `ray-x-style` 时用它，否则 `ray-writer` |
 | 从灵感与检索直接做快速口播；从定稿长文再分发口播；审读或对照实际录制稿 | `ray-kb` |
 | 讲清楚一件事或一个原理的科普讲解稿（讲解者视角，不以 Ray 的判断为主） | 本机装了 `ray-kepu` 时用它，否则 `ray-kb` 叙事型 |
-| 给定稿文章生成公众号、X 与 X Article 封面，给视频做 9:16 / 3:4 竖封面，换风格、改封面标题 | `ray-cover` |
-| 把文章、剪藏或观点做成无人出镜的知识解说视频（代码绘制画面、复刻音色配音） | `ray-explainer`（先出分镜表给 Ray 确认，再配音和画） |
+| 给定稿文章生成公众号、X 与 X Article 封面，给视频做封面（默认 3:4，要时出 9:16 / 16:9），换风格、改封面标题 | `ray-cover` |
+| 把文章、剪藏或观点做成知识解说视频（真实画面优先，HyperFrames 或代码绘制，复刻音色配音） | `ray-explainer`（先出分镜表给 Ray 确认，再配音和画） |
+| 给 Ray 自己的 App / 小工具做上线宣传片 | 本机装了 `ray-promo-beta` 时用它，否则走 HyperFrames 的 product-launch-video |
 | 把定稿文章排版并保存到微信公众号草稿箱 | `ray-wechat` |
 | 把定稿文章和 5:2 封面保存到 X Articles 草稿箱 | `ray-x-article` |
 | 从 idea/草稿一路做到文章、封面与 X Article 草稿 | [内容生产管线](references/content-pipeline.md) |
