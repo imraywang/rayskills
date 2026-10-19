@@ -37,13 +37,19 @@ def how(sc):
     return "手绘·定制"
 
 
+def spoken(t):
+    """Count like the voice reads: a CJK character is one, a Latin letter / digit about half (2026-10-18: the five
+    English terms in the Musk film counted as full characters and padded the estimate)."""
+    return sum(1 if ord(c) > 0x2e80 else 0.5 if c.isalnum() else 0 for c in t)
+
+
 rows, total, dist = [], GAPS["lead"] + GAPS["tail"], {}
 real_n = motion_n = 0
 windowed = []   # moving footage put in a window instead of full screen
 cropped = []    # full-screen cover crops of footage that looks like a whole device / wide shot
 DEVICE = ("手机", "iPhone", "iPad", "平板", "掌机", "Switch", "手持", "握着", "横握", "超宽", "宽屏", "双屏", "笔记本", "显示器", "电视")
 for i, sc in enumerate(s["scenes"], 1):
-    chars = sum(len(l) for l in sc["lines"])
+    chars = sum(spoken(l) for l in sc["lines"])
     dur = chars / RATE + GAPS["line"] * (len(sc["lines"]) - 1) + (GAPS["scene"] if i < len(s["scenes"]) else 0)
     total += dur
     key = how(sc); dist[key] = dist.get(key, 0) + 1
@@ -61,7 +67,7 @@ for i, sc in enumerate(s["scenes"], 1):
 out = [f"# 分镜表：{s.get('title', '')}", ""]
 if s.get("central_judgment"): out += [f"**核心判断**：{s['central_judgment']}", ""]
 out += ["| # | 幕 | 讲什么 | 画法 | 画面 | 真实素材（▶ 动态 · ⛶全屏 / ▭整幅 / ▢窗口） | 卡点 | 时长 |", "|---|---|---|---|---|---|---|---|", *rows, ""]
-out += [f"**预计时长**：约 {total / 60:.0f} 分 {total % 60:02.0f} 秒（{sum(len(l) for sc in s['scenes'] for l in sc['lines'])} 字，按 {RATE:.1f} 字/秒估）",
+out += [f"**预计时长**：约 {int(total // 60)} 分 {int(total % 60):02d} 秒（{sum(spoken(l) for sc in s['scenes'] for l in sc['lines']):.0f} 字，按 {RATE:.1f} 字/秒估）",
         f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}",
         f"**画幅**：" + ("横屏 1920×1080" if s.get("aspect") == "landscape" else "竖屏 1080×1920"),
         *([f"**风格参考**：{s['style_ref']}（references/style-refs.md）"] if s.get("style_ref") else []), ""]

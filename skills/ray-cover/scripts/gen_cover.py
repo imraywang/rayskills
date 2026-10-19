@@ -15,6 +15,11 @@ usage: python3 gen_cover.py <cover_dir> [--platforms wechat,x,x-article,vertical
 --edit (api only): change a finished cover locally instead of regenerating — composition and face stay. Takes
     raw-<platform>.png as the input image and prompts/<platform>-edit.md as the instruction ("只做一处修改：去掉胸前的领夹麦，
     其余一切保持不变…"). The previous raw / cover / thumb are kept as -v1, -v2 … before being replaced.
+--edit --ref <photo> (api only): two-image edit — the finished cover plus a new photo of the person go to /v1/images/edits
+    together (image[]), so the person can be swapped while the composition, text and props stay (2026-10-18: Musk cover
+    v2 → waffle T, v3 → Ray's new black-T photo; first done by hand with curl). The edit prompt says "第一张图是定稿封面，
+    第二张图是同一个人的另一张照片，只把人物换成第二张图的样子……其余一切保持完全不变". The photo is copied in as
+    ref-edit.<ext> so the original identity photo ref.<ext> stays.
 
 <cover_dir>/prompts/<platform>.md holds the complete prompt for that platform (written by the agent). The script writes
 <cover_dir>/raw-<platform>.png, checks the aspect ratio, resizes to the target pixels (same ratio only; a wrong ratio is
@@ -51,14 +56,17 @@ def api_key():
 
 
 def gen_api(cover_dir, plat, prompt_file, image=None):
-    """One image from the OpenAI Images API into raw-<plat>.png. image = input picture (identity ref or the cover to edit)."""
+    """One image from the OpenAI Images API into raw-<plat>.png. image = input picture (identity ref or the cover to edit),
+    or a list of pictures for a multi-image edit (cover + new photo of the person)."""
     key = api_key()
     if not key: return "OPENAI_API_KEY not set (env or ~/.zshenv): use --backend codex"
     url = "https://api.openai.com/v1/images/" + ("edits" if image else "generations")
     cmd = ["curl", "-sS", "--max-time", "600", url, "-H", f"Authorization: Bearer {key}"]
     if image:
         cmd += ["-F", f"model={API_MODEL}", "-F", f"size={API_SIZE[plat]}", "-F", "n=1",
-                "-F", f"image=@{image}", "-F", f"prompt=<{prompt_file}"]
+                *[x for im in (image if isinstance(image, list) else [image])
+                  for x in ("-F", (f"image[]=@{im}" if isinstance(image, list) else f"image=@{im}"))],
+                "-F", f"prompt=<{prompt_file}"]
     else:
         body = {"model": API_MODEL, "size": API_SIZE[plat], "n": 1, "prompt": open(prompt_file).read()}
         cmd += ["-H", "Content-Type: application/json", "-d", json.dumps(body, ensure_ascii=False)]
@@ -93,9 +101,10 @@ def run(cover_dir, plat):
         if not os.path.exists(os.path.join(cover_dir, prompt)) or not os.path.exists(raw_in):
             return plat, {"ok": False, "error": f"--edit needs {prompt} and raw-{plat}.png"}
         v = keep_old(cover_dir, plat)
-        err = gen_api(cover_dir, plat, os.path.join(cover_dir, prompt), os.path.join(cover_dir, f"raw-{plat}-v{v}.png"))
+        src = os.path.join(cover_dir, f"raw-{plat}-v{v}.png")
+        err = gen_api(cover_dir, plat, os.path.join(cover_dir, prompt), [src, os.path.join(cover_dir, REF)] if REF else src)
         if err: return plat, {"ok": False, "error": err}
-        return finish(cover_dir, plat, t0, {"edit_of": f"raw-{plat}-v{v}.png"})
+        return finish(cover_dir, plat, t0, {"edit_of": f"raw-{plat}-v{v}.png", **({"edit_ref": REF} if REF else {})})
     prompt = os.path.join("prompts", f"{plat}.md")
     if not os.path.exists(os.path.join(cover_dir, prompt)):
         return plat, {"ok": False, "error": f"missing {prompt}"}
@@ -160,7 +169,7 @@ def main():
     if BACKEND not in ("api", "codex"): sys.exit("--backend api|codex")
     if EDIT and not api_key(): sys.exit("--edit needs the API (OPENAI_API_KEY)")
     if "--ref" in a:
-        src = a[a.index("--ref") + 1]; REF = "ref" + os.path.splitext(src)[1].lower()
+        src = a[a.index("--ref") + 1]; REF = ("ref-edit" if EDIT else "ref") + os.path.splitext(src)[1].lower()
         shutil.copyfile(src, os.path.join(cover_dir, REF))
     bad = [p for p in plats if p not in SIZES]
     if bad: sys.exit(f"unknown platform {bad}; use {list(SIZES)}")

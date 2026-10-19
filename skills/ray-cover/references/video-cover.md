@@ -100,6 +100,7 @@ python3 $SK/scripts/gen_cover.py <封面目录> --platforms vertical --ref ~/.co
 - 横屏视频只出 `landscape`（`--platforms landscape`）；同一期也发竖屏平台时再加 `vertical`，各写一份提示词，构图分别排，不互相裁。
 - 默认走 OpenAI API（约 40 秒一张、$0.07，xhs 原生 1200×1600 已实测），`--backend codex` 退回 Codex CLI 调 Image 2；比例对就缩放成目标像素并出 420px 缩略图，比例不对报错，不裁不拉。
 - 只改局部（去麦、换背景）用 `--edit`，写 `prompts/<p>-edit.md`，见 SKILL.md 第 7 步。
+- **换人物、保留构图**（Ray 说「换掉人物，用 xx 那张」）：`--edit --ref ~/.config/ray-cover/identity/<那张>.jpg`，把定稿封面和新照片一起送进编辑接口。`prompts/<p>-edit.md` 写「第一张图是定稿封面，第二张图是同一个人的另一张照片。只做一处修改：把人物换成第二张图的样子（长相、发型、衣服）……人物的位置、大小、动作和表情保持第一张图；不要把第二张图的背景带过来。其余一切保持完全不变」，再逐条列出要保留的文字和墨绿位置。照片存成 `ref-edit.<ext>`，原来的 `ref.<ext>` 不动；`photo.txt` 记一行这一版用了哪张。2026-10-18 马斯克那期 v2（华夫格 T）、v3（Ray 新给的黑 T）都这样换，构图和文字都没动。
 
 ## 验收与交付
 

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 420">
+  <!-- 设计：眼镜、墨绿衬衫，手持触控笔在斜放绘图板上画图 -->
+  <defs>
+    <linearGradient id="dsShirt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0D5F5E"/><stop offset=".55" stop-color="#0B6B69"/><stop offset="1" stop-color="#084F4E"/></linearGradient>
+    <linearGradient id="dsBoard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3D3D"/><stop offset="1" stop-color="#2A2C2C"/></linearGradient>
+  </defs>
+  <!-- 身体 -->
+  <path d="M38 410 C 40 318, 70 282, 120 280 C 170 282, 200 318, 202 410 Z" fill="url(#dsShirt)"/>
+  <path d="M120 280 L 104 300 L 120 330 L 136 300 Z" fill="#F3F3F0"/>
+  <path d="M104 300 L 92 286 L 120 280 L 148 286 L 136 300 L 120 290 Z" fill="#E4E2DC"/>
+  <path d="M120 330 L120 410" stroke="#084F4E" stroke-width="3"/>
+  <circle cx="120" cy="350" r="3.2" fill="#9CC2BF"/><circle cx="120" cy="378" r="3.2" fill="#9CC2BF"/>
+  <!-- 脖子 + 头 -->
+  <path d="M106 246 L106 284 Q120 292 134 284 L134 246 Z" fill="#E7D3BF"/>
+  <path d="M106 266 Q120 274 134 266 L134 258 Q120 266 106 258 Z" fill="#D8C0A9"/>
+  <ellipse cx="73" cy="196" rx="11" ry="15" fill="#E7D3BF"/><ellipse cx="167" cy="196" rx="11" ry="15" fill="#E7D3BF"/>
+  <path d="M76 190 q-6 6 0 13" fill="none" stroke="#C9AE95" stroke-width="2.5"/>
+  <path d="M74 200 C 74 140, 96 120, 120 120 C 144 120, 166 140, 166 200 C 166 240, 146 262, 120 262 C 94 262, 74 240, 74 200 Z" fill="#EFDCC8"/>
+  <!-- 头发 -->
+  <path d="M70 196 C 62 132, 102 104, 132 110 C 162 114, 176 140, 170 192 C 166 168, 154 152, 140 146 C 124 156, 98 160, 80 154 C 74 166, 72 180, 70 196 Z" fill="#2B2B2B"/>
+  <path d="M96 128 C 112 118, 136 116, 150 126" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+  <!-- 眼镜 + 简化五官 -->
+  <rect x="88" y="190" width="26" height="18" rx="6" fill="none" stroke="#2B2B2B" stroke-width="3"/>
+  <rect x="126" y="190" width="26" height="18" rx="6" fill="none" stroke="#2B2B2B" stroke-width="3"/>
+  <path d="M114 197 L126 197" stroke="#2B2B2B" stroke-width="3"/>
+  <circle cx="101" cy="199" r="2.6" fill="#2B2B2B"/><circle cx="139" cy="199" r="2.6" fill="#2B2B2B"/>
+  <path d="M110 236 Q120 242 130 236" fill="none" stroke="#B8876B" stroke-width="3" stroke-linecap="round"/>
+  <!-- 右臂（在绘图板后面） -->
+  <path d="M164 298 C 188 306, 196 330, 186 350 L 166 350 C 170 334, 164 318, 152 312 Z" fill="#0B6B69"/>
+  <path d="M164 298 C 176 304, 184 316, 186 330" fill="none" stroke="#084F4E" stroke-width="3"/>
+  <!-- 绘图板（斜放）+ 图纸线 -->
+  <g transform="translate(84 318) rotate(-10)">
+    <rect x="0" y="0" width="122" height="86" rx="8" fill="url(#dsBoard)" stroke="#9A9A96" stroke-width="3"/>
+    <rect x="9" y="9" width="104" height="68" rx="3" fill="#F3F3F0"/>
+    <g stroke="#9CC2BF" stroke-width="2" fill="none">
+      <path d="M20 62 L56 24 L92 62 Z"/><circle cx="56" cy="48" r="9"/><path d="M16 70 L106 70" stroke-dasharray="4 4"/>
+      <path d="M82 18 L102 18 M92 12 L92 24"/>
+    </g>
+    <path d="M56 24 L56 62" stroke="#0B6B69" stroke-width="2"/>
+  </g>
+  <!-- 手 + 触控笔（压在板上） -->
+  <path d="M168 344 C 182 346, 188 358, 182 366 C 176 374, 160 372, 156 362 C 154 354, 160 344, 168 344 Z" fill="#EFDCC8"/>
+  <path d="M160 352 q6 -4 12 0" fill="none" stroke="#C9AE95" stroke-width="1.6"/>
+  <g transform="translate(160 360) rotate(-40)">
+    <rect x="-3" y="-46" width="6" height="48" rx="3" fill="#F3F3F0" stroke="#5E605F" stroke-width="1.5"/>
+    <path d="M-3 2 L0 10 L3 2 Z" fill="#0B6B69"/>
+  </g>
+</svg>

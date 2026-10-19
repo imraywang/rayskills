@@ -69,4 +69,9 @@ os.makedirs(os.path.join(PROJ, "bgm"), exist_ok=True)
 tmp = os.path.join(PROJ, "bgm", "bgm_mixed.wav"); sf.write(tmp, x * env[:, None], sr)
 out = os.path.join(PROJ, "hf", "assets", "audio", "bgm.m4a"); os.makedirs(os.path.dirname(out), exist_ok=True)
 subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp, "-af", "loudnorm=I=-20:TP=-2:LRA=14", "-c:a", "aac", "-b:a", "192k", out], check=True)
+# 记下这次混音对着的时间线（原声位置、各幕起点、总长）：build.py 每次构建都比对，重配音挪动了原声就自动重混
+# （2026-10-18 马斯克那期改了五句配音，原声 c1 晚了 2 秒，静音包络没跟上，成片原声下面又有了配乐）
+json.dump({"src": SRC, "sig": {"total": round(TOTAL, 2), "scenes": {s["id"]: round(s["start"], 2) for s in TL["scenes"]},
+           "clips": [[c["id"], round(c["start"], 2), round(c["end"], 2)] for c in TL.get("clips", [])]}},
+          open(os.path.join(PROJ, "bgm", "mix.json"), "w"), ensure_ascii=False, indent=1)
 print(f"bgm.m4a {len(x) / sr:.1f}s · silent clips {sorted(silent) or '-'} · fades from {fade_from:.1f}s → set BGM_LEN = 0 in build.py, rebuild")

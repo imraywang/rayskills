@@ -39,6 +39,22 @@ BGM_LEN, BGM_VOL = 0.0, 0.35                      # 配乐长度（0 = 和片子
 if BGM and not os.path.exists(os.path.join(HERE, BGM)):
     print(f"WARN: {BGM} 不存在，这次不带配乐（先跑 gen_bgm.py / mix_bgm.py）"); BGM = None
 
+# 配乐包络是按某一版时间线烧进去的（原声静音、分段收放、片尾淡出）。重配音、插原声、删幕之后时间线变了，
+# 就按 bgm/mix.json 记的源文件自动重跑 mix_bgm.py，不让旧包络进成片（2026-10-18 原声下的配乐从静音变成 -32 dB，渲完才发现）
+_MIX, _TLF = os.path.join(HERE, "..", "bgm", "mix.json"), os.path.join(HERE, "..", "timeline.json")
+if BGM and os.path.exists(_MIX) and os.path.exists(_TLF):
+    _tl, _mix = json.load(open(_TLF)), json.load(open(_MIX))
+    _sig = {"total": round(_tl["scenes"][-1]["end"] + 0.4, 2), "scenes": {s["id"]: round(s["start"], 2) for s in _tl["scenes"]},
+            "clips": [[c["id"], round(c["start"], 2), round(c["end"], 2)] for c in _tl.get("clips", [])]}
+    if _sig != _mix.get("sig"):
+        print("bgm: 时间线和上次混音时不一样（重配音 / 原声位置变了），按 bgm/mix.json 自动重跑 mix_bgm.py")
+        _mb = os.path.expanduser("~/.claude/skills/ray-explainer/scripts/mix_bgm.py")
+        r = subprocess.run([sys.executable, _mb, os.path.join(HERE, ".."), _mix["src"]], capture_output=True, text=True)
+        if r.returncode: raise SystemExit(f"bgm 重混失败，先手动跑 mix_bgm.py：{(r.stderr or r.stdout).strip()[-300:]}")
+        print("bgm: " + r.stdout.strip().splitlines()[-1])
+elif BGM and not os.path.exists(_MIX):
+    print("WARN: 没有 bgm/mix.json（旧版 mix_bgm.py 混的），构建时查不了配乐包络是否过期；重配音后记得重跑 mix_bgm.py")
+
 # 旁白音频跟着配音走：2026-10-15 删幕重配后 m4a 还是旧的，音画错位，audio_check 还误报“配乐太响”
 WAV, M4A = os.path.join(HERE, "..", "narration.wav"), os.path.join(HERE, "assets", "audio", "narration.m4a")
 if os.path.exists(WAV) and (not os.path.exists(M4A) or os.path.getmtime(WAV) > os.path.getmtime(M4A)):

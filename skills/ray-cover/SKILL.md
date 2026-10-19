@@ -66,6 +66,7 @@ python3 $SK/scripts/gen_cover.py <封面目录> --platforms wechat,x,x-article
 用 SendUserFile 发成品，回复里写：用的风格和一句话视觉隐喻、这组文案、1–2 组备选文案、验收发现的问题（模型自加的字、颜色偏差）。Ray 要调整时，分两种：
 
 - **只改局部**（去掉一个小东西、换背景、改一处颜色）：不重新生成，写 `prompts/<p>-edit.md`（「只做一处修改：……其余一切保持完全不变」），跑 `gen_cover.py <封面目录> --platforms <p> --edit`。脚本把旧的 raw / cover / thumb 自动留档成 `-v1`、`-v2`，拿现成的 `raw-<p>.png` 去改，构图和脸都不变（2026-10-16 宝可梦封面去领夹麦，一次成功）。
+- **只换人物**（换一张身份照，构图、文字、道具都不动）：`gen_cover.py <封面目录> --platforms <p> --edit --ref <新照片>`，定稿封面和新照片一起送进编辑接口，写法见 [video-cover.md](references/video-cover.md)「换人物、保留构图」。
 - **重新构图**：先把那几个平台的旧文件（`raw-<p>.png`、`<p>-cover.png`、`<p>-thumb.jpg`、`api-<p>.log` / `codex-<p>.log`、`manifest.json`）改名加 `-v1`、`-v2` 留档、提示词另存 `prompts/<p>-v1.md`，再只改对应平台的提示词重跑；脚本会覆盖同名文件。
 
 ## 边界

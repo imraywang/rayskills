@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 420">
+  <!-- 工程：安全帽（墨绿中脊）、深灰工装 + 反光条、手持扳手 -->
+  <defs>
+    <linearGradient id="egJacket" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3A3D3D"/><stop offset=".55" stop-color="#454848"/><stop offset="1" stop-color="#2E3030"/></linearGradient>
+    <linearGradient id="egHat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3F3F0"/><stop offset="1" stop-color="#CFCDC6"/></linearGradient>
+  </defs>
+  <!-- 身体：工装夹克 + 反光条 -->
+  <path d="M38 410 C 40 318, 70 282, 120 280 C 170 282, 200 318, 202 410 Z" fill="url(#egJacket)"/>
+  <path d="M120 284 L 120 410" stroke="#262828" stroke-width="4"/>
+  <path d="M48 366 L 192 366" stroke="#9CC2BF" stroke-width="9"/>
+  <path d="M48 366 L 192 366" stroke="#F3F3F0" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M96 284 L 120 314 L 144 284" fill="none" stroke="#262828" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="136" y="320" width="34" height="26" rx="3" fill="#2A2C2C" stroke="#5E605F" stroke-width="2"/>
+  <path d="M146 320 L146 312 L158 312 L158 320" fill="none" stroke="#9A9A96" stroke-width="2"/>
+  <!-- 脖子 + 头 -->
+  <path d="M106 246 L106 284 Q120 292 134 284 L134 246 Z" fill="#E7D3BF"/>
+  <path d="M106 266 Q120 274 134 266 L134 258 Q120 266 106 258 Z" fill="#D8C0A9"/>
+  <ellipse cx="73" cy="200" rx="11" ry="15" fill="#E7D3BF"/><ellipse cx="167" cy="200" rx="11" ry="15" fill="#E7D3BF"/>
+  <path d="M74 202 C 74 150, 96 132, 120 132 C 144 132, 166 150, 166 202 C 166 242, 146 264, 120 264 C 94 264, 74 242, 74 202 Z" fill="#EFDCC8"/>
+  <path d="M76 176 C 80 168, 88 164, 96 164 L 96 176 Z M164 176 C 160 168, 152 164, 144 164 L 144 176 Z" fill="#2B2B2B"/>
+  <!-- 安全帽 -->
+  <path d="M66 166 C 66 112, 96 92, 120 92 C 144 92, 174 112, 174 166 Z" fill="url(#egHat)"/>
+  <path d="M120 92 C 112 110, 112 140, 116 166 L 124 166 C 128 140, 128 110, 120 92 Z" fill="#0B6B69"/>
+  <path d="M54 166 Q 120 182 186 166 L 186 174 Q 120 192 54 174 Z" fill="#E4E2DC" stroke="#9A9A96" stroke-width="2"/>
+  <!-- 五官 -->
+  <circle cx="102" cy="204" r="3" fill="#2B2B2B"/><circle cx="138" cy="204" r="3" fill="#2B2B2B"/>
+  <path d="M94 192 L108 190 M132 190 L146 192" stroke="#2B2B2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M110 238 Q120 244 130 238" fill="none" stroke="#B8876B" stroke-width="3" stroke-linecap="round"/>
+  <!-- 左手扳手 -->
+  <path d="M72 300 C 50 314, 44 342, 60 358 L 78 346 C 70 336, 74 322, 84 314 Z" fill="#454848"/>
+  <path d="M60 352 C 54 360, 58 370, 66 370 C 76 370, 78 360, 74 354 Z" fill="#EFDCC8"/>
+  <g transform="translate(66 360) rotate(28)">
+    <rect x="-5" y="-62" width="10" height="64" rx="4" fill="#9A9A96" stroke="#5E605F" stroke-width="1.5"/>
+    <path d="M-14 -62 A 14 14 0 1 1 14 -62 L 6 -62 L 6 -74 L -6 -74 L -6 -62 Z" fill="#9A9A96" stroke="#5E605F" stroke-width="1.5"/>
+  </g>
+</svg>
