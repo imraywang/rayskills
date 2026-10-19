@@ -57,15 +57,17 @@ CAP_TOP = HFV["cap_top"] if CAP_TOP is None else CAP_TOP
 X0, X1, GAP = HFV["bar_x0"], HFV["bar_x1"], 10
 span = X1 - X0 - GAP * (len(CHAPS) - 1)
 named = any(t for t, _, _ in CHAPS)
+# 顶栏底板是上深下透的渐变：真实画面一直铺到进度条下面（Ray 2026-10-18 电视去广告那期），不再压一条实心色带
+# 字幕样式用 #root > .cap 限定：2026-10-18 本期 style.css 里给草图写的 .cap 漏进成片，字幕黑底变成满宽长条
 CHROME_CSS = """
 #topbar { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; z-index: 50; --tb-ink: %(ink)s; --tb-dim: %(dim)s; --tb-track: %(track)s; --tb-bg: %(bg)s; }
-#topbar .tb-back { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; background: var(--tb-bg); }
+#topbar .tb-back { position: absolute; left: 0; right: 0; top: 0; height: %(tbh)spx; background: linear-gradient(to bottom, color-mix(in srgb, var(--tb-bg) 62%%, transparent) 0, color-mix(in srgb, var(--tb-bg) 38%%, transparent) 66%%, transparent 100%%); }
 #topbar .tb-no { position: absolute; left: %(x0)spx; top: %(noy)spx; font-family: "JetBrains Mono", monospace; font-size: 26px; letter-spacing: .08em; color: var(--tb-dim); }
 #topbar .tb-t { position: absolute; left: %(tx)spx; top: %(ty)spx; font-family: "HeiBold", sans-serif; font-weight: 700; font-size: %(ts)spx; color: var(--tb-ink); opacity: 0; white-space: nowrap; }
 #topbar .tb-r { position: absolute; right: %(x0)spx; top: %(noy)spx; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 24px; letter-spacing: .12em; color: var(--tb-dim); }
 #topbar .tb-seg { position: absolute; top: %(segy)spx; height: 8px; border-radius: 4px; background: var(--tb-track); overflow: hidden; }
 #topbar .tb-seg i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%%; background: var(--tb-ink); transform-origin: left center; }
-.cap span small { display: block; font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 26px; line-height: 1.35; color: #BDBDB8; margin-top: 6px; }
+#root > .cap span small { display: block; font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 26px; line-height: 1.35; color: #BDBDB8; margin-top: 6px; }
 """ % {"bg": BG, "ink": TB_INK, "dim": TB_DIM, "track": TB_TRACK, "tbh": HFV["topbar_h"], "x0": X0, "noy": HFV["no_y"], "tx": X0 + 108, "ty": HFV["title_y"], "ts": HFV["title_size"], "segy": HFV["seg_y"]}
 segs, titles, x = [], [], X0
 for k, (t, a0, a1) in enumerate(CHAPS):
@@ -166,12 +168,14 @@ for i, s in enumerate(SC):
 stage_open = stage_close = ""
 # 横屏字幕：白字 + 黑描边 + 柔和阴影，无底框（小Lin说、差评、漫士的做法）
 CAP_OUTLINE_CSS = ("""
-      .cap span { background: none; padding: 0 12px; color: #FFFFFF; -webkit-text-stroke: 9px rgba(0,0,0,0.92); paint-order: stroke fill;
+      #root > .cap span { background: none; padding: 0 12px; color: #FFFFFF; -webkit-text-stroke: 9px rgba(0,0,0,0.92); paint-order: stroke fill;
         text-shadow: 0 3px 14px rgba(0,0,0,0.45); }""" if HFV.get("cap_style") == "outline" else "")
 if STAGE_FIT and ASPECT == "portrait":   # 舞台整体缩放进安全区（只用于竖屏旧片子）；场景自己的底色会跟着缩，外面露出的是 #root 的 BG
     a, b = STAGE_FIT; k = (1490 - 300) / (b - a); ty = 300 - k * a
     stage_open = f'    <div id="stage" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:translate(0px,{ty:.1f}px) scale({k:.4f});transform-origin:540px 0px">'
     stage_close = "    </div>"
+if SCRIPT.get("host") and not COVER and not os.path.exists(os.path.join(HERE, "compositions", "s-host.html")):   # 2026-10-18 漏跑 host_build.py，第一版成片没有角落主持人
+    print("WARN: script.json 有 host，但 compositions/s-host.html 不存在 —— 先跑 host.py --plan-only（或 host.py）和 python3 host_build.py，否则成片没有角落主持人")
 host = ""
 if os.path.exists(os.path.join(HERE, "compositions", "s-host.html")) and not COVER:   # host_build.py 生成
     host = f'    <div id="s-host" data-composition-id="s-host" data-composition-src="compositions/s-host.html" data-start="0" data-duration="{TOTAL}" data-track-index="8" data-width="{CW}" data-height="{CH}"></div>'
@@ -199,8 +203,8 @@ doc = f'''<!doctype html>
       * {{ margin: 0; padding: 0; box-sizing: border-box; }}
       html, body {{ width: {CW}px; height: {CH}px; overflow: hidden; background: {BG}; }}
       #root {{ position: relative; width: 100%; height: 100%; overflow: hidden; color: {FG}; background: {BG}; }}
-      .cap {{ position: absolute; left: 50px; right: 50px; top: {CAP_TOP}px; height: {HFV["cap_h"]}px; z-index: 60; display: flex; align-items: center; justify-content: center; }}
-      .cap span {{ display: inline-block; max-width: {HFV["cap_maxw"]}px; padding: 14px 36px; border-radius: 14px; background: rgba(17,17,17,0.88);
+      #root > .cap {{ position: absolute; left: 50px; right: 50px; top: {CAP_TOP}px; height: {HFV["cap_h"]}px; min-height: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: none; border-radius: 0; padding: 0; }}
+      #root > .cap span {{ display: inline-block; max-width: {HFV["cap_maxw"]}px; padding: 14px 36px; border-radius: 14px; background: rgba(17,17,17,0.88);
         font-family: "HeiBold", sans-serif; font-weight: 700; font-size: {HFV["cap_size"]}px; line-height: 1.25; color: #F3F3F0; text-align: center; }}
       {CHROME_CSS}{CAP_OUTLINE_CSS}
     </style>

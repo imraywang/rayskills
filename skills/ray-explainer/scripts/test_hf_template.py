@@ -7,6 +7,8 @@ Each case is a template bug that first showed up in a real film (2026-10-15 《A
   - ray-ip-dark must give a light top bar on a dark ground   (build.py kept the light-theme ink → invisible bar)
   - host_build.py must run with big segments                 (NameError: H used before it was computed)
   - two big segments 1 s apart must not shrink back between  (host flew to the corner and back in 1 s)
+  - captions are scoped to #root (2026-10-18: an episode style.css `.cap` made every caption a full-width black bar)
+  - the top-bar backing is see-through (2026-10-18: Ray wants footage to run up under the progress bar)
 Exit 1 with the failing case named.
 """
 import json, os, shutil, subprocess, sys, tempfile
@@ -59,6 +61,9 @@ with tempfile.TemporaryDirectory() as proj:
     run("build.py")
     idx = open(os.path.join(hf, "index.html")).read() if os.path.exists(os.path.join(hf, "index.html")) else ""
     check("--tb-ink: #F3F3F0" in idx and "background: #1C1D1D" in idx, "ray-ip-dark → light top bar on dark ground")
+    check("#root > .cap {" in idx and "\n      .cap {" not in idx, "caption styles scoped to #root > .cap")
+    back = next((l for l in idx.splitlines() if "#topbar .tb-back" in l), "")
+    check("linear-gradient" in back and "transparent 100%" in back, "top-bar backing is a see-through gradient")
 
 print("hf-template: " + ("OK" if not fails else f"{len(fails)} failed"))
 sys.exit(1 if fails else 0)
