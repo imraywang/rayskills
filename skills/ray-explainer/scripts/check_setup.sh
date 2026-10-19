@@ -6,6 +6,7 @@ need(){ command -v "$1" >/dev/null && echo "ok   $1" || { echo "MISS $1 — $2";
 need node "brew install node"
 need ffmpeg "brew install ffmpeg"
 need python3 "brew install python"
+if command -v yt-dlp >/dev/null; then YV=$(yt-dlp --version 2>/dev/null); [[ "$YV" < "2026.08" ]] && echo "WARN yt-dlp $YV is old — Bilibili answers 412; brew upgrade yt-dlp (or use uvx --from yt-dlp@latest yt-dlp)" || echo "ok   yt-dlp $YV"; else echo "WARN yt-dlp missing — brew install yt-dlp (or uvx --from yt-dlp@latest yt-dlp)"; fi
 CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 [ -x "$CHROME" ] && echo "ok   chrome" || { echo "MISS Google Chrome (or set CHROME=path)"; ok=0; }
 python3 -c "import mlx_whisper" 2>/dev/null && echo "ok   mlx_whisper" || { echo "MISS mlx_whisper — pip3 install mlx-whisper (TTS QA)"; ok=0; }

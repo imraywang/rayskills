@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Record a few seconds of a YouTube / Bilibili video that is open in Ray's Chrome, as a real moving clip for a film
-(hyperframes.md「取材」: real footage first). Same idea as ref_frames.py: yt-dlp gets 403 from YouTube and reading
-Chrome's cookie store is off limits, so the page records its own <video> (captureStream + MediaRecorder, picture and
-sound, in real time) and POSTs the webm to this receiver on 127.0.0.1, which turns it into an mp4.
+"""Get a YouTube / Bilibili clip through Ray's Chrome when yt-dlp can't (hyperframes.md「取材」: real footage first).
+Reading Chrome's cookie store is off limits, so the page itself does the work and POSTs to this receiver on 127.0.0.1.
+Two modes:
+  --js    records the page's own <video> in real time (captureStream + MediaRecorder, picture and sound): any site,
+          but a 10 s clip takes ~10 s and the tab plays out loud.
+  --bili  Bilibili only: asks the player API for the DASH streams (best H.264 video + best audio) and downloads the whole
+          video in seconds; the receiver muxes it without re-encoding. Cut the part you need afterwards with ffmpeg.
 
 usage:
   python3 web_clip.py <out_dir>                         # start the receiver (run in the background); clips land in <out_dir>
@@ -10,11 +13,16 @@ usage:
       it returns at once and works in the background: poll JSON.stringify(window.__clip) until state is done / error
       <start> is seconds or m:ss / h:mm:ss into the video. Recording is real time: a 10 s clip takes ~10 s plus buffering.
   → <out_dir>/<name>.mp4 (H.264 + AAC, 30 fps), <name>.json (page url, title, start, duration, recorded span)
+  python3 web_clip.py --bili <name> <BV id or link> [part]   # print the JS to run on any bilibili.com page; poll the same way
+  → <out_dir>/<name>.mp4 (stream copy, full length), <name>.json (link, title, owner, date, size, duration)
 
 Notes:
 - The page plays the segment while recording; the snippet sets volume to 0 on Chrome's output only where it can —
   check that the mp4 has sound (ffprobe) and tell Ray the tab will make noise if it doesn't.
 - YouTube: wait out / skip the ad first (the snippet clicks "Skip" when it can) and ask the player for 1080p.
+- --bili: the API calls go with Ray's cookies (1080p needs a login); the CDN downloads must NOT send cookies — the
+  video CDN rejects credentialed cross-origin fetches. The JS runs async and reports progress in window.__clip, because
+  one long synchronous evaluate froze the tab at 45 s (2026-10-17, ESP32).
 - The JSON keeps the source link: put it in credits.json and on screen as「来源 · 日期」.
 Stop the receiver when done.
 """
@@ -40,6 +48,21 @@ const q='http://127.0.0.1:%d/save?name='+encodeURIComponent(name)+'&meta='+encod
 S('upload');return await fetch(q,{method:'POST',body:new Blob(ch,{type:mt})}).then(r=>r.text()).catch(e=>'ERR '+e.message)};
 window.__clip={state:'wait'};R('%s',%s,%s).then(r=>{window.__clip.state='done';window.__clip.result=r}).catch(e=>{window.__clip.state='error';window.__clip.result=String(e)});'started — poll: JSON.stringify(window.__clip)'"""
 
+BILI_JS = r"""window.__clip={state:'wait'};(async()=>{const S=x=>window.__clip.state=x,name='%s',bv='%s',part=%d;
+const j=async u=>(await fetch(u,{credentials:'include'})).json();
+const info=(await j('https://api.bilibili.com/x/web-interface/view?bvid='+bv)).data;const cid=(info.pages[part-1]||info.pages[0]).cid;
+const d=(await j(`https://api.bilibili.com/x/player/playurl?bvid=${bv}&cid=${cid}&qn=80&fnval=16`)).data.dash;
+const v=d.video.filter(x=>x.codecs.startsWith('avc')).sort((a,b)=>b.height-a.height||b.bandwidth-a.bandwidth)[0];
+const a=d.audio.slice().sort((x,y)=>y.bandwidth-x.bandwidth)[0];
+for(const [k,s] of [['v',v],['a',a]]){S('download '+k);const r=await fetch(s.baseUrl||s.base_url);if(!r.ok)throw new Error(k+' HTTP '+r.status);
+ const tot=+r.headers.get('content-length')||0,rd=r.body.getReader(),ch=[];let n=0;
+ for(;;){const {done,value}=await rd.read();if(done)break;ch.push(value);n+=value.length;window.__clip.progress=k+' '+(n/1048576).toFixed(1)+(tot?'/'+(tot/1048576).toFixed(1):'')+' MB'}
+ S('upload '+k);const t=await (await fetch('http://127.0.0.1:%d/part?name='+name+'&k='+k,{method:'POST',body:new Blob(ch)})).text();if(!t.startsWith('ok'))throw new Error(t)}
+const meta={url:'https://www.bilibili.com/video/'+bv+(part>1?'?p='+part:''),title:info.title,owner:info.owner.name,pubdate:new Date(info.pubdate*1000).toISOString().slice(0,10),
+ size:[v.width,v.height],codecs:[v.codecs,a.codecs],duration:d.duration};
+S('mux');return (await fetch('http://127.0.0.1:%d/mux?name='+name+'&meta='+encodeURIComponent(JSON.stringify(meta)),{method:'POST'})).text()})()
+.then(r=>{window.__clip.state=r.startsWith('ok')?'done':'error';window.__clip.result=r}).catch(e=>{window.__clip.state='error';window.__clip.result=String(e)});'started — poll: JSON.stringify(window.__clip)'"""
+
 
 def secs(x):
     parts = [float(p) for p in x.split(":")]
@@ -49,6 +72,12 @@ def secs(x):
 if len(sys.argv) > 1 and sys.argv[1] == "--js":
     name, start, dur = re.sub(r"[^\w-]", "_", sys.argv[2]), secs(sys.argv[3]), float(sys.argv[4])
     print(JS % (PORT, name, start, dur))
+    sys.exit(0)
+if len(sys.argv) > 1 and sys.argv[1] == "--bili":
+    if len(sys.argv) < 4: sys.exit(__doc__)
+    name = re.sub(r"[^\w-]", "_", sys.argv[2]); m = re.search(r"BV[0-9A-Za-z]{10}", sys.argv[3])
+    if not m: sys.exit("no BV id in " + sys.argv[3])
+    print(BILI_JS % (name, m.group(0), int(sys.argv[4]) if len(sys.argv) > 4 else 1, PORT, PORT))
     sys.exit(0)
 if len(sys.argv) < 2: sys.exit(__doc__)
 OUT = os.path.abspath(sys.argv[1]); os.makedirs(OUT, exist_ok=True)
@@ -61,9 +90,26 @@ class H(http.server.BaseHTTPRequestHandler):
 
     def do_OPTIONS(self): self.send_response(204); self.cors(); self.end_headers()
 
+    def reply(self, msg):
+        print(msg, flush=True)
+        self.send_response(200); self.cors(); self.end_headers(); self.wfile.write(msg.encode())
+
     def do_POST(self):
-        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
         name = re.sub(r"[^\w-]", "_", q.get("name", ["clip"])[0]); meta = json.loads(q.get("meta", ["{}"])[0])
+        if u.path == "/part":   # --bili: one raw DASH stream (k = v / a)
+            k = "a" if q.get("k", ["v"])[0] == "a" else "v"; n = int(self.headers["Content-Length"])
+            open(os.path.join(OUT, f".{name}.{k}.m4s"), "wb").write(self.rfile.read(n))
+            return self.reply(f"ok {name} {k} {n / 1048576:.1f} MB")
+        if u.path == "/mux":    # --bili: both streams are in, copy them into one mp4
+            v, a, mp4 = (os.path.join(OUT, f".{name}.v.m4s"), os.path.join(OUT, f".{name}.a.m4s"), os.path.join(OUT, name + ".mp4"))
+            r = subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", v, "-i", a, "-map", "0:v", "-map", "1:a", "-c", "copy",
+                                "-movflags", "+faststart", mp4], capture_output=True, text=True)
+            if r.returncode: return self.reply("ffmpeg failed: " + r.stderr[-300:])
+            os.remove(v); os.remove(a)
+            meta["captured"] = datetime.datetime.now().isoformat(timespec="seconds")
+            json.dump(meta, open(os.path.join(OUT, name + ".json"), "w"), ensure_ascii=False, indent=1)
+            return self.reply(f"ok {name}.mp4 {meta.get('size')} {meta.get('duration')}s")
         tag = datetime.datetime.now().strftime("%H%M%S%f")   # each upload gets its own temp files: a stale run can't clobber a fresh one
         webm = os.path.join(OUT, f".{name}.{tag}.webm"); tmp = os.path.join(OUT, f".{name}.{tag}.mp4"); mp4 = os.path.join(OUT, name + ".mp4")
         open(webm, "wb").write(self.rfile.read(int(self.headers["Content-Length"])))
@@ -73,8 +119,7 @@ class H(http.server.BaseHTTPRequestHandler):
         json.dump(meta, open(os.path.join(OUT, name + ".json"), "w"), ensure_ascii=False, indent=1)
         msg = f"ok {name}.mp4 {meta.get('recorded_from', 0):.2f}→{meta.get('recorded_to', 0):.2f}s" if r.returncode == 0 else "ffmpeg failed: " + r.stderr[-300:]
         if r.returncode == 0: os.replace(tmp, mp4); os.remove(webm)
-        print(msg, flush=True)
-        self.send_response(200); self.cors(); self.end_headers(); self.wfile.write(msg.encode())
+        self.reply(msg)
 
     def log_message(self, *a): pass
 
