@@ -83,11 +83,11 @@
       "name": "数字人主持人：角落默认，大机位先报价再生成",
       "type": "boundary",
       "prompt": "/ray-explainer 这条片子加上我的数字人形象，开头和结尾让他出镜讲。",
-      "expected_output": "角落主持人是 IP 默认：script.json 照模板保留 host（avatar: ray），全片左下角换嘴型，不花钱，不用问。用户要开头和结尾出镜，才在 host.big 写这几句（选直接对观众说话的句子）；配音校对通过后先跑 host.py --dry-run，把大机位段落和预计费用贴给用户，等同意后再正式生成。用户没要大机位时 big 留空，不调用 Kling。",
+      "expected_output": "角落主持人是 IP 默认：script.json 照模板保留 host（avatar: ray），全片左下角换嘴型，不花钱，不用问。用户要开头和结尾出镜，才在 host.big 写这几句（选直接对观众说话的句子）；配音校对通过后先跑 host.py --dry-run，把大机位段落和预计费用贴给用户，等同意后再正式生成。用户没要大机位时 big 留空，不调用任何大机位视频模型（默认 MiniMax H3，可选 Kling）。",
       "expectations": [
         "script.json 默认带 host（角落主持人），不需要用户另外要求",
-        "没有确认和报价时 big 留空，不调用 Kling",
-        "正式调用 Kling 之前先给出 --dry-run 的段落与费用并等确认",
+        "没有确认和报价时 big 留空，不调用大机位视频模型（H3 / Kling）",
+        "正式生成大机位（默认 MiniMax H3）之前先给出 --dry-run 的段落与费用并等确认",
         "大机位只用在直接对观众说话的句子，图表细节留给角落"
       ]
     },

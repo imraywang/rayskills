@@ -4,7 +4,7 @@
   python3 make_avatar.py candidates <照片> --name ray   # 生成 3 版扁平卡通形象（绿幕底），给用户挑
   python3 make_avatar.py build --name ray --pick 1      # 用挑中的那版做口型 / 眨眼图层
 产物在 ~/.config/ray-explainer/avatars/<name>/（不放进任何仓库）：
-  flat.png（交给 Kling 的原图）、base.png（抠掉绿幕的底图）、A E I O U M.png（口型补丁）、B.png（闭眼）、meta.json（补丁位置）
+  flat.png（大机位视频模型的首帧原图：默认 MiniMax H3，可选 Kling）、base.png（抠掉绿幕的底图）、A E I O U M.png（口型补丁）、B.png（闭眼）、meta.json（补丁位置）
 费用：candidates 出 3 张图，build 出 7 张图，都走 fal 的 nano-banana-pro/edit，按 fal 当前价计。
 """
 import json, os, subprocess, sys, urllib.request

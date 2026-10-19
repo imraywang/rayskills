@@ -21,7 +21,7 @@
       "name": "只改标题重跑",
       "type": "revision",
       "prompt": "/ray-cover 公众号那张副标题换成「跟 Claude 说一句，它画出会转的机器」，其他不动。",
-      "expected_output": "先把公众号的旧文件（raw-wechat.png、wechat-cover.png、wechat-thumb.jpg、codex-wechat.log、manifest.json）改名加 -v1 留档、提示词另存 prompts/wechat-v1.md，再只改 prompts/wechat.md 里的副标题，只重跑 wechat。",
+      "expected_output": "先把公众号的旧文件（raw-wechat.png、wechat-cover.png、wechat-thumb.jpg、api-wechat.log 或 codex-wechat.log、manifest.json）改名加 -v1 留档、提示词另存 prompts/wechat-v1.md，再只改 prompts/wechat.md 里的副标题，只重跑 wechat。",
       "expectations": ["只重跑公众号一个平台", "其他平台文件不变", "重跑前先把旧文件改名加 -v1 留档，不让脚本覆盖"]
     },
     {
@@ -42,14 +42,15 @@
     },
     {
       "id": 5,
-      "name": "视频竖封面",
+      "name": "视频封面（默认 3:4）",
       "type": "happy-path",
-      "prompt": "/ray-cover 给这期口播视频做一张抖音竖封面，用我的照片。",
-      "expected_output": "读这期口播母稿或 script.json，写主标题（6–10 字断两行）+ 一行小字并备 1–2 组备选，从 S1–S7 按内容选一个风格，从 ~/.config/ray-cover/identity/ 按风格挑一张和上一期不同的照片，按 video-cover.md 的提示词结构写 prompts/vertical.md，用 gen_cover.py --platforms vertical --ref <照片> 生成 1080×1920，验收文字、颜色和中间 3:4 安全区后交付。",
+      "prompt": "/ray-cover 给这期口播视频做封面，用我的照片。",
+      "expected_output": "读这期口播母稿或 script.json，按默认的小Lin风A 写三段字（2–4 字超大关键词、一行中号中文、一行小英文）并备 1–2 组备选，从 ~/.config/ray-cover/identity/ 挑一张和上一期不同的照片，按 video-cover.md 的提示词结构写 prompts/xhs.md（浅色纸面、背景铺满题材实物、人物身后一个隐喻物件、3D 挤出关键词），用 gen_cover.py --platforms xhs --ref <照片> 生成 3:4，验收文字、颜色、数字和安全区后交付；不顺手出 9:16。",
       "expectations": [
         "用 Ray 的真人照片，经 --ref 传入，不用卡通形象",
-        "只有主标题和一行小字，没有副标题",
-        "标题、小字、人脸都在中间 3:4 区域内，顶部 10%、底部 20% 只放背景",
+        "只出 3:4（xhs），没有顺手出 9:16 vertical",
+        "风格是小Lin风A：暖米色纸面、超大 3D 关键词、背景铺满题材实物，不用 S3 黑场",
+        "画面文字只有关键词、一行中文、一行小英文三段，各出现一次",
         "颜色只有黑白灰加暗墨绿 #054C4C，禁止亮青、荧光绿",
         "不用 8 月 10 日以前的旧照片，不用别人的照片"
       ]

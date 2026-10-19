@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，配音 + 字幕）：画面由代码逐帧绘制，可用 Ray 的复刻音色；要真实截图、录屏或专属风格时走 HyperFrames 模式（配乐、数字人、发布包）。用于“做成解说视频”“知识科普短片”“用我的声音配音”。只要口播稿转 ray-kb，要封面转 ray-cover。
+description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“知识科普短片”“用我的声音配音”。只要口播稿转 ray-kb，要封面转 ray-cover。
 ---
 
 # Ray Explainer
@@ -13,7 +13,7 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
 
 ```
 素材 ─▶ ① 解说稿 script.json ─▶ ①b 分镜表 storyboard.py【Ray 确认】
-     ─▶ ② 配音 tts.py（Gemini 预置 / Ray 复刻音色）
+     ─▶ ② 配音 tts.py（默认 Ray 复刻音色；没注册时用 Gemini 预置音色）
      ─▶ ③ Whisper 校对 qa_tts.py（合格判定 + 逐字时间写入 timeline）
      ─▶ ③c 原声插入 splice_clips.py【有原声时】
      ─▶ ③b 数字人主持人 host.py（左下角口型默认带；大机位用户确认后才做）
@@ -21,7 +21,7 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
      ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video + 听感检查 audio_check.py ─▶ ⑧ 发布包 publish.py
 ```
 
-**专属风格模式**：Ray 说不要固定风格、要适合这期内容的风格、要有录屏 / 真实画面 / 截图时，②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。这个模式自带：按章节分段的进度条顶栏、原声插入（`splice_clips.py`）、本地生成配乐（`gen_bgm.py` / `mix_bgm.py`）、用锚点定位的少量音效。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
+**专属风格模式**（HyperFrames，近几期的主要做法）：要适合这期内容的风格、要有录屏 / 真实画面 / 截图时（按下面「真实画面优先」，多数科普片都是这样），②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。这个模式自带：按章节分段的进度条顶栏、原声插入（`splice_clips.py`）、本地生成配乐（`gen_bgm.py` / `mix_bgm.py`）、用锚点定位的少量音效。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
 
 **真实画面优先**（Ray 2026-10-15）：观众愿意看的是真实的东西，手绘、代码动画看久了审美疲劳。每一幕先找真实素材，**动态的优先于静态的**：录屏、本机实跑、产品官方演示片段、新闻 / 发布会画面、别人视频里被讨论到的那一段、Ray 自己的视频和后台数据；其次才是真实截图、原文、照片。代码动画只做两件事：把真实素材串起来（转场、标注、计数、对比），以及真实画面拍不到的抽象机制。别人的作品可以作为引用进成片，画面上标「来源 · 日期」。分镜关每幕写 `footage`（用什么真实素材、从哪来、是不是动态），`storyboard.py` 会列出来，整片动态真实素材太少会提醒。**真实视频默认全屏**（Ray 2026-10-15，《Roadster 真能飞》复盘：素材装在小机位窗口里冲击力不够）：科普 / 解说片里的真实视频素材默认用 `.fullshot` 铺满整个画面播放——竖屏原片直接铺满，横屏素材裁成竖屏、跟着主体走（`object-position`）；不装进机位窗口。窗口只留给截图、原帖、静态图和需要并排对比的场合。提问句之后可以用 `splice_clips.py` 插一段带原声的全屏插片，播完切回画板。分镜关每条 `footage` 写 `fullscreen: true/false`。**主体是整台设备或宽画面时整幅横放**（Ray 2026-10-16，宝可梦那期：双手横握 iPhone 的横屏素材被裁成竖屏，手机被切掉，返工）：`footage` 写 `"framing": "band"`，横屏原片按原比例横贯舞台中部，上下用同一段视频虚化压暗垫底（`.bandshot`）；`storyboard.py` 见到手机、掌机、超宽屏一类素材没写 `framing` 会提醒。
 
@@ -141,7 +141,7 @@ python3 $SK/scripts/host.py <project>             # 用户同意后：H3 生成�
 按 [grammars.md](references/grammars.md) 的选型表，按这期**整体**讲什么挑**一种**画法，每一幕都用它：
 
 - **语法场景**：在 `script.json` 的这一幕里写 `"grammar"` 和 `"cues"`，不用写代码。cue 的时间写成 `{"line": 1, "phrase": "创造新行为"}`，就能精确卡到这个词开口的时刻。
-- **手绘套路场景（优先）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
+- **手绘套路场景（kit 模式里优先于手写场景；整片仍先按「真实画面优先」找素材）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
 - **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
 - **一期只用一种画法**：手绘套路、某一种语法、或整期 HyperFrames，三选一，开场和结尾也用它（开场结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒，确实要混写 `"mix": true` 并说明理由。
 - 横屏（`"aspect": "landscape"`，Ray 2026-10-14 定）：画面基本不被遮挡，四周留 5%。**不放进度条和小标题**；字幕白字黑描边、无底框，居中压底（y 946–1036）；主持人是左下角直径 164 的小圆窗（卡片色底 + 墨绿细圈），**只在关键句出现**：`host.show` 标 3–6 句（写法同 `big`，不花钱），其余时间不在画面上；主画面偏左的那一幕写 `"host_side": "right"` 换到右下（学小Lin说）。贴分镜表时附上选的关键句。语法片段自动让出上 60、下 150（有主持人时下 230）。深色版用 `"theme": "ray-ip-dark"`（深灰 + 墨绿，AI、科技题材优先考虑）。
@@ -220,7 +220,10 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 - 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`；HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](references/hyperframes.md)
 - 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
 - 交付时提醒：平台的「AI 生成内容」声明要勾（复刻音色、数字人），CC 授权图片要在简介署名
-- 横屏片的封面交给 `ray-cover` 的 `landscape`（16:9，1920×1080，另出一份 jpg 给 YouTube）；竖屏封面（抖音、视频号 9:16，小红书 3:4）交给 `ray-cover` 的视频封面流程：Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP；`cover.jpg`（成片里的一帧）只作备用
+- 封面交给 `ray-cover` 的视频封面流程（Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP）：
+  - 竖屏片默认只出 3:4（`xhs`，风格默认小Lin风A），拷成项目根的 `cover_3x4.png`；9:16 只在 Ray 明确要时出。
+  - 横屏片出 `landscape`（16:9，1920×1080，另出一份 jpg 给 YouTube）。
+  - `cover.jpg`（成片里的一帧）只作备用。
 
 ## 边界
 

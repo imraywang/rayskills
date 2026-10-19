@@ -28,7 +28,8 @@ if x: print(f"VoxCPM2 local calls {len(x)}  {sum(v.get('chars', 0) for v in x)} 
 print(f"TTS total ≈ ${total:.3f}  (includes re-synthesized clips; cached clips cost nothing)")
 hf = os.path.join(sys.argv[1], "host", "usage.json")
 if os.path.exists(hf):
-    KLING = {"fal-ai/kling-video/ai-avatar/v2/pro": 0.115, "fal-ai/kling-video/ai-avatar/v2/standard": 0.0562, "MiniMax-H3": 0.08}
-    h = json.load(open(hf)).values(); sec = sum(v.get("billed") or v["seconds"] for v in h); c = sum((v.get("billed") or v["seconds"]) * KLING.get(v["model"], 0.115) for v in h)
+    # 大机位单价（美元/秒）：默认 MiniMax H3；不认识的模型按最贵的 Kling Pro 估，宁高勿低
+    RATES = {"MiniMax-H3": 0.08, "fal-ai/kling-video/ai-avatar/v2/pro": 0.115, "fal-ai/kling-video/ai-avatar/v2/standard": 0.0562}
+    h = json.load(open(hf)).values(); sec = sum(v.get("billed") or v["seconds"] for v in h); c = sum((v.get("billed") or v["seconds"]) * RATES.get(v["model"], 0.115) for v in h)
     print(f"Big-shot host  calls {len(h)}  {sec:.1f}s video  ≈ ${c:.3f}  (cached segments cost nothing)")
     print(f"TTS + host ≈ ${total + c:.3f}")

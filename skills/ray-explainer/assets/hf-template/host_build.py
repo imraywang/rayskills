@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""../host/plan.json（ray-explainer 的 host.py 算出的角落口型、眨眼、Kling 大机位段落）→ compositions/s-host.html。
+"""../host/plan.json（ray-explainer 的 host.py 算出的角落口型、眨眼、大机位段落）→ compositions/s-host.html。
 
 - 角落（免费）：Ray 的卡通形象 + 按逐字时间切换的口型图层 + 眨眼 + 轻微摆动。
 - 大机位（MiniMax H3 / Kling，可选）：段落开始前 0.4 秒从角落放大到大机位位置，播透明 WebM（自动从 host/frames 转出），说完缩回。

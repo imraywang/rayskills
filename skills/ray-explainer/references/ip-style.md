@@ -72,7 +72,7 @@ Ray 定下的方向：形象和声音统一（形象在左下角全片陪着，�
 - `"host"` 的 `big` 留空：配音和 Whisper 校对之后跑一次 `host.py <project>`，生成左下角口型，不花钱。
 - 新项目模板（`new_project.sh`）已经写好 `theme`、`host` 和首幕 `sig`；最后一幕的 `"sig": true` 自己加。
 - 旧项目自己目录里的 `kit.js`、`patterns.js`、`scenes.js` 里写死的颜色不跟这套走；要用 IP 规范重渲旧片，先换成模板里的新版 `kit.js`、`patterns.js`，`scenes.js` 里写死的色值逐个改。
-- 封面不在这里做：走 `ray-cover`，文章封面用 Punk 风格库、视频竖封面用 Ray 真人照片，都按这套黑白灰 + 墨绿编提示词。
+- 封面不在这里做：走 `ray-cover`，文章封面用 Punk 风格库、视频封面（默认只出 3:4、风格默认小Lin风A）用 Ray 真人照片，都按这套黑白灰 + 墨绿编提示词。
 
 ## 还没覆盖的
 

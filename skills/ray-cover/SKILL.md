@@ -1,17 +1,20 @@
 ---
 name: ray-cover
-description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.33:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频封面（9:16 抖音 / 视频号、3:4 小红书、16:9 横屏视频）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，默认用 OpenAI 图像 API 分平台生成（也可退回 Codex CLI 调 Image 2），能只改局部不重画。用于“做封面”“视频封面”“竖屏封面”“横屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
+description: 给定稿的文章或视频做带中文标题的封面：文章封面（公众号 2.33:1、X 16:9、X Article 5:2）用 Punk 风格库（MIT 版）；视频封面（默认只出 3:4、默认小Lin风A；要时出 9:16 竖屏和 16:9 横屏）用 Ray 真人照片 + 大标题。都按 Ray 的黑白灰 + 墨绿 IP 编译提示词，默认用 OpenAI 图像 API 分平台生成（也可退回 Codex CLI 调 Image 2），能只改局部不重画。用于“做封面”“视频封面”“竖屏封面”“横屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
 ---
 
 # Ray Cover
 
-把一篇定稿内容压成一张在信息流里一眼能认出的封面。Claude 负责读内容、写封面文案、选风格、编译每个平台的完整提示词、验收；生成默认走 OpenAI Images API（gpt-image-2.5-sunburst，约 40 秒、$0.07 一张），没有 key 或 `--backend codex` 时由 Codex CLI 调 Image 2。画面和中文由 Image 2 一次生成，不做无字底图再排字。
+把一篇定稿内容压成一张在信息流里一眼能认出的封面。Claude 负责读内容、写封面文案、选风格、编译每个平台的完整提示词、验收；生成默认走 OpenAI Images API（gpt-image-2.5-sunburst，约 40 秒、$0.07 一张），没有 key 或 `--backend codex` 时由 Codex CLI 调 Image 2。画面和中文由生图模型一次生成，不做无字底图再排字。
 
 风格库来自 Adrian Punk 的 Punk Skill MIT 版（`assets/punk/`，来源和许可边界见 `assets/punk/NOTICE.md`）。之后的新版是付费商业授权，不拷进来。
 
 `$SK` 指本 skill 目录。
 
-**视频封面**（抖音、视频号、小红书的竖封面，以及 YouTube、视频号 / 抖音横屏视频的 16:9 横封面）走另一套：真人照片 + 大标题，风格和 9:16 / 3:4 / 16:9 的安全区见 [video-cover.md](references/video-cover.md)。下面第 5–7 步的生成、验收、交付照常适用；第 2 步的文案换成 video-cover.md「文案」（默认只有两行主标题、带悬念，不加副标题和小字），第 3–4 步的选风格和编译提示词也换成 video-cover.md 里的规则。只删改一行字时用 `scripts/erase_text.py`，不重新生成。
+**视频封面**（抖音、视频号、小红书的竖封面，以及 YouTube、视频号 / 抖音横屏视频的 16:9 横封面）走另一套：真人照片 + 大标题，见 [video-cover.md](references/video-cover.md)。默认只出 3:4（`xhs`）、默认风格小Lin风A；9:16 只在 Ray 明确要时出；各比例的安全区见同一文件。
+
+下面第 5–7 步的生成、验收、交付照常适用；以下几步换成 video-cover.md 里的规则：
+- 第 2 步的文案换成 video-cover.md「文案」。小Lin风A 是超大关键词 + 一行中文 + 一行小英文；其他风格默认只有两行主标题。第 3–4 步的选风格和编译提示词也换成 video-cover.md 里的规则。只删改一行字时用 `scripts/erase_text.py`，不重新生成。
 
 ## 1. 读内容
 
@@ -48,7 +51,7 @@ python3 $SK/scripts/gen_cover.py <封面目录> --platforms wechat,x,x-article
 脚本对每个平台各出一张图（并行），生成 `raw-<platform>.png`，比例对就等比缩放成 `<platform>-cover.png` 和 420px 缩略图，写 `manifest.json`；比例不对报错，不裁不拉。
 
 - **默认 `--backend api`**（`OPENAI_API_KEY` 在环境变量或 `~/.zshenv` 里就自动用）：OpenAI Images API，模型 `gpt-image-2.5-sunburst`，有 `--ref` 走 `/v1/images/edits`、没有走 `/v1/images/generations`，一张约 30–50 秒、约 $0.07。原生尺寸已实测 xhs 1200×1600；别的比例 API 不收时报错，那个平台改用 `--backend codex`。
-- **`--backend codex`**：Codex CLI 调 Image 2，一张约 2–5 分钟。需要 `codex` 已登录且 `image_generation` 开启（`codex features list`）。
+- **`--backend codex`**：Codex CLI 调 Image 2，一张约 1–5 分钟。需要 `codex` 已登录且 `image_generation` 开启（`codex features list`）。
 
 只出一个平台或换风格试一版：`--platforms wechat`。
 
