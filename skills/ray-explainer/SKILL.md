@@ -31,6 +31,8 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
 
 **整条真人出镜的口播不走本 skill 的链路**（Ray 2026-10-20 定）：Ray 录好的口播视频本身就是成片画面，只要加字幕或图卡时，交给 HyperFrames 的两个通用 skill，原片不剪、不调色——只加字幕（含字幕嵌到人身后、特效字）用 `embedded-captions`，加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut`。用 Ray 的录音给解说片配音、脸只在小圆窗里出现的，仍按「2. 配音」的 `recording` 走本 skill。这两个 skill 不认识 Ray 的风格，调用时要把签名层带过去：颜色、墨绿用法照 [ip-style.md](references/ip-style.md)（黑白灰 + 一处墨绿，不加别的色相；结尾导流卡可用整屏墨绿签名幕）；字体用思源黑体 / 霞鹜文楷；竖屏信息只放 y 200–1680、横屏四周留 5%，数字从 `assets/canvas.json` 取。这两个 skill 是 HyperFrames 上游的，不在 rayskills 里，没装时用 `npx hyperframes skills update embedded-captions talking-head-recut` 装（本机 10-20 已装）。
 
+**Ray 录的口播先去吸气音**（Ray 2026-10-20 定，所有他自己录的口播都要做）：句子之间的吸气声要压掉。动画面之前先跑 `python3 $SK/scripts/gate_breaths.py <原片> -o voice.wav --verify`：按能量、过零率、频谱重心找出句间吸气，压到 −45 dB、两头 20 ms 淡入淡出，停在下一个字起音前 30 ms（不吃「所以 / 先 / 从 / 写」的声母），时间轴不变、不剪画面。成片里把原片 `<video>` 设成 `muted`，另加 `<audio id="voice" src="voice.wav">` 同起同止。`--verify` 会重新转写对比：Whisper 每次跑都有零星差异，只有紧挨 `voice.cuts.json` 里某个时间点的字变了才算剪坏，去那一处听一下。第 1 节课程视频实测：190 秒里 27 处、7.4 秒，没有丢字。
+
 脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
 
 ## 0. 环境自检
@@ -93,7 +95,7 @@ python3 -I $SK/scripts/tts.py <project>
 - 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
 - `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
 
-**用 Ray 自己录的口播当配音**（他先录一遍、自己剪掉气口，Claude 按句对上画面）：`script.json` 写 `"recording": {"src": "<视频或音频>", "continuous": true, "takes": {"<幕>.<句>": [[起, 止]]}}`。先用 Whisper（`mlx_whisper` 带词级时间）转写整条，按句定起止，`lines` 改成他实际说的话（只修听错的字），整条连续切开、首尾相接，不加停顿、不裁边；没剪过的原始录音可去掉 `continuous`，每句可拼几段（接口 20 ms 淡入淡出）。之后照常 qa_tts → host.py --plan-only → make_beats → build。出镜：从同一个源按句切竖屏片段，裁肩部以上的方块，在画面左下 / 右下空着的句子里放圆形小窗。
+**用 Ray 自己录的口播当配音**（他先录一遍，Claude 先用 `gate_breaths.py` 压掉句间吸气音、再按句对上画面）：`script.json` 写 `"recording": {"src": "<gate_breaths.py 输出的 voice.wav>", "continuous": true, "takes": {"<幕>.<句>": [[起, 止]]}}`。先用 Whisper（`mlx_whisper` 带词级时间）转写整条，按句定起止，`lines` 改成他实际说的话（只修听错的字），整条连续切开、首尾相接，不加停顿、不裁边；没剪过的原始录音可去掉 `continuous`，每句可拼几段（接口 20 ms 淡入淡出）。之后照常 qa_tts → host.py --plan-only → make_beats → build。出镜：从同一个源按句切竖屏片段，裁肩部以上的方块，在画面左下 / 右下空着的句子里放圆形小窗。
 
 **还没有复刻音色时**：请用户提供 1–3 分钟干净的口播录音（手机录音或已发视频的原片都行），然后：
 
