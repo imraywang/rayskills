@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“做一期科普视频”“知识科普短片”“用我的声音配音”；Ray 的解说、科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer（本 skill 内部会调 HyperFrames）。只要口播稿转 ray-kb，要封面转 ray-cover；给已录好的整条真人口播加字幕或图卡转 embedded-captions / talking-head-recut（按本 skill 的 IP 规范带风格）。
+description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“做一期科普视频”“知识科普短片”“用我的声音配音”；Ray 的解说、科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer（本 skill 内部会调 HyperFrames）。只要口播稿转 ray-kb，要封面转 ray-cover；给已录好的整条真人口播加字幕或图卡转 embedded-captions / talking-head-recut（按本 skill 的 IP 规范带风格）；口播要剪成课程片（口播打底 + 全屏画板页 + 截图录屏）留在本 skill，用风格库（如 `ali`）。
 ---
 
 # Ray Explainer
@@ -31,6 +31,8 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
 
 **整条真人出镜的口播不走本 skill 的链路**（Ray 2026-10-20 定）：Ray 录好的口播视频本身就是成片画面，只要加字幕或图卡时，交给 HyperFrames 的两个通用 skill，原片不剪、不调色——只加字幕（含字幕嵌到人身后、特效字）用 `embedded-captions`，加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut`。用 Ray 的录音给解说片配音、脸只在小圆窗里出现的，仍按「2. 配音」的 `recording` 走本 skill。这两个 skill 不认识 Ray 的风格，调用时要把签名层带过去：颜色、墨绿用法照 [ip-style.md](references/ip-style.md)（黑白灰 + 一处墨绿，不加别的色相；结尾导流卡可用整屏墨绿签名幕）；字体用思源黑体 / 霞鹜文楷；竖屏信息只放 y 200–1680、横屏四周留 5%，数字从 `assets/canvas.json` 取。这两个 skill 是 HyperFrames 上游的，不在 rayskills 里，没装时用 `npx hyperframes skills update embedded-captions talking-head-recut` 装（本机 10-20 已装）。
 
+**例外：口播要剪成课程片、长视频时，用风格库**（Ray 2026-10-21 定）。这种片子以口播打底，中间切到全屏画板页、截图和录屏，人像卡跟着口播同步。这时不交给上面那两个 skill，用 [styles/README.md](references/styles/README.md) 里的风格来做。目前只有一种风格 `ali`（[ali.md](references/styles/ali.md)），它带一个能直接构建的工程模板 `assets/styles/ali/`。
+
 **Ray 录的口播先去吸气音**（Ray 2026-10-20 定，所有他自己录的口播都要做）：句子之间的吸气声要压掉。动画面之前先跑 `python3 $SK/scripts/gate_breaths.py <原片> -o voice.wav --verify`：按能量、过零率、频谱重心找出句间吸气，压到 −45 dB、两头 20 ms 淡入淡出，停在下一个字起音前 30 ms（不吃「所以 / 先 / 从 / 写」的声母），时间轴不变、不剪画面。成片里把原片 `<video>` 设成 `muted`，另加 `<audio id="voice" src="voice.wav">` 同起同止。`--verify` 会重新转写对比：Whisper 每次跑都有零星差异，只有紧挨 `voice.cuts.json` 里某个时间点的字变了才算剪坏，去那一处听一下。第 1 节课程视频实测：190 秒里 27 处、7.4 秒，没有丢字。
 
 脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
@@ -57,7 +59,7 @@ $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explai
 
 ### 1b. 分镜关
 
-稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再从 [style-refs.md](references/style-refs.md) 挑一张参考卡定风格（Ray 指定了就用他的；他丢来新链接就按那里的方法抽帧建卡），`script.json` 顶层写 `"style_ref"`，再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
+稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再从 [style-refs.md](references/style-refs.md) 挑一张参考卡定风格（参考卡只借版式；Ray 认可过、带模板的整套做法在[风格库](references/styles/README.md)）（Ray 指定了就用他的；他丢来新链接就按那里的方法抽帧建卡），`script.json` 顶层写 `"style_ref"`，再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
 
 - `beat`：这一幕讲什么，一句话
 - `visual`：画面按出现顺序依次是什么，用大白话写

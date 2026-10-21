@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Head"; font-weight: 700; src: url("assets/fonts/sans-700.woff2") format("woff2"); }
+      @font-face { font-family: "Sans"; font-weight: 500; src: url("assets/fonts/sans-500.woff2") format("woff2"); }
+      :root {
+        --paper: #f6f1ea; --swoosh: #ece4d8; --card: #ffffff;
+        --ink: #2b2622; --soft: #7a6f66; --line: #e6ddd1;
+        --coral: #e0754b; --coral-deep: #b9552f; --coral-tint: #fbe6dc;
+        --ok: #4f8a5b; --ok-tint: #e3efe0; --no: #c8553d;
+        --shadow: 0 18px 48px rgba(70, 48, 30, 0.10), 0 2px 6px rgba(70, 48, 30, 0.06);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Sans", sans-serif; color: var(--ink); }
+
+      #cam { position: absolute; inset: 0; overflow: hidden; }
+      #cam .inner { position: absolute; inset: 0; }
+      #aroll, #matte { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #behind { position: absolute; inset: 0; font-family: "Head"; font-weight: 700; font-size: 380px; line-height: 1; color: #fffaf3; text-shadow: 0 10px 50px rgba(60, 40, 20, 0.28); }
+      #behind span { position: absolute; top: 150px; }
+
+      .board { position: absolute; inset: 0; background: var(--paper); overflow: hidden; }
+      .swoosh { position: absolute; inset: 0; }
+      .swoosh svg { width: 100%; height: 100%; }
+      .w { display: inline-block; white-space: pre; }
+      .hd { font-family: "Head"; font-weight: 700; letter-spacing: 0.01em; }
+      .c { color: var(--coral); }
+      .pill { display: inline-flex; align-items: center; gap: 12px; padding: 12px 26px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-weight: 500; font-size: 28px; color: var(--ink); white-space: nowrap; }
+      .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--coral); }
+      .badge { padding: 2px 10px; border-radius: 8px; background: var(--coral-tint); color: var(--coral-deep); font-size: 22px; font-weight: 500; }
+      .card { position: absolute; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); }
+      .btitle { position: absolute; left: 120px; top: 120px; font-size: 58px; }
+      .bsub { position: absolute; left: 124px; top: 212px; font-size: 30px; color: var(--soft); }
+      .ico { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; flex: none; }
+      .ico.no { background: var(--no); } .ico.ok { background: var(--ok); }
+
+      /* presenter card: one continuous synced video, shown on boards only */
+      #pcard { position: absolute; left: 1440px; top: 300px; width: 360px; height: 480px; border-radius: 26px; overflow: hidden; border: 5px solid var(--card); box-shadow: var(--shadow); background: #ddd; }
+      #pcard video { position: absolute; left: -355px; top: -78px; width: 1150px; height: 647px; object-fit: cover; }
+
+      /* screenshot windows */
+      .win { position: absolute; border-radius: 18px; background: #fff; box-shadow: 0 30px 80px rgba(70,48,30,0.16), 0 2px 8px rgba(70,48,30,0.08); overflow: hidden; }
+      .win .bar { height: 40px; background: #f3efe9; display: flex; align-items: center; gap: 9px; padding-left: 18px; font-size: 18px; color: var(--soft); }
+      .win .bar i { width: 13px; height: 13px; border-radius: 50%; display: block; background: #ddd5ca; }
+      .win .bar span { margin-left: 14px; }
+      .win .vp { position: absolute; left: 0; right: 0; top: 40px; bottom: 0; overflow: hidden; background: #f7f6f4; }
+      .win .vp img { position: absolute; left: 0; top: 0; width: 2560px; height: 2820px; transform-origin: 0 0; }
+      .ring { position: absolute; border: 4px solid var(--coral); border-radius: 18px; box-shadow: 0 0 0 9999px rgba(43,38,34,0.12); opacity: 0; }
+      .typed { position: absolute; font-size: 34px; line-height: 1.5; color: #222; background: #fff; padding: 4px 10px; min-height: 60px; }
+      .typed .caret { display: inline-block; width: 3px; height: 38px; background: var(--coral); margin-left: 4px; vertical-align: -6px; }
+
+      /* captions */
+      .cap { position: absolute; left: 0; right: 0; bottom: 58px; display: flex; justify-content: center; }
+      .cap span { font-weight: 500; font-size: 40px; letter-spacing: 0.03em; }
+      .cap-a span { color: #fff; padding: 8px 24px; border-radius: 14px; background: rgba(28,22,18,0.52); }
+      .cap-b span { color: var(--soft); }
+
+      /* over footage: white card + dark heading */
+      .lt { position: absolute; left: 110px; padding: 10px 32px 14px; border-radius: 20px; background: rgba(255,255,255,0.95); box-shadow: var(--shadow); font-family: "Head"; font-weight: 700; color: var(--ink); white-space: nowrap; }
+      .lt .c { color: var(--coral-deep); }
+      .ltsub { position: absolute; left: 110px; padding: 8px 24px; border-radius: 16px; background: rgba(255,255,255,0.92); box-shadow: var(--shadow); font-size: 30px; color: var(--soft); white-space: nowrap; }
+      .prow { position: absolute; left: 110px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+      /* node paths */
+      .path { position: absolute; height: 8px; border-radius: 4px; background: var(--line); }
+      .pfill { position: absolute; height: 8px; border-radius: 4px; background: var(--coral); transform-origin: left center; }
+      .node { position: absolute; width: 38px; height: 38px; margin-left: -19px; margin-top: -15px; border-radius: 50%; background: var(--card); border: 5px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: var(--soft); }
+      .ring2 { position: absolute; width: 38px; height: 38px; margin-left: -19px; margin-top: -15px; border-radius: 50%; border: 4px solid var(--coral); opacity: 0; }
+      .slab { position: absolute; width: 240px; margin-left: -120px; display: flex; justify-content: center; }
+
+      /* S1 */
+      #s1-kicker { position: absolute; left: 120px; top: 230px; }
+      #s1-title { position: absolute; left: 120px; top: 320px; font-size: 68px; line-height: 1.3; }
+      #s1-title2 { position: absolute; left: 120px; top: 412px; font-size: 68px; }
+      #s1-pills { position: absolute; left: 120px; top: 560px; width: 680px; display: flex; flex-wrap: wrap; gap: 18px; }
+      #s1-last { position: absolute; left: 120px; top: 720px; font-size: 58px; }
+      #phone { position: absolute; left: 880px; top: 150px; width: 384px; height: 784px; border-radius: 52px; background: var(--card); box-shadow: 0 30px 80px rgba(70,48,30,0.18), 0 2px 8px rgba(70,48,30,0.08); }
+      #ice-wrap { position: absolute; left: 892px; top: 162px; width: 360px; height: 760px; border-radius: 42px; overflow: hidden; }
+      #ice { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #tag { position: absolute; left: 60px; top: 50px; }
+      #tag .pill { font-size: 24px; padding: 10px 22px; background: rgba(255,255,255,0.88); }
+
+      /* S4 */
+      #night { position: absolute; left: 160px; top: 690px; display: flex; align-items: baseline; gap: 26px; }
+      #night .a { font-size: 34px; color: var(--soft); }
+      #night .b { font-size: 76px; }
+      #night-line { position: absolute; left: 676px; top: 798px; width: 172px; height: 6px; border-radius: 3px; background: var(--coral); transform-origin: left center; }
+
+      /* S9 */
+      #s9-card { left: 120px; top: 300px; width: 1220px; height: 560px; }
+      .barv { position: absolute; bottom: 120px; width: 220px; border-radius: 18px 18px 6px 6px; transform-origin: bottom center; }
+      .barl { position: absolute; bottom: 60px; width: 220px; text-align: center; font-size: 30px; color: var(--soft); }
+      #s9-tag { position: absolute; left: 1000px; top: 70px; }
+
+      /* S15 */
+      #s15-pipe { position: absolute; left: 120px; top: 150px; display: flex; gap: 16px; }
+      .pchip { display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); font-size: 30px; }
+      .pchip .ck { width: 30px; height: 30px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 19px; display: inline-flex; align-items: center; justify-content: center; opacity: 0; }
+      .pchip .prog { width: 140px; height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
+      .pchip .prog i { display: block; height: 100%; width: 100%; background: var(--coral); transform-origin: left center; }
+      #finder { left: 120px; top: 270px; width: 1180px; height: 600px; overflow: hidden; }
+      #finder .bar { height: 48px; background: #f3efe9; display: flex; align-items: center; gap: 9px; padding-left: 20px; }
+      #finder .bar i { width: 13px; height: 13px; border-radius: 50%; background: #ddd5ca; display: block; }
+      #finder .bar b { margin-left: 18px; font-size: 22px; font-weight: 500; }
+      #finder .sb { position: absolute; left: 0; top: 48px; bottom: 0; width: 230px; background: #faf7f3; padding: 26px 22px; font-size: 24px; color: var(--soft); }
+      #finder .sb p { padding: 10px 14px; border-radius: 10px; margin-bottom: 6px; }
+      #finder .sb p.on { background: var(--coral-tint); color: var(--coral-deep); }
+      #ffile { position: absolute; left: 330px; top: 70px; width: 260px; display: flex; flex-direction: column; align-items: center; }
+      #ffile .th { width: 170px; height: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 26px rgba(70,48,30,0.2); }
+      #ffile .th img { width: 100%; display: block; }
+      #ffile b { margin-top: 14px; font-weight: 500; font-size: 22px; text-align: center; line-height: 1.35; }
+
+      /* S14 */
+      .still { position: absolute; width: 200px; height: 310px; border-radius: 16px; overflow: hidden; background: var(--card); box-shadow: var(--shadow); }
+      .still img { display: block; width: 100%; }
+      .stlab { position: absolute; width: 200px; display: flex; justify-content: center; }
+      .stlab .pill { font-size: 22px; padding: 6px 16px; }
+
+      /* S16 */
+      #s16-sheet { left: 120px; top: 120px; width: 640px; height: 752px; overflow: hidden; }
+      #s16-sheet img { width: 100%; display: block; }
+      #s16-mag { position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 50%; border: 6px solid var(--coral); box-shadow: 0 0 0 6px rgba(255,255,255,0.8); opacity: 0; }
+      .okb { position: absolute; width: 54px; height: 54px; border-radius: 50%; background: var(--ok); border: 4px solid #fff; color: #fff; font-weight: 700; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
+      #s16-r { position: absolute; left: 830px; top: 160px; width: 560px; }
+      #s16-r .item { margin-top: 26px; }
+      #s16-done { position: absolute; left: 830px; top: 620px; }
+      #s16-done .pill { font-size: 36px; padding: 16px 34px; color: var(--ok); }
+
+      /* S17 */
+      #s17-big { position: absolute; left: 520px; top: 892px; }
+      #s17-big .pill { font-family: "Head"; font-weight: 700; font-size: 72px; padding: 16px 44px; color: var(--coral-deep); }
+
+      /* S20 */
+      .s20s { position: absolute; top: 300px; width: 190px; border-radius: 14px; overflow: hidden; background: var(--card); box-shadow: var(--shadow); }
+      .s20s img { display: block; width: 100%; }
+      .s20ring { position: absolute; border: 4px solid var(--coral); border-radius: 14px; opacity: 0; }
+      #ppt { left: 300px; top: 270px; width: 880px; height: 600px; overflow: hidden; opacity: 0; }
+      #ppt .bar { height: 46px; background: #f3efe9; color: var(--soft); font-size: 20px; display: flex; align-items: center; padding-left: 22px; }
+      #ppt .slide { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; display: flex; align-items: center; justify-content: center; background: #faf7f3; }
+      #ppt .slide img { position: absolute; height: 500px; border-radius: 10px; opacity: 0; box-shadow: var(--shadow); }
+
+      /* S23 */
+      .brk { position: absolute; height: 26px; border: 4px solid var(--line); border-top: none; border-radius: 0 0 14px 14px; transform-origin: top center; }
+
+      /* S25 */
+      #note { position: absolute; left: 1250px; top: 120px; width: 580px; height: 380px; padding: 44px 46px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); }
+      #note .tape { position: absolute; left: 210px; top: -20px; width: 150px; height: 40px; background: rgba(224,117,75,0.35); transform: rotate(3deg); }
+      #note p { font-family: "Head"; font-weight: 700; font-size: 44px; }
+      #note .blank { margin-top: 60px; height: 5px; background: var(--ink); width: 100%; transform-origin: left center; }
+      #note .q { margin-top: 26px; font-family: "Head"; font-weight: 700; font-size: 60px; color: var(--coral); }
+      #best { position: absolute; left: 1540px; top: 440px; }
+      #best .pill { font-size: 34px; color: var(--coral-deep); background: var(--coral-tint); }
+
+      /* S26 */
+      #end { left: 110px; top: 690px; padding: 30px 44px; display: flex; align-items: center; gap: 30px; }
+      #end .pill { background: var(--coral); color: #fff; box-shadow: none; font-size: 28px; }
+      #end b { font-family: "Head"; font-weight: 700; font-size: 52px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="/*DUR*/" data-width="1920" data-height="1080">
+
+      <div id="cam">
+        <div class="inner" data-layout-allow-overflow>
+          <video id="aroll" class="clip" src="assets/aroll.mp4" muted playsinline data-start="0" data-media-start="0" data-duration="/*DUR*/" data-track-index="0"></video>
+          <div id="behind" class="clip" data-start="6.84" data-duration="4.9" data-track-index="1" data-layout-allow-overflow><span id="bh1" style="left:300px">一</span><span id="bh2" style="left:1080px">句</span><span id="bh3" style="left:1460px">话</span></div>
+          <video id="matte" class="clip" src="assets/matte.webm" muted playsinline data-start="6.84" data-media-start="0.34" data-duration="4.9" data-track-index="2"></video>
+        </div>
+      </div>
+      <audio id="voice" src="assets/voice.wav" data-start="0" data-media-start="0" data-duration="/*DUR*/" data-track-index="6" data-volume="1"></audio>
+      <audio id="bgm" src="assets/bgm.mp3" data-start="0" data-duration="/*DUR*/" data-track-index="7" data-volume="0.11"></audio>
+
+      <!-- S1 0 – 6.84 -->
+      <section id="s1" class="clip board" data-start="0" data-duration="6.84" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div id="s1-kicker"><span class="pill"><span class="dot"></span>冰为什么浮在水面上</span></div>
+        <div id="s1-title" class="hd"><span class="w" data-t="0.0">你</span><span class="w" data-t="0.32">现在</span><span class="w" data-t="0.5">看到的</span></div>
+        <div id="s1-title2" class="hd"><span class="w" data-t="0.94">这条</span><span class="w" data-t="3.3">视频</span></div>
+        <div id="s1-pills">
+          <span class="pill" id="p1">稿子<span class="badge">AI</span></span><span class="pill" id="p2">画面<span class="badge">AI</span></span>
+          <span class="pill" id="p3">配音<span class="badge">AI</span></span><span class="pill" id="p4">字幕<span class="badge">AI</span></span>
+        </div>
+        <div id="s1-last" class="hd"><span class="w" data-t="5.64">全部是</span><span class="w c" data-t="6.1"> AI </span><span class="w" data-t="6.34">做的</span></div>
+        <div id="phone"></div>
+      </section>
+      <div id="ice-wrap"><video id="ice" class="clip" src="assets/ice.mp4" muted playsinline data-start="0" data-media-start="0" data-duration="6.84" data-track-index="4"></video></div>
+
+      <!-- S2 6.84 – 11.74 A-roll -->
+      <div id="tag" class="clip" data-start="7.1" data-duration="4.6" data-track-index="5"><span class="pill">零基础 AI 做视频 · 第 1 节</span></div>
+      <div id="s2-lt" class="lt clip" data-start="9.9" data-duration="1.84" data-track-index="11" style="top:740px;font-size:56px"><span class="w" data-t="9.94">不到</span><span class="w c" data-t="10.16"> 3 分钟</span></div>
+
+      <!-- S4 11.74 – 21.94 -->
+      <section id="s4" class="clip board" data-start="11.74" data-duration="10.2" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M0 1080 L0 820 C 500 760, 1100 900, 1920 640 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="btitle hd"><span class="w" data-t="11.74">说实话，</span><span class="w" data-t="12.46">我以前</span><span class="w" data-t="13.24">做一条视频</span></div>
+        <div class="bsub"><span class="w" data-t="14.68">全靠自己，一步一步来</span></div>
+        <div id="s4-path" data-path='{"x0":160,"x1":1320,"y":560,"labels":["写稿","录","剪","加字幕","找配音","调音乐"],"times":[15.02,16.22,17.12,17.6,18.2,18.85],"above":true}'></div>
+        <div id="night" class="hd"><span class="a w" data-t="19.78">一条几分钟的视频</span><span class="b w" data-t="20.94">= 一个<span class="c">晚上</span></span></div>
+        <div id="night-line"></div>
+      </section>
+
+      <!-- S6 / S7 A-roll -->
+      <div id="s6-l1" class="lt clip" data-start="23.2" data-duration="3.06" data-track-index="5" style="top:650px;font-size:50px"><span class="w" data-t="23.24">为什么那么多人</span><span class="w" data-t="24.14">想做视频</span></div>
+      <div id="s6-l2" class="lt clip" data-start="25.0" data-duration="1.26" data-track-index="11" style="top:756px;font-size:50px"><span class="w" data-t="25.0">最后连一条</span><span class="w c" data-t="25.56">都没发出去</span></div>
+      <div id="s6-l3" class="lt clip" data-start="27.9" data-duration="2.56" data-track-index="5" style="top:740px;font-size:54px"><span class="w" data-t="27.9">做视频的</span><span class="w c" data-t="28.96">门槛</span><span class="w" data-t="29.34">，实在太高</span></div>
+      <div id="s7-card" class="lt clip" data-start="30.46" data-duration="2.82" data-track-index="11" style="top:720px;font-size:68px"><span id="s7-word" class="w" data-t="30.82" style="position:relative">门槛<i id="s7-strike" style="position:absolute;left:-6px;right:-6px;top:52%;height:8px;border-radius:4px;background:var(--coral);transform-origin:left center"></i></span><span class="w c" data-t="32.1">　被 AI 拆掉了</span></div>
+
+      <!-- S8 33.28 – 39.2 A-roll -->
+      <div id="s8-a" class="lt clip" data-start="34.4" data-duration="4.8" data-track-index="5" style="top:600px;font-size:50px"><span class="w" data-t="34.48">做科普视频</span><span class="w c" data-t="35.08"> = 一句话</span></div>
+      <div id="s8-row" class="prow clip" data-start="36.2" data-duration="3.0" data-track-index="11" style="top:720px;width:700px">
+        <span class="pill" id="s8-d">📅 10 月 13 号</span><span class="pill s8e">第 1 期</span><span class="pill s8e">第 2 期</span><span class="pill s8e">第 3 期</span>
+      </div>
+
+      <!-- S9 39.2 – 48.64 -->
+      <section id="s9" class="clip board" data-start="39.2" data-duration="9.44" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="btitle hd"><span class="w" data-t="39.44">一个很扎心的</span><span class="w c" data-t="40.4">事实</span></div>
+        <div class="bsub"><span class="w" data-t="43.44">同样是科普视频，在社交媒体上的数据</span></div>
+        <div class="card" id="s9-card">
+          <div class="barv" id="s9-b1" style="left:260px;height:190px;background:#ddd3c6"></div><div class="barl" style="left:260px">自己录、自己剪</div>
+          <div class="barv" id="s9-b2" style="left:740px;height:340px;background:var(--coral)"></div><div class="barl" style="left:740px">AI 做的</div>
+          <div id="s9-tag"><span class="pill" style="color:var(--coral-deep);background:var(--coral-tint);box-shadow:none">效果还要好</span></div>
+        </div>
+      </section>
+
+      <!-- S11 / S12 52.1 – 68.06 -->
+      <section id="s11" class="clip board" data-start="52.1" data-duration="15.96" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M0 1080 L0 820 C 500 760, 1100 900, 1920 640 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="win" id="w11" style="left:110px;top:110px;width:1240px;height:760px"><div class="bar"><i></i><i></i><i></i><span>WorkBuddy</span></div>
+          <div class="vp" data-layout-allow-overflow>
+            <img id="w11-home" src="assets/shots/wb-home.png" />
+            <img id="w11-skill" src="assets/shots/wb-skills.png" style="opacity:0" />
+            <div class="ring" id="w11-ring"></div>
+            <div class="typed" id="w11-typed" style="opacity:0"><span id="w11-txt"></span><span class="caret"></span></div>
+          </div></div>
+        <div class="prow" id="s11-lt" style="top:900px;width:1300px"><span class="pill" id="lt1"><span class="dot"></span>WorkBuddy</span><span class="pill" id="lt2">腾讯出品 · 装在你自己的电脑上</span><span class="pill" id="lt3">Windows / Mac</span></div>
+        <div id="s12-tag" style="position:absolute;left:110px;top:900px"><span class="pill">出片技能 <b class="c" style="font-weight:500">kepu-video</b></span></div>
+      </section>
+
+      <!-- S13 68.06 – 70.7 A-roll -->
+      <div id="s13-lt" class="lt clip" data-start="68.06" data-duration="2.64" data-track-index="5" style="top:660px;font-size:62px"><span class="w" data-t="68.06">就这一句</span></div>
+      <div id="s13-sub" class="ltsub clip" data-start="68.5" data-duration="2.2" data-track-index="11" style="top:780px"><span class="w" data-t="68.52">然后它自己就开始干活了</span></div>
+
+      <!-- S14 70.7 – 90.4 -->
+      <section id="s14" class="clip board" data-start="70.7" data-duration="19.7" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="win" id="w14" style="left:110px;top:110px;width:720px;height:820px"><div class="bar"><i></i><i></i><i></i><span>制作冰浮于水科普视频</span></div>
+          <div class="vp" data-layout-allow-overflow><img id="w14-img" src="assets/shots/wb-ice-steps.png" /></div></div>
+        <div id="s14-chip" style="position:absolute;left:880px;top:110px"><span class="pill">旁白稿 · <b class="c" style="font-weight:500">6 段</b></span></div>
+        <div class="still" id="sti1" style="left:880px;top:200px"><img src="assets/ice/q.jpg" /></div>
+        <div class="still" id="sti2" style="left:1110px;top:200px"><img src="assets/ice/hex.jpg" /></div>
+        <div class="still" id="sti3" style="left:880px;top:590px"><img src="assets/ice/num.jpg" /></div>
+        <div class="still" id="sti4" style="left:1110px;top:590px"><img src="assets/ice/cmp.jpg" /></div>
+        <div class="stlab" id="stl1" style="left:880px;top:525px"><span class="pill">抛问题</span></div>
+        <div class="stlab" id="stl2" style="left:1110px;top:525px"><span class="pill">六角格子</span></div>
+        <div class="stlab" id="stl3" style="left:880px;top:915px"><span class="pill">0.92</span></div>
+        <div class="stlab" id="stl4" style="left:1110px;top:915px"><span class="pill">水 vs 冰</span></div>
+      </section>
+
+      <!-- S15 90.4 – 97.72 -->
+      <section id="s15" class="clip board" data-start="90.4" data-duration="7.32" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M0 1080 L0 820 C 500 760, 1100 900, 1920 640 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div id="s15-pipe">
+          <span class="pchip" id="pc1">配音<span class="ck">✓</span></span><span class="pchip" id="pc2">对字幕<span class="ck">✓</span></span>
+          <span class="pchip" id="pc3">渲染<span class="prog"><i id="pc3-bar"></i></span></span><span class="pchip" id="pc4">放进文件夹<span class="ck">✓</span></span>
+        </div>
+        <div class="card" id="finder"><div class="bar"><i></i><i></i><i></i><b>我的视频</b></div>
+          <div class="sb"><p>桌面</p><p>下载</p><p class="on">我的视频</p></div>
+          <div id="ffile"><div class="th"><img src="assets/ice/q.jpg" /></div><b>冰为什么浮在水面上.mp4</b></div></div>
+      </section>
+
+      <!-- S16 97.72 – 108.58 -->
+      <section id="s16" class="clip board" data-start="97.72" data-duration="10.86" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="card" id="s16-sheet"><img src="assets/ice-check.jpg" /></div>
+        <div id="s16-mag"></div><div id="s16-oks"></div>
+        <div id="s16-r">
+          <div class="hd" style="font-size:54px"><span class="w" data-t="98.3">它还会</span><span class="w c" data-t="99.9">自己检查</span></div>
+          <div style="margin-top:14px;font-size:30px;color:var(--soft)"><span class="w" data-t="102.12">每一段截一张图</span></div>
+          <div class="item" id="s16-i1"><span class="pill"><span class="ico ok" id="s16-c1" style="opacity:0">✓</span>字有没有被压住</span></div>
+          <div class="item" id="s16-i2"><span class="pill"><span class="ico ok" id="s16-c2" style="opacity:0">✓</span>画面有没有出错</span></div>
+        </div>
+        <div id="s16-done"><span class="pill">✓ 确认没问题，才交给你</span></div>
+      </section>
+
+      <!-- S17 108.58 – 111.92 -->
+      <section id="s17" class="clip board" data-start="108.58" data-duration="3.34" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M0 1080 L0 820 C 500 760, 1100 900, 1920 640 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="win" id="w17" style="left:110px;top:110px;width:1240px;height:760px"><div class="bar"><i></i><i></i><i></i><span>制作冰浮于水科普视频</span></div>
+          <div class="vp" data-layout-allow-overflow><img id="w17-img" src="assets/shots/wb-ice-done.png" /><div class="ring" id="w17-ring"></div></div></div>
+        <div id="s17-big"><span class="pill">2 分 44 秒</span></div>
+      </section>
+      <div id="s17b" class="lt clip" data-start="111.92" data-duration="1.72" data-track-index="5" style="top:700px;font-size:54px"><span class="w" data-t="111.98">手动操作 </span><span class="w c" data-t="112.3">0 次</span></div>
+
+      <!-- S18 113.64 – 123.16 -->
+      <section id="s18" class="clip board" data-start="113.64" data-duration="9.52" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="btitle hd"><span class="w" data-t="113.76">做一条视频，其实就</span><span class="w c" data-t="115.5">四步</span></div>
+        <div id="s18-path" data-path='{"x0":240,"x1":1200,"y":520,"labels":["选题","写稿","做画面","配音合成"],"times":[116.1,116.62,117.26,117.9],"above":false,"big":true}'></div>
+        <div id="s18-who"></div>
+      </section>
+
+      <!-- S19 123.16 – 129.32 A-roll -->
+      <div id="s19-h" class="lt clip" data-start="123.16" data-duration="6.16" data-track-index="5" style="top:580px;font-size:50px"><span class="w" data-t="123.16">剩下的，</span><span class="w c" data-t="123.94">归你</span></div>
+      <div id="s19-row" class="prow clip" data-start="124.9" data-duration="4.42" data-track-index="11" style="top:700px;width:600px">
+        <span class="pill" id="s19-1" style="font-size:34px">① 选题</span><span class="pill" id="s19-2" style="font-size:34px">② 好不好看</span>
+      </div>
+
+      <!-- S20 129.32 – 139.76 -->
+      <div id="s20a" class="lt clip" data-start="132.9" data-duration="0.98" data-track-index="5" style="top:700px;font-size:60px"><span class="w" data-t="132.9">但是它</span><span class="w c" data-t="133.14">还不够好</span></div>
+      <section id="s20" class="clip board" data-start="133.88" data-duration="5.88" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M0 1080 L0 820 C 500 760, 1100 900, 1920 640 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="btitle hd" id="s20-h"><span class="w" data-t="133.92">仔细看这条片子</span></div>
+        <div id="s20-row"></div>
+        <div id="s20-tags" style="position:absolute;left:120px;top:780px;display:flex;gap:14px"><span class="pill" id="s20-t1">一个<b class="c" style="font-weight:500">图标</b></span><span class="pill" id="s20-t2">加一行<b class="c" style="font-weight:500">大字</b></span></div>
+        <div class="card" id="ppt"><div class="bar">演示文稿.pptx</div><div class="slide"><img src="assets/ice/q.jpg" /><img src="assets/ice/s2.jpg" /><img src="assets/ice/num.jpg" /><img src="assets/ice/end.jpg" /></div></div>
+        <div id="s20-ppt" style="position:absolute;left:120px;top:150px"><span class="pill" style="font-size:36px">有点像在翻 <b class="c" style="font-weight:500">PPT</b></span></div>
+      </section>
+
+      <!-- S21 139.76 – 145.42 A-roll -->
+      <div id="s21-lt" class="lt clip" data-start="139.9" data-duration="5.52" data-track-index="5" style="top:640px;font-size:58px"><span class="w" data-t="140.0">能看</span><span class="w" data-t="140.9" style="color:var(--soft)"> → </span><span class="w c" data-t="141.5">能火</span></div>
+      <div id="s21-sub" class="ltsub clip" data-start="143.2" data-duration="2.22" data-track-index="11" style="top:760px"><span class="w" data-t="143.24">中间这段差距，就是</span><span class="w" data-t="143.88" style="color:var(--coral-deep)">这门课</span></div>
+
+      <!-- S22 145.42 – 155.24 A-roll -->
+      <div id="s22-no" class="prow clip" data-start="145.9" data-duration="9.34" data-track-index="5" style="top:540px;width:560px">
+        <span class="pill" id="n1"><span class="ico no">✕</span>学剪辑软件</span><span class="pill" id="n2"><span class="ico no">✕</span>背一堆参数</span><span class="pill" id="n3"><span class="ico no">✕</span>买设备</span><span class="pill" id="n4"><span class="ico no">✕</span>露脸</span>
+      </div>
+      <div id="s22-yes" class="prow clip" data-start="152.2" data-duration="3.04" data-track-index="11" style="top:720px;width:560px">
+        <span class="pill" id="y1"><span class="ico ok">✓</span>一台电脑</span><span class="pill" id="y2"><span class="ico ok">✓</span>一件想讲给别人听的事</span>
+      </div>
+
+      <!-- S23 155.24 – 173.56 -->
+      <section id="s23" class="clip board" data-start="155.24" data-duration="18.32" data-track-index="3">
+        <div class="swoosh"><svg viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="M520 1080 C 900 700, 1300 520, 1920 430 L1920 1080 Z" fill="#ece4d8"/></svg></div>
+        <div class="btitle hd"><span class="w" data-t="155.3">这门课，</span><span class="w c" data-t="155.6">13 节</span></div>
+        <div id="s23-path" data-path='{"x0":160,"x1":1320,"y":560,"labels":[],"n":13,"numbers":true}'></div>
+        <div class="brk" id="br1" style="left:142px;top:600px;width:323px"></div>
+        <div id="bl1" style="position:absolute;left:200px;top:646px"><span class="pill" style="color:var(--ok);background:var(--ok-tint);box-shadow:none">1–4 节 · 免费</span></div>
+        <div class="brk" id="br2" style="left:500px;top:600px;width:838px"></div>
+        <div id="bl2" style="position:absolute;left:820px;top:646px"><span class="pill" style="box-shadow:none;background:#efe8de">5–13 节 · 进阶</span></div>
+        <div id="gift" style="position:absolute;left:330px;top:410px"><span class="pill" style="color:var(--coral-deep)">🎁 送你出片技能</span></div>
+        <div id="m1" style="position:absolute;left:560px;top:410px"><span class="pill">能看</span></div>
+        <div id="m2" style="position:absolute;left:740px;top:410px"><span class="pill">能发</span></div>
+        <div id="m3" style="position:absolute;left:920px;top:410px"><span class="pill" style="color:var(--coral-deep)">能火</span></div>
+        <div id="m4" style="position:absolute;left:560px;top:770px"><span class="pill">你自己的声音</span></div>
+        <div id="m5" style="position:absolute;left:820px;top:770px"><span class="pill">出片流水线</span></div>
+        <div id="m6" style="position:absolute;left:1060px;top:770px"><span class="pill" style="background:var(--coral);color:#fff">一周 3 条</span></div>
+      </section>
+
+      <!-- S25 173.56 – 186.24 A-roll -->
+      <section id="s25" class="clip" data-start="173.56" data-duration="12.68" data-track-index="5" style="position:absolute;inset:0">
+        <div id="note"><div class="tape"></div><p>我的第一个视频讲：</p><div class="blank" id="note-blank"></div><div class="q" id="note-q">？</div></div>
+        <div id="best"><span class="pill">最好的选题</span></div>
+        <div id="tip1" class="ltsub" style="top:600px"><span class="w" data-t="178.98">不知道写什么？</span></div>
+        <div id="tip2" class="lt" style="top:680px;font-size:46px"><span class="w" data-t="180.18">写你</span><span class="w c" data-t="181.3">解释过 3 遍以上</span><span class="w" data-t="182.4">的事</span></div>
+      </section>
+
+      <!-- S26 186.24 – end A-roll -->
+      <section id="s26" class="clip" data-start="186.24" data-duration="4.12" data-track-index="5" style="position:absolute;inset:0">
+        <div class="card" id="end"><span class="pill">下一节</span><b>把会干活的 AI 装进你的电脑</b></div>
+      </section>
+
+      <!-- presenter card (above boards) -->
+      <div id="pcard"><video id="pcv" class="clip" src="assets/aroll.mp4" muted playsinline data-start="0" data-media-start="0" data-duration="/*DUR*/" data-track-index="10"></video></div>
+
+<!--SFX-->
+<!--CAPTIONS-->
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const A = "#cam .inner";
+      const rise = (sel, t, d = 0.45) => tl.fromTo(sel, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: d, ease: "power3.out" }, t);
+      const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, y: 12, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" }, t);
+
+      // node paths
+      function buildPath(id) {
+        const host = document.getElementById(id); const P = JSON.parse(host.dataset.path);
+        const n = P.n || P.labels.length; const X = [...Array(n)].map((_, i) => P.x0 + i * (P.x1 - P.x0) / (n - 1));
+        let h = `<div class="path" style="left:${P.x0}px;top:${P.y}px;width:${P.x1 - P.x0}px"></div><div class="pfill" id="${id}-fill" style="left:${P.x0}px;top:${P.y}px;width:${P.x1 - P.x0}px"></div>`;
+        X.forEach((x, i) => {
+          h += `<div class="ring2" id="${id}-r${i}" style="left:${x}px;top:${P.y}px"></div><div class="node" id="${id}-n${i}" style="left:${x}px;top:${P.y}px">${P.numbers ? i + 1 : ""}</div>`;
+          if (P.labels[i]) h += `<div class="slab" id="${id}-l${i}" style="left:${x}px;top:${P.above ? P.y - 100 : P.y + 50}px"><span class="pill" style="${P.big ? "font-size:38px;padding:16px 34px" : "font-size:30px"}">${P.labels[i]}</span></div>`;
+        });
+        host.innerHTML = h; return { P, X };
+      }
+      function lightNode(id, i, t, X, P) {
+        tl.to(`#${id}-fill`, { scaleX: (X[i] - P.x0) / (P.x1 - P.x0), duration: 0.45, ease: "power2.inOut" }, t - 0.3);
+        tl.to(`#${id}-n${i}`, { borderColor: "#e0754b", backgroundColor: "#e0754b", color: "#ffffff", duration: 0.2 }, t);
+        tl.fromTo(`#${id}-r${i}`, { scale: 1, opacity: 0.6 }, { scale: 2.4, opacity: 0, duration: 0.9, ease: "power2.out" }, t);
+      }
+      const s4 = buildPath("s4-path"), s18 = buildPath("s18-path"), s23 = buildPath("s23-path");
+      document.getElementById("s18-who").innerHTML = s18.X.map((x, i) =>
+        `<div style="position:absolute;left:${x - 60}px;top:690px;width:120px;display:flex;justify-content:center"><span class="pill who-you" id="wy${i}" style="font-size:26px">你</span></div>` +
+        (i ? `<div style="position:absolute;left:${x - 60}px;top:690px;width:120px;display:flex;justify-content:center"><span class="pill who-ai" id="wa${i}" style="font-size:26px;color:#b9552f;background:#fbe6dc">AI</span></div>` : "")).join("");
+      const CELLS = []; for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) CELLS.push({ x: 120 + (c + 0.5) * 213, y: 120 + (r + 0.5) * 376 });
+      document.getElementById("s16-oks").innerHTML = CELLS.map((p, i) => `<div class="okb" id="ok${i}" style="left:${p.x + 40}px;top:${p.y + 110}px">✓</div>`).join("");
+      const S20X = [120, 330, 540, 750, 960, 1170];
+      document.getElementById("s20-row").innerHTML = ["q", "s2", "hex", "num", "cmp", "end"].map((k, i) =>
+        `<div class="s20s" style="left:${S20X[i]}px"><img src="assets/ice/${k}.jpg" /></div><div class="s20ring r-ic" style="left:${S20X[i] + 50}px;top:355px;width:90px;height:90px"></div><div class="s20ring r-tx" style="left:${S20X[i] + 10}px;top:440px;width:170px;height:100px"></div>`).join("");
+
+      // word-by-word reveal
+      gsap.utils.toArray(".w[data-t]").forEach((w) => tl.fromTo(w, { opacity: 0, y: 10, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.38, ease: "power2.out" }, parseFloat(w.dataset.t)));
+
+      // camera framing (hard cuts + slow drift)
+//CAM
+
+      // presenter card on boards
+//PCARD
+
+      // S1
+      rise("#phone", 0.05, 0.6); rise("#ice-wrap", 0.05, 0.6); rise("#s1-kicker", 1.12);
+      [["#p1", 3.86], ["#p2", 4.3], ["#p3", 4.9], ["#p4", 5.34]].forEach(([id, t]) => pop(id, t));
+      tl.set("#s1-pills .badge", { opacity: 0 }, 0);
+      tl.to("#s1-pills .badge", { opacity: 1, duration: 0.3, stagger: 0.08, ease: "power2.out" }, 6.1);
+      // S2
+      rise("#tag", 7.1, 0.4); tl.to("#tag", { opacity: 0, duration: 0.3 }, 11.3);
+      tl.fromTo("#behind span", { opacity: 0, y: 40, filter: "blur(14px)" }, { opacity: 0.96, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power2.out", stagger: 0.08 }, 9.3);
+      // S4
+      tl.set("#s4-path-fill", { scaleX: 0 }, 11.74); rise("#s4-path", 13.4, 0.5);
+      s4.P.times.forEach((t, i) => { lightNode("s4-path", i, t, s4.X, s4.P); tl.fromTo(`#s4-path-l${i}`, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, t); });
+      tl.to("#s4-path", { opacity: 0.35, duration: 0.6 }, 19.6);
+      tl.fromTo("#night-line", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 21.2);
+      // S6 / S7
+      tl.to("#s6-l1", { opacity: 0, duration: 0.25 }, 25.9);
+      tl.fromTo("#s7-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut" }, 32.32);
+      tl.to("#s7-word", { color: "#a89b90", duration: 0.3 }, 32.4);
+      // S8
+      pop("#s8-d", 36.32); gsap.utils.toArray(".s8e").forEach((e, i) => pop(e, 38.38 + i * 0.12));
+      // S9
+      rise("#s9-card", 40.2, 0.5);
+      tl.fromTo("#s9-b2", { scaleY: 0 }, { scaleY: 1, duration: 0.9, ease: "power3.out" }, 41.7);
+      tl.fromTo("#s9-b1", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "power3.out" }, 45.2);
+      pop("#s9-tag", 47.4);
+
+      // screenshots
+      function fit(vw, vh, r, fill) { const s = Math.min(vw * fill / r.w, vh * fill / r.h); return { s, x: vw / 2 - (r.x + r.w / 2) * s, y: vh / 2 - (r.y + r.h / 2) * s }; }
+      function focus(img, vw, vh, r, fill, t, dur, ease) { const f = fit(vw, vh, r, fill); if (dur) tl.to(img, { x: f.x, y: f.y, scale: f.s, duration: dur, ease: ease || "power3.inOut" }, t); else tl.set(img, { x: f.x, y: f.y, scale: f.s }, t); return f; }
+      function ringAt(sel, f, r, pad, t) { tl.set(sel, { left: r.x * f.s + f.x - pad, top: r.y * f.s + f.y - pad, width: r.w * f.s + pad * 2, height: r.h * f.s + pad * 2 }, t); tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, t); }
+      const VW = 1240, VH = 720;
+      // S11
+      rise("#w11", 52.15, 0.5);
+      focus("#w11-home", VW, VH, { x: 0, y: 260, w: 2560, h: 1500 }, 1, 52.1, 0);
+      focus("#w11-home", VW, VH, { x: 500, y: 600, w: 2060, h: 1100 }, 1, 53.0, 5.5, "sine.inOut");
+      [["#lt1", 53.2], ["#lt2", 54.2], ["#lt3", 57.44]].forEach(([id, t]) => pop(id, t));
+      tl.to("#s11-lt", { opacity: 0, duration: 0.25 }, 59.0);
+      // S12
+      const SK = { x: 614, y: 206, w: 615, h: 177 };
+      tl.set("#w11-skill", { opacity: 1 }, 59.18); tl.set("#w11-home", { opacity: 0 }, 59.18);
+      const fSk = focus("#w11-skill", VW, VH, SK, 0.62, 59.18, 0);
+      ringAt("#w11-ring", fSk, SK, 12, 59.8);
+      tl.set("#s12-tag", { opacity: 0 }, 52.1); pop("#s12-tag", 60.2); tl.to("#s12-tag", { opacity: 0, duration: 0.2 }, 61.45);
+      tl.to("#w11-ring", { opacity: 0, duration: 0.15 }, 61.45);
+      const INP = { x: 770, y: 1221, w: 1608, h: 284 };
+      tl.set("#w11-skill", { opacity: 0 }, 61.62); tl.set("#w11-home", { opacity: 1 }, 61.62);
+      const fIn = focus("#w11-home", VW, VH, INP, 0.94, 61.62, 0);
+      tl.set("#w11-typed", { opacity: 1, left: (INP.x + 30) * fIn.s + fIn.x, top: (INP.y + 6) * fIn.s + fIn.y, width: (INP.w - 110) * fIn.s }, 61.62);
+      const SENT = "用 kepu-video 技能做一条 60 秒的竖屏科普视频，讲讲「为什么冰会浮在水面上」。";
+      const typer = { n: 0 };
+      tl.fromTo(typer, { n: 0 }, { n: SENT.length, duration: 5.4, ease: "none", onUpdate: () => { document.getElementById("w11-txt").textContent = SENT.slice(0, Math.round(typer.n)); } }, 62.1);
+      tl.to("#w11-typed .caret", { opacity: 0, duration: 0.1 }, 67.6);
+      tl.to("#w11-txt", { backgroundColor: "rgba(224,117,75,0.22)", duration: 0.2 }, 67.6);
+      // S14
+      rise("#w14", 70.75, 0.5);
+      focus("#w14-img", 720, 780, { x: 0, y: 330, w: 1380, h: 1000 }, 1, 70.7, 0);
+      focus("#w14-img", 720, 780, { x: 0, y: 1150, w: 1380, h: 1000 }, 1, 82.0, 6.5, "sine.inOut");
+      pop("#s14-chip", 71.4);
+      tl.set(["#sti1", "#sti2", "#sti3", "#sti4", "#stl1", "#stl2", "#stl3", "#stl4"], { opacity: 0 }, 70.7);
+      [[74.84, 1], [80.2, 2], [85.56, 3], [87.18, 4]].forEach(([t, i]) => { pop("#sti" + i, t); pop("#stl" + i, t + 0.15); });
+      // S15
+      tl.set("#s15-pipe .pchip", { opacity: 0.35 }, 90.4); rise("#finder", 90.6, 0.5);
+      tl.set("#ffile", { opacity: 0 }, 90.4); tl.set("#pc3-bar", { scaleX: 0 }, 90.4);
+      [[91.32, "#pc1"], [91.96, "#pc2"]].forEach(([t, id]) => { tl.to(id, { opacity: 1, duration: 0.15 }, t); tl.fromTo(id + " .ck", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power3.out" }, t + 0.2); });
+      tl.to("#pc3", { opacity: 1, duration: 0.15 }, 93.6); tl.to("#pc3-bar", { scaleX: 1, duration: 1.7, ease: "power1.inOut" }, 93.7);
+      tl.to("#pc4", { opacity: 1, duration: 0.15 }, 95.36); tl.fromTo("#pc4 .ck", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3 }, 95.9);
+      tl.fromTo("#ffile", { scale: 0.85, opacity: 0, y: -30 }, { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 95.8);
+      // S16
+      rise("#s16-sheet", 97.75, 0.5);
+      tl.set(".okb", { scale: 0.6, opacity: 0 }, 97.72);
+      tl.set(["#s16-i1", "#s16-i2", "#s16-done"], { opacity: 0 }, 97.72);
+      rise("#s16-i1", 103.62); rise("#s16-i2", 105.48);
+      tl.set("#s16-mag", { opacity: 1, x: CELLS[0].x - 100, y: CELLS[0].y - 100 }, 102.1);
+      tl.fromTo("#s16-mag", { scale: 0.7 }, { scale: 1, duration: 0.3, ease: "power3.out" }, 102.1);
+      CELLS.forEach((p, i) => { const t = 102.4 + i * 0.55; if (i) tl.to("#s16-mag", { x: p.x - 100, y: p.y - 100, duration: 0.35, ease: "power2.inOut" }, t - 0.35); tl.to("#ok" + i, { scale: 1, opacity: 1, duration: 0.25, ease: "power3.out" }, t); });
+      tl.to("#s16-mag", { opacity: 0, duration: 0.25 }, 105.8);
+      tl.to(["#s16-c1", "#s16-c2"], { opacity: 1, duration: 0.2, stagger: 0.1 }, 106.4);
+      rise("#s16-done", 106.64);
+      // S17
+      focus("#w17-img", VW, VH, { x: 0, y: 120, w: 1550, h: 1450 }, 1, 108.58, 0);
+      const DONE = { x: 62, y: 405, w: 260, h: 64 };
+      const fDone = focus("#w17-img", VW, VH, DONE, 0.42, 109.6, 0.9);
+      tl.set("#w17-ring", { opacity: 0 }, 108.58); ringAt("#w17-ring", fDone, DONE, 14, 110.55);
+      tl.set("#s17-big", { opacity: 0 }, 108.58); pop("#s17-big", 110.82);
+      // S18
+      tl.set("#s18-path-fill", { scaleX: 0 }, 113.64); rise("#s18-path", 114.2, 0.5);
+      s18.P.times.forEach((t, i) => { lightNode("s18-path", i, t, s18.X, s18.P); pop(`#s18-path-l${i}`, t); });
+      tl.set([".who-you", ".who-ai"], { opacity: 0 }, 113.64);
+      tl.to(".who-you", { opacity: 1, duration: 0.3, stagger: 0.1 }, 119.6);
+      [[1, 121.34], [2, 121.56], [3, 121.76]].forEach(([i, t]) => { tl.to("#wy" + i, { opacity: 0, y: -8, duration: 0.15 }, t - 0.05); tl.fromTo("#wa" + i, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, t); });
+      // S19
+      pop("#s19-1", 125.02); pop("#s19-2", 126.6);
+      // S20
+      tl.set(["#s20 .s20s", "#s20-tags .pill", "#s20-ppt"], { opacity: 0 }, 133.88);
+      tl.to("#s20 .s20s", { opacity: 1, duration: 0.4, stagger: 0.06 }, 133.95);
+      tl.to("#s20 .r-ic", { opacity: 1, duration: 0.2, stagger: 0.05 }, 135.3); pop("#s20-t1", 135.3);
+      tl.to("#s20 .r-tx", { opacity: 1, duration: 0.2, stagger: 0.05 }, 136.56); pop("#s20-t2", 136.56);
+      tl.to(["#s20-row", "#s20-tags", "#s20-h"], { opacity: 0, duration: 0.25 }, 137.1);
+      tl.fromTo("#ppt", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, 137.2);
+      gsap.utils.toArray("#ppt .slide img").forEach((im, i) => { tl.fromTo(im, { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.18 }, 137.35 + i * 0.5); if (i < 3) tl.to(im, { x: -80, opacity: 0, duration: 0.18 }, 137.8 + i * 0.5); });
+      pop("#s20-ppt", 137.64);
+      // S22
+      ["#n1", "#n2", "#n3", "#n4"].forEach((id, i) => pop(id, [146.22, 147.52, 150.12, 151.0][i]));
+      pop("#y1", 152.4); pop("#y2", 153.88);
+      // S23
+      tl.set("#s23-path-fill", { scaleX: 0 }, 155.24); rise("#s23-path", 155.4, 0.5);
+      [0, 1, 2, 3].forEach((i) => lightNode("s23-path", i, 155.8 + i * 0.15, s23.X, s23.P));
+      tl.set(["#br1", "#br2", "#bl1", "#bl2", "#gift", "#m1", "#m2", "#m3", "#m4", "#m5", "#m6"], { opacity: 0 }, 155.24);
+      tl.fromTo("#br1", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.3 }, 156.08); pop("#bl1", 156.08);
+      pop("#gift", 157.64); tl.to("#gift", { opacity: 0, duration: 0.3 }, 163.3);
+      tl.fromTo("#br2", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.3 }, 163.6); pop("#bl2", 163.6);
+      for (let i = 4; i < 13; i++) lightNode("s23-path", i, 164.0 + (i - 4) * 0.95, s23.X, s23.P);
+      [["#m1", 165.14], ["#m2", 166.3], ["#m3", 166.62], ["#m4", 168.0], ["#m5", 171.4], ["#m6", 172.4]].forEach(([id, t]) => pop(id, t));
+      // S25
+      tl.set(["#note-q", "#best", "#tip1", "#tip2"], { opacity: 0 }, 173.56);
+      tl.set("#note", { rotation: -2 }, 0); rise("#note", 175.66, 0.5);
+      tl.fromTo("#note-blank", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power2.inOut" }, 176.6);
+      pop("#note-q", 178.3); rise("#tip1", 178.98); rise("#tip2", 180.18); pop("#best", 184.9);
+      // S26
+      rise("#end", 186.6, 0.6);
+
+      gsap.utils.toArray(".cap").forEach((c) => tl.fromTo(c.querySelector("span"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, parseFloat(c.dataset.start)));
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
