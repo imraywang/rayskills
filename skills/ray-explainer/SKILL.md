@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“做一期科普视频”“知识科普短片”“用我的声音配音”；Ray 的解说、科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer（本 skill 内部会调 HyperFrames）。只要口播稿转 ray-kb，要封面转 ray-cover。
+description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“做一期科普视频”“知识科普短片”“用我的声音配音”；Ray 的解说、科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer（本 skill 内部会调 HyperFrames）。只要口播稿转 ray-kb，要封面转 ray-cover；给已录好的整条真人口播加字幕或图卡转 embedded-captions / talking-head-recut（按本 skill 的 IP 规范带风格）。
 ---
 
 # Ray Explainer
@@ -28,6 +28,8 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
 **两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
 
 **画幅**：默认竖屏 1080×1920（抖音、视频号）。Ray 要横屏时（YouTube、视频号 / 抖音横屏）才出 1920×1080：`new_project.sh <slug> --landscape`，即 `script.json` 顶层 `"aspect": "landscape"`。一个项目只出一种画幅，不同时出两版。横屏只能用语法片段或 HyperFrames 模式（手绘套路是竖屏坐标，`render.js` 会拒绝）；没有进度条，字幕白字黑描边，主持人是只在关键句出现的小圆窗、按幕在左下 / 右下之间换（[host.md](references/host.md)「横屏」）。尺寸、安全区、字幕和主持人版位都在 `assets/canvas.json`，各脚本从那里读。
+
+**整条真人出镜的口播不走本 skill 的链路**（Ray 2026-10-20 定）：Ray 录好的口播视频本身就是成片画面，只要加字幕或图卡时，交给 HyperFrames 的两个通用 skill，原片不剪、不调色——只加字幕（含字幕嵌到人身后、特效字）用 `embedded-captions`，加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut`。用 Ray 的录音给解说片配音、脸只在小圆窗里出现的，仍按「2. 配音」的 `recording` 走本 skill。这两个 skill 不认识 Ray 的风格，调用时要把签名层带过去：颜色、墨绿用法照 [ip-style.md](references/ip-style.md)（黑白灰 + 一处墨绿，不加别的色相；结尾导流卡可用整屏墨绿签名幕）；字体用思源黑体 / 霞鹜文楷；竖屏信息只放 y 200–1680、横屏四周留 5%，数字从 `assets/canvas.json` 取。这两个 skill 是 HyperFrames 上游的，不在 rayskills 里，没装时用 `npx hyperframes skills update embedded-captions talking-head-recut` 装（本机 10-20 已装）。
 
 脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
 
