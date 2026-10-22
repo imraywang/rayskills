@@ -31,7 +31,9 @@ description: 把文章或观点做成知识解说视频（默认竖屏，要求�
 
 **整条真人出镜的口播不走本 skill 的链路**（Ray 2026-10-20 定）：Ray 录好的口播视频本身就是成片画面，只要加字幕或图卡时，交给 HyperFrames 的两个通用 skill，原片不剪、不调色——只加字幕（含字幕嵌到人身后、特效字）用 `embedded-captions`，加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut`。用 Ray 的录音给解说片配音、脸只在小圆窗里出现的，仍按「2. 配音」的 `recording` 走本 skill。这两个 skill 不认识 Ray 的风格，调用时要把签名层带过去：颜色、墨绿用法照 [ip-style.md](references/ip-style.md)（黑白灰 + 一处墨绿，不加别的色相；结尾导流卡可用整屏墨绿签名幕）；字体用思源黑体 / 霞鹜文楷；竖屏信息只放 y 200–1680、横屏四周留 5%，数字从 `assets/canvas.json` 取。这两个 skill 是 HyperFrames 上游的，不在 rayskills 里，没装时用 `npx hyperframes skills update embedded-captions talking-head-recut` 装（本机 10-20 已装）。
 
-**例外：口播要剪成课程片、长视频时，用风格库**（Ray 2026-10-21 定）。这种片子以口播打底，中间切到全屏画板页、截图和录屏，人像卡跟着口播同步。这时不交给上面那两个 skill，用 [styles/README.md](references/styles/README.md) 里的风格来做。目前只有一种风格 `ali`（[ali.md](references/styles/ali.md)），它带一个能直接构建的工程模板 `assets/styles/ali/`。
+**例外：口播要剪成课程片、长视频时，用风格库**（Ray 2026-10-21 定）。这种片子以口播打底，中间切到全屏画板页、截图和录屏，人像卡跟着口播同步。这时不交给上面那两个 skill，用 [styles/README.md](references/styles/README.md) 里的风格来做。课程片用 `ali`（[ali.md](references/styles/ali.md)，模板 `assets/styles/ali/`）。
+
+**横屏科普解说片默认用风格库的 `xiaolin`**（Ray 2026-10-21 定）：深色底、新闻画面快切，加玻璃气泡图、盖章、引语卡，见 [xiaolin.md](references/styles/xiaolin.md)，模板 `assets/styles/xiaolin/`。配音照 ②③ 走，拿到 `timeline.json` 以后，画面用这个模板做，不再走专属风格模式的通用骨架。
 
 **Ray 录的口播先去吸气音**（Ray 2026-10-20 定，所有他自己录的口播都要做）：句子之间的吸气声要压掉。动画面之前先跑 `python3 $SK/scripts/gate_breaths.py <原片> -o voice.wav --verify`：按能量、过零率、频谱重心找出句间吸气，压到 −45 dB、两头 20 ms 淡入淡出，停在下一个字起音前 30 ms（不吃「所以 / 先 / 从 / 写」的声母），时间轴不变、不剪画面。成片里把原片 `<video>` 设成 `muted`，另加 `<audio id="voice" src="voice.wav">` 同起同止。`--verify` 会重新转写对比：Whisper 每次跑都有零星差异，只有紧挨 `voice.cuts.json` 里某个时间点的字变了才算剪坏，去那一处听一下。第 1 节课程视频实测：190 秒里 27 处、7.4 秒，没有丢字。
 

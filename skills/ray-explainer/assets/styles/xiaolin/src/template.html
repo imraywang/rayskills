@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Sans"; font-weight: 500; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); }
+      @font-face { font-family: "Sans"; font-weight: 700; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); }
+      @font-face { font-family: "Sans"; font-weight: 900; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); }
+      @font-face { font-family: "Brush"; src: url("assets/fonts/brush.woff2") format("woff2"); }
+      :root {
+        --bg0: #0b0e14; --bg1: #1a2232; --ink: #f4f6fa; --soft: #9aa4b5; --line: rgba(255,255,255,0.16);
+        --red: #e5483e; --green: #3fbf7f; --gold: #e3b341; --violet: #7b6cf0;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg0); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Sans", sans-serif; color: var(--ink); }
+
+      .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .srcl { position: absolute; right: 40px; top: 30px; font-size: 18px; color: rgba(255,255,255,0.7); letter-spacing: 0.04em; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+      .chap { position: absolute; left: 40px; top: 30px; display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 12px; border-radius: 8px; background: rgba(20,26,38,0.72); border: 1px solid var(--line); font-size: 22px; font-weight: 700; letter-spacing: 0.04em; }
+      .chap i { width: 6px; height: 22px; border-radius: 3px; background: var(--red); display: block; }
+
+      /* boards */
+      .board { position: absolute; inset: 0; overflow: hidden; background: #121825 url("assets/img/board.png") center/cover; }
+      .board .wm { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-weight: 900; font-size: 300px; color: rgba(255,255,255,0.035); letter-spacing: 0.06em; white-space: nowrap; }
+      .dim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,16,0.55), rgba(8,10,16,0.7)); }
+      .blurbg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+      /* silver title over footage */
+      .silver { position: absolute; left: 0; right: 0; text-align: center; }
+      .silver .k { font-size: 34px; font-weight: 700; letter-spacing: 0.3em; color: #d9dee6; }
+      .silver .t { font-size: 150px; font-weight: 900; letter-spacing: 0.08em; line-height: 1.15; background: linear-gradient(180deg, #ffffff 0%, #dfe4ea 45%, #8d97a6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .silver .t.sh { position: absolute; left: 0; right: 0; top: auto; color: rgba(0,0,0,0.55); background: none; -webkit-background-clip: border-box; }
+      .silver .e { font-size: 22px; letter-spacing: 0.35em; color: rgba(230,234,240,0.8); text-transform: uppercase; }
+
+      /* text behind subject */
+      #behind { position: absolute; inset: 0; font-weight: 900; font-size: 430px; line-height: 1; color: #f2f4f8; text-shadow: 0 10px 50px rgba(0,0,0,0.5); }
+      #behind span { position: absolute; top: 60px; }
+
+      /* glass bubbles */
+      .bub { position: absolute; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+             background: linear-gradient(155deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.06) 26%, rgba(255,255,255,0) 40%), linear-gradient(160deg, var(--c) 30%, var(--c2) 100%);
+             border: 2px solid rgba(255,255,255,0.32); box-shadow: 0 0 60px var(--g), inset 0 -18px 40px rgba(0,0,0,0.35); }
+      .bub b { font-weight: 900; letter-spacing: 0.04em; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+      .bub small { font-size: 16px; letter-spacing: 0.2em; color: rgba(255,255,255,0.75); margin-top: 4px; text-transform: uppercase; }
+            .num { position: absolute; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); background: #10151f; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
+      .ptag { position: absolute; display: flex; align-items: baseline; gap: 10px; padding: 8px 18px; border-radius: 8px; background: rgba(10,13,20,0.88); border: 1px solid var(--line); white-space: nowrap; }
+      .ptag em { font-style: normal; font-size: 18px; color: var(--soft); }
+      .ptag b { font-size: 34px; font-weight: 900; }
+      .arrow { position: absolute; height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.85)); transform-origin: left center; }
+      .arrow::after { content: ""; position: absolute; right: -6px; top: -9px; border-left: 18px solid rgba(255,255,255,0.85); border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
+      .alab { position: absolute; font-size: 24px; color: var(--soft); white-space: nowrap; }
+
+      /* stamps */
+      .stampimg { position: absolute; display: block; }
+      .stamp { position: absolute; padding: 8px 26px 12px; border: 7px solid var(--red); border-radius: 10px; color: var(--red); font-weight: 900; font-size: 76px; letter-spacing: 0.06em; white-space: nowrap; background: rgba(229,72,62,0.06); text-shadow: 0 0 2px rgba(229,72,62,0.4); }
+      .stamp.g { border-color: var(--green); color: var(--green); background: rgba(63,191,127,0.06); }
+
+      /* cards */
+      .quote { position: absolute; left: 260px; right: 260px; top: 300px; text-align: center; }
+      .quote .src { font-size: 34px; font-weight: 700; letter-spacing: 0.06em; }
+      .quote .rule { margin: 26px auto; width: 70%; height: 1px; background: rgba(255,255,255,0.35); }
+      .quote .tx { font-size: 50px; font-weight: 700; line-height: 1.55; }
+      .quote .hl { background: #f4f6fa; color: #11151d; padding: 0 8px; }
+      .quote .dt { margin-top: 26px; font-size: 22px; color: var(--soft); letter-spacing: 0.1em; }
+      .tw { position: absolute; border-radius: 18px; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,0.55); }
+      .tw img { display: block; width: 100%; }
+      .trans { position: absolute; left: 0; right: 0; text-align: center; font-size: 46px; font-weight: 700; }
+      .trans .hl { color: #11151d; background: var(--gold); padding: 0 10px; }
+      .name { position: absolute; left: 120px; top: 640px; padding: 18px 30px 20px; border-radius: 10px; background: rgba(12,15,22,0.72); border-left: 6px solid var(--red); }
+      .name .en { font-size: 44px; letter-spacing: 0.06em; font-weight: 500; }
+      .name .zh { margin-top: 6px; font-size: 26px; color: #c9cfd9; letter-spacing: 0.1em; }
+      .nick { position: absolute; font-family: "Brush"; font-size: 110px; color: var(--gold); -webkit-text-stroke: 3px #1a1206; paint-order: stroke fill; text-shadow: 0 6px 0 #1a1206; }
+      .stat { position: absolute; left: 50%; top: 50%; width: 1120px; margin-left: -560px; margin-top: -230px; height: 400px; border: 4px solid var(--violet); border-radius: 6px; background: rgba(12,14,24,0.55); box-shadow: 0 0 60px rgba(123,108,240,0.35); text-align: center; padding-top: 48px; }
+      .stat .k { font-size: 32px; color: #dfe3ea; letter-spacing: 0.08em; }
+      .stat .n { font-size: 170px; font-weight: 900; line-height: 1.15; letter-spacing: 0.02em; }
+      .stat .n sup { font-size: 80px; vertical-align: top; }
+      .stat .d { font-size: 24px; color: var(--soft); letter-spacing: 0.12em; }
+      .brush { position: absolute; left: 0; right: 0; text-align: center; font-family: "Brush"; color: #f6f1ea; text-shadow: 0 8px 30px rgba(0,0,0,0.6); white-space: nowrap; }
+      .redtint { position: absolute; inset: 0; background: #b3121b; mix-blend-mode: multiply; }
+
+      /* paper */
+      .botfade { position: absolute; left: 0; right: 0; bottom: 0; height: 230px; background: linear-gradient(0deg, rgba(8,8,10,0.85), rgba(8,8,10,0)); }
+      .desk { position: absolute; inset: 0; background: #22170f url("assets/img/desk.png") center/cover; }
+      .paper { position: absolute; left: 50%; top: 50%; width: 1275px; height: 1650px; margin-left: -637px; margin-top: -825px; transform-origin: 0 0; }
+      .paper .pg { position: absolute; inset: 0; background: #fbfaf6; box-shadow: 0 40px 100px rgba(0,0,0,0.6); }
+      .paper .pg img { width: 100%; display: block; }
+      .mark { position: absolute; background: rgba(227,179,65,0.45); transform-origin: left center; }
+
+      /* bars / pie / lock / ruler */
+      .bar { position: absolute; bottom: 230px; width: 200px; border-radius: 8px 8px 0 0; transform-origin: bottom center; }
+      .blab { position: absolute; width: 300px; text-align: center; font-size: 30px; color: var(--soft); }
+      .bval { position: absolute; width: 300px; text-align: center; font-size: 54px; font-weight: 900; }
+      .pie { position: absolute; border-radius: 50%; background: conic-gradient(var(--green) 0 calc(var(--p) * 1%), #2a3242 0); box-shadow: 0 0 80px rgba(63,191,127,0.25), inset 0 0 0 2px rgba(255,255,255,0.1); }
+      .track { position: absolute; height: 14px; border-radius: 7px; background: #2a3242; }
+      .tfill { position: absolute; height: 14px; border-radius: 7px; background: linear-gradient(90deg, var(--gold), var(--red)); transform-origin: left center; }
+      .tick { position: absolute; width: 2px; background: rgba(255,255,255,0.4); }
+      .tlab { position: absolute; width: 200px; margin-left: -100px; text-align: center; font-size: 26px; color: var(--soft); }
+      .pin { position: absolute; width: 200px; margin-left: -100px; text-align: center; }
+      .pin b { display: inline-block; padding: 10px 22px; border-radius: 8px; background: rgba(12,15,22,0.9); border: 2px solid var(--gold); font-size: 30px; font-weight: 700; white-space: nowrap; }
+      #ruler { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: linear-gradient(0deg, rgba(8,10,16,0.92), rgba(8,10,16,0)); }
+      #ruler .y { position: absolute; bottom: 30px; font-size: 18px; color: rgba(255,255,255,0.55); width: 80px; margin-left: -40px; text-align: center; }
+      #ruler .t { position: absolute; bottom: 6px; width: 2px; height: 12px; background: rgba(255,255,255,0.45); }
+      #ruler .hot { position: absolute; bottom: 4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 16px var(--red); }
+
+      .chip { display: inline-flex; align-items: center; gap: 14px; padding: 14px 28px; border-radius: 10px; background: rgba(12,15,22,0.85); border: 1px solid var(--line); font-size: 38px; font-weight: 700; white-space: nowrap; }
+      .chip .x { width: 40px; height: 40px; border-radius: 50%; background: var(--red); display: inline-flex; align-items: center; justify-content: center; font-size: 26px; }
+      .phone { position: absolute; left: 710px; top: 60px; width: 500px; height: 960px; border-radius: 56px; background: #05070b; border: 3px solid #3a4253; box-shadow: 0 40px 100px rgba(0,0,0,0.6); overflow: hidden; }
+      .phone video { position: absolute; left: 14px; top: 14px; width: 466px; height: 926px; border-radius: 44px; object-fit: cover; }
+
+      .cap { position: absolute; left: 0; right: 0; bottom: 54px; display: flex; justify-content: center; }
+      .cap span { font-size: 44px; font-weight: 700; letter-spacing: 0.04em; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 18px rgba(0,0,0,0.6); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="/*DUR*/" data-width="1920" data-height="1080">
+      <audio id="narration" src="assets/audio/narration.m4a" data-start="0" data-duration="/*DUR*/" data-track-index="20" data-volume="1"></audio>
+      <audio id="bgm" src="assets/audio/bgm.m4a" data-start="0" data-duration="/*DUR*/" data-track-index="21" data-volume="0.22"></audio>
+
+<!--SHOTS-->
+
+      <!-- ===== HOOK ===== -->
+      <div id="h-name" class="clip" data-start="2.6" data-duration="2.0" data-track-index="4"><div class="name"><div class="en">Elon Musk</div><div class="zh">SpaceX 创始人</div></div><div class="nick" style="left:560px;top:600px">马斯克</div></div>
+      <section id="h-tw" class="clip board" data-start="4.6" data-until="@[hook.2-0.05]" data-track-index="3">
+        <img class="blurbg" src="assets/img/musk1-blur.jpg" />
+        <div class="tw" style="left:414px;top:240px;width:1092px"><img src="assets/img/tweet-musk.png" /></div>
+        <div style="position:absolute;left:414px;top:178px;font-size:24px;color:var(--soft);letter-spacing:0.1em">X · @elonmusk · 2026-10-19</div>
+      </section>
+      <div id="h-behind" class="clip" data-start="@[hook.2-0.05]" data-until="@[hook.3-0.05]" data-track-index="3" data-layout-allow-overflow>
+        <div id="behind"><span id="bh1" style="left:300px">一</span><span id="bh2" style="left:1110px">股</span></div></div>
+      <video id="matte" class="clip shot" src="assets/v/musk2-matte.webm" muted playsinline data-start="@[hook.2-0.05]" data-until="@[hook.3-0.05]" data-track-index="10"></video>
+      <div id="h-stat" class="clip" data-start="@[hook.3.7200]" data-duration="2.2" data-track-index="4"><div class="dim"></div><div class="stat" style="height:360px"><div class="k">美国 18 岁以下的孩子</div><div class="n">7,200<sup>万</sup></div><div class="d">每人一股</div></div></div>
+      <div id="h-105" class="clip" data-start="@[hook.3.一共是-0.4]" data-duration="2.6" data-track-index="4"><div class="dim"></div>
+        <div class="silver" style="top:330px"><div class="k">按发推前收盘价 · 合计</div><div class="t">105 亿美元</div><div class="e">$10.5 billion in SpaceX stock</div></div></div>
+      <div id="h-st1" class="clip" data-start="@[hook.4.好几年]" data-until="@[hook.4.家长-0.0]" data-track-index="4"><div class="dim" style="opacity:0.45"></div><img class="stampimg" id="st1" src="assets/img/stamp-st1.png" style="left:700px;top:380px" /></div>
+      <div id="h-st2" class="clip" data-start="@[hook.4.家长]" data-duration="3.0" data-track-index="4"><div class="dim" style="opacity:0.45"></div><img class="stampimg" id="st2" src="assets/img/stamp-st2.png" style="left:760px;top:380px" /></div>
+
+      <!-- ===== ASK ===== -->
+      <section id="ask" class="clip board" data-start="@[ask.1-0.05]" data-duration="5.0" data-track-index="3">
+        <div class="wm">SPACEX × KIDS</div>
+        <div class="bub" id="q1" style="left:250px;top:300px;width:400px;height:400px;--c:#3d6fd8;--c2:#1a2f66;--g:rgba(61,111,216,0.35)"><b style="font-size:58px">为什么送</b><small>Why</small></div>
+        <div class="bub" id="q2" style="left:760px;top:240px;width:400px;height:400px;--c:#2f9c6a;--c2:#123d2a;--g:rgba(47,156,106,0.35)"><b style="font-size:58px">怎么送</b><small>How</small></div>
+        <div class="bub" id="q3" style="left:1270px;top:300px;width:400px;height:400px;--c:#c0573e;--c2:#4d1d12;--g:rgba(192,87,62,0.35)"><b style="font-size:58px">有先例吗</b><small>History</small></div>
+        <div class="num" style="left:430px;top:270px">1</div><div class="num" style="left:940px;top:210px">2</div><div class="num" style="left:1450px;top:270px">3</div>
+      </section>
+
+      <!-- ===== WHY ===== -->
+      <div id="w-title" class="clip" data-start="@[why.1-0.05]" data-until="@[why.1.就在前一天-0.05]" data-track-index="4"><div class="dim"></div>
+        <div class="silver" style="top:360px"><div class="k">起因</div><div class="t">为什么是现在</div><div class="e">why now</div></div></div>
+      <div id="w-name" class="clip" data-start="@[why.1.美国]" data-duration="2.2" data-track-index="4"><div class="name"><div class="en">Dario Amodei</div><div class="zh">Anthropic CEO</div></div></div>
+      <section id="w-news" class="clip board" data-start="@[why.2-0.05]" data-until="@[why.3-0.05]" data-track-index="3">
+        <img class="blurbg" src="assets/img/dario1-blur.jpg" />
+        <div class="quote"><div class="src">CNBC</div><div class="rule"></div>
+          <div class="tx">Anthropic 宣布拿出 <span class="hl" id="w-hl">5% 的股份</span><br>成立公益基金，用途包括应对 AI 带来的失业</div>
+          <div class="dt">2026 年 10 月 18 日</div></div>
+      </section>
+      <section id="w-reply" class="clip board" data-start="@[why.3-0.05]" data-until="@[account.1-0.05]" data-track-index="3">
+        <div class="wm">X</div>
+        <div class="tw" id="w-tw1" style="left:414px;top:150px;width:1092px"><img src="assets/img/tweet-anthropic.png" /></div>
+        <div class="tw" id="w-tw2" style="left:470px;top:420px;width:1092px"><img src="assets/img/tweet-musk-reply1.png" /></div>
+        <div class="trans" id="w-tr" style="top:680px">「我建议<span class="hl">直接把股份发给公众</span>，我就打算这么做」</div>
+        <div id="w-days" style="position:absolute;left:560px;top:780px;width:800px">
+          <div class="track" style="left:0;top:40px;width:800px"></div>
+          <div class="pin" style="left:120px;top:0"><b>10.18 Anthropic</b></div><div class="pin" style="left:680px;top:0"><b style="border-color:var(--red)">10.19 马斯克发推</b></div>
+        </div>
+      </section>
+
+      <!-- ===== ACCOUNT ===== -->
+      <div id="a-title" class="clip" data-start="@[account.1.特朗普已经说了]" data-until="@[account.2-0.05]" data-track-index="4"><div class="dim" style="opacity:0.7"></div>
+        <div class="silver" style="top:330px"><div class="k">大而美法案设立</div><div class="t">特朗普账户</div><div class="e">Trump Accounts</div></div></div>
+      <section id="a-phone" class="clip board" data-start="@[account.2-0.05]" data-until="@[account.3-0.05]" data-track-index="3">
+        <div class="wm">TRUMP ACCOUNTS</div>
+        <div class="phone"></div>
+        <div class="ptag" id="a-pig" style="left:1280px;top:420px"><em>可以理解成</em><b>国家给每个孩子开的存钱罐</b></div>
+        <div style="position:absolute;left:1280px;top:510px;font-size:22px;color:var(--soft)">trumpaccounts.gov</div>
+      </section>
+      <div id="ta-wrap" style="position:absolute;left:724px;top:74px;width:466px;height:926px;border-radius:44px;overflow:hidden"><video id="ta" class="clip" src="assets/v/ta.mp4" muted playsinline data-start="@[account.2-0.05]" data-until="@[account.3-0.05]" data-track-index="11" style="width:100%;height:100%;object-fit:cover"></video></div>
+      <section id="a-rules" class="clip board" data-start="@[account.3-0.05]" data-until="@[flow.1-0.05]" data-track-index="3">
+        <div class="wm">TRUMP ACCOUNTS</div>
+        <div class="bub" id="a-bub" style="left:300px;top:240px;width:520px;height:520px;--c:#3d6fd8;--c2:#14275a;--g:rgba(61,111,216,0.4)"><b style="font-size:68px">特朗普账户</b><small>Trump Account</small></div>
+        <div id="a-c1" style="position:absolute;left:940px;top:380px"><span class="chip">只能买 <span style="color:var(--gold)">指数基金</span></span></div>
+        <div id="a-c2" style="position:absolute;left:940px;top:510px"><span class="chip">18 岁前 <span style="color:var(--red)">取不出来</span></span></div>
+      </section>
+
+      <!-- ===== FLOW ===== -->
+      <section id="f-paper" class="clip board" data-start="@[flow.1-0.05]" data-until="@[flow.2-0.05]" data-track-index="3">
+        <div class="desk"></div>
+        <div class="paper" id="f-pp"><div class="pg"><img src="assets/img/rule-p1-01.png" /></div>
+          <div class="mark" id="f-m1" style="left:452px;top:52px;width:412px;height:28px"></div>
+          <div class="mark" id="f-m2" style="left:298px;top:758px;width:530px;height:46px"></div></div>
+        <img class="stampimg" id="f-st" src="assets/img/stamp-f-st.png" style="left:1390px;top:560px" />
+      <div class="botfade"></div>
+      </section>
+      <section id="f-flow" class="clip board" data-start="@[flow.2-0.05]" data-until="@[tax.1-0.05]" data-track-index="3">
+        <div class="wm">FLOW</div>
+        <div class="bub" id="fb1" style="left:110px;top:330px;width:300px;height:300px;--c:#5b6576;--c2:#1f2530;--g:rgba(200,210,230,0.25)"><b style="font-size:48px">马斯克</b><small>SpaceX 股票</small></div>
+        <div class="bub" id="fb2" style="left:580px;top:330px;width:300px;height:300px;--c:#2f9c6a;--c2:#123d2a;--g:rgba(47,156,106,0.35)"><b style="font-size:46px">慈善机构</b><small>基金会</small></div>
+        <div class="bub" id="fb3" style="left:1050px;top:330px;width:300px;height:300px;--c:#b08a2e;--c2:#43320d;--g:rgba(227,179,65,0.3)"><b style="font-size:48px">财政部</b><small>Treasury</small></div>
+        <div class="bub" id="fb4" style="left:1520px;top:330px;width:300px;height:300px;--c:#3d6fd8;--c2:#14275a;--g:rgba(61,111,216,0.4)"><b style="font-size:40px">孩子的账户</b><small>×7,200 万</small></div>
+        <div class="arrow" id="fa1" style="left:420px;top:477px;width:140px"></div><div class="alab" style="left:452px;top:420px">捐</div>
+        <div class="arrow" id="fa2" style="left:890px;top:477px;width:140px"></div><div class="alab" style="left:906px;top:420px">报批</div>
+        <div class="arrow" id="fa3" style="left:1360px;top:477px;width:140px"></div><div class="alab" style="left:1384px;top:420px">转入</div>
+        <img class="stampimg" id="f-ok" src="assets/img/stamp-f-ok.png" style="left:1060px;top:680px" />
+      </section>
+
+      <!-- ===== TAX ===== -->
+      <section id="t-brush" class="clip board" data-start="@[tax.1-0.05]" data-until="@[tax.2-0.05]" data-track-index="3">
+        <img src="assets/img/falcon1-gray.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+        <div class="redtint"></div><div class="dim" style="opacity:0.35"></div>
+        <div class="brush" id="t-b" style="top:300px;font-size:320px">省 税</div>
+      </section>
+      <section id="t-bars" class="clip board" data-start="@[tax.2-0.05]" data-until="@[tax.4-0.05]" data-track-index="3">
+        <div class="wm">TAX</div>
+        <div style="position:absolute;left:120px;top:110px;font-size:40px;font-weight:700">打个比方</div>
+        <div class="bar" id="tb1" style="left:430px;height:10px;background:#5b6576"></div>
+        <div class="bval" style="left:380px;bottom:256px">100 万</div><div class="blab" style="left:380px;bottom:180px">买入成本</div>
+        <div class="bar" id="tb2" style="left:900px;height:640px;background:linear-gradient(180deg,#e5483e 0%,#e5483e 98.4%,#5b6576 98.4%)"></div>
+        <div class="bval" id="tv2" style="left:850px;top:120px">1 亿</div><div class="blab" style="left:850px;bottom:180px">现在的市值</div>
+        <div id="t-brk" style="position:absolute;left:1120px;top:210px;width:40px;height:630px;border:4px solid var(--red);border-left:none;border-radius:0 18px 18px 0"></div>
+        <div id="t-gain" style="position:absolute;left:1190px;top:430px"><div style="font-size:64px;font-weight:900;color:var(--red)">9,900 万涨幅</div><div style="font-size:34px;color:#dfe3ea;margin-top:6px">卖掉 → 要交税</div></div>
+        <img class="stampimg" id="t-free" src="assets/img/stamp-t-free.png" style="left:1190px;top:620px" />
+        <div class="ptag" id="t-ded" style="left:1190px;top:780px"><em>还能按市值抵扣收入</em><b style="color:var(--gold)">1 亿</b></div>
+      </section>
+      <section id="t-pie" class="clip board" data-start="@[tax.4-0.05]" data-until="@[tax.4.马斯克的-0.05]" data-track-index="3">
+                <div class="pie" id="t-p" style="left:300px;top:200px;width:560px;height:560px;--p:0"></div>
+        <div style="position:absolute;left:1000px;top:330px"><div style="font-size:36px;color:var(--soft)">每年最多抵扣</div><div style="font-size:150px;font-weight:900;color:var(--green)">20%</div><div style="font-size:36px;color:var(--soft)">的收入</div></div>
+      </section>
+      <section id="t-2002" class="clip board" data-start="@[tax.4.马斯克的-0.05]" data-until="@[kids.1-0.05]" data-track-index="3">
+        <img id="t-f1" src="assets/img/falcon1-dark.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+        <div class="silver" style="top:340px"><div class="k">SpaceX 创办 · 马斯克拿到股份</div><div class="t">2002</div><div class="e">founded 2002 · photo: Falcon 1, 2008</div></div>
+      </section>
+
+      <!-- ===== KIDS ===== -->
+      <div id="k-price" class="clip" data-start="@[kids.1.一股]" data-until="@[kids.2-0.05]" data-track-index="4"><div class="dim"></div>
+        <div class="silver" style="top:330px"><div class="k">每个孩子拿到</div><div class="t">1 股 ≈ $146</div><div class="e" style="font-size:40px;letter-spacing:0.12em;text-transform:none">≈ 人民币 1,000 元</div></div></div>
+      <section id="k-lock" class="clip board" data-start="@[kids.2-0.05]" data-until="@[kids.3-0.05]" data-track-index="3">
+        <div class="wm">LOCKED</div>
+        <div style="position:absolute;left:160px;top:150px;font-size:56px;font-weight:900">规矩很严</div>
+        <div class="track" style="left:160px;top:520px;width:1600px"></div>
+        <div class="tfill" id="k-fill" style="left:160px;top:520px;width:1600px"></div>
+        <div class="tick" style="left:160px;top:500px;height:54px"></div><div class="tlab" style="left:160px;top:570px">拿到股票</div>
+        <div class="pin" id="k-p1" style="left:760px;top:410px"><b>🔒 锁 5 年</b></div>
+        <div class="pin" id="k-p2" style="left:1220px;top:410px"><b style="border-color:var(--red)">🔒 17 岁那年年底</b></div>
+        <div class="tick" style="left:760px;top:500px;height:54px"></div><div class="tick" style="left:1220px;top:500px;height:54px"></div>
+        <div id="k-first" style="position:absolute;left:0;right:0;top:700px;text-align:center"><span class="chip">哪个先到，<span style="color:var(--gold)">算哪个</span></span></div>
+      </section>
+      <div id="k-st" class="clip" data-start="@[kids.3-0.05]" data-until="@[kids.3.连财政部-0.05]" data-track-index="4"><div class="dim" style="opacity:0.6"></div>
+        <img class="stampimg" id="k-s1" src="assets/img/stamp-k-s1.png" style="left:420px;top:360px" /><img class="stampimg" id="k-s2" src="assets/img/stamp-k-s2.png" style="left:1040px;top:420px" /></div>
+      <section id="k-paper" class="clip board" data-start="@[kids.3.连财政部-0.05]" data-until="@[kids.4-0.05]" data-track-index="3">
+        <div class="desk"></div>
+        <div class="paper" id="k-pp"><div class="pg"><img src="assets/img/rule-p49-49.png" /></div>
+          <div class="mark" id="k-m1" style="left:440px;top:124px;width:680px;height:48px"></div>
+          <div class="mark" id="k-m2" style="left:146px;top:182px;width:500px;height:48px"></div></div>
+        <div class="trans" id="k-tr" style="top:80px;background:rgba(10,12,18,0.8);padding:14px 0">财政部：孩子会承担 <span class="hl">持仓集中</span> 带来的额外风险</div>
+      <div class="botfade"></div>
+      </section>
+      <div id="k-no" class="clip" data-start="@[kids.4.没有社保号]" data-until="@[mongolia.1-0.05]" data-track-index="4"><div class="dim" style="opacity:0.6"></div>
+        <div style="position:absolute;left:0;right:0;top:380px;display:flex;flex-direction:column;align-items:center;gap:28px">
+          <span class="chip" id="k-n1"><span class="x">✕</span>没有社保号</span><span class="chip" id="k-n2"><span class="x">✕</span>不是美国公民</span></div></div>
+
+      <!-- ===== HISTORY ===== -->
+      <div id="hist-ruler" class="clip" data-start="@[mongolia.1-0.05]" data-until="@[charity.1-0.05]" data-track-index="6"><div id="ruler"></div></div>
+      <div id="m-title" class="clip" data-start="@[mongolia.1-0.05]" data-until="@[mongolia.1.2011-0.05]" data-track-index="4"><div class="dim"></div>
+        <div class="silver" style="top:340px"><div class="k">历史上</div><div class="t">给全民发股票</div><div class="e">it has been done before</div></div></div>
+      <div id="m-1072" class="clip" data-start="@[mongolia.1.每人]" data-until="@[mongolia.2-0.05]" data-track-index="4"><div class="dim" style="opacity:0.6"></div>
+        <div class="stat"><div class="k">2011 · 蒙古塔温陶勒盖煤矿</div><div class="n">1,072<sup>股</sup></div><div class="d">每个公民</div></div></div>
+      <div id="m-34" class="clip" data-start="@[mongolia.2.拿到的]" data-until="@[mongolia.3-0.05]" data-track-index="4"><div class="dim" style="opacity:0.6"></div>
+        <div class="stat"><div class="k">一股没卖，全部分红折合</div><div class="n">≈ $34</div><div class="d">来源：NRGI</div></div></div>
+      <div id="m-cash" class="clip" data-start="@[mongolia.3.在选举前]" data-until="@[russia.1-0.05]" data-track-index="4"><div class="dim" style="opacity:0.45"></div><img class="stampimg" id="m-st" src="assets/img/stamp-m-st.png" style="left:620px;top:380px" /></div>
+      <div id="r-40" class="clip" data-start="@[russia.1.4000]" data-until="@[russia.2-0.05]" data-track-index="4"><div class="dim" style="opacity:0.6"></div>
+        <div class="stat"><div class="k">1992 · 俄罗斯私有化凭证</div><div class="n">4,000<sup>万</sup></div><div class="d">人成了股东</div></div></div>
+      <section id="r-card" class="clip board" data-start="@[russia.1.用来换-0.05]" data-until="@[russia.1.4000-0.05]" data-track-index="3">
+        <div class="desk"></div>
+        <img id="r-v" src="assets/img/voucher-1992.jpg" style="position:absolute;left:510px;top:200px;width:900px;box-shadow:0 30px 80px rgba(0,0,0,0.6)" />
+        <div style="position:absolute;left:510px;top:740px;font-size:24px;color:#d8cbbd">1992 年俄罗斯私有化凭证 · Wikimedia Commons</div>
+      </section>
+      <section id="r-flow" class="clip board" data-start="@[russia.2-0.05]" data-until="@[russia.3-0.05]" data-track-index="3">
+        <div class="wm">1992</div>
+        <div class="bub" id="rb1" style="left:200px;top:330px;width:320px;height:320px;--c:#5b6576;--c2:#1f2530;--g:rgba(200,210,230,0.25)"><b style="font-size:50px">凭证</b><small>Voucher</small></div>
+        <div class="bub" id="rb2" style="left:800px;top:330px;width:320px;height:320px;--c:#b08a2e;--c2:#43320d;--g:rgba(227,179,65,0.3)"><b style="font-size:50px">卖掉换钱</b><small>Cash</small></div>
+        <div class="bub" id="rb3" style="left:1400px;top:300px;width:380px;height:380px;--c:#c0573e;--c2:#4d1d12;--g:rgba(192,87,62,0.4)"><b style="font-size:50px">企业管理层</b><small>Insiders</small></div>
+        <div class="arrow" id="ra1" style="left:540px;top:487px;width:220px"></div><div class="arrow" id="ra2" style="left:1140px;top:487px;width:220px"></div>
+      </section>
+      <section id="r-lock" class="clip board" data-start="@[russia.3-0.05]" data-until="@[charity.1-0.05]" data-track-index="3">
+        <div class="wm">2026</div>
+        <div class="silver" style="top:300px"><div class="k">这一次</div><div class="t">🔒 锁定期</div><div class="e">no early selling</div></div>
+      </section>
+
+      <!-- ===== CHARITY / BUYOFF ===== -->
+      <section id="c-split" class="clip board" data-start="@[charity.1-0.05]" data-until="@[charity.2-0.05]" data-track-index="3">
+        <div id="c-l" style="position:absolute;left:0;top:0;width:960px;height:1080px;background:linear-gradient(135deg,#123d2a,#0b0e14)"></div>
+        <div id="c-r" style="position:absolute;left:960px;top:0;width:960px;height:1080px;background:linear-gradient(225deg,#4d1212,#0b0e14)"></div>
+        <div class="brush" id="c-b1" style="left:0;right:960px;top:300px;font-size:240px">慈善</div>
+        <div class="brush" id="c-b2" style="left:960px;right:0;top:300px;font-size:240px">收买</div>
+        <div class="ptag" id="c-105" style="left:300px;top:640px"><em>真金白银</em><b style="color:var(--green)">105 亿美元</b></div>
+      </section>
+      <section id="c-shot" class="clip board" data-start="@[charity.2-0.05]" data-until="@[charity.3-0.05]" data-track-index="3">
+        <div class="wm">SPACEX</div>
+        <div style="position:absolute;left:414px;top:200px;font-size:24px;color:var(--soft);letter-spacing:0.1em">X · @Gwynne_Shotwell · SpaceX 总裁</div>
+        <div class="tw" style="left:414px;top:250px;width:1092px"><img src="assets/img/tweet-shotwell.png" /></div>
+        <div class="trans" style="top:640px">承诺给 <span class="hl">200 多万个孩子</span> 每人一股</div>
+      </section>
+      <div id="c-dell" class="clip" data-start="@[charity.3-0.05]" data-until="@[buyoff.1-0.05]" data-track-index="4">
+        <div class="name" style="top:560px"><div class="en">Michael &amp; Susan Dell</div><div class="zh">戴尔创始人夫妇 · 承诺捐出</div></div>
+        <div class="ptag" style="left:120px;top:720px"><em>给特朗普账户</em><b style="color:var(--gold)">62.5 亿美元</b></div></div>
+      <section id="b-three" class="clip board" data-start="@[buyoff.1-0.05]" data-until="@[buyoff.2-0.05]" data-track-index="3">
+        <div class="wm">收买？</div>
+        <img class="stampimg" id="b1" src="assets/img/stamp-b1.png" style="left:160px;top:330px" />
+        <img class="stampimg" id="b2" src="assets/img/stamp-b2.png" style="left:740px;top:330px" />
+        <img class="stampimg" id="b3" src="assets/img/stamp-b3.png" style="left:1270px;top:330px" />
+        <div id="b-sub" style="position:absolute;left:0;right:0;top:560px;text-align:center;font-size:40px;color:#dfe3ea">关心 SpaceX 股价</div>
+      </section>
+      <section id="b-paper" class="clip board" data-start="@[buyoff.2-0.05]" data-until="@[buyoff.3-0.05]" data-track-index="3">
+        <div class="desk"></div>
+        <div class="paper" id="b-pp"><div class="pg"><img src="assets/img/rule-p49-49.png" /></div>
+          <div class="mark" id="b-m1" style="left:146px;top:584px;width:960px;height:48px"></div>
+          <div class="mark" id="b-m2" style="left:146px;top:642px;width:950px;height:48px"></div></div>
+        <div class="trans" id="b-tr" style="top:80px;background:rgba(10,12,18,0.82);padding:16px 0">让孩子和家人觉得，<span class="hl">自己和这家公司的命运绑在一起</span></div>
+      <div class="botfade"></div>
+      </section>
+      <div id="b-shield" class="clip" data-start="@[buyoff.3.以后]" data-until="@[end.1-0.05]" data-track-index="4"><div class="dim" style="opacity:0.55"></div>
+        <div class="silver" style="top:360px"><div class="k">批评者担心</div><div class="t">政治护盾？</div><div class="e">7,200 万个家庭</div></div></div>
+
+      <!-- ===== END ===== -->
+      <section id="e-pie" class="clip board" data-start="@[end.1-0.05]" data-until="@[end.1.你觉得-0.05]" data-track-index="3">
+                <div id="e-grid" style="position:absolute;left:300px;top:190px;width:600px;height:600px;display:grid;grid-template-columns:repeat(10,1fr);gap:8px"></div>
+        <div style="position:absolute;left:1020px;top:300px"><div style="font-size:40px;color:var(--soft)">105 亿美元 ≈ 马斯克身家的</div><div style="font-size:170px;font-weight:900;color:var(--green)">1%</div></div>
+      </section>
+      <section id="e-q" class="clip" data-start="@[end.1.你觉得-0.05]" data-until="@[end.1.你觉得+4]" data-track-index="3" style="position:absolute;inset:0">
+        <div class="dim" style="background:rgba(6,8,12,0.62)"></div>
+        <div class="brush" id="e-b" style="top:330px;font-size:170px">真慈善，还是收买？</div>
+      </section>
+
+<!--CHAPTERS-->
+<!--CAPTIONS-->
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const pop = (sel, t, d = 0.4) => tl.fromTo(sel, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: d, ease: "power3.out" }, t);
+      const rise = (sel, t, d = 0.45) => tl.fromTo(sel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: d, ease: "power3.out" }, t);
+      const stamp = (sel, t, rot = -6) => {
+        const el = document.querySelector(sel), host = el.closest(".clip") || el.parentElement;
+        tl.set(sel, { rotation: rot }, 0);
+        tl.fromTo(sel, { opacity: 0, scale: 2.2 }, { opacity: 1, scale: 0.96, duration: 0.16, ease: "power3.in" }, t);
+        tl.to(sel, { scale: 1, duration: 0.18, ease: "power2.out" }, t + 0.16);
+        tl.fromTo(host, { x: 0, y: 0 }, { keyframes: [{ x: -7, y: 4, duration: 0.04 }, { x: 5, y: -3, duration: 0.05 }, { x: -2, y: 1, duration: 0.05 }, { x: 0, y: 0, duration: 0.06 }] }, t + 0.15);
+      };
+      const titleIn = (sel, t) => { tl.fromTo(sel + " .t", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, t); tl.fromTo([sel + " .k", sel + " .e"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, t + 0.25); };
+      const sec = (id) => parseFloat(document.getElementById(id).dataset.start);
+
+      document.getElementById("e-grid").innerHTML = [...Array(100)].map((_, i) => `<div class="gc" id="gc${i}" style="border-radius:6px;background:#2a3242"></div>`).join("");
+      // ruler for the history chapter (1990 → 2030)
+      (function () { const R = document.getElementById("ruler"); let h = ""; for (let y = 1990; y <= 2030; y++) { const x = 120 + (y - 1990) * 42; h += `<div class="t" style="left:${x}px;height:${y % 5 ? 8 : 16}px"></div>`; if (y % 5 === 0) h += `<div class="y" style="left:${x}px">${y}</div>`; } h += `<div class="hot" id="rhot" style="left:${120 + 21 * 42}px"></div>`; R.innerHTML = h; })();
+      const YX = (y) => 120 + (y - 1990) * 42;
+
+      // hook
+      rise("#h-name .name", 2.65); tl.fromTo("#h-name .nick", { opacity: 0, scale: 1.5, rotation: -8 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.3, ease: "back.out(2)" }, 3.0);
+      tl.fromTo("#h-tw .tw", { opacity: 0, y: 40, rotation: -2 }, { opacity: 1, y: 0, rotation: -1, duration: 0.5, ease: "power3.out" }, 4.65);
+      tl.fromTo("#behind span", { opacity: 0, scale: 1.3 }, { opacity: 0.97, scale: 1, duration: 0.5, ease: "power3.out", stagger: 0.12 }, @[hook.2.一股-0.15]);
+      pop("#h-stat .stat", @[hook.3.7200]);
+      titleIn("#h-105 .silver", @[hook.3.一共是-0.35]);
+      stamp("#st1", @[hook.4.好几年]); stamp("#st2", @[hook.4.家长], 5);
+      // ask
+      ["#q1", "#q2", "#q3"].forEach((q, i) => pop(q, sec("ask") + 0.1 + i * 0.12, 0.5));
+      tl.set(["#q2", "#q3"], { opacity: 0.3 }, sec("ask") + 0.7);
+      tl.to("#q2", { opacity: 1, duration: 0.3 }, @[ask.1.股票怎么送]); tl.to("#q1", { opacity: 0.3, duration: 0.3 }, @[ask.1.股票怎么送]);
+      tl.to("#q3", { opacity: 1, duration: 0.3 }, @[ask.1.历史上]); tl.to("#q2", { opacity: 0.3, duration: 0.3 }, @[ask.1.历史上]);
+      [["#q1", 0], ["#q2", 1], ["#q3", 2]].forEach(([q, i]) => tl.to(q, { y: -12, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, sec("ask") + 0.6 + i * 0.3));
+      // why
+      titleIn("#w-title .silver", @[why.1-0.05]);
+      rise("#w-name .name", @[why.1.美国]);
+      rise("#w-news .quote", @[why.2-0.05]); tl.fromTo("#w-hl", { backgroundColor: "rgba(244,246,250,0)", color: "#f4f6fa" }, { backgroundColor: "rgba(244,246,250,1)", color: "#11151d", duration: 0.25 }, @[why.2.5]);
+      rise("#w-tw1", @[why.3-0.05]); tl.to("#w-tw1", { opacity: 0.35, duration: 0.3 }, @[why.3.我建议-0.3]);
+      tl.fromTo("#w-tw2", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, @[why.3.我建议-0.3]);
+      rise("#w-tr", @[why.3.我建议]);
+      tl.set("#w-days", { opacity: 0 }, 0); rise("#w-days", @[why.3.第二天]);
+      // account
+      titleIn("#a-title .silver", @[account.1.特朗普已经说了]);
+      tl.fromTo(["#a-phone .phone", "#ta-wrap"], { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, @[account.2-0.05]);
+      tl.set("#a-pig", { opacity: 0 }, 0); rise("#a-pig", @[account.2.可以理解成]);
+      pop("#a-bub", @[account.3-0.05], 0.5); tl.set(["#a-c1", "#a-c2"], { opacity: 0 }, 0);
+      rise("#a-c1", @[account.3.指数基金-0.6]); rise("#a-c2", @[account.3.之前-0.5]);
+      // flow paper: zoom from the header date to the stock line
+      const PS = (s, px, py, sx = 960, sy = 470) => ({ scale: s, x: sx - 323 - s * px, y: sy + 285 - s * py });
+      tl.fromTo("#f-pp", PS(0.62, 640, 480), { ...PS(0.95, 600, 760), duration: 4.2, ease: "sine.inOut" }, @[flow.1-0.05]);
+      tl.fromTo("#f-m1", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[flow.1.9]);
+      tl.fromTo("#f-m2", { scaleX: 0 }, { scaleX: 1, duration: 0.5 }, @[flow.1.允许]);
+      stamp("#f-st", @[flow.1.上市公司], -4);
+      // flow bubbles
+      ["#fb1", "#fb2", "#fb3", "#fb4"].forEach((b) => tl.set(b, { opacity: 0 }, 0));
+      pop("#fb1", @[flow.2.马斯克-0.1], 0.45);
+      pop("#fb2", @[flow.2.慈善机构-0.1], 0.45); tl.fromTo("#fa1", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[flow.2.捐给-0.1]);
+      pop("#fb3", @[flow.3.报财政部-0.1], 0.45); tl.fromTo("#fa2", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[flow.3.报财政部-0.1]);
+      stamp("#f-ok", @[flow.3.批准]);
+      pop("#fb4", @[flow.3.转进-0.1], 0.45); tl.fromTo("#fa3", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[flow.3.转进-0.1]);
+      // tax
+      tl.fromTo("#t-b", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, @[tax.1.省税-0.4]);
+      tl.fromTo("#tb1", { scaleY: 0 }, { scaleY: 1, duration: 0.3 }, @[tax.2.100]);
+      tl.fromTo("#tb2", { scaleY: 0 }, { scaleY: 1, duration: 0.9, ease: "power3.out" }, @[tax.2.涨到了]); tl.fromTo("#tv2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, @[tax.2.涨到了+0.6]);
+      tl.set(["#t-brk", "#t-gain", "#t-free", "#t-ded"], { opacity: 0 }, 0);
+      rise("#t-brk", @[tax.2.9900-0.2]); rise("#t-gain", @[tax.2.9900-0.1]);
+      stamp("#t-free", @[tax.3.不算卖出-0.2], -4); tl.to("#t-gain", { opacity: 0.35, duration: 0.3 }, @[tax.3.不用交]);
+      rise("#t-ded", @[tax.3.还能按]);
+      tl.fromTo("#t-p", { "--p": 0 }, { "--p": 20, duration: 0.9, ease: "power2.out" }, @[tax.4.20-0.4]);
+      tl.fromTo("#t-f1", { scale: 1.0 }, { scale: 1.08, duration: 4, ease: "none" }, @[tax.4.马斯克的-0.05]);
+      titleIn("#t-2002 .silver", @[tax.4.2002-0.2]);
+      // kids
+      titleIn("#k-price .silver", @[kids.1.一股]);
+      tl.fromTo("#k-fill", { scaleX: 0 }, { scaleX: 0.375, duration: 0.6 }, @[kids.2.锁五年-0.3]);
+      tl.set(["#k-p1", "#k-p2", "#k-first"], { opacity: 0 }, 0);
+      pop("#k-p1", @[kids.2.锁五年-0.2]);
+      tl.to("#k-fill", { scaleX: 0.66, duration: 0.6 }, @[kids.2.17-0.3]); pop("#k-p2", @[kids.2.17-0.2]);
+      rise("#k-first", @[kids.2.哪个先到-0.1]);
+      stamp("#k-s1", @[kids.3.不能拒收-0.1]); stamp("#k-s2", @[kids.3.不能换-0.1], 5);
+      tl.fromTo("#k-pp", PS(0.62, 640, 560, 960, 560), { ...PS(1.0, 640, 190, 960, 560), duration: 3.6, ease: "sine.inOut" }, @[kids.3.连财政部-0.05]);
+      tl.fromTo(["#k-m1", "#k-m2"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, stagger: 0.35 }, @[kids.3.集中-0.4]);
+      tl.set("#k-tr", { opacity: 0 }, 0); rise("#k-tr", @[kids.3.集中-0.3]);
+      tl.set(["#k-n1", "#k-n2"], { opacity: 0 }, 0); pop("#k-n1", @[kids.4.没有社保号]); pop("#k-n2", @[kids.4.不是美国公民]);
+      // history ruler: hot dot moves 2011 → 1992 → 2026
+      tl.set("#rhot", { x: 0 }, 0);
+      tl.to("#rhot", { x: YX(2011) - YX(2011), duration: 0.01 }, @[mongolia.1.2011]);
+      tl.to("#rhot", { x: YX(1992) - YX(2011), duration: 0.8, ease: "power2.inOut" }, @[russia.1-0.3]);
+      tl.to("#rhot", { x: YX(2026) - YX(2011), duration: 1.0, ease: "power2.inOut" }, @[russia.3-0.3]);
+      titleIn("#m-title .silver", @[mongolia.1-0.05]);
+      pop("#m-1072 .stat", @[mongolia.1.每人]); pop("#m-34 .stat", @[mongolia.2.拿到的]);
+      stamp("#m-st", @[mongolia.3.换成了现金-0.3]);
+      tl.fromTo("#r-v", { opacity: 0, y: 40, rotation: -3 }, { opacity: 1, y: 0, rotation: -2, duration: 0.5 }, @[russia.1.用来换-0.05]);
+      pop("#r-40 .stat", @[russia.1.4000]);
+      tl.set(["#rb2", "#rb3"], { opacity: 0 }, 0); pop("#rb1", @[russia.2-0.05], 0.4);
+      tl.fromTo("#ra1", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[russia.2.卖了-0.2]); pop("#rb2", @[russia.2.卖了]);
+      tl.fromTo("#ra2", { scaleX: 0 }, { scaleX: 1, duration: 0.4 }, @[russia.2.管理层-0.4]); pop("#rb3", @[russia.2.管理层-0.2]);
+      titleIn("#r-lock .silver", @[russia.3.锁定期-0.3]);
+      // charity / buyoff
+      tl.set(["#c-b2", "#c-105"], { opacity: 0 }, 0);
+      tl.fromTo("#c-b1", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.5 }, @[charity.1.慈善-0.2]);
+      tl.fromTo("#c-r", { opacity: 1 }, { opacity: 0.25, duration: 0.3 }, @[charity.1.慈善-0.2]);
+      tl.to("#c-b2", { opacity: 0.18, duration: 0.3 }, @[charity.1.慈善]);
+      rise("#c-105", @[charity.1.105]);
+      tl.fromTo("#c-shot .tw", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4 }, @[charity.2-0.05]);
+      rise("#c-dell .name", @[charity.3-0.05]); rise("#c-dell .ptag", @[charity.3.62]);
+      stamp("#b1", @[buyoff.1.税省]); stamp("#b2", @[buyoff.1.股票锁], 4); stamp("#b3", @[buyoff.1.还多了], -3);
+      tl.set("#b-sub", { opacity: 0 }, 0); rise("#b-sub", @[buyoff.1.关心]);
+      tl.fromTo("#b-pp", PS(0.62, 640, 700, 960, 560), { ...PS(1.05, 630, 640, 960, 560), duration: 4.5, ease: "sine.inOut" }, @[buyoff.2-0.05]);
+      tl.fromTo(["#b-m1", "#b-m2"], { scaleX: 0 }, { scaleX: 1, duration: 0.6, stagger: 0.4 }, @[buyoff.2.就是让-0.3]);
+      tl.set("#b-tr", { opacity: 0 }, 0); rise("#b-tr", @[buyoff.2.就是让]);
+      titleIn("#b-shield .silver", @[buyoff.3.以后]);
+      // end
+      tl.fromTo("#e-grid .gc", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, stagger: { each: 0.006, from: "random" } }, @[end.1-0.05]);
+      tl.to("#gc0", { backgroundColor: "#3fbf7f", boxShadow: "0 0 30px rgba(63,191,127,0.9)", duration: 0.3 }, @[end.1.1%-0.2]);
+      tl.fromTo("#e-b", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, @[end.1.你觉得]);
+
+      // board-level ambience: slow push on all footage
+      gsap.utils.toArray(".shot").forEach((v) => { const s = parseFloat(v.dataset.start), d = parseFloat(v.dataset.duration); if (!isNaN(s)) tl.fromTo(v, { scale: 1.0 }, { scale: 1.06, duration: d, ease: "none" }, s); });
+      gsap.utils.toArray(".chap").forEach((c) => tl.fromTo(c, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4 }, parseFloat(c.dataset.start)));
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
