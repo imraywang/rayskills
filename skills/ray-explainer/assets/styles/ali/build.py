@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Style `ali` (ray-explainer references/styles/ali.md). Worked example: lesson 1 of the AI-video course, 190.36 s.
 Edit CAPS / BOARDS / HIDE / CAM / POPS here and the scenes in src/template.html, then: python3 build.py -> index.html + chars.txt"""
-import re
+import json, re
 
 DUR = 190.36
 
@@ -124,6 +124,20 @@ html = open("src/template.html", encoding="utf-8").read()
 html = (html.replace("/*DUR*/", str(DUR)).replace("<!--CAPTIONS-->", caps()).replace("<!--SFX-->", sfx())
         .replace("//CAM", cam()).replace("//PCARD", pcard()))
 open("index.html", "w", encoding="utf-8").write(html)
+
+# scenes.json: one row per shot (board / A-roll / punch-in) for review.py and qa_video.py
+def scenes():
+    marks = sorted({0.0, DUR, *(t for b in BOARDS for t in b), *(c[0] for c in CAM), *(c[1] for c in CAM)})
+    rows = []
+    for a, b in zip(marks, marks[1:]):
+        if b - a < 0.3: continue
+        mid = (a + b) / 2
+        cam = next((c for c in CAM if c[0] <= mid < c[1]), None)
+        label = "画板" if on_board(mid) else ("口播·推近" if cam and cam[2] > 1 else "口播")
+        said = "".join(t.replace("**", "") for s0, e0, t in CAPS if a - 0.05 <= s0 < b - 0.05)
+        rows.append({"id": f"s{len(rows) + 1:02d}", "start": round(a, 2), "end": round(b, 2), "label": label, "spoken": said})
+    return rows
+json.dump(scenes(), open("scenes.json", "w"), ensure_ascii=False, indent=1)
 
 chars = set(re.findall(r"[\u3000-\u9fff\uff00-\uffef“”‘’·—…–→①②✓✕]", html))
 open("chars.txt", "w", encoding="utf-8").write("".join(sorted(chars)))

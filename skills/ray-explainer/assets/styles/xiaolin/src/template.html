@@ -23,6 +23,7 @@
       .chap i { width: 6px; height: 22px; border-radius: 3px; background: var(--red); display: block; }
 
       /* boards */
+      .drift { position: absolute; inset: 0; transform-origin: 50% 50%; }
       .board { position: absolute; inset: 0; overflow: hidden; background: #121825 url("assets/img/board.png") center/cover; }
       .board .wm { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-weight: 900; font-size: 300px; color: rgba(255,255,255,0.035); letter-spacing: 0.06em; white-space: nowrap; }
       .dim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,16,0.55), rgba(8,10,16,0.7)); }
@@ -452,6 +453,14 @@
       tl.to("#gc0", { backgroundColor: "#3fbf7f", boxShadow: "0 0 30px rgba(63,191,127,0.9)", duration: 0.3 }, @[end.1.1%-0.2]);
       tl.fromTo("#e-b", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, @[end.1.你觉得]);
 
+      // no still frames: every board's content sits in a .drift wrapper that pushes in 4% over the board
+      gsap.utils.toArray("section.board").forEach((sec) => {
+        const w = document.createElement("div"); w.className = "drift";
+        while (sec.firstChild) w.appendChild(sec.firstChild);
+        sec.appendChild(w);
+        const s = parseFloat(sec.dataset.start), d = parseFloat(sec.dataset.duration);
+        tl.fromTo(w, { scale: 1 }, { scale: 1.04, duration: d, ease: "none" }, s);
+      });
       // board-level ambience: slow push on all footage
       gsap.utils.toArray(".shot").forEach((v) => { const s = parseFloat(v.dataset.start), d = parseFloat(v.dataset.duration); if (!isNaN(s)) tl.fromTo(v, { scale: 1.0 }, { scale: 1.06, duration: d, ease: "none" }, s); });
       gsap.utils.toArray(".chap").forEach((c) => tl.fromTo(c, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4 }, parseFloat(c.dataset.start)));

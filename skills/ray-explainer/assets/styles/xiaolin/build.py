@@ -106,6 +106,18 @@ def captions_html():
             rows.append(f'      <div class="clip cap" data-start="{st:.2f}" data-duration="{en - st:.2f}" data-track-index="9"><span>{seg.strip()}</span></div>')
     return "\n".join(rows)
 
+def scenes_json():
+    """One row per shot: clip name or 画板, source label, words said. For review.py and qa_video.py."""
+    S = [(T(a), c, src) for a, c, m, src in SHOTS] + [(DUR, None, "")]
+    rows = []
+    for (t, c, src), (t2, _, _) in zip(S, S[1:]):
+        if t2 - t < 0.05: continue
+        said = "".join(l["text"][k] for l in LINES.values() for k, ct in enumerate(l["chars"]) if t <= ct < t2)
+        rows.append({"id": f"s{len(rows) + 1:02d}", "start": round(t, 2), "end": round(t2, 2),
+                     "label": c or "画板", "visual": src, "spoken": said})
+    json.dump(rows, open("scenes.json", "w"), ensure_ascii=False, indent=1)
+
+scenes_json()
 html = open("src/template.html", encoding="utf-8").read()
 html = re.sub(r"@\[([^\]]+)\]", lambda m: f"{at(m.group(1))}", html)
 def until(m):

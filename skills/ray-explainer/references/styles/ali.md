@@ -93,6 +93,7 @@
 
 ## 做一条新片
 
+0. **先剪口播**：`cut_retakes.py scan`，改 `cuts.txt`，再 `apply`，然后对剪好的片子跑 `gate_breaths.py`（见 SKILL.md）。
 1. **建工程**：`cp -R $SK/assets/styles/ali <工程目录>`，把素材放进 `assets/`：
    - `aroll.mp4`：口播，按 1920×1080 或更高。
    - `voice.wav`：去吸气音后的人声。
@@ -125,6 +126,8 @@
    npx hyperframes render -q looks -o raw.mp4
    ```
    然后用 ffmpeg 统一响度，再出一份 720p、crf 30 的手机预览（30 MB 以内，方便直接发给 Ray）。
+
+渲染之后：先跑 `qa_video.py`（ali 用 `--lufs -14`，xiaolin 用默认的 −21），看切点图；然后开 `review.py --tailnet`，把手机地址发给 Ray，按他写在画面上的批注改。
 
 ## 踩过的坑
 
