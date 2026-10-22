@@ -28,9 +28,12 @@ def main():
         sys.exit("找不到 HyperFrames 的 Chrome：先跑一次 npx hyperframes browser ensure")
     out = os.path.abspath(a.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    subprocess.run([chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=2",
-                    f"--window-size={width},{a.height // 2}", "--virtual-time-budget=8000", f"--screenshot={out}", a.url],
-                   capture_output=True)
+    try:   # some pages never let virtual time settle (codebuddy.cn hung forever): give up after 60 s
+        subprocess.run([chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=2",
+                        f"--window-size={width},{a.height // 2}", "--virtual-time-budget=8000", f"--screenshot={out}", a.url],
+                       capture_output=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        sys.exit(f"60 秒内没截到 {a.url}（页面一直在加载）：改用 Ray 的 Chrome 截")
     if not os.path.isfile(out):
         sys.exit(f"Chrome 没截到 {a.url}")
     print(f"{a.url} → {out}（{width * 2}px 宽）。先用 Read 看图，挑一整段，再在画面里从上往下慢慢移。")
