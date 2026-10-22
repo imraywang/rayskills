@@ -5,7 +5,7 @@
 //   node render.js <project> stills 3,12.5,40      -> <project>/stills/tNNN.N.jpg
 //   node render.js <project> sheet [N]             -> N evenly spaced stills tiled into <project>/contact.jpg
 //   node render.js <project> video [fps]           -> <project>/out.mp4
-//   node render.js <project> gate [file.mp4]       -> film_gate on an existing render (video mode runs it automatically), writes gate.json
+//   node render.js <project> gate [file.mp4]       -> qa_video.py on an existing render (video mode runs it automatically)
 //   node render.js <project> serve                 -> live preview URL (kit scenes; grammar scenes show via stills)
 // env RX_CLEAN=1: frames without captions / progress bar (publish.py uses it for the cover)
 const path = require('path'), fs = require('fs'), http = require('http'), os = require('os');
@@ -58,7 +58,7 @@ const hsv = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.substr(i, 2),
 function six(o, where, avail) {
   const bad = PAL_KEYS.filter(k => !/^#[0-9a-f]{6}$/i.test(String(o[k] || '')));
   if (bad.length) throw new Error(`script.json ${where} 缺或写错 ${bad.join(' ')}（每个键写 #rrggbb；或写 name 用一套色板补齐）。可用：${avail}`);
-  for (const k of ['bg', 'surface', 'accent']) { const [h, sat] = hsv(o[k]); if (h >= 225 && h <= 300 && sat >= .3) console.warn(`WARN ${where}.${k}=${o[k]} 落在蓝紫区（色相 225°–300°），film_gate 会量出蓝紫底`); }
+  for (const k of ['bg', 'surface', 'accent']) { const [h, sat] = hsv(o[k]); if (h >= 225 && h <= 300 && sat >= .3) console.warn(`WARN ${where}.${k}=${o[k]} 落在蓝紫区（色相 225°–300°），成片检查会量出蓝紫底`); }
   return Object.fromEntries(PAL_KEYS.map(k => [k, o[k].toLowerCase()]));
 }
 function resolveTheme(th) {
@@ -101,26 +101,19 @@ function serve() {
   return new Promise(r => srv.listen(+process.env.PORT || 0, '127.0.0.1', () => r(srv)));
 }
 
-// ---------- film gate (scripts/film_gate.py, from huashu-art-motion): report only, never blocks the render ----------
-// measures how much of the film moves inside the shot, mid-film blank frames and blue/purple share; writes <project>/gate.json
+// ---------- render check (scripts/qa_video.py): loudness, black / blank frames, blue-purple share, cut strips ----------
+// report only here; the script itself exits 1 on a failed hard check, which is printed but never blocks the render
 function gate(mp4) {
-  const L = { red: '红', yellow: '黄', green: '绿', pass: '绿' };
-  let d;
+  const scr = path.join(__dirname, 'qa_video.py');
+  const args = [scr, mp4];
+  const tl = path.join(PROJ, 'timeline.json');
+  if (fs.existsSync(tl)) args.push('--timeline', tl);
   try {
-    const raw = execFileSync('uv', ['run', '-q', path.join(__dirname, 'film_gate.py'), mp4, '--no-template', '--sub-band', '0.2', '--json'],
-      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 << 20 });
-    d = JSON.parse(raw);
+    console.log(execFileSync('python3', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 << 20 }).trim());
   } catch (e) {
-    if (e.code === 'ENOENT') return console.log('gate: 没装 uv，跳过 film_gate');
-    const out = String(e.stdout || ''); try { d = JSON.parse(out); } catch { return console.log('gate: film_gate 没跑成 —', String(e.stderr || e.message).trim().split('\n').pop()); }
+    const out = String(e.stdout || '').trim();
+    console.log(out || `qa: 成片检查没跑成 — ${String(e.stderr || e.message).trim().split('\n').pop()}`);
   }
-  fs.writeFileSync(path.join(PROJ, 'gate.json'), JSON.stringify(d, null, 1));
-  const lt = k => L[d.lights[k]] || '—';
-  console.log(`gate: [${L[d.verdict] || d.verdict}] 快动帧占比 ${d.fast_ratio}（${lt('fast_ratio')}，花叔的红线 0.035、认可片最低 0.068）· ` +
-    `中段空画面 ${d.blank_run_s}s（${lt('blank_run_s')}）· 蓝紫占比 ${d.blue_purple_share}（${lt('blue_purple_share')}）· 推近 ${d.push_in_per_min} 次/分钟`);
-  console.log(`gate: 最差 30 秒 ${d.worst_window_start_s}–${d.worst_window_start_s + d.worst_window_len_s}s（快动帧占比 ${d.fast_ratio_worst_window}）· 最长无事件 ${d.max_event_gap_s}s` +
-    ((d.blank_runs_s || []).length ? ` · 空画面在 ${d.blank_runs_s.map(r => Array.isArray(r) ? r.join('–') : r).join(', ')}s` : ''));
-  if (d.verdict === 'red') console.log('gate: 红灯只是提醒：用正常速度看一遍最差那 30 秒，再决定要不要补镜头内运动（见 SKILL.md 第 6 步）');
 }
 
 // ---------- cue timing: number (seconds into the scene) or {line, phrase, offset} on Whisper per-char timing ----------

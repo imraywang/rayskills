@@ -73,7 +73,7 @@
 
 ## 只看过预览图的（低清，参考价值有限）
 
-- `kurzgesagt` · Kurzgesagt《AI Slop Is Destroying The Internet》https://www.youtube.com/watch?v=_zfN9wnPvU0 ：高饱和蓝紫扁平插画、一个视觉隐喻撑一镜。构图可学，配色和 IP 相反（`film_gate` 也会对蓝紫报警）。
+- `kurzgesagt` · Kurzgesagt《AI Slop Is Destroying The Internet》https://www.youtube.com/watch?v=_zfN9wnPvU0 ：高饱和蓝紫扁平插画、一个视觉隐喻撑一镜。构图可学，配色和 IP 相反（成片检查 `qa_video.py` 也会对蓝紫报警）。
 - `polymatter` · PolyMatter《Why "Learn to Code" Failed》https://www.youtube.com/watch?v=bThPluSzlDU ：以实拍素材为主；图表只用一种底色 + 白线，品牌 logo 直接当数据点。
 - `vox` · Vox《AI can do your homework. Now what?》https://www.youtube.com/watch?v=bEJ0_TVXh-I ：拼贴、圆形抠像头像、人名小标签、右上角台标。
 
