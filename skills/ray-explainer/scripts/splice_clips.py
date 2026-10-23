@@ -61,15 +61,18 @@ for t0, c in ins:
 out += pcm[cursor:]
 
 
-def shifted(t):
-    return round(t + sum(p["end"] - p["start"] + 2 * PAD for p in placed if p["at_voice"] <= t - 1e-6), 3)
+def shifted(t, start=False):
+    # a start that sits exactly on an insertion point belongs after the clip (continuous recordings have no gap
+    # between lines, so the next line starts at the very time the previous one ends); an end there stays before it
+    eps = -1e-6 if start else 1e-6
+    return round(t + sum(p["end"] - p["start"] + 2 * PAD for p in placed if p["at_voice"] <= t - eps), 3)
 
 
 for sc in tl["scenes"]:
-    sc["start"], sc["end"] = shifted(sc["start"]), shifted(sc["end"])
+    sc["start"], sc["end"] = shifted(sc["start"], True), shifted(sc["end"])
     for ln in sc["lines"]:
-        ln["start"], ln["end"] = shifted(ln["start"]), shifted(ln["end"])
-        if "chars" in ln: ln["chars"] = [shifted(x) for x in ln["chars"]]
+        ln["start"], ln["end"] = shifted(ln["start"], True), shifted(ln["end"])
+        if "chars" in ln: ln["chars"] = [shifted(x, True) for x in ln["chars"]]
 # a scene that contains a clip must stretch to cover it
 for p in placed:
     for sc in tl["scenes"]:
