@@ -43,7 +43,7 @@ BACKEND = "codex"
 EDIT = False
 API_MODEL = "gpt-image-2.5-sunburst"
 # native request sizes for the API (padded platforms ask for the 1:1 / 3:2 they are padded from)
-API_SIZE = {"xhs": "1200x1600", "vertical": "1080x1920", "landscape": "1920x1080", "wechat": "2100x900", "x": "1600x900",
+API_SIZE = {"xhs": "1200x1600", "vertical": "1152x2048", "landscape": "2048x1152", "wechat": "2100x900", "x": "1600x900",
             "x-article": "1600x640", "channels": "1200x1200", "card": "1536x1024"}
 
 
