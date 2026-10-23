@@ -119,6 +119,9 @@ def retakes(ph, window=12.0, k=4):
     return bad
 
 
+EXPLAIN = ("的意思", "这个词", "指的是", "就是说", "是什么")
+
+
 def repeats(words, min_len=3, max_gap=2):
     """Restarts inside the word stream: a run of >= min_len characters said again within max_gap characters
     ("现在我做事现在我做事…", "我跟他说这个是我跟他说这个风格"). Returns (cut_start, cut_end, text) in raw seconds,
@@ -139,6 +142,13 @@ def repeats(words, min_len=3, max_gap=2):
         if not hit:
             i += 1; continue
         L, j = hit
+        nxt = text.find(text[i:i + L], j + L, j + L + max_gap + L)
+        if j > i + L and nxt > j + L:    # said a third time with different words between: a list ("自己去查自己去下自己去安装")
+            while nxt >= 0:
+                j, nxt = nxt, text.find(text[i:i + L], nxt + L, nxt + L + max_gap + L)
+            i = j + L; continue
+        if text.startswith(EXPLAIN, j + L):  # a term said again to explain it ("写着默认权限。默认权限的意思是…")
+            i = j; continue
         wi, wj = owner[i], owner[j]
         if wj > wi and (i == 0 or owner[i - 1] != wi) and (owner[j - 1] != wj):   # both takes start on a word
             found.append((words[wi]["start"], words[wj]["start"], text[i:j]))
