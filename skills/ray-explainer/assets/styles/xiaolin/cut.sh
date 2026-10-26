@@ -1,10 +1,14 @@
 #!/bin/bash
-# name src ss dur [mode]   mode: fill (default, 16:9 crop), blur (vertical/odd -> blurred fill), crop-ap (hide AP logo)
+# name src ss dur [mode]   mode: fill (default, 16:9 crop), blur (vertical/odd -> blurred fill), crop-ap (hide AP logo),
+#   sub / deep / tight: zoom off burned-in subtitles, banners and corner logos (1.22x / 1.35x / centre 58%)
 cut(){ n=$1; s=$2; ss=$3; d=$4; m=${5:-fill}
  case $m in
   fill) vf="scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080";;
   blur) vf="split[a][b];[a]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=30:3,eq=brightness=-0.15[bg];[b]scale=-2:1080[fg];[bg][fg]overlay=(W-w)/2:0";;
   crop-ap) vf="crop=iw*0.86:ih*0.86:0:ih*0.14,scale=1920:1080";;
+  sub) vf="crop=iw*0.82:ih*0.82:iw*0.09:ih*0.03,scale=1920:1080";;
+  deep) vf="crop=iw*0.74:ih*0.74:iw*0.13:ih*0.03,scale=1920:1080";;
+  tight) vf="crop=iw*0.58:ih*0.58:iw*0.21:ih*0.13,scale=1920:1080";;
   keep) vf="scale=-2:1080";;
  esac
  ffmpeg -v error -y -ss $ss -t $d -i "$s" -an -vf "$vf" -r 30 -c:v libx264 -crf 20 -pix_fmt yuv420p "assets/v/$n.mp4" && echo "$n ok"; }

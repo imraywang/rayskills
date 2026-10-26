@@ -115,6 +115,7 @@ python3 -I $SK/scripts/tts.py <project>
 **选音色**（`script.json` 的 `"voice"`）：
 
 - `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，直接调 MiniMax API 的 `speech-2.8-hd`（`scripts/minimax_api.py`，需要 `MINIMAX_API_KEY`；国内平台 platform.minimax.cn 的 key 另设 `MINIMAX_API_HOST=https://api.minimax.cn`；国内账号默认档每分钟请求数低，偶尔 1002 限流，tts.py 会自动退避重试），每千字约 0.1 美元。`model` 以 `fal-ai/` 开头的旧条目是经 fal 复刻的音色，只能继续走 fal。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
+- **ElevenLabs 复刻音色**（2026-10-24 起 Ray 最认可的一档：v4 好过 v4 turbo，两者都好过 MiniMax 和 Eleven 旧模型）：voice id `CAxJPGSVBbZB3ztecX9c`，模型 `eleven_v4`（1 字 1 credit；`eleven_v4_turbo` 半价），key 在 `~/.config/hangzhou-film/elevenlabs.env`。不走 `tts.py` 的逐句合成，用 `python3 $SK/scripts/whole_tts.py <project> --eleven CAxJPGSVBbZB3ztecX9c eleven_v4 [--one] [--tag "[...]"]` 整段读，再 `tts.py --allow-readings` 切句、`qa_tts.py` 校对。`--one` 整篇一次请求（单次上限 1 万字，一期 6 分钟约 2,100 字）；不加就按场景一段一请求（Lex 那期）。**v4 不认 `voice_settings.speed`**（0.8–1.2 出来一样长），要快一点就在开头加语气指令 `--tag "[fast-paced, crisp tech news anchor]"`：快约 9%，指令本身不会念出来（Ray 10-25 选的「科技播报」语气）。阿拉伯数字 v4 按数值念得对（382亿、3.28万亿），可以直接写数字，不用汉字读法 + `display`。
 - `"ray-local"`：本地复刻音色，走 VoxCPM2（`mlx-community/VoxCPM2-8bit`，MLX 8bit；2026-10-14 两轮盲听，12 句里赢了 MiniMax 9 句），不花钱，样本也不出本机。`voices.json` 条目写 `"provider": "voxcpm2"`，记录模型目录（模型约 3 GB，可以放外置盘，如 `/Volumes/<盘名>/ai-models/VoxCPM2-8bit`；盘没挂上会直接报错）、参考片段、`cfg` 3.0、`takes` 3。每句合成 3 遍，由 Whisper 挑最贴稿的一遍（VoxCPM2 每次输出不同，常见问题是英文词念坏、句首吞字）。它不能直接调语速，靠后期变速；`native_speed` 1.1 表示原速就相当于 MiniMax 的 1.1，所以模板的 `speed` 1.1 不会再加速。速度约 1.3 倍实时，一期 3 分钟要合 10 分钟上下。运行环境在 `~/.local/share/ray-explainer/voxcpm-env`（`uv venv -p 3.12`，装 `mlx-audio==0.5.9 soundfile mlx-whisper`）。
 - 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
 - `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
@@ -161,6 +162,8 @@ python3 $SK/scripts/host.py <project>             # 用户同意后：H3 生成�
 ```
 
 大机位（开头、金句、结尾，每集约 30 秒）默认用 MiniMax H3 生成带手势、嘴在动的视频（不逐字对口型），约 $0.08/秒；要逐字对口型时 `"model": "pro"` 换 Kling，约 $0.115/秒；其余时间主持人缩在左下角，用同一形象的换嘴型图层，不花钱。形象、选句原则、画面避让见 [host.md](references/host.md)。没有 `host` 字段的片子不受任何影响。
+
+**Ray 本人对口型出镜（横屏科普片）用 HeyGen**：Ray 已训练好的数字分身按配音逐字对口型，做全屏出镜和分屏人像卡，见 [host.md](references/host.md)「HeyGen」，`scripts/heygen_host.py`。
 
 **大机位默认不加。** `big` 为空时 `host.py` 只算角落口型、不花钱，直接跑；只有用户明确要大机位（或被问到时确认要加），才往 `big` 里写句子、`--dry-run` 估价、同意后再生成。
 

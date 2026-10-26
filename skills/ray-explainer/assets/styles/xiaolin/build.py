@@ -13,7 +13,7 @@ for s in TL["scenes"]:
         LINES[f"{s['id']}.{i}"] = l
 
 def at(ref):
-    m = re.fullmatch(r"(\w+)\.(\d+)(?:\.([^+\-]*))?([+\-][\d.]+)?", ref.strip())
+    m = re.fullmatch(r"(\w+)\.(\d+)(?:\.([^+\-]*))?((?:[+\-][\d.]+)*)", ref.strip())
     if not m: raise SystemExit(f"bad anchor {ref}")
     sc, ln, ph, off = m.groups()
     l = LINES[f"{sc}.{ln}"]
@@ -23,7 +23,7 @@ def at(ref):
         t = l["chars"][k]
     else:
         t = l["start"]
-    return round(t + float(off or 0), 2)
+    return round(t + sum(float(x) for x in re.findall(r"[+\-][\d.]+", off or "")), 2)   # offsets chain: @[x.1-0.05+0.3]
 
 def T(x): return x if isinstance(x, (int, float)) else at(x)
 
@@ -93,7 +93,7 @@ def chapters_html():
                      for a, b, txt in CHAPTERS)
 
 def captions_html():
-    rows, k = [], 0
+    segs = []
     for key, l in LINES.items():
         text, ch = l["text"], l["chars"]
         parts = [(m.start(), m.group()) for m in re.finditer(r"[^，。：？；！、]+[，。：？；！、]?", text)]
@@ -101,10 +101,11 @@ def captions_html():
             st = ch[p]
             en = ch[parts[j + 1][0]] if j + 1 < len(parts) else l["end"] + 0.25
             seg = seg.rstrip("，。：；、")
-            if not seg.strip(): continue
-            k += 1
-            rows.append(f'      <div class="clip cap" data-start="{st:.2f}" data-duration="{en - st:.2f}" data-track-index="9"><span>{seg.strip()}</span></div>')
-    return "\n".join(rows)
+            if seg.strip(): segs.append([st, en, seg.strip()])
+    segs.sort()
+    for a, b in zip(segs, segs[1:]): a[1] = min(a[1], b[0])   # one caption on screen at a time (line ends used to overlap the next line)
+    return "\n".join(f'      <div class="clip cap" data-start="{st:.2f}" data-duration="{en - st:.2f}" data-track-index="9"><span>{seg}</span></div>'
+                     for st, en, seg in segs)
 
 def scenes_json():
     """One row per shot: clip name or 画板, source label, words said. For review.py and qa_video.py."""
@@ -125,6 +126,7 @@ def until(m):
     return f'data-start="{st}"{m.group(2)}data-duration="{min(un, DUR) - st:.2f}"'
 html = re.sub(r'data-start="([\d.]+)"([^>]*?)data-until="([\d.]+)"', until, html)
 assert "data-until" not in html, "until without start"
+html = re.sub(r'data-media-start="-[\d.]+"', 'data-media-start="0"', html)   # e.g. @[x.1-0.05-<clip start>] a hair before the clip
 html = (html.replace("/*DUR*/", str(DUR)).replace("<!--SHOTS-->", shots_html())
         .replace("<!--CHAPTERS-->", chapters_html()).replace("<!--CAPTIONS-->", captions_html()))
 open("index.html", "w", encoding="utf-8").write(html)
