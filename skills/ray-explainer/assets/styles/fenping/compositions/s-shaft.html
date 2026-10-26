@@ -1,0 +1,79 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-shaft { position: absolute; inset: 0; background: #f3f3f0; overflow: hidden; }
+    #s-shaft .photo { position: absolute; inset: 0; overflow: hidden; background: #111; }
+    #s-shaft .photo img { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 40%; }
+    #s-shaft .chip {
+      position: absolute; left: 0; right: 0; top: 214px; text-align: center;
+    }
+    #s-shaft .chip span {
+      display: inline-block; padding: 12px 28px; border-radius: 14px; background: rgba(243, 243, 240, 0.94);
+      font-family: "HeiBold", sans-serif; font-weight: 700; font-size: 40px; color: #111;
+    }
+    #s-shaft .dia { position: absolute; inset: 0; background: #f3f3f0; }
+    #s-shaft .engine {
+      position: absolute; left: 370px; top: 300px; width: 340px; height: 150px; border-radius: 26px;
+      border: 4px solid #111; background: #fff; display: flex; align-items: center; justify-content: center;
+    }
+    #s-shaft .engine b { position: absolute; font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 56px; color: #111; }
+    #s-shaft .engine .motor { color: #f3f3f0; opacity: 0; }
+    #s-shaft .drive { position: absolute; left: 532px; top: 450px; width: 16px; height: 120px; background: #111; }
+    #s-shaft .shaft { position: absolute; left: 110px; width: 860px; top: 566px; height: 22px; border-radius: 11px; background: #111; overflow: hidden; }
+    #s-shaft .shaft i {
+      position: absolute; left: -120px; top: 0; width: 1100px; height: 22px;
+      background: repeating-linear-gradient(90deg, #111 0 26px, #6e6e6e 26px 40px);
+    }
+    #s-shaft .pulley { position: absolute; top: 549px; width: 56px; height: 56px; border-radius: 50%; border: 6px solid #111; background: #f3f3f0; }
+    #s-shaft .pulley::after { content: ""; position: absolute; left: 20px; top: -2px; width: 4px; height: 48px; background: #111; }
+    #s-shaft .belt { position: absolute; top: 600px; width: 14px; height: 290px; border-left: 4px solid #111; border-right: 4px solid #111; }
+    #s-shaft .mach {
+      position: absolute; top: 890px; width: 150px; height: 130px; border-radius: 18px; border: 4px solid #111; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-family: "HeiBold", sans-serif; font-size: 34px; color: #111;
+    }
+    #s-shaft .note { position: absolute; left: 0; right: 0; top: 1076px; text-align: center; }
+    #s-shaft .note span {
+      display: inline-block; padding: 12px 26px; border-radius: 14px; background: #e4e4e0;
+      font-family: "HeiBold", sans-serif; font-size: 36px; color: #111;
+    }
+  </style>
+  <div id="s-shaft" data-composition-id="s-shaft" data-width="1080" data-height="1920">
+    <div id="sh-photo" class="photo clip" data-start="0" data-duration="3.42">
+      <img id="sh-img" src="assets/img/lineshaft_shop.jpg" alt="" />
+      <div id="sh-chip" class="chip"><span>皮带传动的老车间</span></div>
+    </div>
+    <div id="sh-dia" class="dia clip" data-start="3.42" data-duration="6.8">
+      <div id="sh-engine" class="engine"><b class="steam">蒸汽机</b><b class="motor">大电机</b></div>
+      <div class="drive"></div>
+      <div class="shaft"><i id="sh-stripes"></i></div>
+      <div class="pulley" style="left:160px"></div><div class="pulley" style="left:330px"></div>
+      <div class="pulley" style="left:500px"></div><div class="pulley" style="left:670px"></div>
+      <div class="pulley" style="left:840px"></div>
+      <div class="belt" style="left:181px"></div><div class="belt" style="left:351px"></div>
+      <div class="belt" style="left:521px"></div><div class="belt" style="left:691px"></div>
+      <div class="belt" style="left:861px"></div>
+      <div class="mach" style="left:113px">车床</div><div class="mach" style="left:283px">钻床</div>
+      <div class="mach" style="left:453px">刨床</div><div class="mach" style="left:623px">铣床</div>
+      <div class="mach" style="left:793px">磨床</div>
+    </div>
+  </div>
+  <script>
+    // 场景从 29.98 秒开始
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#sh-img", { scale: 1.0 }, { scale: 1.1, duration: 3.42, ease: "none" }, 0);
+    tl.fromTo("#sh-chip", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.3);
+    // 示意图：一根总轴带动所有机器，传动一直在转
+    tl.fromTo("#sh-dia .mach", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.25, stagger: 0.06, ease: "power2.out" }, 3.45);
+    tl.fromTo("#sh-stripes", { x: 0 }, { x: 80 * 4, duration: 6.8, ease: "none" }, 3.42);
+    tl.fromTo("#sh-dia .pulley", { rotation: 0 }, { rotation: 1440, duration: 6.8, ease: "none" }, 3.42);
+    // 「换掉」：蒸汽机划掉；「换上了一台大电机」：变墨绿
+    tl.to("#sh-engine .steam", { opacity: 0, scale: 0.8, duration: 0.25, ease: "power2.in" }, 5.86);
+    tl.to("#sh-engine", { backgroundColor: "#054c4c", borderColor: "#054c4c", duration: 0.25 }, 6.66);
+    tl.fromTo("#sh-engine .motor", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 6.66);
+    // 「皮带和传动轴照样不动」：总轴和皮带闪一下，表示原封不动
+    tl.to(["#sh-dia .shaft", "#sh-dia .belt"], { opacity: 0.35, duration: 0.18, yoyo: true, repeat: 3, ease: "sine.inOut" }, 8.32);
+    window.__timelines["s-shaft"] = tl;
+  </script>
+</template>

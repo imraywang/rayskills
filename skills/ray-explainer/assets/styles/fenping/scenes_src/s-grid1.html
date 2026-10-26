@@ -1,0 +1,51 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-grid1 { position: absolute; inset: 0; }
+    #s-grid1 .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #f3f3f0; overflow: hidden; }
+    #s-grid1 svg { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }
+    #s-grid1 .chip { position: absolute; left: 0; right: 0; top: 196px; text-align: center; }
+    #s-grid1 .chip span { display: inline-block; padding: 12px 28px; border-radius: 14px; background: #111; color: #f3f3f0; font-family: "HeiBold", sans-serif; font-size: 40px; }
+    #s-grid1 .ax { font-family: "HeiBold", sans-serif; font-size: 30px; fill: #6e6e6e; }
+    #s-grid1 .pt { font-family: "HeiBold", sans-serif; font-size: 34px; fill: #111; }
+  </style>
+  <div id="s-grid1" data-composition-id="s-grid1" data-width="1080" data-height="1920">
+    <div class="panel">
+      <div id="g1-wrap"><svg id="g1-svg" viewBox="0 0 1080 960"></svg></div>
+      <svg id="g1-chart" viewBox="0 0 1080 960">
+        <line x1="230" y1="780" x2="880" y2="780" stroke="#111" stroke-width="4" />
+        <line x1="230" y1="780" x2="230" y2="320" stroke="#111" stroke-width="4" />
+        <text class="ax" x="880" y="826" text-anchor="end">打通的通道 →</text>
+        <text class="ax" x="248" y="336">能过去的毒气 ↑</text>
+        <line id="g1-diag" x1="230" y1="780" x2="860" y2="340" stroke="#111" stroke-width="7" stroke-linecap="round" pathLength="1" stroke-dasharray="1" />
+        <text id="g1-tag" class="ax" x="760" y="420">直觉</text>
+        <g id="g1-pt">
+          <line x1="545" y1="780" x2="545" y2="560" stroke="#8c8c8c" stroke-width="3" stroke-dasharray="10 8" />
+          <line x1="230" y1="560" x2="545" y2="560" stroke="#8c8c8c" stroke-width="3" stroke-dasharray="10 8" />
+          <circle cx="545" cy="560" r="14" fill="#111" />
+          <text class="pt" x="580" y="616">50% → 50%</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <script>
+    /*PERC*/
+    // 场景从 80.35 秒开始；分屏上半屏用 12×7 的网格
+    const G = makeGrid("g1-svg", 12, 7, 64, 188, 330, 64);
+    paint(G, 0);
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(G.nodes, { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.2, stagger: { each: 0.008, from: "center" } }, 0.05);
+    // 「画成了一张网格」：通道一条条画出来，通的黑、堵的浅灰
+    tl.fromTo(G.edges.map((e) => e.el), { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: { each: 0.006, from: "random" } }, 1.65);
+    const st = { p: 0 };
+    tl.to(st, { p: 0.5, duration: 0.01, onUpdate: () => paint(G, st.p) }, 1.65);
+    // 「你可能以为」：换成直觉里的直线
+    tl.to("#g1-wrap", { opacity: 0, duration: 0.25 }, 4.5);
+    tl.fromTo("#g1-chart", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 4.6);
+    tl.fromTo("#g1-diag", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.0, ease: "power2.inOut" }, 5.05);
+    tl.fromTo("#g1-pt", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 6.23);
+    window.__timelines["s-grid1"] = tl;
+  </script>
+</template>

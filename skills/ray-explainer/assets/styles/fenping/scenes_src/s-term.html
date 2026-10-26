@@ -1,0 +1,25 @@
+<template>
+  <style>
+    #s-term { position: absolute; inset: 0; background: #054c4c; overflow: hidden; }
+    #s-term svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s-term .word { position: absolute; left: 0; right: 0; top: 860px; text-align: center; font-family: "Inter", sans-serif; font-weight: 900; font-size: 128px; color: #f3f3f0; letter-spacing: -0.02em; }
+  </style>
+  <div id="s-term" data-composition-id="s-term" data-width="1080" data-height="1920">
+    <svg id="tm-svg" viewBox="0 0 1080 1920"></svg>
+    <div id="tm-word" class="word">percolation</div>
+  </div>
+  <script>
+    /*PERC*/
+    // 场景从 68.2 秒开始，签名幕配色（整屏墨绿）。中文名交给字幕，这里只放英文原词和一张小网格
+    const G = makeGrid("tm-svg", 8, 6, 64, 316, 380, 64);
+    const crit = critical(G);
+    const st = { p: 0.2 };
+    const show = () => paint(G, st.p, { gas: true, openCol: "#9cc2bf", closedCol: "#0d5f5e", wetCol: "#f3f3f0", spanCol: "#f3f3f0" });
+    show();
+    G.nodes.forEach((n) => n.setAttribute("opacity", "0.9"));
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#tm-word", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+    tl.to(st, { p: crit.pc + 0.001, duration: 1.4, ease: "power2.in", onUpdate: show }, 0.2);
+    window.__timelines["s-term"] = tl;
+  </script>
+</template>

@@ -1,0 +1,45 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-curve { position: absolute; inset: 0; }
+    #s-curve .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #f3f3f0; overflow: hidden; }
+    #s-curve svg { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }
+    #s-curve .ax { font-family: "HeiBold", sans-serif; font-size: 30px; fill: #6e6e6e; }
+    #s-curve .tag { font-family: "HeiBold", sans-serif; font-size: 30px; fill: #8c8c8c; }
+    #s-curve .crit { font-family: "HeiHeavy", sans-serif; font-size: 44px; fill: #054c4c; }
+  </style>
+  <div id="s-curve" data-composition-id="s-curve" data-width="1080" data-height="1920">
+    <div class="panel">
+      <svg viewBox="0 0 1080 960">
+        <text class="tag" x="540" y="232" text-anchor="middle">方格网 · 示意</text>
+        <line x1="230" y1="780" x2="880" y2="780" stroke="#111" stroke-width="4" />
+        <line x1="230" y1="780" x2="230" y2="300" stroke="#111" stroke-width="4" />
+        <text class="ax" x="880" y="826" text-anchor="end">打通的通道 →</text>
+        <text class="ax" x="248" y="318">能穿过去的可能 ↑</text>
+        <line id="cv-diag" x1="230" y1="780" x2="860" y2="340" stroke="#c9c9c5" stroke-width="5" stroke-dasharray="14 10" />
+        <text id="cv-diag-lab" class="tag" x="700" y="500">直觉</text>
+        <path id="cv-s" fill="none" stroke="#111" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" />
+        <g id="cv-mark">
+          <line x1="545" y1="800" x2="545" y2="320" stroke="#054c4c" stroke-width="5" />
+          <text class="crit" x="570" y="736">50%</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <script>
+    // 场景从 95.14 秒开始。有限大小网格的贯通概率曲线是陡峭的 S 形，网格越大越接近一步跳变（这里画示意）
+    let d = "";
+    for (let i = 0; i <= 120; i++) {
+      const p = i / 120, y = 1 / (1 + Math.exp(-28 * (p - 0.5)));
+      d += (i ? " L " : "M ") + (230 + p * 630).toFixed(1) + " " + (780 - y * 440).toFixed(1);
+    }
+    document.getElementById("cv-s").setAttribute("d", d);
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(["#cv-diag", "#cv-diag-lab"], { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+    tl.fromTo("#cv-s", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.6, ease: "power1.inOut" }, 0.4);
+    // 「这个临界点正好是一半」
+    tl.fromTo("#cv-mark", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.36);
+    window.__timelines["s-curve"] = tl;
+  </script>
+</template>

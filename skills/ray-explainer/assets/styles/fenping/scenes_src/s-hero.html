@@ -1,0 +1,39 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-hero { position: absolute; inset: 0; background: #f3f3f0; overflow: hidden; }
+    #s-hero svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s-hero .meter { position: absolute; left: 0; right: 0; top: 196px; text-align: center; font-family: "HeiBold", sans-serif; font-size: 40px; color: #6e6e6e; }
+    #s-hero .meter b { font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 64px; color: #111; margin-left: 12px; font-variant-numeric: tabular-nums; }
+    #s-hero .flag { position: absolute; left: 0; right: 0; top: 280px; text-align: center; }
+    #s-hero .flag span { display: inline-block; padding: 10px 26px; border-radius: 14px; background: #054c4c; color: #f3f3f0; font-family: "HeiHeavy", sans-serif; font-size: 40px; }
+    #s-hero .end { position: absolute; left: 60px; font-family: "HeiBold", sans-serif; font-size: 30px; color: #8c8c8c; }
+  </style>
+  <div id="s-hero" data-composition-id="s-hero" data-width="1080" data-height="1920">
+    <svg id="hr-svg" viewBox="0 0 1080 1920"></svg>
+    <div id="hr-meter" class="meter">已通<b id="hr-pct">30%</b></div>
+    <div id="hr-flag" class="flag"><span>贯通</span></div>
+  </div>
+  <script>
+    /*PERC*/
+    // 场景从 88.0 秒开始。12×16 网格，种子 96 的贯通点在 p≈0.4985（打通约一半）
+    const G = makeGrid("hr-svg", 12, 16, 96, 254, 352, 52);
+    const crit = critical(G);
+    const show = (p) => {
+      const r = paint(G, p, { gas: true });
+      document.getElementById("hr-pct").textContent = Math.round(r.open * 100) + "%";
+    };
+    show(0.3);
+    const tl = gsap.timeline({ paused: true });
+    const st = { p: 0.3 };
+    // 「没到临界点之前，几乎一点都过不去」：慢慢打通到临界点前一点
+    tl.to(st, { p: crit.pc - 0.004, duration: 4.2, ease: "power1.inOut", onUpdate: () => show(st.p) }, 0.05);
+    // 「一过临界点」（92.28 秒 = 场景内 4.28）：最后一条打通，毒气一下子冲到底
+    tl.to(st, { p: crit.pc + 0.0005, duration: 0.05, ease: "none", onUpdate: () => show(st.p) }, 4.28);
+    tl.fromTo("#hr-flag", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 4.3);
+    tl.to(st, { p: 0.56, duration: 2.6, ease: "power1.out", onUpdate: () => show(st.p) }, 4.5);
+    window.__timelines["s-hero"] = tl;
+  </script>
+</template>

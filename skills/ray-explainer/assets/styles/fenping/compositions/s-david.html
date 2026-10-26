@@ -1,0 +1,28 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-david { position: absolute; inset: 0; background: #111; overflow: hidden; }
+    #s-david .ph { position: absolute; left: 220px; top: 360px; width: 640px; height: 760px; border-radius: 28px; overflow: hidden; }
+    #s-david img { position: absolute; left: 0; top: 0; width: 640px; height: 760px; object-fit: cover; object-position: 50% 30%; transform-origin: 50% 40%; }
+    #s-david .name { position: absolute; left: 0; right: 0; top: 196px; text-align: center; font-family: "Inter", sans-serif; font-weight: 900; font-size: 80px; color: #f3f3f0; letter-spacing: -0.01em; }
+    #s-david .years { position: absolute; left: 0; right: 0; top: 296px; text-align: center; font-family: "Inter", sans-serif; font-weight: 400; font-size: 36px; color: #9a9a96; }
+    #s-david .paper { position: absolute; left: 0; right: 0; top: 1040px; text-align: center; }
+    #s-david .paper span { display: inline-block; padding: 12px 22px; border-left: 8px solid #9cc2bf; background: rgba(17,17,17,.82); font-family: "Inter", sans-serif; font-weight: 700; font-size: 34px; color: #f3f3f0; }
+  </style>
+  <div id="s-david" data-composition-id="s-david" data-width="1080" data-height="1920">
+    <div class="ph"><img id="dv-img" src="assets/img/paul_david.jpg" alt="" /></div>
+    <div id="dv-name" class="name">Paul A. David</div>
+    <div id="dv-years" class="years">1935 – 2023</div>
+    <div id="dv-paper" class="paper"><span>The Dynamo and the Computer · 1990</span></div>
+  </div>
+  <script>
+    // 场景从 45.9 秒开始。照片：Wikimedia Commons，CC0（维基百科 Paul A. David 词条配图）
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#dv-img", { scale: 1.08 }, { scale: 1.0, duration: 4.2, ease: "power1.out" }, 0);
+    tl.fromTo("#dv-name", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.4);
+    tl.fromTo("#dv-years", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.7);
+    tl.fromTo("#dv-paper", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 2.4);
+    window.__timelines["s-david"] = tl;
+  </script>
+</template>

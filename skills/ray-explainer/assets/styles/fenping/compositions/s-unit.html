@@ -1,0 +1,66 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-unit { position: absolute; inset: 0; background: #f3f3f0; overflow: hidden; }
+    #s-unit .era { position: absolute; left: 0; right: 0; top: 214px; text-align: center; }
+    #s-unit .era span { display: inline-block; padding: 12px 28px; border-radius: 14px; background: #111; color: #f3f3f0; font-family: "HeiBold", sans-serif; font-size: 42px; }
+    #s-unit .old { position: absolute; inset: 0; }
+    #s-unit .engine { position: absolute; left: 370px; top: 300px; width: 340px; height: 150px; border-radius: 26px; background: #6e6e6e; display: flex; align-items: center; justify-content: center; font-family: "HeiHeavy", sans-serif; font-size: 56px; color: #f3f3f0; }
+    #s-unit .shaft { position: absolute; left: 110px; width: 860px; top: 566px; height: 22px; border-radius: 11px; background: #6e6e6e; }
+    #s-unit .belt { position: absolute; top: 588px; width: 14px; height: 302px; border-left: 4px solid #8c8c8c; border-right: 4px solid #8c8c8c; }
+    #s-unit .mach {
+      position: absolute; left: 0; top: 0; width: 150px; height: 130px; border-radius: 18px; border: 4px solid #111; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-family: "HeiBold", sans-serif; font-size: 34px; color: #111;
+    }
+    #s-unit .mach i { position: absolute; right: -16px; top: -16px; width: 46px; height: 46px; border-radius: 50%; background: #054c4c; border: 4px solid #f3f3f0; }
+    #s-unit .flow { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s-unit .flow-lab { position: absolute; font-family: "HeiBold", sans-serif; font-size: 34px; color: #6e6e6e; }
+    #s-unit .up { position: absolute; left: 0; right: 0; top: 1060px; text-align: center; }
+    #s-unit .up span { display: inline-block; padding: 14px 34px; border-radius: 16px; background: #111; color: #f3f3f0; font-family: "HeiHeavy", sans-serif; font-size: 52px; }
+  </style>
+  <div id="s-unit" data-composition-id="s-unit" data-width="1080" data-height="1920">
+    <div id="un-era" class="era"><span>1920s</span></div>
+    <div id="un-old" class="old">
+      <div class="engine">大电机</div>
+      <div class="shaft"></div>
+      <div class="belt" style="left:181px"></div><div class="belt" style="left:351px"></div>
+      <div class="belt" style="left:521px"></div><div class="belt" style="left:691px"></div>
+      <div class="belt" style="left:861px"></div>
+    </div>
+    <svg id="un-flow" class="flow" viewBox="0 0 1080 1920">
+      <path id="un-path" d="M 190 420 L 890 420 L 890 760 L 190 760" fill="none" stroke="#8c8c8c" stroke-width="6" stroke-dasharray="18 14" />
+    </svg>
+    <div id="un-in" class="flow-lab" style="left:110px;top:296px">原料</div>
+    <div id="un-out" class="flow-lab" style="left:110px;top:830px">成品</div>
+    <div id="un-m1" class="mach">车床<i></i></div>
+    <div id="un-m2" class="mach">钻床<i></i></div>
+    <div id="un-m3" class="mach">刨床<i></i></div>
+    <div id="un-m4" class="mach">铣床<i></i></div>
+    <div id="un-m5" class="mach">磨床<i></i></div>
+    <svg id="un-up" style="position:absolute;left:300px;top:930px;width:480px;height:200px" viewBox="0 0 480 200"><text x="0" y="150" font-family="HeiBold" font-size="34" fill="#6e6e6e">效率</text><path id="un-rise" d="M 100 160 L 260 150 L 470 30" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" pathLength="1" stroke-dasharray="1"/></svg>
+  </div>
+  <script>
+    // 场景从 50.1 秒开始。开头接上一段的示意：一台大电机 + 总轴 + 五台机器排成一排
+    const tl = gsap.timeline({ paused: true });
+    const row = [113, 283, 453, 623, 793];
+    const flow = [[115, 355], [465, 355], [815, 355], [815, 695], [365, 695]];
+    ["#un-m1", "#un-m2", "#un-m3", "#un-m4", "#un-m5"].forEach((m, i) => {
+      tl.fromTo(m, { x: row[i], y: 890 }, { x: row[i], y: 890, duration: 0.01 }, 0);
+      tl.fromTo(m + " i", { scale: 0 }, { scale: 0, duration: 0.01 }, 0);
+      // 「装上自己的小电机」：每台机器各长出一个墨绿小电机
+      tl.to(m + " i", { scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 3.6 + i * 0.32);
+      // 「按照物料怎么走重新摆一遍」：从挂在总轴下排一排，改成沿生产线摆
+      tl.to(m, { x: flow[i][0], y: flow[i][1], duration: 0.7, ease: "power3.inOut" }, 6.2 + i * 0.12);
+    });
+    tl.fromTo("#un-era", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.54);
+    tl.to("#un-old", { opacity: 0, duration: 0.45, ease: "power2.in" }, 3.25);
+    tl.fromTo("#un-path", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 6.6);
+    tl.fromTo(["#un-in", "#un-out"], { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.2 }, 7.0);
+    tl.fromTo("#un-path", { strokeDashoffset: 0 }, { strokeDashoffset: -160, duration: 3.1, ease: "none" }, 6.6);
+    tl.fromTo("#un-up", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 9.0);
+    tl.fromTo("#un-rise", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.in" }, 9.04);
+    window.__timelines["s-unit"] = tl;
+  </script>
+</template>

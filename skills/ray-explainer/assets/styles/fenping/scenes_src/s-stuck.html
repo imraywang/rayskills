@@ -1,0 +1,42 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-stuck { position: absolute; inset: 0; }
+    #s-stuck .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #f3f3f0; overflow: hidden; }
+    #s-stuck svg { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }
+    #s-stuck .row { position: absolute; left: 0; right: 0; top: 196px; display: flex; justify-content: center; gap: 18px; }
+    #s-stuck .chip { padding: 12px 26px; border-radius: 14px; font-family: "HeiBold", sans-serif; font-size: 38px; }
+    #s-stuck .chip.dark { background: #111; color: #f3f3f0; }
+    #s-stuck .chip.light { background: #e4e4e0; color: #111; }
+    #s-stuck .chip.green { background: #054c4c; color: #f3f3f0; }
+  </style>
+  <div id="s-stuck" data-composition-id="s-stuck" data-width="1080" data-height="1920">
+    <div class="panel">
+      <svg id="sk-svg" viewBox="0 0 1080 960"></svg>
+      <svg id="sk-eff" style="position:absolute;left:300px;top:206px;width:480px;height:70px" viewBox="0 0 480 70"><text x="0" y="46" font-family="HeiBold" font-size="34" fill="#6e6e6e">效果</text><rect x="100" y="20" width="370" height="30" rx="15" fill="#e4e4e0"/><rect id="sk-bar" x="100" y="20" width="8" height="30" rx="4" fill="#111"/></svg>
+    </div>
+  </div>
+  <script>
+    /*PERC*/
+    // 场景从 108.6 秒开始。同一张分屏网格（种子 64）：先零零星星打通几条，再悄悄连成片，只差最后三条
+    const G = makeGrid("sk-svg", 12, 7, 64, 188, 330, 64);
+    const crit = critical(G);
+    const pEnd = crit.us[crit.index - 3] + 1e-6;          // 还差 3 条就贯通
+    const last = G.edges.filter((e) => e.u >= pEnd && e.u <= crit.pc).map((e) => e.el);
+    const st = { p: 0.3 };
+    const show = () => paint(G, st.p, { gas: true });
+    show();
+    const tl = gsap.timeline({ paused: true });
+    // 「你单独地打通了三条五条」：一下一下地打通
+    [1.3, 1.8, 2.3].forEach((t, i) => tl.to(st, { p: 0.33 + i * 0.03, duration: 0.15, ease: "none", onUpdate: show }, t));
+    tl.fromTo("#sk-eff", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.78);
+    // 「但是这些通道其实都是在悄悄地连起来」
+    tl.to(st, { p: pEnd, duration: 2.9, ease: "power1.inOut", onUpdate: show }, 5.92);
+    // 「差的只是最后这几条」：还没打通的三条闪墨绿虚线
+    tl.fromTo(last, { attr: { stroke: "#dddcd8", "stroke-width": 3, "stroke-dasharray": "0" } },
+      { attr: { stroke: "#054c4c", "stroke-width": 8, "stroke-dasharray": "10 8" }, duration: 0.2 }, 9.0);
+    tl.to(last, { opacity: 0.25, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }, 9.3);
+    window.__timelines["s-stuck"] = tl;
+  </script>
+</template>

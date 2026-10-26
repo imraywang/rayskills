@@ -1,0 +1,36 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-ent { position: absolute; inset: 0; background: #f3f3f0; overflow: hidden; }
+    #s-ent svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #s-ent .chips { position: absolute; left: 270px; right: 270px; top: 220px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    #s-ent .chip { height: 108px; border-radius: 54px; background: #111; color: #f3f3f0; display: flex; align-items: center; justify-content: center; font-family: "HeiHeavy", sans-serif; font-size: 44px; }
+    #s-ent .head { position: absolute; left: 0; right: 0; top: 316px; text-align: center; font-family: "HeiBold", sans-serif; font-size: 34px; color: #6e6e6e; }
+  </style>
+  <div id="s-ent" data-composition-id="s-ent" data-width="1080" data-height="1920">
+    <svg id="en-svg" viewBox="0 0 1080 1920"></svg>
+    <div class="chips">
+      <div id="en-c1" class="chip">1</div><div id="en-c2" class="chip">2</div>
+      <div id="en-c3" class="chip">3</div><div id="en-c4" class="chip">4</div>
+    </div>
+  </div>
+  <script>
+    /*PERC*/
+    // 场景从 100.36 秒开始。同一张网格换成企业：每说一件事，点亮网格里属于它的一组通道
+    const G = makeGrid("en-svg", 12, 14, 96, 254, 404, 52);
+    paint(G, 0.4, { openCol: "#b8b8b4", closedCol: "#e4e4e0" });
+    const open = G.edges.filter((e) => e.u < 0.4);
+    const groups = [0, 1, 2, 3].map((k) => open.filter((_, i) => i % 4 === k).map((e) => e.el));
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#en-svg", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.05);
+    const at = [2.14, 3.3, 4.44, 5.66];
+    at.forEach((t, k) => {
+      tl.fromTo("#en-c" + (k + 1), { opacity: 0, y: 14, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(2)" }, t);
+      tl.fromTo(groups[k], { attr: { stroke: "#b8b8b4", "stroke-width": 5 } }, { attr: { stroke: "#111", "stroke-width": 9 }, duration: 0.3, stagger: 0.006 }, t + 0.05);
+    });
+    // 「每一件都是一条通道」
+    tl.to(G.edges.filter((e) => e.u < 0.4).map((e) => e.el), { opacity: 0.4, duration: 0.2, yoyo: true, repeat: 1, ease: "sine.inOut" }, 6.98);
+    window.__timelines["s-ent"] = tl;
+  </script>
+</template>

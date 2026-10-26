@@ -1,0 +1,36 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-forty { position: absolute; inset: 0; background: #f3f3f0; overflow: hidden; }
+    #s-forty .line { position: absolute; left: 170px; width: 740px; top: 760px; height: 8px; border-radius: 4px; background: #111; transform-origin: left center; }
+    #s-forty .dot { position: absolute; top: 740px; width: 48px; height: 48px; border-radius: 50%; background: #111; }
+    #s-forty .yr { position: absolute; top: 620px; width: 340px; text-align: center; font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 84px; color: #111; }
+    #s-forty .what { position: absolute; top: 830px; width: 340px; text-align: center; font-family: "HeiBold", sans-serif; font-size: 36px; line-height: 1.35; color: #6e6e6e; }
+    #s-forty .brace { position: absolute; left: 170px; width: 740px; top: 520px; height: 60px; border: 6px solid #054c4c; border-bottom: none; border-radius: 30px 30px 0 0; transform-origin: center bottom; }
+    #s-forty .forty { position: absolute; left: 0; right: 0; top: 340px; text-align: center; font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 120px; color: #054c4c; }
+  </style>
+  <div id="s-forty" data-composition-id="s-forty" data-width="1080" data-height="1920">
+    <div id="fy-line" class="line"></div>
+    <div id="fy-d1" class="dot" style="left:146px"></div>
+    <div id="fy-d2" class="dot" style="left:886px"></div>
+    <div id="fy-y1" class="yr" style="left:0px">1882</div>
+    <div id="fy-y2" class="yr" style="left:740px">1920s</div>
+    <div id="fy-w1" class="what" style="left:0px">纽约珍珠街<br />电站</div>
+    <div id="fy-w2" class="what" style="left:740px">单机电机<br />普及</div>
+    <div id="fy-brace" class="brace"></div>
+    <div id="fy-forty" class="forty">≈ 40</div>
+  </div>
+  <script>
+    // 场景从 59.85 秒开始；「差不多走了 40 年」在 62.98 秒（场景内 3.13）
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(["#fy-d1", "#fy-y1"], { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.1);
+    tl.fromTo("#fy-w1", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.6);
+    tl.fromTo("#fy-line", { scaleX: 0 }, { scaleX: 1, duration: 1.6, ease: "power2.inOut" }, 1.0);
+    tl.fromTo(["#fy-d2", "#fy-y2", "#fy-w2"], { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 2.5);
+    tl.fromTo("#fy-brace", { scaleX: 0.2, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.4, ease: "power3.out" }, 3.13);
+    tl.fromTo("#fy-forty", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 3.5);
+    window.__timelines["s-forty"] = tl;
+  </script>
+</template>

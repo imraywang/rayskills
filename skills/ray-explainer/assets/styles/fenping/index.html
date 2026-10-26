@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+      @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #111; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+      #bg { position: absolute; inset: 0; background: #111; }
+      /* 版式 A：全屏真人（推近做在外层包裹上） */
+      #face-a-wrap { position: absolute; inset: 0; transform-origin: 50% 32%; }
+      #face-a-wrap video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+      /* 版式 B：下半屏真人 */
+      .face-half { position: absolute; left: 0; top: 960px; width: 1080px; height: 960px; object-fit: cover; }
+    </style>
+  </head>
+  <body>
+    <!--
+      口播包装：真人竖屏 + 三种版式。B = 上半屏画面、下半屏真人；A = 全屏真人；C = 全屏画面。
+      时间轴是原片时间（去气口只压了吸气声，没剪时间）。
+    -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="128.3" data-width="1080" data-height="1920">
+      <div id="bg"></div>
+
+      <!-- 下半屏真人（B） -->
+      <!-- FACES-B -->
+      <video id="fb-stat" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="0" data-duration="10.8" data-media-start="0" data-track-index="1" style="z-index:2"></video>
+      <video id="fb-model" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="19.6" data-duration="8" data-media-start="19.6" data-track-index="1" style="z-index:2"></video>
+      <video id="fb-share" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="40.2" data-duration="5.7" data-media-start="40.2" data-track-index="1" style="z-index:2"></video>
+      <video id="fb-grid1" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="80.35" data-duration="7.65" data-media-start="80.35" data-track-index="1" style="z-index:2"></video>
+      <video id="fb-curve" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="95.14" data-duration="5.22" data-media-start="95.14" data-track-index="1" style="z-index:2"></video>
+      <video id="fb-stuck" class="clip face-half" src="assets/footage/face_half.mp4" muted playsinline data-start="108.6" data-duration="11" data-media-start="108.6" data-track-index="1" style="z-index:2"></video>      <!-- /FACES-B -->
+
+      <!-- 全屏真人（A） -->
+      <!-- 结尾垫最后一帧，免得画面比字幕先结束 -->
+      <img id="end-still" class="clip" src="assets/img/end_still.jpg" alt="" data-start="127.6" data-duration="0.7" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;z-index:1" />
+      <div id="face-a-wrap" style="z-index:2">
+        <!-- FACES-A -->
+        <video id="fa-ask" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="10.8" data-duration="8.8" data-media-start="10.8" data-track-index="2"></video>
+        <video id="fa-why" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="64.6" data-duration="3.6" data-media-start="64.6" data-track-index="2"></video>
+        <video id="fa-end" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="119.6" data-duration="8.6" data-media-start="119.6" data-track-index="2"></video>        <!-- /FACES-A -->
+      </div>
+
+      <!-- 画面（分屏上半屏或全屏） -->
+      <!-- SCENES -->
+      <div id="s-stat" data-composition-id="s-stat" data-composition-src="compositions/s-stat.html" data-start="0" data-duration="10.8" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="s-model" data-composition-id="s-model" data-composition-src="compositions/s-model.html" data-start="19.6" data-duration="8" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="s-years" data-composition-id="s-years" data-composition-src="compositions/s-years.html" data-start="27.6" data-duration="2.38" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-shaft" data-composition-id="s-shaft" data-composition-src="compositions/s-shaft.html" data-start="29.98" data-duration="10.22" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-share" data-composition-id="s-share" data-composition-src="compositions/s-share.html" data-start="40.2" data-duration="5.7" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="s-david" data-composition-id="s-david" data-composition-src="compositions/s-david.html" data-start="45.9" data-duration="4.2" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-unit" data-composition-id="s-unit" data-composition-src="compositions/s-unit.html" data-start="50.1" data-duration="9.75" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-forty" data-composition-id="s-forty" data-composition-src="compositions/s-forty.html" data-start="59.85" data-duration="4.75" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-term" data-composition-id="s-term" data-composition-src="compositions/s-term.html" data-start="68.2" data-duration="1.9" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-mask" data-composition-id="s-mask" data-composition-src="compositions/s-mask.html" data-start="70.1" data-duration="10.25" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-grid1" data-composition-id="s-grid1" data-composition-src="compositions/s-grid1.html" data-start="80.35" data-duration="7.65" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="s-hero" data-composition-id="s-hero" data-composition-src="compositions/s-hero.html" data-start="88" data-duration="7.14" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-curve" data-composition-id="s-curve" data-composition-src="compositions/s-curve.html" data-start="95.14" data-duration="5.22" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="s-ent" data-composition-id="s-ent" data-composition-src="compositions/s-ent.html" data-start="100.36" data-duration="8.24" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="s-stuck" data-composition-id="s-stuck" data-composition-src="compositions/s-stuck.html" data-start="108.6" data-duration="11" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>      <!-- /SCENES -->
+
+
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="128.3" data-track-index="7" data-track-kind="captions" data-width="1080" data-height="1920" style="z-index:10"></div>
+
+      <!-- 人声：原片去掉句间吸气（gate_breaths.py），时间轴不变 -->
+      <audio id="voice" class="clip" src="assets/footage/voice.wav" data-start="0" data-duration="128.2" data-media-start="0" data-volume="1" data-track-index="8"></audio>
+      <!-- 配乐：ACE-Step 本地生成（bgm_47，响度一路慢慢抬起），归一到 -20 LUFS 后压在人声下约 15 dB -->
+      <audio id="bgm" class="clip" src="assets/audio/bgm.m4a" data-start="0" data-duration="128.3" data-media-start="0" data-volume="0.32" data-track-index="9"></audio>
+      <!-- 音效：只给画面上的关键动作，合成的短音 -->
+      <audio id="sfx-95" class="clip" src="assets/audio/ding.wav" data-start="6.38" data-duration="0.7" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-motor" class="clip" src="assets/audio/click.wav" data-start="36.64" data-duration="0.05" data-volume="0.5" data-track-index="10"></audio>
+      <audio id="sfx-40" class="clip" src="assets/audio/ding.wav" data-start="63.38" data-duration="0.7" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-term" class="clip" src="assets/audio/whoosh.wav" data-start="68.0" data-duration="0.7" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-span" class="clip" src="assets/audio/swell.wav" data-start="91.28" data-duration="2.6" data-volume="0.55" data-track-index="11"></audio>
+      <audio id="sfx-half" class="clip" src="assets/audio/ding.wav" data-start="98.5" data-duration="0.7" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-c1" class="clip" src="assets/audio/click.wav" data-start="102.5" data-duration="0.05" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-c2" class="clip" src="assets/audio/click.wav" data-start="103.66" data-duration="0.05" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-c3" class="clip" src="assets/audio/click.wav" data-start="104.8" data-duration="0.05" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-c4" class="clip" src="assets/audio/click.wav" data-start="106.02" data-duration="0.05" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-last" class="clip" src="assets/audio/ding.wav" data-start="117.58" data-duration="0.7" data-volume="0.3" data-track-index="10"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const wrap = "#face-a-wrap";
+      // 推近只在全屏真人段里做：A1「那为什么」、A3「为什么会这样」、A4「往往不是 AI 不行」
+      tl.fromTo(wrap, { scale: 1 }, { scale: 1, duration: 0.01 }, 10.8);
+      tl.to(wrap, { scale: 1.09, duration: 0.22, ease: "power2.out" }, 13.8);
+      tl.set(wrap, { scale: 1 }, 17.36);
+      tl.set(wrap, { scale: 1 }, 64.6);
+      tl.to(wrap, { scale: 1.09, duration: 0.22, ease: "power2.out" }, 65.14);
+      tl.set(wrap, { scale: 1 }, 119.6);
+      tl.to(wrap, { scale: 1.08, duration: 0.22, ease: "power2.out" }, 121.6);
+      tl.set(wrap, { scale: 1 }, 125.64);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

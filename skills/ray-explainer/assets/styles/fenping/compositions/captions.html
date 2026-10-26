@@ -1,0 +1,155 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    #captions { position: absolute; inset: 0; pointer-events: none; }
+    #captions .cap { position: absolute; left: 0; right: 0; text-align: center; overflow: visible; }
+    #captions .cap.seam { top: 918px; }
+    #captions .cap.low { top: 1196px; }
+    #captions .pill {
+      display: inline-block; padding: 10px 30px 14px; border-radius: 18px;
+      background: rgba(17, 17, 17, 0.84); color: #f3f3f0;
+      font-family: "HeiBold", sans-serif; font-weight: 700; font-size: 64px; line-height: 1.12;
+      letter-spacing: 0.02em; white-space: nowrap;
+    }
+    #captions .pill em { font-style: normal; color: #9cc2bf; }
+  </style>
+  <div id="captions" data-composition-id="captions" data-width="1080" data-height="1920">
+    <!-- 词组字幕：由 build.py 生成，改字改时间去那里改 -->
+    <!-- CAPS -->
+    <div id="c001" class="cap seam clip" data-start="0.15" data-duration="0.85"><span class="pill">2025年</span></div>
+    <div id="c002" class="cap seam clip" data-start="1.0" data-duration="0.84"><span class="pill">美国麻省理工</span></div>
+    <div id="c003" class="cap seam clip" data-start="1.84" data-duration="1.2"><span class="pill">一个研究团队</span></div>
+    <div id="c004" class="cap seam clip" data-start="3.04" data-duration="0.96"><span class="pill">翻了300多个</span></div>
+    <div id="c005" class="cap seam clip" data-start="4.0" data-duration="1.3"><span class="pill">公开的企业AI项目</span></div>
+    <div id="c006" class="cap seam clip" data-start="5.3" data-duration="1.08"><span class="pill">结论很扎眼</span></div>
+    <div id="c007" class="cap seam clip" data-start="6.38" data-duration="1.28"><span class="pill">95%的公司</span></div>
+    <div id="c008" class="cap seam clip" data-start="7.66" data-duration="1.1"><span class="pill">在生成式AI上</span></div>
+    <div id="c009" class="cap seam clip" data-start="8.76" data-duration="0.86"><span class="pill">没看到任何</span></div>
+    <div id="c010" class="cap seam clip" data-start="9.62" data-duration="1.18"><span class="pill">能算出来的回报</span></div>
+    <div id="c011" class="cap low clip" data-start="10.86" data-duration="0.94"><span class="pill">钱花了</span></div>
+    <div id="c012" class="cap low clip" data-start="11.8" data-duration="0.74"><span class="pill">模型也确实</span></div>
+    <div id="c013" class="cap low clip" data-start="12.54" data-duration="1.26"><span class="pill">越来越聪明</span></div>
+    <div id="c014" class="cap low clip" data-start="13.8" data-duration="0.42"><span class="pill">那为什么</span></div>
+    <div id="c015" class="cap low clip" data-start="14.22" data-duration="0.92"><span class="pill">企业上AI</span></div>
+    <div id="c016" class="cap low clip" data-start="15.14" data-duration="0.64"><span class="pill"><em>前半年</em></span></div>
+    <div id="c017" class="cap low clip" data-start="15.78" data-duration="1.58"><span class="pill">几乎看不到效果？</span></div>
+    <div id="c018" class="cap low clip" data-start="17.36" data-duration="0.8"><span class="pill">你可能会想</span></div>
+    <div id="c019" class="cap low clip" data-start="18.16" data-duration="0.5"><span class="pill">是不是AI</span></div>
+    <div id="c020" class="cap low clip" data-start="18.66" data-duration="0.98"><span class="pill">还不够强？</span></div>
+    <div id="c021" class="cap seam clip" data-start="19.7" data-duration="0.54"><span class="pill">报告说</span></div>
+    <div id="c022" class="cap seam clip" data-start="20.24" data-duration="1.38"><span class="pill">问题不在模型</span></div>
+    <div id="c023" class="cap seam clip" data-start="21.62" data-duration="0.98"><span class="pill">而是在<em>落地</em></span></div>
+    <div id="c024" class="cap seam clip" data-start="22.6" data-duration="1.5"><span class="pill">流程还是老流程</span></div>
+    <div id="c025" class="cap seam clip" data-start="24.1" data-duration="0.74"><span class="pill">AI记不住</span></div>
+    <div id="c026" class="cap seam clip" data-start="24.84" data-duration="1.42"><span class="pill">公司里的来龙去脉</span></div>
+    <div id="c027" class="cap seam clip" data-start="26.26" data-duration="1.42"><span class="pill">用一次就忘一次</span></div>
+    <div id="c028" class="cap low clip" data-start="27.68" data-duration="0.64"><span class="pill">这种事情</span></div>
+    <div id="c029" class="cap low clip" data-start="28.32" data-duration="0.7"><span class="pill">100多年前</span></div>
+    <div id="c030" class="cap low clip" data-start="29.02" data-duration="0.96"><span class="pill">就发生过一回</span></div>
+    <div id="c031" class="cap low clip" data-start="30.0" data-duration="1.84"><span class="pill">电刚进工厂的时候</span></div>
+    <div id="c032" class="cap low clip" data-start="31.86" data-duration="0.78"><span class="pill">老板们做的事情</span></div>
+    <div id="c033" class="cap low clip" data-start="32.64" data-duration="0.8"><span class="pill">很简单</span></div>
+    <div id="c034" class="cap low clip" data-start="33.46" data-duration="1.62"><span class="pill">把带动整个车间的</span></div>
+    <div id="c035" class="cap low clip" data-start="35.08" data-duration="0.74"><span class="pill">那台蒸汽机</span></div>
+    <div id="c036" class="cap low clip" data-start="35.82" data-duration="0.8"><span class="pill">换掉</span></div>
+    <div id="c037" class="cap low clip" data-start="36.64" data-duration="1.64"><span class="pill">换上了一台大电机</span></div>
+    <div id="c038" class="cap low clip" data-start="38.3" data-duration="1.02"><span class="pill">皮带和传动轴</span></div>
+    <div id="c039" class="cap low clip" data-start="39.34" data-duration="0.86"><span class="pill">照样不动</span></div>
+    <div id="c040" class="cap seam clip" data-start="40.22" data-duration="1.24"><span class="pill">到1899年</span></div>
+    <div id="c041" class="cap seam clip" data-start="41.48" data-duration="0.76"><span class="pill">美国工厂里</span></div>
+    <div id="c042" class="cap seam clip" data-start="42.26" data-duration="1.18"><span class="pill">电动机提供的动力</span></div>
+    <div id="c043" class="cap seam clip" data-start="43.46" data-duration="1.32"><span class="pill">还不到<em>5%</em></span></div>
+    <div id="c044" class="cap seam clip" data-start="44.8" data-duration="1.16"><span class="pill">效率也没怎么变</span></div>
+    <div id="c045" class="cap low clip" data-start="46.0" data-duration="1.08"><span class="pill">美国斯坦福大学</span></div>
+    <div id="c046" class="cap low clip" data-start="47.1" data-duration="0.52"><span class="pill">的经济学家</span></div>
+    <div id="c047" class="cap low clip" data-start="47.64" data-duration="0.64"><span class="pill">保罗·戴维</span></div>
+    <div id="c048" class="cap low clip" data-start="48.3" data-duration="0.86"><span class="pill">专门研究过</span></div>
+    <div id="c049" class="cap low clip" data-start="49.18" data-duration="1.02"><span class="pill">这段历史</span></div>
+    <div id="c050" class="cap low clip" data-start="50.24" data-duration="0.78"><span class="pill">真正的提速</span></div>
+    <div id="c051" class="cap low clip" data-start="51.04" data-duration="0.58"><span class="pill">要等到</span></div>
+    <div id="c052" class="cap low clip" data-start="51.64" data-duration="1.66"><span class="pill">20世纪20年代</span></div>
+    <div id="c053" class="cap low clip" data-start="53.34" data-duration="1.28"><span class="pill">工厂给每台机器</span></div>
+    <div id="c054" class="cap low clip" data-start="54.64" data-duration="1.54"><span class="pill">装上自己的小电机</span></div>
+    <div id="c055" class="cap low clip" data-start="56.2" data-duration="0.94"><span class="pill">把厂房按照</span></div>
+    <div id="c056" class="cap low clip" data-start="57.16" data-duration="0.84"><span class="pill">物料怎么走</span></div>
+    <div id="c057" class="cap low clip" data-start="58.02" data-duration="1.12"><span class="pill">重新摆一遍</span></div>
+    <div id="c058" class="cap low clip" data-start="59.16" data-duration="0.7"><span class="pill">才真正起来</span></div>
+    <div id="c059" class="cap low clip" data-start="59.88" data-duration="1.12"><span class="pill">从爱迪生</span></div>
+    <div id="c060" class="cap low clip" data-start="61.02" data-duration="1.28"><span class="pill">建起第一座发电厂</span></div>
+    <div id="c061" class="cap low clip" data-start="62.32" data-duration="0.64"><span class="pill">算起</span></div>
+    <div id="c062" class="cap low clip" data-start="62.98" data-duration="1.62"><span class="pill">差不多走了<em>40年</em></span></div>
+    <div id="c063" class="cap low clip" data-start="65.14" data-duration="0.82"><span class="pill">为什么会这样？</span></div>
+    <div id="c064" class="cap low clip" data-start="65.98" data-duration="1.12"><span class="pill">数学里面有个现象</span></div>
+    <div id="c065" class="cap low clip" data-start="67.12" data-duration="1.06"><span class="pill">正好能够解释</span></div>
+    <div id="c066" class="cap low clip" data-start="68.2" data-duration="1.32"><span class="pill">叫做<em>渗流相变</em></span></div>
+    <div id="c067" class="cap low clip" data-start="69.54" data-duration="0.64"><span class="pill">Percolation</span></div>
+    <div id="c068" class="cap low clip" data-start="70.2" data-duration="1.54"><span class="pill">英国一位统计学家</span></div>
+    <div id="c069" class="cap low clip" data-start="71.76" data-duration="0.58"><span class="pill">在研究</span></div>
+    <div id="c070" class="cap low clip" data-start="72.36" data-duration="0.96"><span class="pill">煤矿工人戴的</span></div>
+    <div id="c071" class="cap low clip" data-start="73.34" data-duration="0.76"><span class="pill">防毒面具</span></div>
+    <div id="c072" class="cap low clip" data-start="74.12" data-duration="0.9"><span class="pill">滤芯里面</span></div>
+    <div id="c073" class="cap low clip" data-start="75.04" data-duration="0.7"><span class="pill">有无数条</span></div>
+    <div id="c074" class="cap low clip" data-start="75.76" data-duration="1.3"><span class="pill">细小的通道</span></div>
+    <div id="c075" class="cap low clip" data-start="77.08" data-duration="0.58"><span class="pill">有的通</span></div>
+    <div id="c076" class="cap low clip" data-start="77.68" data-duration="0.58"><span class="pill">有的堵</span></div>
+    <div id="c077" class="cap low clip" data-start="78.28" data-duration="0.88"><span class="pill">那毒气到底</span></div>
+    <div id="c078" class="cap low clip" data-start="79.18" data-duration="1.2"><span class="pill">能不能够穿过去呢？</span></div>
+    <div id="c079" class="cap seam clip" data-start="80.4" data-duration="0.8"><span class="pill">他和一位数学家</span></div>
+    <div id="c080" class="cap seam clip" data-start="81.2" data-duration="0.78"><span class="pill">把这个问题</span></div>
+    <div id="c081" class="cap seam clip" data-start="82.0" data-duration="1.56"><span class="pill">画成了一张网格</span></div>
+    <div id="c082" class="cap seam clip" data-start="83.58" data-duration="1.32"><span class="pill">答案很反直觉</span></div>
+    <div id="c083" class="cap seam clip" data-start="84.92" data-duration="0.46"><span class="pill">你可能以为</span></div>
+    <div id="c084" class="cap seam clip" data-start="85.4" data-duration="1.16"><span class="pill">通道打通一半</span></div>
+    <div id="c085" class="cap seam clip" data-start="86.58" data-duration="1.52"><span class="pill">毒气就能走一半</span></div>
+    <div id="c086" class="cap low clip" data-start="88.12" data-duration="0.46"><span class="pill">实际上</span></div>
+    <div id="c087" class="cap low clip" data-start="88.6" data-duration="0.72"><span class="pill">打通的通道</span></div>
+    <div id="c088" class="cap low clip" data-start="89.34" data-duration="1.26"><span class="pill">没到临界点之前</span></div>
+    <div id="c089" class="cap low clip" data-start="90.62" data-duration="1.14"><span class="pill">几乎一点都过不去</span></div>
+    <div id="c090" class="cap low clip" data-start="91.78" data-duration="1.34"><span class="pill">一过<em>临界点</em></span></div>
+    <div id="c091" class="cap low clip" data-start="93.14" data-duration="1.02"><span class="pill">一下子就从这头</span></div>
+    <div id="c092" class="cap low clip" data-start="94.18" data-duration="0.96"><span class="pill">连到了那头</span></div>
+    <div id="c093" class="cap seam clip" data-start="95.16" data-duration="1.28"><span class="pill">数学家后来证明</span></div>
+    <div id="c094" class="cap seam clip" data-start="96.46" data-duration="0.88"><span class="pill">在最常见的</span></div>
+    <div id="c095" class="cap seam clip" data-start="97.36" data-duration="1.12"><span class="pill">方格网里面</span></div>
+    <div id="c096" class="cap seam clip" data-start="98.5" data-duration="0.62"><span class="pill">这个临界点</span></div>
+    <div id="c097" class="cap seam clip" data-start="99.14" data-duration="1.22"><span class="pill">正好是<em>一半</em></span></div>
+    <div id="c098" class="cap low clip" data-start="100.4" data-duration="0.82"><span class="pill">企业上AI</span></div>
+    <div id="c099" class="cap low clip" data-start="101.24" data-duration="1.24"><span class="pill">也是这样一张网</span></div>
+    <div id="c100" class="cap low clip" data-start="102.5" data-duration="1.14"><span class="pill">数据拿不拿得到</span></div>
+    <div id="c101" class="cap low clip" data-start="103.66" data-duration="1.12"><span class="pill">流程改没改</span></div>
+    <div id="c102" class="cap low clip" data-start="104.8" data-duration="1.2"><span class="pill">权限给没给</span></div>
+    <div id="c103" class="cap low clip" data-start="106.02" data-duration="1.3"><span class="pill">员工愿不愿意用</span></div>
+    <div id="c104" class="cap low clip" data-start="107.34" data-duration="0.78"><span class="pill">每一件都是</span></div>
+    <div id="c105" class="cap low clip" data-start="108.14" data-duration="0.54"><span class="pill">一条通道</span></div>
+    <div id="c106" class="cap seam clip" data-start="108.7" data-duration="1.64"><span class="pill">你单独地打通了</span></div>
+    <div id="c107" class="cap seam clip" data-start="110.36" data-duration="1.0"><span class="pill">三条五条</span></div>
+    <div id="c108" class="cap seam clip" data-start="111.38" data-duration="0.66"><span class="pill">单看起来</span></div>
+    <div id="c109" class="cap seam clip" data-start="112.06" data-duration="0.92"><span class="pill">都没有效果</span></div>
+    <div id="c110" class="cap seam clip" data-start="113.0" data-duration="0.58"><span class="pill">老板就觉得</span></div>
+    <div id="c111" class="cap seam clip" data-start="113.6" data-duration="0.9"><span class="pill">钱白花了</span></div>
+    <div id="c112" class="cap seam clip" data-start="114.52" data-duration="0.9"><span class="pill">但是这些通道</span></div>
+    <div id="c113" class="cap seam clip" data-start="115.44" data-duration="0.8"><span class="pill">其实都是在</span></div>
+    <div id="c114" class="cap seam clip" data-start="116.26" data-duration="1.3"><span class="pill">悄悄地连起来</span></div>
+    <div id="c115" class="cap seam clip" data-start="117.58" data-duration="0.66"><span class="pill">差的只是</span></div>
+    <div id="c116" class="cap seam clip" data-start="118.26" data-duration="1.34"><span class="pill"><em>最后这几条</em></span></div>
+    <div id="c117" class="cap low clip" data-start="119.82" data-duration="0.96"><span class="pill">所以前半年</span></div>
+    <div id="c118" class="cap low clip" data-start="120.8" data-duration="0.78"><span class="pill">看不到效果</span></div>
+    <div id="c119" class="cap low clip" data-start="121.6" data-duration="1.3"><span class="pill">往往不是AI不行</span></div>
+    <div id="c120" class="cap low clip" data-start="122.92" data-duration="0.72"><span class="pill">是你们公司的</span></div>
+    <div id="c121" class="cap low clip" data-start="123.66" data-duration="0.76"><span class="pill">通道还没有</span></div>
+    <div id="c122" class="cap low clip" data-start="124.44" data-duration="1.16"><span class="pill">完全地连上</span></div>
+    <div id="c123" class="cap low clip" data-start="125.64" data-duration="0.66"><span class="pill">想知道自己</span></div>
+    <div id="c124" class="cap low clip" data-start="126.32" data-duration="1.02"><span class="pill">还差在哪几条</span></div>
+    <div id="c125" class="cap low clip" data-start="127.36" data-duration="0.94"><span class="pill">可以来找我聊一聊</span></div>
+    <!-- /CAPS -->
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 每组弹入 0.12 秒；clip 窗口结束即消失，不另做退场
+    document.querySelectorAll("#captions .cap").forEach((cap) => {
+      const start = parseFloat(cap.dataset.start);
+      tl.fromTo(cap.querySelector(".pill"), { scale: 0.86, y: 10 }, { scale: 1, y: 0, duration: 0.12, ease: "back.out(2.2)" }, start);
+    });
+    window.__timelines["captions"] = tl;
+  </script>
+</template>

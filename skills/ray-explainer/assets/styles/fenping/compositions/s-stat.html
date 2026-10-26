@@ -1,0 +1,75 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-stat { position: absolute; inset: 0; }
+    #s-stat .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #f3f3f0; overflow: hidden; }
+    #s-stat .tag {
+      position: absolute; left: 0; right: 0; top: 196px; text-align: center;
+      font-family: "Hei", sans-serif; font-size: 34px; color: #6e6e6e; letter-spacing: 0.06em;
+    }
+    #s-stat .head {
+      position: absolute; left: 0; right: 0; top: 246px; text-align: center;
+      font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 60px; color: #111;
+    }
+    #s-stat .grid {
+      position: absolute; left: 220px; top: 346px; width: 640px; height: 480px;
+      display: grid; grid-template-columns: repeat(20, 32px); grid-auto-rows: 32px;
+    }
+    #s-stat .dot { width: 22px; height: 22px; margin: 5px; border-radius: 50%; background: #111; }
+    #s-stat .big {
+      position: absolute; left: 0; right: 0; top: 446px; text-align: center;
+      font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 250px; line-height: 1; color: #111;
+      letter-spacing: -0.02em;
+    }
+    #s-stat .big span { display: inline-block; padding: 0 36px 10px; background: rgba(243, 243, 240, 0.9); border-radius: 28px; }
+    #s-stat .legend {
+      position: absolute; left: 220px; right: 220px; top: 842px; display: flex; justify-content: space-between;
+      font-family: "HeiBold", sans-serif; font-weight: 700; font-size: 32px; color: #6e6e6e;
+    }
+    #s-stat .legend i { display: inline-block; width: 22px; height: 22px; border-radius: 50%; margin-right: 10px; vertical-align: -2px; }
+    #s-stat .legend .ok { color: #054c4c; }
+  </style>
+  <div id="s-stat" data-composition-id="s-stat" data-width="1080" data-height="1920">
+    <div class="panel">
+      <div id="stat-tag" class="tag">MIT NANDA · The GenAI Divide</div>
+      <div id="stat-head" class="head">● = 1 个项目</div>
+      <div id="stat-grid" class="grid"></div>
+      <div id="stat-big" class="big"><span id="stat-num">0%</span></div>
+      <div id="stat-legend" class="legend">
+        <span><i style="background:#c9c9c5"></i>95%</span>
+        <span class="ok"><i style="background:#054c4c"></i>5% 有回报</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    // 20×15 = 300 个点代表 300 多个项目；有回报的 15 个点（5%）位置固定
+    const grid = document.getElementById("stat-grid");
+    const winners = new Set([7, 23, 41, 58, 76, 99, 118, 133, 152, 171, 190, 214, 236, 259, 283]);
+    for (let i = 0; i < 300; i++) {
+      const d = document.createElement("div");
+      d.className = winners.has(i) ? "dot win" : "dot lose";
+      grid.appendChild(d);
+    }
+    const dots = grid.querySelectorAll(".dot");
+    const tl = gsap.timeline({ paused: true });
+    // 第 0 帧就有标签和一层淡点阵，不从空白开始
+    tl.fromTo("#stat-tag", { opacity: 1 }, { opacity: 1, duration: 0.01 }, 0);
+    tl.fromTo(dots, { opacity: 0.12, scale: 0.6 }, { opacity: 0.12, scale: 0.6, duration: 0.01 }, 0);
+    tl.fromTo("#stat-head", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 3.0);
+    // 「翻了 300 多个」：点阵逐个点亮
+    tl.to(dots, { opacity: 1, scale: 1, duration: 0.18, ease: "power2.out", stagger: { each: 0.0068, from: "start" } }, 3.04);
+    // 「95% 的公司」：输家变灰、赢家变墨绿，大数字数上来
+    tl.to(grid.querySelectorAll(".lose"), { backgroundColor: "#c9c9c5", duration: 0.5, ease: "power2.inOut", stagger: { each: 0.0012, from: "random" } }, 6.38);
+    tl.to(grid.querySelectorAll(".win"), { backgroundColor: "#054c4c", scale: 1.25, duration: 0.4, ease: "back.out(2)" }, 6.5);
+    tl.fromTo("#stat-big", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 6.38);
+    const counter = { v: 0 };
+    tl.to(counter, {
+      v: 95, duration: 0.9, ease: "power2.out",
+      onUpdate: () => { document.getElementById("stat-num").textContent = Math.round(counter.v) + "%"; },
+    }, 6.38);
+    tl.fromTo("#stat-legend", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 8.8);
+    window.__timelines["s-stat"] = tl;
+  </script>
+</template>

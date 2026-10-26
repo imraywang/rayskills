@@ -1,0 +1,41 @@
+<template>
+  <style>
+    @font-face { font-family: "Hei"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; }
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #s-share { position: absolute; inset: 0; }
+    #s-share .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #f3f3f0; overflow: hidden; }
+    #s-share .year { position: absolute; left: 0; right: 0; top: 200px; text-align: center; font-family: "HeiHeavy", sans-serif; font-weight: 900; font-size: 110px; color: #111; }
+    #s-share .sub { position: absolute; left: 0; right: 0; top: 340px; text-align: center; font-family: "Hei", sans-serif; font-size: 38px; color: #6e6e6e; }
+    #s-share .bar { position: absolute; left: 120px; width: 840px; top: 460px; height: 120px; border-radius: 18px; background: #c9c9c5; overflow: hidden; }
+    #s-share .elec { position: absolute; left: 0; top: 0; height: 120px; width: 40px; background: #054c4c; transform-origin: left center; }
+    #s-share .lab { position: absolute; top: 610px; font-family: "HeiBold", sans-serif; font-size: 38px; }
+    #s-share .lab.l { left: 120px; color: #054c4c; }
+    #s-share .lab.r { right: 120px; color: #6e6e6e; text-align: right; }
+    #s-share .eff { position: absolute; left: 0; right: 0; top: 720px; text-align: center; }
+    #s-share .eff span { display: inline-block; padding: 12px 26px; border-radius: 14px; background: #e4e4e0; font-family: "HeiBold", sans-serif; font-size: 38px; color: #111; }
+  </style>
+  <div id="s-share" data-composition-id="s-share" data-width="1080" data-height="1920">
+    <div class="panel">
+      <div id="sr-year" class="year">1899</div>
+      <div id="sr-sub" class="sub">美国制造业 · 机械动力构成</div>
+      <div id="sr-bar" class="bar"><div id="sr-elec" class="elec"></div></div>
+      <div id="sr-l" class="lab l">电动机</div>
+      <div id="sr-r" class="lab r">蒸汽、水力…</div>
+      <svg id="sr-eff" style="position:absolute;left:300px;top:720px;width:480px;height:120px" viewBox="0 0 480 120"><text x="0" y="70" font-family="HeiBold" font-size="34" fill="#6e6e6e">效率</text><path id="sr-flat" d="M 100 60 L 470 60" stroke="#111" stroke-width="6" stroke-linecap="round" fill="none" pathLength="1" stroke-dasharray="1"/></svg>
+    </div>
+  </div>
+  <script>
+    // 场景从 40.2 秒开始；数字出自 Mowery & Rosenberg：1899 年电动机不到美国制造业机械总马力的 5%
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#sr-year", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 0.05);
+    tl.fromTo("#sr-sub", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.3);
+    tl.fromTo("#sr-bar", { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "power2.out" }, 1.6);
+    tl.fromTo("#sr-elec", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 3.3);
+    tl.fromTo("#sr-l", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 3.3);
+    tl.fromTo("#sr-r", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.0);
+    tl.fromTo("#sr-eff", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 4.62);
+    tl.fromTo("#sr-flat", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "none" }, 4.66);
+    window.__timelines["s-share"] = tl;
+  </script>
+</template>
