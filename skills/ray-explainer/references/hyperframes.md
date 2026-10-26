@@ -2,7 +2,7 @@
 
 默认的 kit / 语法场景适合“讲清一个框架”。当 Ray 说**不要固定风格、要适合这期内容的风格，要有录屏、真实画面、截图**时，用这个模式：配音和逐字时间仍走本 skill 的 ②③（tts.py / qa_tts.py / check_numbers.py），画面换成 HyperFrames 合成，每期单独设计一套视觉语言。
 
-第一次实战：《三天涨星8万，AI开始逆向一切》（2026-10，`~/Movies/ray-explainer/2026-10-11-rea-reverse-everything/`），风格“逆向工作台”：真实截图像证据钉在反汇编台面上，加本机实跑工具的真实输出和 CC 历史照片。10 幕、222 秒、144 条字幕，4 个子任务并行做场景，约 15 分钟出全部场景。
+第一次实战：《三天涨星8万，AI开始逆向一切》（2026-10，`/Volumes/协作/ray-explainer/2026-10-11-rea-reverse-everything/`），风格“逆向工作台”：真实截图像证据钉在反汇编台面上，加本机实跑工具的真实输出和 CC 历史照片。10 幕、222 秒、144 条字幕，4 个子任务并行做场景，约 15 分钟出全部场景。
 
 ## 流程
 
@@ -53,7 +53,7 @@
 - **页面自己能定位时间（`window.__seek(t)`）的，按旁白重映射时间逐帧截**：用几个“开口词 → 页面时刻”的锚点做分段线性映射，旁白说到“落刀”刀就落下；一段 30 秒的演示能压进一句话。片段的 0 秒对齐第一个锚点，场景里 `data-start` 填那个时刻。
 - **原声**（采访、任务录音、档案音频）：先 `python3 $SK/scripts/cut_clips.py --words <录音> --from <h:m:s> --to <h:m:s>` 拿词级时间戳找准起止，把来源文件和片段写进 `clips[].cut`（`file`、`base`、`segs`，见脚本文件头），再 `cut_clips.py <project>` 一次切好全部 `clips/<id>.wav`（淡入淡出、拼接、响度统一）；改片段只改 `segs` 重跑。`"clips"` 的其余字段见 `scripts/splice_clips.py` 文件头：插在哪句后面、说话人、`segs` 逐句原文 + 中文、`caps` 更短的字幕句。配音和校对之后跑 `splice_clips.py <project>`，再 `host.py <project> --plan-only`（原声期间主持人闭嘴）。原声字幕是“中文大字 + 英文原句小字”，中文每条 ≤ 14 字，长的在 `caps` 里拆短。旁白一个字不改，原声是加进来的真实证据。
 - **配乐（默认本地生成）**：`python3 $SK/scripts/gen_bgm.py <project>` 用 ACE-Step 1.5 在本机生成 3 首（MIT，可商用，约 4 分钟；安装见脚本文件头），`bgm/listen/*.m4a` 发给 Ray 挑。风格写在 `script.json` 的 `"bgm": {"caption": "…", "bpm": 70}`；参考某部电影的配乐时只描述配器和走向，不写片名和作曲家。挑中后 `python3 $SK/scripts/mix_bgm.py <project> bgm/<pick>.wav`：按 `"bgm"` 里的 `silent_clips`（关键原声完全静音）、`duck`（其余原声下压）、`sections`（哪几幕收弱 / 抬起）、`end_at`（从哪个字开始收）把包络烧进 `hf/assets/audio/bgm.m4a`，`build.py` 里 `BGM_LEN = 0`、`BGM_VOL = 0.35`。配乐比片子短时 `mix_bgm.py` 自动把中段交叉淡化循环接长（默认从倒数 10 秒接回第 30 秒，`"bgm": {"loop": {…}}` 可改）。不要再沿用上期配乐了事：旧配乐音量 0.18、又被人声压低，Ray 看片时等于没有。改了已有片子的句子要重跑 `mix_bgm.py`：句子一变，原声位置跟着挪，配乐的静音包络就对不上了（2026-10-18 马斯克那期补配英文后返工过）。
-- **配乐（ElevenLabs Music，2026-10-24 起 Ray 更偏好）**：本地配乐被 Ray 说过「盖过人声、节奏不对」，Lex 那期起改用 ElevenLabs Music 按章节作曲。`POST https://api.elevenlabs.io/v1/music`，`model_id: music_v1`，`composition_plan` 里写全片风格（`positive_global_styles` / `negative_global_styles`，负面里写 vocals、heavy drums、big drops）和逐段 `sections`（`section_name`、`positive_local_styles`、`duration_ms` 按章节起止算、`lines: []`）。一次最长 300 秒，长片分两次请求，前一段多生成 2 秒、后一段提前 2 秒开始，`acrossfade=d=4` 接起来，`atrim` 到片长、最后 3.5 秒淡出、`loudnorm=I=-16`。两段可以并发；key 在 `~/.config/hangzhou-film/elevenlabs.env`。在成片里用 `<audio id="bgm" data-volume="0.10">`，比人声低约 12 dB（Lex 那期 0.13 + 人声 0.8；Ray 说过盖人声之后就按 12–13 dB 放）。没有原声的片子不需要 `mix_bgm.py` 的包络。范例：`~/Movies/ray-explainer/2026-10-25-china-ai-chain/bgm/gen_music.py`。
+- **配乐（ElevenLabs Music，2026-10-24 起 Ray 更偏好）**：本地配乐被 Ray 说过「盖过人声、节奏不对」，Lex 那期起改用 ElevenLabs Music 按章节作曲。`POST https://api.elevenlabs.io/v1/music`，`model_id: music_v1`，`composition_plan` 里写全片风格（`positive_global_styles` / `negative_global_styles`，负面里写 vocals、heavy drums、big drops）和逐段 `sections`（`section_name`、`positive_local_styles`、`duration_ms` 按章节起止算、`lines: []`）。一次最长 300 秒，长片分两次请求，前一段多生成 2 秒、后一段提前 2 秒开始，`acrossfade=d=4` 接起来，`atrim` 到片长、最后 3.5 秒淡出、`loudnorm=I=-16`。两段可以并发；key 在 `~/.config/hangzhou-film/elevenlabs.env`。在成片里用 `<audio id="bgm" data-volume="0.10">`，比人声低约 12 dB（Lex 那期 0.13 + 人声 0.8；Ray 说过盖人声之后就按 12–13 dB 放）。没有原声的片子不需要 `mix_bgm.py` 的包络。范例：`/Volumes/协作/ray-explainer/2026-10-25-china-ai-chain/bgm/gen_music.py`。
 
 ## 安全区
 

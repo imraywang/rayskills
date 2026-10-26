@@ -7,9 +7,9 @@
 
 拆解笔记在 Ray 知识库的 `30-资料/10-自主调研/解说视频风格参考/小Lin说-近三期拆解.md`，截帧在 `60-素材/50-调研媒体/解说视频风格参考/xiaolin-2026-10/`。
 
-第一条成片是《马斯克给美国每个孩子发一股 SpaceX》横屏版（2026-10-21，3 分 12 秒），工程在 Ray 本机 `~/Movies/ray-explainer/2026-10-21-spacex-xiaolin`。模板 `assets/styles/xiaolin/` 就是这个工程，去掉了素材。
+第一条成片是《马斯克给美国每个孩子发一股 SpaceX》横屏版（2026-10-21，3 分 12 秒），工程在 Ray 的外置盘「协作」`/Volumes/协作/ray-explainer/2026-10-21-spacex-xiaolin`。模板 `assets/styles/xiaolin/` 就是这个工程，去掉了素材。
 
-第二条是《你用 AI 没花钱，那国内这条 AI 产业链的钱是谁出的》（2026-10-25，5 分 50 秒），工程在 `~/Movies/ray-explainer/2026-10-25-china-ai-chain`。这一条换成了 Ray 的深色 IP 色板，去掉了盖章，加了 HeyGen 数字人出镜、ali 式左内容右人像卡、真实股价走势线和地铁线路图章节卡。它的 `hf/make_template.py` 用 Python 生成整页模板（图表从 CSV 画、重复的章节卡用函数生成），`hf/src/head.part` 里有下文提到的 `trace()`、`pie()`、`big()`、纸钞 `.bn` 等写法，做类似的片子先看这两个文件。下文「Ray 的修改记录」10-25 那几条都来自这期的三轮审片。
+第二条是《你用 AI 没花钱，那国内这条 AI 产业链的钱是谁出的》（2026-10-25，5 分 50 秒），工程在 `/Volumes/协作/ray-explainer/2026-10-25-china-ai-chain`。这一条换成了 Ray 的深色 IP 色板，去掉了盖章，加了 HeyGen 数字人出镜、ali 式左内容右人像卡、真实股价走势线和地铁线路图章节卡。它的 `hf/make_template.py` 用 Python 生成整页模板（图表从 CSV 画、重复的章节卡用函数生成），`hf/src/head.part` 里有下文提到的 `trace()`、`pie()`、`big()`、纸钞 `.bn` 等写法，做类似的片子先看这两个文件。下文「Ray 的修改记录」10-25 那几条都来自这期的三轮审片。
 
 ## 适合什么
 

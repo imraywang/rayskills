@@ -12,7 +12,7 @@ cut(){ n=$1; s=$2; ss=$3; d=$4; m=${5:-fill}
   keep) vf="scale=-2:1080";;
  esac
  ffmpeg -v error -y -ss $ss -t $d -i "$s" -an -vf "$vf" -r 30 -c:v libx264 -crf 20 -pix_fmt yuv420p "assets/v/$n.mp4" && echo "$n ok"; }
-R=raw; O=~/Movies/ray-explainer/2026-10-20-spacex-share-every-kid/hf/assets/video
+R=raw; O=/Volumes/协作/ray-explainer/2026-10-20-spacex-share-every-kid/hf/assets/video
 cut starship1 $R/starship.mp4 9.5 3.2
 cut starship2 $R/starship.mp4 17 3
 cut musk1 $R/musk.mp4 15 4
