@@ -1,0 +1,49 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #hook { position: absolute; inset: 0; overflow: hidden; }
+    .tile { position: absolute; left: 0; top: 0; width: 176px; height: 176px; border-radius: 40px; background: #fff; overflow: hidden;
+            box-shadow: 0 18px 40px rgba(17,17,17,0.16), 0 3px 8px rgba(17,17,17,0.1); }
+    .tile img { position: absolute; left: 0; top: 0; width: 176px; height: 176px; object-fit: contain; }
+    .tile.pad img { padding: 26px; }
+    #hook .tw { position: absolute; width: 176px; height: 176px; }
+    #hook .l1 { position: absolute; left: 0; right: 0; top: 118px; text-align: center; font-family: "HeiHeavy"; font-weight: 900; font-size: 66px; color: #111111; }
+    #hook .big { position: absolute; left: 0; right: 0; top: 196px; text-align: center; white-space: nowrap; }
+    #hook .big b { font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; font-size: 250px; line-height: 1; color: rgba(5,76,76,0.08);
+                   -webkit-text-stroke: 7px #054c4c; vertical-align: -18px; }
+    #hook .big span { font-family: "HeiHeavy"; font-weight: 900; font-size: 116px; color: #111111; margin-left: 18px; }
+    #hook .stat { position: absolute; top: 230px; width: 540px; text-align: center; }
+    #hook .stat b { display: block; white-space: nowrap; font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; font-size: 200px; line-height: 1; color: #111111; }
+    #hook .stat b small { font-family: "HeiHeavy"; font-style: normal; font-size: 110px; }
+    #hook .stat .lbl { display: block; margin-top: 26px; font-family: "HeiBold"; font-weight: 700; font-size: 50px; color: #767676; }
+    #hook .stat.r b { color: #054c4c; }
+    #hook .half { position: absolute; left: 0; right: 0; top: 120px; text-align: center; font-family: "HeiBold"; font-weight: 700; font-size: 50px; color: #767676; }
+  </style>
+  <div id="hook" data-composition-id="hook" data-width="1080" data-height="1920">
+    <div id="h-l1" class="l1">我每天离不开的</div>
+    <div id="h-big" class="big"><b>4</b><span>个工具</span></div>
+    <div class="tw" style="left:80px;top:470px"><div class="tile"><img src="assets/img/logo_obsidian.png" alt="" /></div></div>
+    <div class="tw" style="left:312px;top:470px"><div class="tile pad"><img src="assets/img/logo_claude.png" alt="" /></div></div>
+    <div class="tw" style="left:592px;top:470px"><div class="tile pad"><img src="assets/img/logo_hyperframes.svg" alt="" /></div></div>
+    <div class="tw" style="left:824px;top:470px"><div class="tile"><img src="assets/img/logo_tailscale.svg" alt="" /></div></div>
+    <div id="h-half" class="half">过去半年 · 一个人</div>
+    <div id="h-s1" class="stat" style="left:0"><b><span id="h-c1">0</span>+</b><span class="lbl">条视频</span></div>
+    <div id="h-s2" class="stat r" style="left:540px"><b><small>近</small><span id="h-c2">0</span><small>万</small></b><span class="lbl">全网粉丝</span></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 场景从 0 秒开始。「每天…离不开」→「四个」大字 →「就靠这四个」四个图标依次弹出 →「过去半年」切到两组数字
+    tl.fromTo("#h-l1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 0.5);
+    tl.fromTo("#h-big", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power3.out" }, 2.08);
+    tl.fromTo("#hook .tw", { opacity: 0, y: 40, scale: 0.7 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(1.6)", stagger: 0.13 }, 2.64);
+    tl.to(["#h-l1", "#h-big", "#hook .tw"], { opacity: 0, y: -40, duration: 0.25, ease: "power2.in" }, 3.3);
+    tl.fromTo("#h-half", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3 }, 3.45);
+    tl.fromTo("#h-s1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 4.4);
+    const c1 = { v: 0 }, c2 = { v: 0 };
+    tl.to(c1, { v: 100, duration: 0.6, ease: "power2.out", onUpdate: () => { document.getElementById("h-c1").textContent = Math.round(c1.v); } }, 4.75);
+    tl.fromTo("#h-s2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 6.2);
+    tl.to(c2, { v: 5, duration: 0.45, ease: "power2.out", onUpdate: () => { document.getElementById("h-c2").textContent = Math.round(c2.v); } }, 6.5);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

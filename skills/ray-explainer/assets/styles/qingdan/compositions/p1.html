@@ -1,0 +1,39 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #p1 { position: absolute; inset: 0; overflow: hidden; }
+    .card { position: absolute; left: 60px; top: 150px; width: 960px; height: 600px; border-radius: 36px; overflow: hidden;
+            background: #1b1b1b; box-shadow: 0 28px 60px rgba(17,17,17,0.22), 0 4px 12px rgba(17,17,17,0.12); }
+    .card img { position: absolute; left: 0; top: 0; width: 960px; height: 600px; object-fit: cover; object-position: 50% 0; }
+    .src { position: absolute; left: 66px; top: 92px; font-family: "JetBrains Mono", monospace; font-size: 30px; color: #767676; letter-spacing: 0.02em; }
+    .term { padding: 34px 40px; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 27px; line-height: 1.62; color: #d8d8d4; }
+    .term .bar { display: flex; gap: 12px; margin-bottom: 22px; }
+    .term .bar i { width: 18px; height: 18px; border-radius: 50%; background: #3a3a3a; display: block; }
+    .term .hd { color: #8c8c8c; margin-bottom: 8px; }
+    .term .row { white-space: nowrap; overflow: hidden; }
+    .term .k { color: #9cc2bf; } .term .s { color: #e8c9a0; } .term .d { color: #6e6e6e; } .term .g { color: #9cc2bf; }
+    #p1 .scan { position: absolute; left: 0; right: 0; top: 0; height: 120px; opacity: 0;
+                background: linear-gradient(180deg, rgba(156,194,191,0) 0%, rgba(156,194,191,0.35) 85%, #9cc2bf 100%); }
+  </style>
+  <div id="p1" data-composition-id="p1" data-width="1080" data-height="1920">
+    <div id="p1a-src" class="src">obsidian.md</div>
+    <div id="p1a" class="card"><img src="assets/img/shot_obsidian.jpg" alt="" /></div>
+    <div id="p1b-src" class="src">~/rays-brain · 本地文件夹</div>
+    <div id="p1b" class="card"><div class="term"><div class="bar"><i></i><i></i><i></i></div><div class="hd">~/rays-brain</div><div class="row"><span class="k">▸ 00-入口/</span>  <span class="d">首页、索引</span></div><div class="row"><span class="k">▸ 10-创作/</span>  <span class="d">灵感、选题、口播、文章</span></div><div class="row"><span class="k">▸ 20-知识/</span>  <span class="d">长期知识</span></div><div class="row"><span class="k">▸ 30-资料/</span>  <span class="d">剪藏、访谈、调研</span></div><div class="row"><span class="k">▸ 40-发布/</span>  <span class="d">已发布的每一条</span></div><div class="row"><span class="k">▸ 50-系统/</span>  <span class="d">模板、自动化</span></div><div class="row"><span class="k">▸ 60-素材/</span>  <span class="d">图片、视频</span></div><div class="row"><span class="k">▸ 70-思考/</span>  <span class="d">原则、当前关注</span></div><div class="row" style="margin-top:10px"><span class="g">4,201</span> <span class="d">× .md · 纯文本</span></div></div><div id="scan" class="scan"></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#p1a", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 0.0);
+    tl.fromTo("#p1a-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.10);
+    tl.to(["#p1a", "#p1a-src"], { opacity: 0, y: -30, duration: 0.25, ease: "power2.in" }, 4.25);
+    tl.fromTo("#p1b", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 4.3);
+    tl.fromTo("#p1b-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.40);
+    tl.fromTo("#p1a img", { scale: 1 }, { scale: 1.06, duration: 4.3, ease: "none", transformOrigin: "50% 0%" }, 0);
+    // 「AI 可以直接把你整个知识库从头读一遍」（18.9 秒）：一道扫描线从上扫到下，扫两遍
+    tl.set("#scan", { opacity: 1 }, 10.00);
+    tl.fromTo("#scan", { y: -120 }, { y: 600, duration: 1.1, ease: "none", repeat: 1 }, 10.00);
+    tl.set("#scan", { opacity: 0 }, 12.30);
+    window.__timelines["p1"] = tl;
+  </script>
+</template>

@@ -1,0 +1,35 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #p2 { position: absolute; inset: 0; overflow: hidden; }
+    .card { position: absolute; left: 60px; top: 150px; width: 960px; height: 600px; border-radius: 36px; overflow: hidden;
+            background: #1b1b1b; box-shadow: 0 28px 60px rgba(17,17,17,0.22), 0 4px 12px rgba(17,17,17,0.12); }
+    .card img { position: absolute; left: 0; top: 0; width: 960px; height: 600px; object-fit: cover; object-position: 50% 0; }
+    .src { position: absolute; left: 66px; top: 92px; font-family: "JetBrains Mono", monospace; font-size: 30px; color: #767676; letter-spacing: 0.02em; }
+    .term { padding: 34px 40px; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 27px; line-height: 1.62; color: #d8d8d4; }
+    .term .bar { display: flex; gap: 12px; margin-bottom: 22px; }
+    .term .bar i { width: 18px; height: 18px; border-radius: 50%; background: #3a3a3a; display: block; }
+    .term .hd { color: #8c8c8c; margin-bottom: 8px; }
+    .term .row { white-space: nowrap; overflow: hidden; }
+    .term .k { color: #9cc2bf; } .term .s { color: #e8c9a0; } .term .d { color: #6e6e6e; } .term .g { color: #9cc2bf; }
+  </style>
+  <div id="p2" data-composition-id="p2" data-width="1080" data-height="1920">
+    <div id="p2a-src" class="src">claude.com/product/claude-code</div>
+    <div id="p2a" class="card"><img src="assets/img/shot_claude.jpg" alt="" /></div>
+    <div id="p2b-src" class="src">rays-brain · 最近的提交</div>
+    <div id="p2b" class="card"><div class="term"><div class="bar"><i></i><i></i><i></i></div><div class="hd">$ git log --oneline</div><div class="row"><span class="s">a787482</span> 口播草稿：我每天离不开的四个生产力工具</div><div class="row"><span class="s">0631dd1</span> 清单口播包装拆解：Brock Mesarich</div><div class="row"><span class="s">971f676</span> 爆款雷达：TikHub 抓取 + 工作台雷达页</div><div class="row"><span class="s">2372ccd</span> 口播草稿：为什么企业上 AI 前半年看不到效果</div><div class="row"><span class="s">266502c</span> 候选选题：按爆款雷达规律列出 8 个题</div><div class="row"><span class="s">aaf59c7</span> 爆款选题雷达：方案稿与探针记录</div><div class="row d" style="margin-top:10px">Co-Authored-By: Claude</div></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#p2a", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 0.0);
+    tl.fromTo("#p2a-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.10);
+    tl.to(["#p2a", "#p2a-src"], { opacity: 0, y: -30, duration: 0.25, ease: "power2.in" }, 5.80);
+    tl.fromTo("#p2b", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 5.85);
+    tl.fromTo("#p2b-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 5.95);
+    tl.fromTo("#p2a img", { scale: 1 }, { scale: 1.06, duration: 5.8, ease: "none", transformOrigin: "50% 0%" }, 0);
+    // 「它撑起了我所有的内容生产」（32.4 秒）：提交记录逐行出现
+    tl.fromTo("#p2b .row", { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.2, stagger: 0.12 }, 6.00);
+    window.__timelines["p2"] = tl;
+  </script>
+</template>

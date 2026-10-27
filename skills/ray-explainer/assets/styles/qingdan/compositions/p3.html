@@ -1,0 +1,35 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #p3 { position: absolute; inset: 0; overflow: hidden; }
+    .card { position: absolute; left: 60px; top: 150px; width: 960px; height: 600px; border-radius: 36px; overflow: hidden;
+            background: #1b1b1b; box-shadow: 0 28px 60px rgba(17,17,17,0.22), 0 4px 12px rgba(17,17,17,0.12); }
+    .card img { position: absolute; left: 0; top: 0; width: 960px; height: 600px; object-fit: cover; object-position: 50% 0; }
+    .src { position: absolute; left: 66px; top: 92px; font-family: "JetBrains Mono", monospace; font-size: 30px; color: #767676; letter-spacing: 0.02em; }
+    .term { padding: 34px 40px; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 27px; line-height: 1.62; color: #d8d8d4; }
+    .term .bar { display: flex; gap: 12px; margin-bottom: 22px; }
+    .term .bar i { width: 18px; height: 18px; border-radius: 50%; background: #3a3a3a; display: block; }
+    .term .hd { color: #8c8c8c; margin-bottom: 8px; }
+    .term .row { white-space: nowrap; overflow: hidden; }
+    .term .k { color: #9cc2bf; } .term .s { color: #e8c9a0; } .term .d { color: #6e6e6e; } .term .g { color: #9cc2bf; }
+  </style>
+  <div id="p3" data-composition-id="p3" data-width="1080" data-height="1920">
+    <div id="p3a-src" class="src">github.com/heygen-com/hyperframes</div>
+    <div id="p3a" class="card"><img src="assets/img/shot_hyperframes.jpg" alt="" /></div>
+    <div id="p3b-src" class="src">这一集的编号卡</div>
+    <div id="p3b" class="card"><div class="term"><div class="bar"><i></i><i></i><i></i></div><div class="row"><span class="d">&lt;!-- compositions/n3.html --&gt;</span></div><div class="row"><span class="k">&lt;text</span> font-size=<span class="s">"440"</span></div><div class="row">  stroke=<span class="s">"url(#grad)"</span><span class="k">&gt;</span>#3<span class="k">&lt;/text&gt;</span></div><div class="row"><span class="k">&lt;div</span> class=<span class="s">"name"</span><span class="k">&gt;</span>HYPERFRAMES<span class="k">&lt;/div&gt;</span></div><div class="row">&nbsp;</div><div class="row">tl.<span class="k">fromTo</span>(<span class="s">"#n3-num"</span>,</div><div class="row">  { scale: <span class="g">1.18</span> }, { scale: <span class="g">1</span> }, <span class="g">0</span>);</div></div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#p3a", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 0.0);
+    tl.fromTo("#p3a-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.10);
+    tl.to(["#p3a", "#p3a-src"], { opacity: 0, y: -30, duration: 0.25, ease: "power2.in" }, 8.40);
+    tl.fromTo("#p3b", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 8.45);
+    tl.fromTo("#p3b-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.55);
+    tl.fromTo("#p3a img", { scale: 1 }, { scale: 1.06, duration: 8.4, ease: "none", transformOrigin: "50% 0%" }, 0);
+    // 「你现在看到这些编号和卡片」（47.5 秒）：换成本片编号卡的源码
+    tl.fromTo("#p3b .row", { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.1 }, 8.60);
+    window.__timelines["p3"] = tl;
+  </script>
+</template>

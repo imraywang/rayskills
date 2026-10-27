@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f4f1ea; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+      /* 奶油底：两团很淡的暖色光，模拟窗边的光影 */
+      #bg { position: absolute; inset: 0; background:
+              radial-gradient(900px 700px at 88% 6%, rgba(255,255,255,0.75), rgba(255,255,255,0) 70%),
+              radial-gradient(800px 900px at 0% 60%, rgba(214,204,186,0.35), rgba(214,204,186,0) 70%), #f4f1ea; }
+      /* 探头真人：窗里放原片，窗上沿以上只放抠像，头顶越出窗框 */
+      #pop-win { position: absolute; left: 60px; top: 1210px; width: 960px; height: 760px; border-radius: 44px; overflow: hidden;
+                 box-shadow: 0 30px 70px rgba(17,17,17,0.20), 0 4px 14px rgba(17,17,17,0.12); }
+      #pop-win video { position: absolute; left: -60px; top: -250px; width: 1080px; height: 960px; }
+      #pop-out { position: absolute; left: 0; top: 960px; width: 1080px; height: 250px; overflow: hidden; }
+      #pop-out video { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }
+      /* 全屏真人（编号卡、判断句） */
+      #face-a-wrap { position: absolute; inset: 0; transform-origin: 50% 32%; }
+      #face-a-wrap video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+    </style>
+  </head>
+  <body>
+    <!-- 清单口播：奶油底 + 探头真人（H/P/R/C）与全屏真人（N/F）硬切交替。镜头表在 build.py。 -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="81.6" data-width="1080" data-height="1920">
+      <div id="bg"></div>
+      <!-- 结尾垫一帧，免得画面比导流卡先结束 -->
+      <img id="end-still" class="clip" src="assets/img/end_still_pop.jpg" alt="" data-start="81.37" data-duration="0.23" data-track-index="0" style="position:absolute;left:60px;top:1210px;width:960px;height:710px;object-fit:cover;object-position:50% 0;border-radius:44px;z-index:1" />
+      <div id="pop-win" style="z-index:2">
+        <video id="pw-hook" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="0" data-duration="7.6" data-media-start="0" data-track-index="1"></video>
+        <video id="pw-p1" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="8.9" data-duration="15.35" data-media-start="8.9" data-track-index="1"></video>
+        <video id="pw-p2" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="26.45" data-duration="10.85" data-media-start="26.45" data-track-index="1"></video>
+        <video id="pw-p3" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="38.95" data-duration="12" data-media-start="38.95" data-track-index="1"></video>
+        <video id="pw-p4" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="52.25" data-duration="12.45" data-media-start="52.25" data-track-index="1"></video>
+        <video id="pw-recap" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="64.7" data-duration="7.5" data-media-start="64.7" data-track-index="1"></video>
+        <video id="pw-cta" class="clip" src="assets/footage/face_pop.mp4" muted playsinline data-start="77.35" data-duration="4.12" data-media-start="77.35" data-track-index="1"></video>
+      </div>
+      <div id="pop-out" style="z-index:3">
+        <video id="pm-hook" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="0" data-duration="7.6" data-media-start="0" data-track-index="2"></video>
+        <video id="pm-p1" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="8.9" data-duration="15.35" data-media-start="8.9" data-track-index="2"></video>
+        <video id="pm-p2" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="26.45" data-duration="10.85" data-media-start="26.45" data-track-index="2"></video>
+        <video id="pm-p3" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="38.95" data-duration="12" data-media-start="38.95" data-track-index="2"></video>
+        <video id="pm-p4" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="52.25" data-duration="12.45" data-media-start="52.25" data-track-index="2"></video>
+        <video id="pm-recap" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="64.7" data-duration="7.5" data-media-start="64.7" data-track-index="2"></video>
+        <video id="pm-cta" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="77.35" data-duration="4.12" data-media-start="77.35" data-track-index="2"></video>
+      </div>
+      <div id="face-a-wrap" style="z-index:6">
+        <video id="fa-n1" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="7.6" data-duration="1.3" data-media-start="7.6" data-track-index="3"></video>
+        <video id="fa-n2" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="24.25" data-duration="2.2" data-media-start="24.25" data-track-index="3"></video>
+        <video id="fa-n3" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="37.3" data-duration="1.65" data-media-start="37.3" data-track-index="3"></video>
+        <video id="fa-n4" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="50.95" data-duration="1.3" data-media-start="50.95" data-track-index="3"></video>
+        <video id="fa-judge" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="72.2" data-duration="5.15" data-media-start="72.2" data-track-index="3"></video>
+      </div>
+
+      <div id="h-hook" data-composition-id="hook" data-composition-src="compositions/hook.html" data-start="0" data-duration="7.6" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-n1" data-composition-id="n1" data-composition-src="compositions/n1.html" data-start="7.6" data-duration="1.3" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
+      <div id="h-p1" data-composition-id="p1" data-composition-src="compositions/p1.html" data-start="8.9" data-duration="15.35" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-n2" data-composition-id="n2" data-composition-src="compositions/n2.html" data-start="24.25" data-duration="2.2" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
+      <div id="h-p2" data-composition-id="p2" data-composition-src="compositions/p2.html" data-start="26.45" data-duration="10.85" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-n3" data-composition-id="n3" data-composition-src="compositions/n3.html" data-start="37.3" data-duration="1.65" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
+      <div id="h-p3" data-composition-id="p3" data-composition-src="compositions/p3.html" data-start="38.95" data-duration="12" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-n4" data-composition-id="n4" data-composition-src="compositions/n4.html" data-start="50.95" data-duration="1.3" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
+      <div id="h-p4" data-composition-id="p4" data-composition-src="compositions/p4.html" data-start="52.25" data-duration="12.45" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-recap" data-composition-id="recap" data-composition-src="compositions/recap.html" data-start="64.7" data-duration="7.5" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="h-cta" data-composition-id="cta" data-composition-src="compositions/cta.html" data-start="77.35" data-duration="4.25" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
+
+      <div id="captions-host" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="81.6" data-track-index="7" data-track-kind="captions" data-width="1080" data-height="1920" style="z-index:10"></div>
+
+      <!-- 人声：原片去掉句间吸气（gate_breaths.py），时间轴不变 -->
+      <audio id="voice" class="clip" src="assets/footage/voice.wav" data-start="0" data-duration="81.47" data-media-start="0" data-volume="1" data-track-index="8"></audio>
+      <audio id="bgm" class="clip" src="assets/audio/bgm.m4a" data-start="0" data-duration="81.6" data-media-start="0" data-volume="0.3" data-track-index="9"></audio>
+      <audio id="sfx-n1" class="clip" src="assets/audio/whoosh.wav" data-start="7.48" data-duration="0.7" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-n2" class="clip" src="assets/audio/whoosh.wav" data-start="24.13" data-duration="0.7" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-n3" class="clip" src="assets/audio/whoosh.wav" data-start="37.18" data-duration="0.7" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-n4" class="clip" src="assets/audio/whoosh.wav" data-start="50.83" data-duration="0.7" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-tiles" class="clip" src="assets/audio/click.wav" data-start="2.64" data-duration="0.05" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-100" class="clip" src="assets/audio/ding.wav" data-start="5.3" data-duration="0.7" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-5w" class="clip" src="assets/audio/ding.wav" data-start="6.9" data-duration="0.7" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-phone" class="clip" src="assets/audio/click.wav" data-start="55.95" data-duration="0.05" data-volume="0.45" data-track-index="10"></audio>
+      <audio id="sfx-line" class="clip" src="assets/audio/whoosh.wav" data-start="65.95" data-duration="0.7" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-r1" class="clip" src="assets/audio/click.wav" data-start="67.37" data-duration="0.05" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-r2" class="clip" src="assets/audio/click.wav" data-start="68.41" data-duration="0.05" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-r3" class="clip" src="assets/audio/click.wav" data-start="69.73" data-duration="0.05" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-r4" class="clip" src="assets/audio/click.wav" data-start="71.57" data-duration="0.05" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-kw" class="clip" src="assets/audio/ding.wav" data-start="77.98" data-duration="0.7" data-volume="0.35" data-track-index="10"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      // 判断句「串联」上推近
+      tl.set("#face-a-wrap", { scale: 1 }, 72.2);
+      tl.to("#face-a-wrap", { scale: 1.08, duration: 0.22, ease: "power2.out" }, 75.3);
+      tl.set("#face-a-wrap", { scale: 1 }, 77.35);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #n4 { position: absolute; inset: 0; overflow: hidden; }
+    #n4 svg { position: absolute; left: 0; top: 1150px; width: 1080px; height: 460px; overflow: visible; }
+    #n4 .name { position: absolute; left: 0; right: 0; top: 1490px; text-align: center; font-family: "Playfair Display", serif;
+              font-style: italic; font-weight: 900; font-size: 86px; color: #fff; letter-spacing: 0.01em;
+              text-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.35); }
+    #n4 .name span { display: inline-block; }
+  </style>
+  <div id="n4" data-composition-id="n4" data-width="1080" data-height="1920">
+    <svg viewBox="0 0 1080 460" data-layout-allow-overlap>
+      <defs><linearGradient id="n4-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9cc2bf"/><stop offset="1" stop-color="#054c4c"/></linearGradient></defs>
+      <g id="n4-num"><text x="540" y="400" text-anchor="middle" font-family="Playfair Display" font-style="italic" font-weight="900" font-size="440"
+        fill="rgba(5,76,76,0.10)" stroke="url(#n4-g)" stroke-width="7" paint-order="stroke">#4</text></g>
+    </svg>
+    <div id="n4-name" class="name" data-layout-allow-overlap><span class="ch">T</span><span class="ch">A</span><span class="ch">I</span><span class="ch">L</span><span class="ch">S</span><span class="ch">C</span><span class="ch">A</span><span class="ch">L</span><span class="ch">E</span></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 硬切进来：编号先落下，名字逐个字母跟上
+    tl.fromTo("#n4-num", { opacity: 0, scale: 1.18, transformOrigin: "540px 260px" }, { opacity: 1, scale: 1, duration: 0.28, ease: "power3.out" }, 0);
+    tl.fromTo("#n4-name .ch", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out", stagger: 0.03 }, 0.2);
+    window.__timelines["n4"] = tl;
+  </script>
+</template>

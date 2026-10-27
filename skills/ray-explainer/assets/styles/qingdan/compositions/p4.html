@@ -1,0 +1,35 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #p4 { position: absolute; inset: 0; overflow: hidden; }
+    .card { position: absolute; left: 60px; top: 150px; width: 960px; height: 600px; border-radius: 36px; overflow: hidden;
+            background: #1b1b1b; box-shadow: 0 28px 60px rgba(17,17,17,0.22), 0 4px 12px rgba(17,17,17,0.12); }
+    .card img { position: absolute; left: 0; top: 0; width: 960px; height: 600px; object-fit: cover; object-position: 50% 0; }
+    .src { position: absolute; left: 66px; top: 92px; font-family: "JetBrains Mono", monospace; font-size: 30px; color: #767676; letter-spacing: 0.02em; }
+    .term { padding: 34px 40px; font-family: "JetBrains Mono", "HeiBold", monospace; font-size: 27px; line-height: 1.62; color: #d8d8d4; }
+    .term .bar { display: flex; gap: 12px; margin-bottom: 22px; }
+    .term .bar i { width: 18px; height: 18px; border-radius: 50%; background: #3a3a3a; display: block; }
+    .term .hd { color: #8c8c8c; margin-bottom: 8px; }
+    .term .row { white-space: nowrap; overflow: hidden; }
+    .term .k { color: #9cc2bf; } .term .s { color: #e8c9a0; } .term .d { color: #6e6e6e; } .term .g { color: #9cc2bf; }
+    #p4 .phone { position: absolute; left: 380px; top: 110px; width: 320px; height: 692px; border-radius: 52px; background: #111; padding: 11px;
+                 box-shadow: 0 30px 70px rgba(17,17,17,0.28); }
+    #p4 .phone img { width: 298px; height: 670px; border-radius: 42px; object-fit: cover; object-position: 50% 0; display: block; }
+  </style>
+  <div id="p4" data-composition-id="p4" data-width="1080" data-height="1920">
+    <div id="p4a-src" class="src">tailscale.com</div>
+    <div id="p4a" class="card"><img src="assets/img/shot_tailscale.jpg" alt="" /></div>
+    <div id="p4b" class="phone"><img src="assets/img/shot_phone.jpg" alt="" /></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 「我在外面掏出手机」（55.7 秒）：网页卡退场，手机从下面立起来
+    tl.fromTo("#p4a", { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 0);
+    tl.fromTo("#p4a-src", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+    tl.fromTo("#p4a img", { scale: 1 }, { scale: 1.06, duration: 3.4, ease: "none", transformOrigin: "50% 0%" }, 0);
+    tl.to(["#p4a", "#p4a-src"], { opacity: 0, y: -30, duration: 0.25, ease: "power2.in" }, 3.50);
+    tl.fromTo("#p4b", { opacity: 0, y: 120, rotation: 6 }, { opacity: 1, y: 0, rotation: 0, duration: 0.5, ease: "power3.out" }, 3.70);
+    window.__timelines["p4"] = tl;
+  </script>
+</template>

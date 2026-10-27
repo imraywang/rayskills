@@ -1,0 +1,130 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #captions { position: absolute; inset: 0; pointer-events: none; }
+    #captions .cap { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }
+    /* 奶油底：一次一个词，压在截图卡和探头真人之间 */
+    #captions .cap.mid { top: 846px; font-family: "HeiHeavy"; font-weight: 900; font-size: 84px; color: #111111; letter-spacing: 0.01em; }
+    #captions .cap.mid em { font-style: normal; color: #054c4c; }
+    /* 全屏真人：白字带阴影，偏下 */
+    #captions .cap.low { top: 1330px; font-family: "HeiHeavy"; font-weight: 900; font-size: 76px; color: #fff;
+                         text-shadow: 0 4px 18px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.5); }
+    #captions .cap.low em { font-style: normal; color: #9cc2bf; }
+  </style>
+  <div id="captions" data-composition-id="captions" data-width="1080" data-height="1920">
+    <!-- 一次一个词：由 build.py 按逐字时间生成，改字改时间去那里改 -->
+    <div id="c001" class="cap mid clip" data-start="8.9" data-duration="0.4"><span>我看到的</span></div>
+    <div id="c002" class="cap mid clip" data-start="9.3" data-duration="0.44"><span>文章</span></div>
+    <div id="c003" class="cap mid clip" data-start="9.74" data-duration="0.32"><span>突然</span></div>
+    <div id="c004" class="cap mid clip" data-start="10.06" data-duration="0.44"><span>冒出来的</span></div>
+    <div id="c005" class="cap mid clip" data-start="10.5" data-duration="0.48"><span>想法</span></div>
+    <div id="c006" class="cap mid clip" data-start="10.98" data-duration="0.6"><span>写到一半的</span></div>
+    <div id="c007" class="cap mid clip" data-start="11.58" data-duration="0.44"><span>稿子</span></div>
+    <div id="c008" class="cap mid clip" data-start="12.02" data-duration="0.4"><span>全部</span></div>
+    <div id="c009" class="cap mid clip" data-start="12.42" data-duration="0.84"><span>存在这里</span></div>
+    <div id="c010" class="cap mid clip" data-start="13.26" data-duration="0.86"><span>最关键的是</span></div>
+    <div id="c011" class="cap mid clip" data-start="14.12" data-duration="0.42"><span>它就是</span></div>
+    <div id="c012" class="cap mid clip" data-start="14.54" data-duration="0.48"><span>存在</span></div>
+    <div id="c013" class="cap mid clip" data-start="15.02" data-duration="0.32"><span>你自己</span></div>
+    <div id="c014" class="cap mid clip" data-start="15.34" data-duration="0.46"><span>电脑上的</span></div>
+    <div id="c015" class="cap mid clip" data-start="15.8" data-duration="0.74"><span><em>普通文件</em></span></div>
+    <div id="c016" class="cap mid clip" data-start="16.54" data-duration="0.48"><span>不锁在</span></div>
+    <div id="c017" class="cap mid clip" data-start="17.02" data-duration="0.38"><span>任何的</span></div>
+    <div id="c018" class="cap mid clip" data-start="17.4" data-duration="0.4"><span>一个平台</span></div>
+    <div id="c019" class="cap mid clip" data-start="17.8" data-duration="0.68"><span>里面</span></div>
+    <div id="c020" class="cap mid clip" data-start="18.48" data-duration="0.14"><span>所以</span></div>
+    <div id="c021" class="cap mid clip" data-start="18.62" data-duration="0.3"><span>AI</span></div>
+    <div id="c022" class="cap mid clip" data-start="18.92" data-duration="0.58"><span>可以直接</span></div>
+    <div id="c023" class="cap mid clip" data-start="19.5" data-duration="0.4"><span>把你</span></div>
+    <div id="c024" class="cap mid clip" data-start="19.9" data-duration="0.6"><span>整个知识库</span></div>
+    <div id="c025" class="cap mid clip" data-start="20.5" data-duration="0.4"><span>从头</span></div>
+    <div id="c026" class="cap mid clip" data-start="20.9" data-duration="0.74"><span>读一遍</span></div>
+    <div id="c027" class="cap mid clip" data-start="21.64" data-duration="0.56"><span>这个价值</span></div>
+    <div id="c028" class="cap mid clip" data-start="22.2" data-duration="0.3"><span>也会</span></div>
+    <div id="c029" class="cap mid clip" data-start="22.5" data-duration="0.32"><span>随着</span></div>
+    <div id="c030" class="cap mid clip" data-start="22.82" data-duration="0.6"><span>你的使用</span></div>
+    <div id="c031" class="cap mid clip" data-start="23.42" data-duration="0.83"><span>越来越大</span></div>
+    <div id="c032" class="cap mid clip" data-start="26.46" data-duration="0.46"><span>我是让它</span></div>
+    <div id="c033" class="cap mid clip" data-start="26.92" data-duration="0.28"><span>直接</span></div>
+    <div id="c034" class="cap mid clip" data-start="27.2" data-duration="0.42"><span><em>住进</em></span></div>
+    <div id="c035" class="cap mid clip" data-start="27.62" data-duration="0.76"><span>我的知识库</span></div>
+    <div id="c036" class="cap mid clip" data-start="28.38" data-duration="0.3"><span>读我的</span></div>
+    <div id="c037" class="cap mid clip" data-start="28.68" data-duration="0.4"><span>笔记</span></div>
+    <div id="c038" class="cap mid clip" data-start="29.08" data-duration="0.34"><span>帮我</span></div>
+    <div id="c039" class="cap mid clip" data-start="29.42" data-duration="0.64"><span>写稿</span></div>
+    <div id="c040" class="cap mid clip" data-start="30.06" data-duration="0.48"><span>写代码</span></div>
+    <div id="c041" class="cap mid clip" data-start="30.54" data-duration="0.46"><span>把整套</span></div>
+    <div id="c042" class="cap mid clip" data-start="31.0" data-duration="0.34"><span>流程</span></div>
+    <div id="c043" class="cap mid clip" data-start="31.34" data-duration="1.04"><span>都给跑完</span></div>
+    <div id="c044" class="cap mid clip" data-start="32.38" data-duration="0.56"><span>它撑起了</span></div>
+    <div id="c045" class="cap mid clip" data-start="32.94" data-duration="0.54"><span>我所有的</span></div>
+    <div id="c046" class="cap mid clip" data-start="33.48" data-duration="0.52"><span>内容生产</span></div>
+    <div id="c047" class="cap mid clip" data-start="34.0" data-duration="0.72"><span>需要</span></div>
+    <div id="c048" class="cap mid clip" data-start="34.72" data-duration="0.68"><span>从文章</span></div>
+    <div id="c049" class="cap mid clip" data-start="35.4" data-duration="0.52"><span>APP</span></div>
+    <div id="c050" class="cap mid clip" data-start="35.92" data-duration="0.28"><span>视频</span></div>
+    <div id="c051" class="cap mid clip" data-start="36.2" data-duration="0.48"><span>都是它</span></div>
+    <div id="c052" class="cap mid clip" data-start="36.68" data-duration="0.62"><span>来完成的</span></div>
+    <div id="c053" class="cap mid clip" data-start="38.98" data-duration="0.5"><span>这是一个</span></div>
+    <div id="c054" class="cap mid clip" data-start="39.48" data-duration="1.0"><span>用网页代码</span></div>
+    <div id="c055" class="cap mid clip" data-start="40.48" data-duration="0.58"><span>做视频的</span></div>
+    <div id="c056" class="cap mid clip" data-start="41.06" data-duration="0.86"><span>开源工具</span></div>
+    <div id="c057" class="cap mid clip" data-start="41.92" data-duration="0.3"><span>我不会</span></div>
+    <div id="c058" class="cap mid clip" data-start="42.22" data-duration="0.62"><span>剪辑</span></div>
+    <div id="c059" class="cap mid clip" data-start="42.84" data-duration="0.76"><span>字幕</span></div>
+    <div id="c060" class="cap mid clip" data-start="43.6" data-duration="0.52"><span>卡片</span></div>
+    <div id="c061" class="cap mid clip" data-start="44.12" data-duration="0.32"><span>动画</span></div>
+    <div id="c062" class="cap mid clip" data-start="44.44" data-duration="0.28"><span>全部</span></div>
+    <div id="c063" class="cap mid clip" data-start="44.72" data-duration="0.46"><span>让AI</span></div>
+    <div id="c064" class="cap mid clip" data-start="45.18" data-duration="0.88"><span>写成网页</span></div>
+    <div id="c065" class="cap mid clip" data-start="46.06" data-duration="0.42"><span>再渲染</span></div>
+    <div id="c066" class="cap mid clip" data-start="46.48" data-duration="1.0"><span>成视频</span></div>
+    <div id="c067" class="cap mid clip" data-start="47.48" data-duration="0.32"><span>你现在</span></div>
+    <div id="c068" class="cap mid clip" data-start="47.8" data-duration="0.3"><span>看到</span></div>
+    <div id="c069" class="cap mid clip" data-start="48.1" data-duration="0.78"><span>这些编号</span></div>
+    <div id="c070" class="cap mid clip" data-start="48.88" data-duration="0.64"><span>和卡片</span></div>
+    <div id="c071" class="cap mid clip" data-start="49.52" data-duration="0.26"><span>就是</span></div>
+    <div id="c072" class="cap mid clip" data-start="49.78" data-duration="0.18"><span>这么</span></div>
+    <div id="c073" class="cap mid clip" data-start="49.96" data-duration="0.99"><span><em>做出来的</em></span></div>
+    <div id="c074" class="cap mid clip" data-start="52.28" data-duration="0.44"><span>它能让</span></div>
+    <div id="c075" class="cap mid clip" data-start="52.72" data-duration="0.76"><span>你的手机</span></div>
+    <div id="c076" class="cap mid clip" data-start="53.48" data-duration="0.72"><span>在任何地方</span></div>
+    <div id="c077" class="cap mid clip" data-start="54.2" data-duration="0.52"><span>都连回</span></div>
+    <div id="c078" class="cap mid clip" data-start="54.72" data-duration="0.44"><span>家里的</span></div>
+    <div id="c079" class="cap mid clip" data-start="55.16" data-duration="0.54"><span>那台电脑</span></div>
+    <div id="c080" class="cap mid clip" data-start="55.7" data-duration="0.68"><span>我在外面</span></div>
+    <div id="c081" class="cap mid clip" data-start="56.38" data-duration="0.68"><span>掏出手机</span></div>
+    <div id="c082" class="cap mid clip" data-start="57.06" data-duration="0.54"><span>就能打开</span></div>
+    <div id="c083" class="cap mid clip" data-start="57.6" data-duration="0.5"><span>我自己的</span></div>
+    <div id="c084" class="cap mid clip" data-start="58.1" data-duration="0.7"><span><em>工作台</em></span></div>
+    <div id="c085" class="cap mid clip" data-start="58.8" data-duration="0.4"><span>看今天的</span></div>
+    <div id="c086" class="cap mid clip" data-start="59.2" data-duration="0.66"><span>选题</span></div>
+    <div id="c087" class="cap mid clip" data-start="59.86" data-duration="0.32"><span>审刚</span></div>
+    <div id="c088" class="cap mid clip" data-start="60.18" data-duration="0.56"><span>渲染好的</span></div>
+    <div id="c089" class="cap mid clip" data-start="60.74" data-duration="0.54"><span>片子</span></div>
+    <div id="c090" class="cap mid clip" data-start="61.28" data-duration="0.28"><span>随手</span></div>
+    <div id="c091" class="cap mid clip" data-start="61.56" data-duration="0.34"><span>记一个</span></div>
+    <div id="c092" class="cap mid clip" data-start="61.9" data-duration="0.76"><span>灵感</span></div>
+    <div id="c093" class="cap mid clip" data-start="62.66" data-duration="0.32"><span>跟坐在</span></div>
+    <div id="c094" class="cap mid clip" data-start="62.98" data-duration="0.54"><span>电脑前面</span></div>
+    <div id="c095" class="cap mid clip" data-start="63.52" data-duration="0.24"><span>没有</span></div>
+    <div id="c096" class="cap mid clip" data-start="63.76" data-duration="0.38"><span>任何的</span></div>
+    <div id="c097" class="cap mid clip" data-start="64.14" data-duration="0.56"><span>区别</span></div>
+    <div id="c098" class="cap low clip" data-start="72.3" data-duration="0.38"><span>工具</span></div>
+    <div id="c099" class="cap low clip" data-start="72.68" data-duration="0.14"><span>真的</span></div>
+    <div id="c100" class="cap low clip" data-start="72.82" data-duration="0.46"><span>不在于</span></div>
+    <div id="c101" class="cap low clip" data-start="73.28" data-duration="0.68"><span>多少</span></div>
+    <div id="c102" class="cap low clip" data-start="73.96" data-duration="0.4"><span>而是在于</span></div>
+    <div id="c103" class="cap low clip" data-start="74.36" data-duration="0.38"><span>你能不能</span></div>
+    <div id="c104" class="cap low clip" data-start="74.74" data-duration="0.52"><span>把它们</span></div>
+    <div id="c105" class="cap low clip" data-start="75.26" data-duration="0.54"><span>给<em>串联</em></span></div>
+    <div id="c106" class="cap low clip" data-start="75.8" data-duration="0.38"><span>起来</span></div>
+    <div id="c107" class="cap low clip" data-start="76.18" data-duration="0.22"><span>变成</span></div>
+    <div id="c108" class="cap low clip" data-start="76.4" data-duration="0.4"><span>你真正的</span></div>
+    <div id="c109" class="cap low clip" data-start="76.8" data-duration="0.55"><span>生产力</span></div>
+  </div>
+  <script>
+    window.__timelines["captions"] = gsap.timeline({ paused: true });
+  </script>
+</template>

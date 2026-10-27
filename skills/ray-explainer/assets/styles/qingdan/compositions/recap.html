@@ -1,0 +1,40 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #recap { position: absolute; inset: 0; overflow: hidden; }
+    .tile { position: absolute; left: 0; top: 0; width: 176px; height: 176px; border-radius: 40px; background: #fff; overflow: hidden;
+            box-shadow: 0 18px 40px rgba(17,17,17,0.16), 0 3px 8px rgba(17,17,17,0.1); }
+    .tile img { position: absolute; left: 0; top: 0; width: 176px; height: 176px; object-fit: contain; }
+    .tile.pad img { padding: 26px; }
+    #recap .tw { position: absolute; width: 176px; height: 330px; }
+    #recap .lab { position: absolute; left: 0; right: 0; top: 210px; text-align: center; font-family: "HeiHeavy"; font-weight: 900; font-size: 96px; color: #054c4c; }
+    #recap svg { position: absolute; left: 0; top: 0; width: 1080px; height: 900px; }
+    #recap .ttl { position: absolute; left: 0; right: 0; top: 140px; text-align: center; font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; font-size: 64px; color: #767676; }
+  </style>
+  <div id="recap" data-composition-id="recap" data-width="1080" data-height="1920">
+    <svg viewBox="0 0 1080 900"><line id="r-line" x1="158" y1="388" x2="922" y2="388" stroke="#054c4c" stroke-width="10" stroke-linecap="round" stroke-dasharray="764" stroke-dashoffset="764"/></svg>
+    <div id="r-ttl" class="ttl">one line</div>
+    <div class="tw" id="rt-0" style="left:70px;top:300px"><div class="tile"><img src="assets/img/logo_obsidian.png" alt="" /></div><div class="lab" id="lab-0">存</div></div>
+    <div class="tw" id="rt-1" style="left:318px;top:300px"><div class="tile pad"><img src="assets/img/logo_claude.png" alt="" /></div><div class="lab" id="lab-1">想</div></div>
+    <div class="tw" id="rt-2" style="left:586px;top:300px"><div class="tile pad"><img src="assets/img/logo_hyperframes.svg" alt="" /></div><div class="lab" id="lab-2">做</div></div>
+    <div class="tw" id="rt-3" style="left:834px;top:300px"><div class="tile"><img src="assets/img/logo_tailscale.svg" alt="" /></div><div class="lab" id="lab-3">带</div></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 场景从 64.7 秒开始。「这四个」四个图标进；「一条线」（66.0）画线；存 / 想 / 做 / 带 各落在说到的字上
+    tl.fromTo("#recap .tw", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out", stagger: 0.08 }, 0.40);
+    tl.set("#recap .lab", { opacity: 0 }, 0);
+    tl.to("#r-line", { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 1.30);
+    tl.fromTo("#r-ttl", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.40);
+    tl.fromTo("#lab-0", { opacity: 0, y: 24, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(2)" }, 2.67);
+    tl.fromTo("#rt-0 .tile", { scale: 1 }, { scale: 1.1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 2.67);
+    tl.fromTo("#lab-1", { opacity: 0, y: 24, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(2)" }, 3.71);
+    tl.fromTo("#rt-1 .tile", { scale: 1 }, { scale: 1.1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 3.71);
+    tl.fromTo("#lab-2", { opacity: 0, y: 24, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(2)" }, 5.03);
+    tl.fromTo("#rt-2 .tile", { scale: 1 }, { scale: 1.1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 5.03);
+    tl.fromTo("#lab-3", { opacity: 0, y: 24, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(2)" }, 6.87);
+    tl.fromTo("#rt-3 .tile", { scale: 1 }, { scale: 1.1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 6.87);
+    window.__timelines["recap"] = tl;
+  </script>
+</template>

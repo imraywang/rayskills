@@ -1,0 +1,26 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #cta { position: absolute; inset: 0; overflow: hidden; }
+    #cta .gcard { position: absolute; left: 60px; top: 150px; width: 960px; height: 250px; border-radius: 36px; background: #054c4c;
+                  box-shadow: 0 28px 60px rgba(5,76,76,0.28); }
+    #cta .gcard span { position: absolute; left: 0; right: 0; top: 78px; text-align: center; font-family: "HeiBold"; font-weight: 700; font-size: 72px; color: #f3f3f0; letter-spacing: 0.08em; }
+    #cta .kw { position: absolute; left: 0; right: 0; top: 450px; text-align: center; font-family: "HeiHeavy"; font-weight: 900; font-size: 200px; line-height: 1; color: #111111; }
+    #cta .kw em { font-style: normal; color: #054c4c; }
+    #cta .sub { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-family: "HeiBold"; font-weight: 700; font-size: 46px; color: #767676; }
+  </style>
+  <div id="cta" data-composition-id="cta" data-width="1080" data-height="1920">
+    <div id="c-card" class="gcard"><span>评论区打</span></div>
+    <div id="c-kw" class="kw"><em>「</em>工具<em>」</em></div>
+    <div id="c-sub" class="sub">上手清单 + 我的配置</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 场景从 77.35 秒开始：「评论区打」→「工具」（78.0）→「上手清单和配置」（79.3）
+    tl.fromTo("#c-card", { opacity: 0, y: 50, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" }, 0.05);
+    tl.fromTo("#c-kw", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.63);
+    tl.fromTo("#c-sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.3 }, 1.95);
+    window.__timelines["cta"] = tl;
+  </script>
+</template>
