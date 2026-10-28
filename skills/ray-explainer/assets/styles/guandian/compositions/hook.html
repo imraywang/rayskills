@@ -1,0 +1,71 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #hook { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; overflow: hidden; }
+    #hook .ttl { position: absolute; left: 0; right: 0; top: 74px; text-align: center; font-family: "HeiHeavy"; font-weight: 900; font-size: 64px; color: #111111; white-space: nowrap; }
+    #hook .ttl i { font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; color: #054c4c; margin-right: 18px; }
+    #hook .doc { position: absolute; left: 330px; top: 210px; width: 690px; height: 560px; border-radius: 30px; background: #ffffff;
+                 border: 2px solid rgba(17,17,17,0.10); box-shadow: 0 30px 70px rgba(0,0,0,0.14); padding: 40px 44px; overflow: hidden; }
+    #hook .doc .hd { font-family: "JetBrains Mono", monospace; font-size: 24px; color: #767676; letter-spacing: 0.04em; margin-bottom: 22px; }
+    #hook .doc p { font-family: "HeiBold"; font-weight: 700; font-size: 40px; line-height: 1.5; color: #111111; margin-bottom: 18px; }
+    #hook .doc p.dim { color: #b9b6ae; }
+    #hook .doc .ch { opacity: 0; display: inline-block; white-space: pre; }
+    #hook .doc em { font-style: normal; color: #054c4c; }
+    #hook .ladw { position: absolute; left: 340px; top: 190px; width: 400px; height: 620px; }
+    #hook .mini { position: absolute; left: 40px; top: 230px; width: 240px; height: 372px; opacity: 0; }
+    #hook .cam { position: absolute; inset: 0; transform-origin: 50% 42%; }
+    #hook .tc { display: inline-block; white-space: pre; }
+    #hook .pc { position: absolute; top: 230px; width: 380px; height: 470px; border-radius: 30px; background: #fff; border: 2px solid rgba(17,17,17,0.08); box-shadow: 0 24px 50px rgba(17,17,17,0.12); overflow: hidden; }
+    #hook .pc img { position: absolute; left: 0; top: 0; width: 380px; height: 360px; object-fit: cover; object-position: 50% 0; }
+    #hook .pc .views { position: absolute; left: 0; right: 0; bottom: 28px; display: flex; align-items: center; justify-content: center; gap: 12px; white-space: nowrap;
+                       font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 50px; letter-spacing: -0.02em; }
+    #hook .pc .views svg { flex: none; }
+    #hook .src { position: absolute; left: 0; right: 0; top: 724px; text-align: center; font-family: "HeiBold"; font-weight: 700; font-size: 26px; color: #767676; }
+    #hook .vs { position: absolute; left: 0; right: 0; top: 420px; text-align: center; font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; font-size: 64px; color: #9a978f; }
+  </style>
+  <div id="hook" data-composition-id="hook" data-width="1080" data-height="960">
+    <div id="hook-cam" class="cam">
+    <div id="hook-ttl" class="ttl"><span class="tc">同</span><span class="tc">一</span><span class="tc">件</span><span class="tc">事</span></div>
+    <div id="hook-pa" class="pc" style="left:110px"><img src="assets/img/cover_washer.jpg" alt="" />
+      <div class="views" style="color:#9a978f"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#9a978f"/></svg>1,103</div>
+    </div>
+    <div id="hook-vs" class="vs">vs</div>
+    <div id="hook-pb" class="pc" style="left:590px;border:3px solid #054c4c"><img src="assets/img/cover_iphone.jpg" alt="" style="object-position:50% 38%" />
+      <div class="views" style="color:#054c4c"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#054c4c"/></svg><span id="hook-cnt">0</span></div>
+    </div>
+    <div id="hook-src" class="src">我自己的两条抖音 · 播放量</div>
+    <div id="hook-ladw" class="ladw" style="opacity:0"><svg viewBox="0 0 400 620" width="400" height="620" overflow="visible"><defs><filter id="hook-blur" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="hook-sg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect class="rail" x="20" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><rect class="rail" x="366" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><g class="rung" id="hook-r0"><rect class="gl" id="hook-g0" x="30" y="524" width="340" height="72" rx="20" fill="#054c4c" filter="url(#hook-blur)" opacity="0"/><rect class="rr" x="40" y="530" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="hook-cp0"><rect x="40" y="530" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="hook-s0" clip-path="url(#hook-cp0)" x="-120" y="530" width="110" height="60" fill="url(#hook-sg)"/><text x="200" y="571" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第1层 · 念稿</text></g><g class="rung" id="hook-r1"><rect class="gl" id="hook-g1" x="30" y="406" width="340" height="72" rx="20" fill="#054c4c" filter="url(#hook-blur)" opacity="0"/><rect class="rr" x="40" y="412" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="hook-cp1"><rect x="40" y="412" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="hook-s1" clip-path="url(#hook-cp1)" x="-120" y="412" width="110" height="60" fill="url(#hook-sg)"/><text x="200" y="453" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第2层 · 埋钩子</text></g><g class="rung" id="hook-r2"><rect class="gl" id="hook-g2" x="30" y="288" width="340" height="72" rx="20" fill="#054c4c" filter="url(#hook-blur)" opacity="0"/><rect class="rr" x="40" y="294" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="hook-cp2"><rect x="40" y="294" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="hook-s2" clip-path="url(#hook-cp2)" x="-120" y="294" width="110" height="60" fill="url(#hook-sg)"/><text x="200" y="335" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第3层 · 跟你有关</text></g><g class="rung" id="hook-r3"><rect class="gl" id="hook-g3" x="30" y="170" width="340" height="72" rx="20" fill="#054c4c" filter="url(#hook-blur)" opacity="0"/><rect class="rr" x="40" y="176" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="hook-cp3"><rect x="40" y="176" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="hook-s3" clip-path="url(#hook-cp3)" x="-120" y="176" width="110" height="60" fill="url(#hook-sg)"/><text x="200" y="217" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第4层 · 有起伏</text></g><g class="rung" id="hook-r4"><rect class="gl" id="hook-g4" x="30" y="52" width="340" height="72" rx="20" fill="#054c4c" filter="url(#hook-blur)" opacity="0"/><rect class="rr" x="40" y="58" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="hook-cp4"><rect x="40" y="58" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="hook-s4" clip-path="url(#hook-cp4)" x="-120" y="58" width="110" height="60" fill="url(#hook-sg)"/><text x="200" y="99" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第5层 · 有你自己</text></g></svg></div>
+    <div id="hook-ttl2" class="ttl"><span class="tc">讲</span><span class="tc">故</span><span class="tc">事</span><span class="tc">的</span><span class="tc"> </span><i class="tc">5</i><span class="tc"> </span><span class="tc">层</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 整场镜头一直在缓慢推近，画面不会停死
+    tl.fromTo("#hook-cam", { scale: 1 }, { scale: 1.045, duration: 11.00, ease: "none" }, 0);
+    // 场景从 0 秒开始。「有人讲出来没人看」左卡虚焦落下，「百万爆款」右卡虚焦落下、数字 count-up
+    tl.fromTo("#hook-ttl .tc", { opacity: 0, y: -24, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out", stagger: 0.045 }, 0.15);
+    tl.fromTo("#hook-pa", { opacity: 0, y: 60, scale: 1.18, filter: "blur(24px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 1.37);
+    tl.fromTo("#hook-src", { opacity: 0, y: 0, scale: 1, filter: "blur(8px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 1.72);
+    tl.fromTo("#hook-vs", { opacity: 0, y: 0, scale: 1.6, filter: "blur(10px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 2.47);
+    tl.fromTo("#hook-pb", { opacity: 0, y: 60, scale: 1.18, filter: "blur(24px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 2.57);
+    const cnt = { v: 0 };
+    tl.to(cnt, { v: 1300334, duration: 0.9, ease: "power2.in", onUpdate: () => { document.getElementById("hook-cnt").textContent = Math.round(cnt.v).toLocaleString("en-US"); } }, 2.92);
+    tl.fromTo("#hook-pb", { scale: 1 }, { scale: 1.06, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 3.82);
+    // 「而在你讲到的第几层」两张卡带模糊甩出去，换成梯子
+    tl.to(["#hook-pa", "#hook-vs", "#hook-pb", "#hook-ttl", "#hook-src"], { opacity: 0, y: -110, filter: "blur(18px)", duration: 0.4, ease: "power3.in", stagger: 0.04 }, 4.75);
+    tl.set("#hook-ladw", { opacity: 1 }, 5.20);
+    // 梯子：两根竖杆从下往上长出来，五格从下往上虚焦落位
+    tl.fromTo("#hook .rail", { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.6, ease: "expo.out", stagger: 0.05 }, 5.20);
+    tl.fromTo("#hook .rung", { opacity: 0, y: 24, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out", stagger: 0.08 }, 5.35);
+    tl.fromTo("#hook-ttl2 .tc", { opacity: 0, y: -24, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out", stagger: 0.045 }, 7.61);
+    // 「分成了 5 层」五格从下往上依次点亮，每亮一格起一圈光、扫一道光
+    tl.to("#hook .rung .rr", { fill: "#054c4c", stroke: "#9cc2bf", duration: 0.12, stagger: 0.16 }, 7.76);
+    tl.to("#hook .rung text", { fill: "#f3f3f0", duration: 0.12, stagger: 0.16 }, 7.76);
+    tl.fromTo("#hook .gl", { opacity: 0 }, { opacity: 0.55, duration: 0.3, stagger: 0.16 }, 7.76);
+    tl.fromTo("#hook .sh", { attr: { x: -120 } }, { attr: { x: 380 }, duration: 0.5, ease: "power2.inOut", stagger: 0.16 }, 7.81);
+    // 「你越往上走」整架梯子往上抬一下
+    tl.to("#hook-ladw", { y: -22, duration: 0.5, ease: "power2.out", yoyo: true, repeat: 1 }, 8.94);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

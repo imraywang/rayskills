@@ -1,0 +1,68 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #l4 { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; overflow: hidden; }
+    #l4 .ttl { position: absolute; left: 0; right: 0; top: 74px; text-align: center; font-family: "HeiHeavy"; font-weight: 900; font-size: 64px; color: #111111; white-space: nowrap; }
+    #l4 .ttl i { font-family: "Playfair Display", serif; font-style: italic; font-weight: 900; color: #054c4c; margin-right: 18px; }
+    #l4 .doc { position: absolute; left: 330px; top: 210px; width: 690px; height: 560px; border-radius: 30px; background: #ffffff;
+                 border: 2px solid rgba(17,17,17,0.10); box-shadow: 0 30px 70px rgba(0,0,0,0.14); padding: 40px 44px; overflow: hidden; }
+    #l4 .doc .hd { font-family: "JetBrains Mono", monospace; font-size: 24px; color: #767676; letter-spacing: 0.04em; margin-bottom: 22px; }
+    #l4 .doc p { font-family: "HeiBold"; font-weight: 700; font-size: 40px; line-height: 1.5; color: #111111; margin-bottom: 18px; }
+    #l4 .doc p.dim { color: #b9b6ae; }
+    #l4 .doc .ch { opacity: 0; display: inline-block; white-space: pre; }
+    #l4 .doc em { font-style: normal; color: #054c4c; }
+    #l4 .ladw { position: absolute; left: 340px; top: 190px; width: 400px; height: 620px; }
+    #l4 .mini { position: absolute; left: 40px; top: 230px; width: 240px; height: 372px; opacity: 0; }
+    #l4 .cam { position: absolute; inset: 0; transform-origin: 50% 42%; }
+    #l4 .tc { display: inline-block; white-space: pre; }
+    #l4 .wave { position: absolute; left: 330px; top: 210px; width: 690px; height: 560px; border-radius: 30px; background: #fff; border: 2px solid rgba(17,17,17,0.08); box-shadow: 0 30px 70px rgba(17,17,17,0.14); }
+    #l4 .tag { position: absolute; font-family: "HeiBold"; font-weight: 700; font-size: 32px; color: #111111; background: #ebe7de; border-radius: 12px; padding: 6px 18px; white-space: nowrap; opacity: 0; }
+    #l4 .tag.g { background: #054c4c; color: #f3f3f0; }
+  </style>
+  <div id="l4" data-composition-id="l4" data-width="1080" data-height="960">
+    <div id="l4-cam" class="cam">
+    <div id="l4-ttl" class="ttl"><i class="tc">4</i><i class="tc">.</i><span class="tc">有</span><span class="tc">起</span><span class="tc">伏</span></div>
+    <div id="l4-ladw" class="ladw"><svg viewBox="0 0 400 620" width="400" height="620" overflow="visible"><defs><filter id="l4-blur" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="l4-sg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect class="rail" x="20" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><rect class="rail" x="366" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><g class="rung" id="l4-r0"><rect class="gl" id="l4-g0" x="30" y="524" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4-blur)" opacity="0"/><rect class="rr" x="40" y="530" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4-cp0"><rect x="40" y="530" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4-s0" clip-path="url(#l4-cp0)" x="-120" y="530" width="110" height="60" fill="url(#l4-sg)"/><text x="200" y="571" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第1层 · 念稿</text></g><g class="rung" id="l4-r1"><rect class="gl" id="l4-g1" x="30" y="406" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4-blur)" opacity="0"/><rect class="rr" x="40" y="412" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4-cp1"><rect x="40" y="412" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4-s1" clip-path="url(#l4-cp1)" x="-120" y="412" width="110" height="60" fill="url(#l4-sg)"/><text x="200" y="453" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第2层 · 埋钩子</text></g><g class="rung" id="l4-r2"><rect class="gl" id="l4-g2" x="30" y="288" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4-blur)" opacity="0"/><rect class="rr" x="40" y="294" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4-cp2"><rect x="40" y="294" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4-s2" clip-path="url(#l4-cp2)" x="-120" y="294" width="110" height="60" fill="url(#l4-sg)"/><text x="200" y="335" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第3层 · 跟你有关</text></g><g class="rung" id="l4-r3"><rect class="gl" id="l4-g3" x="30" y="170" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4-blur)" opacity="0"/><rect class="rr" x="40" y="176" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4-cp3"><rect x="40" y="176" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4-s3" clip-path="url(#l4-cp3)" x="-120" y="176" width="110" height="60" fill="url(#l4-sg)"/><text x="200" y="217" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第4层 · 有起伏</text></g><g class="rung" id="l4-r4"><rect class="gl" id="l4-g4" x="30" y="52" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4-blur)" opacity="0"/><rect class="rr" x="40" y="58" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="l4-cp4"><rect x="40" y="58" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4-s4" clip-path="url(#l4-cp4)" x="-120" y="58" width="110" height="60" fill="url(#l4-sg)"/><text x="200" y="99" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第5层 · 有你自己</text></g></svg></div>
+    <div id="l4-mini" class="mini"><svg viewBox="0 0 400 620" width="240" height="372" overflow="visible"><defs><filter id="l4m-blur" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="l4m-sg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect class="rail" x="20" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><rect class="rail" x="366" y="0" width="14" height="620" rx="7" fill="#dcd8cf"/><g class="rung" id="l4m-r0"><rect class="gl" id="l4m-g0" x="30" y="524" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4m-blur)" opacity="0"/><rect class="rr" x="40" y="530" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4m-cp0"><rect x="40" y="530" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4m-s0" clip-path="url(#l4m-cp0)" x="-120" y="530" width="110" height="60" fill="url(#l4m-sg)"/><text x="200" y="571" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第1层 · 念稿</text></g><g class="rung" id="l4m-r1"><rect class="gl" id="l4m-g1" x="30" y="406" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4m-blur)" opacity="0"/><rect class="rr" x="40" y="412" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4m-cp1"><rect x="40" y="412" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4m-s1" clip-path="url(#l4m-cp1)" x="-120" y="412" width="110" height="60" fill="url(#l4m-sg)"/><text x="200" y="453" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第2层 · 埋钩子</text></g><g class="rung" id="l4m-r2"><rect class="gl" id="l4m-g2" x="30" y="288" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4m-blur)" opacity="0"/><rect class="rr" x="40" y="294" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4m-cp2"><rect x="40" y="294" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4m-s2" clip-path="url(#l4m-cp2)" x="-120" y="294" width="110" height="60" fill="url(#l4m-sg)"/><text x="200" y="335" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第3层 · 跟你有关</text></g><g class="rung" id="l4m-r3"><rect class="gl" id="l4m-g3" x="30" y="170" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4m-blur)" opacity="0.6"/><rect class="rr" x="40" y="176" width="320" height="60" rx="14" fill="#054c4c" stroke="#9cc2bf" stroke-width="3"/><clipPath id="l4m-cp3"><rect x="40" y="176" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4m-s3" clip-path="url(#l4m-cp3)" x="-120" y="176" width="110" height="60" fill="url(#l4m-sg)"/><text x="200" y="217" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#f3f3f0">第4层 · 有起伏</text></g><g class="rung" id="l4m-r4"><rect class="gl" id="l4m-g4" x="30" y="52" width="340" height="72" rx="20" fill="#054c4c" filter="url(#l4m-blur)" opacity="0"/><rect class="rr" x="40" y="58" width="320" height="60" rx="14" fill="#dcd8cf" stroke="none" stroke-width="3"/><clipPath id="l4m-cp4"><rect x="40" y="58" width="320" height="60" rx="14"/></clipPath><rect class="sh" id="l4m-s4" clip-path="url(#l4m-cp4)" x="-120" y="58" width="110" height="60" fill="url(#l4m-sg)"/><text x="200" y="99" text-anchor="middle" font-family="HeiBold" font-weight="700" font-size="30" fill="#767676">第5层 · 有你自己</text></g></svg></div>
+    <div id="l4-wave" class="wave">
+      <svg width="690" height="560" viewBox="0 0 690 560">
+        <line x1="50" y1="480" x2="650" y2="480" stroke="#e6e2d9" stroke-width="4"/>
+        <path id="l4-path" d="M50 440 C 120 430, 150 260, 210 250 S 280 400, 320 380 S 400 120, 470 110 S 540 420, 580 400 S 630 300, 650 290"
+          fill="none" stroke="#054c4c" stroke-width="8" stroke-linecap="round" stroke-dasharray="1400" stroke-dashoffset="1400"/>
+        <circle id="l4-d1" cx="210" cy="250" r="14" fill="#054c4c" opacity="0"/><circle id="l4-d2" cx="470" cy="110" r="14" fill="#054c4c" opacity="0"/><circle id="l4-d3" cx="580" cy="400" r="14" fill="#111111" opacity="0"/>
+      </svg>
+      <div id="l4-t1" class="tag" style="left:178px;top:170px">？</div>
+      <div id="l4-t2" class="tag" style="left:340px;top:36px">芯片 · 数据中心</div>
+      <div id="l4-t3" class="tag g" style="left:558px;top:426px">！</div>
+    </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // 整场镜头一直在缓慢推近，画面不会停死
+    tl.fromTo("#l4-cam", { scale: 1 }, { scale: 1.045, duration: 15.80, ease: "none" }, 0);
+    // 开头：梯子虚焦进场 → 第 4 层弹起、发光、扫光 → 镜头扎进这一格 → 左边小梯子当进度条
+    tl.fromTo("#l4-ladw", { opacity: 0, y: 0, scale: 0.9, filter: "blur(18px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, 0.00);
+    tl.fromTo("#l4-ttl .tc", { opacity: 0, y: -24, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out", stagger: 0.045 }, 0.08);
+    tl.fromTo("#l4-r3 .rr", { scale: 0.82, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.55, ease: "back.out(2.6)" }, 0.28);
+    tl.fromTo("#l4-g3", { opacity: 0 }, { opacity: 0.75, duration: 0.4, ease: "power2.out" }, 0.28);
+    tl.fromTo("#l4-s3", { attr: { x: -120 } }, { attr: { x: 380 }, duration: 0.6, ease: "power2.inOut" }, 0.5);
+    tl.to("#l4-ladw", { scale: 3.4, opacity: 0, filter: "blur(16px)", transformOrigin: "200px 206px", duration: 0.5, ease: "power3.in" }, 1.25);
+    tl.fromTo("#l4-mini", { opacity: 0, y: 0, scale: 1.25, filter: "blur(14px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, 1.65);
+    tl.fromTo("#l4-wave", { opacity: 0, y: 30, scale: 1.14, filter: "blur(22px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, 1.60);
+    // 曲线跟着说：「抛一个问题」第一个峰 →「为什么还要减人」第二个峰 →「再揭晓」落下 →「张一下松一下」走完
+    tl.to("#l4-path", { strokeDashoffset: 1060, duration: 1.60, ease: "none" }, 1.9);
+    tl.fromTo("#l4-d1", { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(3)" }, 3.50);
+    tl.fromTo("#l4-t1", { opacity: 0, y: 16, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 3.50);
+    tl.to("#l4-path", { strokeDashoffset: 560, duration: 4.34, ease: "none" }, 3.50);
+    tl.fromTo("#l4-d2", { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(3)" }, 7.84);
+    tl.fromTo("#l4-t2", { opacity: 0, y: 16, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 10.00);
+    tl.to("#l4-path", { strokeDashoffset: 220, duration: 4.32, ease: "none" }, 7.84);
+    tl.fromTo("#l4-d3", { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(3)" }, 12.16);
+    tl.to("#l4-wave", { scale: 1.04, duration: 0.16, ease: "power2.out", yoyo: true, repeat: 1 }, 12.16);
+    tl.fromTo("#l4-t3", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.4)" }, 12.16);
+    tl.to("#l4-path", { strokeDashoffset: 0, duration: 1.2, ease: "none" }, 12.98);
+    window.__timelines["l4"] = tl;
+  </script>
+</template>

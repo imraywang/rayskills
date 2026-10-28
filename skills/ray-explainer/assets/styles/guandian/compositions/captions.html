@@ -1,0 +1,308 @@
+<template>
+  <style>
+    @font-face { font-family: "HeiBold"; src: url("assets/fonts/NotoSansSC-700.woff") format("woff"); font-weight: 700; }
+    @font-face { font-family: "HeiHeavy"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; }
+    #captions { position: absolute; inset: 0; pointer-events: none; }
+    #captions .cap { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: "HeiHeavy"; font-weight: 900; }
+    #captions .cap span { display: inline-block; }
+    /* 分屏：一次一个词，压在卡片和探头真人之间 */
+    #captions .cap.mid-d, #captions .cap.mid-l { top: 846px; font-size: 84px; letter-spacing: 0.01em; }
+    #captions .cap.mid-d { color: #f3f3f0; }
+    #captions .cap.mid-d em { font-style: normal; color: #9cc2bf; }
+    #captions .cap.mid-l { color: #111111; }
+    #captions .cap.mid-l em { font-style: normal; color: #054c4c; }
+    /* 全屏真人：白字带阴影，偏下 */
+    #captions .cap.low { top: 1330px; font-size: 76px; color: #fff; text-shadow: 0 4px 18px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.5); }
+    #captions .cap.low em { font-style: normal; color: #9cc2bf; }
+  </style>
+  <div id="captions" data-composition-id="captions" data-width="1080" data-height="1920">
+    <!-- 一次一个词：由 build.py 按逐字时间生成，改字改时间去那里改 -->
+    <div id="c001" class="cap mid-l clip" data-start="0.0" data-duration="0.5"><span>说实话</span></div>
+    <div id="c002" class="cap mid-l clip" data-start="0.5" data-duration="0.22"><span>同样</span></div>
+    <div id="c003" class="cap mid-l clip" data-start="0.72" data-duration="0.48"><span>一件事情</span></div>
+    <div id="c004" class="cap mid-l clip" data-start="1.2" data-duration="0.18"><span>有人</span></div>
+    <div id="c005" class="cap mid-l clip" data-start="1.38" data-duration="0.34"><span>讲出来</span></div>
+    <div id="c006" class="cap mid-l clip" data-start="1.72" data-duration="0.62"><span>没人看</span></div>
+    <div id="c007" class="cap mid-l clip" data-start="2.34" data-duration="0.14"><span>有人</span></div>
+    <div id="c008" class="cap mid-l clip" data-start="2.48" data-duration="0.26"><span>讲出来</span></div>
+    <div id="c009" class="cap mid-l clip" data-start="2.74" data-duration="0.18"><span>就是</span></div>
+    <div id="c010" class="cap mid-l clip" data-start="2.92" data-duration="0.78"><span>百万爆款</span></div>
+    <div id="c011" class="cap mid-l clip" data-start="3.7" data-duration="0.3"><span>差别</span></div>
+    <div id="c012" class="cap mid-l clip" data-start="4.0" data-duration="0.14"><span>其实</span></div>
+    <div id="c013" class="cap mid-l clip" data-start="4.14" data-duration="0.26"><span>根本</span></div>
+    <div id="c014" class="cap mid-l clip" data-start="4.4" data-duration="0.34"><span>不在于</span></div>
+    <div id="c015" class="cap mid-l clip" data-start="4.74" data-duration="0.46"><span>素材</span></div>
+    <div id="c016" class="cap mid-l clip" data-start="5.2" data-duration="0.22"><span>而在</span></div>
+    <div id="c017" class="cap mid-l clip" data-start="5.42" data-duration="0.46"><span>你讲到的</span></div>
+    <div id="c018" class="cap mid-l clip" data-start="5.88" data-duration="0.84"><span><em>第几层</em></span></div>
+    <div id="c019" class="cap mid-l clip" data-start="6.72" data-duration="0.26"><span>我把</span></div>
+    <div id="c020" class="cap mid-l clip" data-start="6.98" data-duration="0.78"><span>讲故事能力</span></div>
+    <div id="c021" class="cap mid-l clip" data-start="7.76" data-duration="0.42"><span>分成了</span></div>
+    <div id="c022" class="cap mid-l clip" data-start="8.18" data-duration="0.7"><span>5层</span></div>
+    <div id="c023" class="cap mid-l clip" data-start="8.88" data-duration="0.2"><span>你越</span></div>
+    <div id="c024" class="cap mid-l clip" data-start="9.08" data-duration="0.58"><span>往上走</span></div>
+    <div id="c025" class="cap mid-l clip" data-start="9.66" data-duration="0.22"><span>观众</span></div>
+    <div id="c026" class="cap mid-l clip" data-start="9.88" data-duration="0.48"><span>就越容易</span></div>
+    <div id="c027" class="cap mid-l clip" data-start="10.36" data-duration="0.64"><span>停下来</span></div>
+    <div id="c028" class="cap low clip" data-start="11.06" data-duration="0.34"><span>我就拿</span></div>
+    <div id="c029" class="cap low clip" data-start="11.4" data-duration="0.54"><span>这两天的</span></div>
+    <div id="c030" class="cap low clip" data-start="11.94" data-duration="0.64"><span>一条新闻</span></div>
+    <div id="c031" class="cap low clip" data-start="12.58" data-duration="0.2"><span>给你</span></div>
+    <div id="c032" class="cap low clip" data-start="12.78" data-duration="0.6"><span>从第1层</span></div>
+    <div id="c033" class="cap low clip" data-start="13.38" data-duration="1.04"><span>讲到第5层</span></div>
+    <div id="c034" class="cap mid-l clip" data-start="15.64" data-duration="0.32"><span>只把</span></div>
+    <div id="c035" class="cap mid-l clip" data-start="15.96" data-duration="0.6"><span>事实</span></div>
+    <div id="c036" class="cap mid-l clip" data-start="16.56" data-duration="0.64"><span>按照顺序</span></div>
+    <div id="c037" class="cap mid-l clip" data-start="17.2" data-duration="0.66"><span>摆出来</span></div>
+    <div id="c038" class="cap mid-l clip" data-start="21.42" data-duration="0.68"><span>事实全对</span></div>
+    <div id="c039" class="cap mid-l clip" data-start="22.1" data-duration="0.1"><span>但是</span></div>
+    <div id="c040" class="cap mid-l clip" data-start="22.2" data-duration="0.42"><span>观众</span></div>
+    <div id="c041" class="cap mid-l clip" data-start="22.62" data-duration="0.36"><span>听完</span></div>
+    <div id="c042" class="cap mid-l clip" data-start="22.98" data-duration="0.74"><span>就<em>划走了</em></span></div>
+    <div id="c043" class="cap low clip" data-start="23.72" data-duration="0.12"><span>因为</span></div>
+    <div id="c044" class="cap low clip" data-start="23.84" data-duration="0.28"><span>这就是</span></div>
+    <div id="c045" class="cap low clip" data-start="24.12" data-duration="0.22"><span>一条</span></div>
+    <div id="c046" class="cap low clip" data-start="24.34" data-duration="0.74"><span>新闻播报</span></div>
+    <div id="c047" class="cap low clip" data-start="25.08" data-duration="0.76"><span>而你要做的</span></div>
+    <div id="c048" class="cap low clip" data-start="25.84" data-duration="0.18"><span>就是</span></div>
+    <div id="c049" class="cap low clip" data-start="26.02" data-duration="0.46"><span>尽快</span></div>
+    <div id="c050" class="cap low clip" data-start="26.48" data-duration="0.34"><span>离开</span></div>
+    <div id="c051" class="cap low clip" data-start="26.82" data-duration="0.44"><span>这一层</span></div>
+    <div id="c052" class="cap mid-l clip" data-start="28.8" data-duration="0.74"><span>先把观众</span></div>
+    <div id="c053" class="cap mid-l clip" data-start="29.54" data-duration="0.68"><span>往一个方向</span></div>
+    <div id="c054" class="cap mid-l clip" data-start="30.22" data-duration="0.42"><span>带</span></div>
+    <div id="c055" class="cap mid-l clip" data-start="30.64" data-duration="0.3"><span>再一把</span></div>
+    <div id="c056" class="cap mid-l clip" data-start="30.94" data-duration="0.7"><span><em>拽回来</em></span></div>
+    <div id="c057" class="cap mid-l clip" data-start="31.64" data-duration="0.38"><span>比如说</span></div>
+    <div id="c058" class="cap low clip" data-start="38.18" data-duration="0.46"><span>一条视频</span></div>
+    <div id="c059" class="cap low clip" data-start="38.64" data-duration="0.26"><span>里面</span></div>
+    <div id="c060" class="cap low clip" data-start="38.9" data-duration="0.3"><span>你能</span></div>
+    <div id="c061" class="cap low clip" data-start="39.2" data-duration="0.22"><span>这样拽</span></div>
+    <div id="c062" class="cap low clip" data-start="39.42" data-duration="0.8"><span>两到三次</span></div>
+    <div id="c063" class="cap low clip" data-start="40.22" data-duration="0.28"><span>就已经</span></div>
+    <div id="c064" class="cap low clip" data-start="40.5" data-duration="0.36"><span>赢过了</span></div>
+    <div id="c065" class="cap low clip" data-start="40.86" data-duration="0.98"><span>大部分人了</span></div>
+    <div id="c066" class="cap mid-l clip" data-start="43.8" data-duration="0.72"><span>光有反转</span></div>
+    <div id="c067" class="cap mid-l clip" data-start="44.52" data-duration="0.5"><span>还不够</span></div>
+    <div id="c068" class="cap mid-l clip" data-start="45.02" data-duration="0.72"><span>观众得觉得</span></div>
+    <div id="c069" class="cap mid-l clip" data-start="45.74" data-duration="0.42"><span>这件事情</span></div>
+    <div id="c070" class="cap mid-l clip" data-start="46.16" data-duration="0.3"><span>跟他们</span></div>
+    <div id="c071" class="cap mid-l clip" data-start="46.46" data-duration="0.86"><span>有关系</span></div>
+    <div id="c072" class="cap low clip" data-start="51.28" data-duration="0.26"><span>没有</span></div>
+    <div id="c073" class="cap low clip" data-start="51.54" data-duration="0.56"><span>这一步</span></div>
+    <div id="c074" class="cap low clip" data-start="52.1" data-duration="0.3"><span>故事</span></div>
+    <div id="c075" class="cap low clip" data-start="52.4" data-duration="0.58"><span>再精彩</span></div>
+    <div id="c076" class="cap low clip" data-start="52.98" data-duration="0.18"><span>观众</span></div>
+    <div id="c077" class="cap low clip" data-start="53.16" data-duration="0.3"><span>也只是</span></div>
+    <div id="c078" class="cap low clip" data-start="53.46" data-duration="0.82"><span>看个<em>热闹</em></span></div>
+    <div id="c079" class="cap mid-l clip" data-start="56.06" data-duration="0.28"><span>这时候</span></div>
+    <div id="c080" class="cap mid-l clip" data-start="56.34" data-duration="0.42"><span>你开始</span></div>
+    <div id="c081" class="cap mid-l clip" data-start="56.76" data-duration="0.48"><span>设计节奏</span></div>
+    <div id="c082" class="cap mid-l clip" data-start="57.24" data-duration="0.54"><span>一会儿</span></div>
+    <div id="c083" class="cap mid-l clip" data-start="57.78" data-duration="0.78"><span>抛一个问题</span></div>
+    <div id="c084" class="cap mid-l clip" data-start="58.56" data-duration="0.12"><span>一会儿</span></div>
+    <div id="c085" class="cap mid-l clip" data-start="58.68" data-duration="0.64"><span>给个答案</span></div>
+    <div id="c086" class="cap mid-l clip" data-start="59.32" data-duration="0.28"><span>或者说</span></div>
+    <div id="c087" class="cap mid-l clip" data-start="59.6" data-duration="0.46"><span>再放一个</span></div>
+    <div id="c088" class="cap mid-l clip" data-start="60.06" data-duration="0.9"><span>小悬念</span></div>
+    <div id="c089" class="cap mid-l clip" data-start="60.96" data-duration="0.22"><span>微软</span></div>
+    <div id="c090" class="cap mid-l clip" data-start="61.18" data-duration="0.94"><span>明明不缺钱</span></div>
+    <div id="c091" class="cap mid-l clip" data-start="62.12" data-duration="0.16"><span>为什么</span></div>
+    <div id="c092" class="cap mid-l clip" data-start="62.28" data-duration="0.82"><span>还要减人</span></div>
+    <div id="c093" class="cap mid-l clip" data-start="63.1" data-duration="0.8"><span>先吊着</span></div>
+    <div id="c094" class="cap mid-l clip" data-start="63.9" data-duration="0.38"><span>等你把</span></div>
+    <div id="c095" class="cap mid-l clip" data-start="64.28" data-duration="0.58"><span>芯片和</span></div>
+    <div id="c096" class="cap mid-l clip" data-start="64.86" data-duration="0.78"><span>数据中心的账</span></div>
+    <div id="c097" class="cap mid-l clip" data-start="65.64" data-duration="0.72"><span>算完</span></div>
+    <div id="c098" class="cap mid-l clip" data-start="66.36" data-duration="0.9"><span>再<em>揭晓</em></span></div>
+    <div id="c099" class="cap mid-l clip" data-start="67.26" data-duration="0.6"><span>张一下</span></div>
+    <div id="c100" class="cap mid-l clip" data-start="67.86" data-duration="0.58"><span>松一下</span></div>
+    <div id="c101" class="cap mid-l clip" data-start="68.44" data-duration="0.24"><span>观众</span></div>
+    <div id="c102" class="cap mid-l clip" data-start="68.68" data-duration="0.56"><span>就会跟着你</span></div>
+    <div id="c103" class="cap mid-l clip" data-start="69.24" data-duration="0.84"><span>走完全程</span></div>
+    <div id="c104" class="cap mid-l clip" data-start="71.74" data-duration="0.16"><span>到了</span></div>
+    <div id="c105" class="cap mid-l clip" data-start="71.9" data-duration="0.6"><span>这一层</span></div>
+    <div id="c106" class="cap mid-l clip" data-start="72.5" data-duration="0.3"><span>拼的是</span></div>
+    <div id="c107" class="cap mid-l clip" data-start="72.8" data-duration="0.66"><span>你独一份的</span></div>
+    <div id="c108" class="cap mid-l clip" data-start="73.46" data-duration="0.48"><span>东西</span></div>
+    <div id="c109" class="cap mid-l clip" data-start="73.94" data-duration="0.78"><span>你的判断</span></div>
+    <div id="c110" class="cap mid-l clip" data-start="74.72" data-duration="0.7"><span>你的语气</span></div>
+    <div id="c111" class="cap mid-l clip" data-start="75.42" data-duration="0.7"><span>你的画面</span></div>
+    <div id="c112" class="cap mid-l clip" data-start="76.12" data-duration="0.32"><span>同一条</span></div>
+    <div id="c113" class="cap mid-l clip" data-start="76.44" data-duration="0.7"><span>微软的新闻</span></div>
+    <div id="c114" class="cap mid-l clip" data-start="77.14" data-duration="0.24"><span>我会</span></div>
+    <div id="c115" class="cap mid-l clip" data-start="77.38" data-duration="0.24"><span>把它</span></div>
+    <div id="c116" class="cap low clip" data-start="80.58" data-duration="0.28"><span>这句话</span></div>
+    <div id="c117" class="cap low clip" data-start="80.86" data-duration="0.38"><span><em>只有我</em></span></div>
+    <div id="c118" class="cap low clip" data-start="81.24" data-duration="0.74"><span>会这么说</span></div>
+    <div id="c119" class="cap low clip" data-start="81.98" data-duration="0.3"><span>刚做</span></div>
+    <div id="c120" class="cap low clip" data-start="82.28" data-duration="0.46"><span>自媒体的</span></div>
+    <div id="c121" class="cap low clip" data-start="82.74" data-duration="0.22"><span>同学</span></div>
+    <div id="c122" class="cap low clip" data-start="82.96" data-duration="0.4"><span>一开始</span></div>
+    <div id="c123" class="cap low clip" data-start="83.36" data-duration="0.28"><span>到不了</span></div>
+    <div id="c124" class="cap low clip" data-start="83.64" data-duration="0.48"><span>第5层</span></div>
+    <div id="c125" class="cap low clip" data-start="84.12" data-duration="0.84"><span>很正常</span></div>
+    <div id="c126" class="cap low clip" data-start="84.96" data-duration="0.68"><span>但它才是</span></div>
+    <div id="c127" class="cap low clip" data-start="85.64" data-duration="0.46"><span>让观众</span></div>
+    <div id="c128" class="cap low clip" data-start="86.1" data-duration="0.58"><span>认准你的</span></div>
+    <div id="c129" class="cap low clip" data-start="86.68" data-duration="0.36"><span>那一层</span></div>
+    <div id="c130" class="cap mid-l clip" data-start="87.04" data-duration="0.52"><span>所以</span></div>
+    <div id="c131" class="cap mid-l clip" data-start="87.56" data-duration="0.3"><span>下次</span></div>
+    <div id="c132" class="cap mid-l clip" data-start="87.86" data-duration="0.32"><span>如果说</span></div>
+    <div id="c133" class="cap mid-l clip" data-start="88.18" data-duration="0.3"><span>你觉得</span></div>
+    <div id="c134" class="cap mid-l clip" data-start="88.48" data-duration="0.52"><span>你的选题</span></div>
+    <div id="c135" class="cap mid-l clip" data-start="89.0" data-duration="0.66"><span>太无聊了</span></div>
+    <div id="c136" class="cap mid-l clip" data-start="89.66" data-duration="0.48"><span>先别急着</span></div>
+    <div id="c137" class="cap mid-l clip" data-start="90.14" data-duration="0.68"><span>换题</span></div>
+    <div id="c138" class="cap mid-l clip" data-start="90.82" data-duration="0.28"><span>你看看</span></div>
+    <div id="c139" class="cap mid-l clip" data-start="91.1" data-duration="0.32"><span>你自己</span></div>
+    <div id="c140" class="cap mid-l clip" data-start="91.42" data-duration="0.42"><span>可以讲到</span></div>
+    <div id="c141" class="cap mid-l clip" data-start="91.84" data-duration="0.66"><span><em>第几层</em></span></div>
+  </div>
+  <script>
+    // 每个词出来时从略大、略虚弹到位
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#c001 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 0.0);
+    tl.fromTo("#c002 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 0.5);
+    tl.fromTo("#c003 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 0.72);
+    tl.fromTo("#c004 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 1.2);
+    tl.fromTo("#c005 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 1.38);
+    tl.fromTo("#c006 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 1.72);
+    tl.fromTo("#c007 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 2.34);
+    tl.fromTo("#c008 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 2.48);
+    tl.fromTo("#c009 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 2.74);
+    tl.fromTo("#c010 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 2.92);
+    tl.fromTo("#c011 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 3.7);
+    tl.fromTo("#c012 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 4.0);
+    tl.fromTo("#c013 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 4.14);
+    tl.fromTo("#c014 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 4.4);
+    tl.fromTo("#c015 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 4.74);
+    tl.fromTo("#c016 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 5.2);
+    tl.fromTo("#c017 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 5.42);
+    tl.fromTo("#c018 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 5.88);
+    tl.fromTo("#c019 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 6.72);
+    tl.fromTo("#c020 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 6.98);
+    tl.fromTo("#c021 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 7.76);
+    tl.fromTo("#c022 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 8.18);
+    tl.fromTo("#c023 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 8.88);
+    tl.fromTo("#c024 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 9.08);
+    tl.fromTo("#c025 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 9.66);
+    tl.fromTo("#c026 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 9.88);
+    tl.fromTo("#c027 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 10.36);
+    tl.fromTo("#c028 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 11.06);
+    tl.fromTo("#c029 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 11.4);
+    tl.fromTo("#c030 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 11.94);
+    tl.fromTo("#c031 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 12.58);
+    tl.fromTo("#c032 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 12.78);
+    tl.fromTo("#c033 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 13.38);
+    tl.fromTo("#c034 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 15.64);
+    tl.fromTo("#c035 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 15.96);
+    tl.fromTo("#c036 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 16.56);
+    tl.fromTo("#c037 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 17.2);
+    tl.fromTo("#c038 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 21.42);
+    tl.fromTo("#c039 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 22.1);
+    tl.fromTo("#c040 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 22.2);
+    tl.fromTo("#c041 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 22.62);
+    tl.fromTo("#c042 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 22.98);
+    tl.fromTo("#c043 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 23.72);
+    tl.fromTo("#c044 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 23.84);
+    tl.fromTo("#c045 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 24.12);
+    tl.fromTo("#c046 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 24.34);
+    tl.fromTo("#c047 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 25.08);
+    tl.fromTo("#c048 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 25.84);
+    tl.fromTo("#c049 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 26.02);
+    tl.fromTo("#c050 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 26.48);
+    tl.fromTo("#c051 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 26.82);
+    tl.fromTo("#c052 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 28.8);
+    tl.fromTo("#c053 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 29.54);
+    tl.fromTo("#c054 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 30.22);
+    tl.fromTo("#c055 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 30.64);
+    tl.fromTo("#c056 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 30.94);
+    tl.fromTo("#c057 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 31.64);
+    tl.fromTo("#c058 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 38.18);
+    tl.fromTo("#c059 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 38.64);
+    tl.fromTo("#c060 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 38.9);
+    tl.fromTo("#c061 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 39.2);
+    tl.fromTo("#c062 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 39.42);
+    tl.fromTo("#c063 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 40.22);
+    tl.fromTo("#c064 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 40.5);
+    tl.fromTo("#c065 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 40.86);
+    tl.fromTo("#c066 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 43.8);
+    tl.fromTo("#c067 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 44.52);
+    tl.fromTo("#c068 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 45.02);
+    tl.fromTo("#c069 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 45.74);
+    tl.fromTo("#c070 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 46.16);
+    tl.fromTo("#c071 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 46.46);
+    tl.fromTo("#c072 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 51.28);
+    tl.fromTo("#c073 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 51.54);
+    tl.fromTo("#c074 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 52.1);
+    tl.fromTo("#c075 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 52.4);
+    tl.fromTo("#c076 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 52.98);
+    tl.fromTo("#c077 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 53.16);
+    tl.fromTo("#c078 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 53.46);
+    tl.fromTo("#c079 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 56.06);
+    tl.fromTo("#c080 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 56.34);
+    tl.fromTo("#c081 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 56.76);
+    tl.fromTo("#c082 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 57.24);
+    tl.fromTo("#c083 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 57.78);
+    tl.fromTo("#c084 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 58.56);
+    tl.fromTo("#c085 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 58.68);
+    tl.fromTo("#c086 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 59.32);
+    tl.fromTo("#c087 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 59.6);
+    tl.fromTo("#c088 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 60.06);
+    tl.fromTo("#c089 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 60.96);
+    tl.fromTo("#c090 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 61.18);
+    tl.fromTo("#c091 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 62.12);
+    tl.fromTo("#c092 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 62.28);
+    tl.fromTo("#c093 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 63.1);
+    tl.fromTo("#c094 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 63.9);
+    tl.fromTo("#c095 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 64.28);
+    tl.fromTo("#c096 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 64.86);
+    tl.fromTo("#c097 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 65.64);
+    tl.fromTo("#c098 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 66.36);
+    tl.fromTo("#c099 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 67.26);
+    tl.fromTo("#c100 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 67.86);
+    tl.fromTo("#c101 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 68.44);
+    tl.fromTo("#c102 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 68.68);
+    tl.fromTo("#c103 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 69.24);
+    tl.fromTo("#c104 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 71.74);
+    tl.fromTo("#c105 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 71.9);
+    tl.fromTo("#c106 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 72.5);
+    tl.fromTo("#c107 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 72.8);
+    tl.fromTo("#c108 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 73.46);
+    tl.fromTo("#c109 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 73.94);
+    tl.fromTo("#c110 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 74.72);
+    tl.fromTo("#c111 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 75.42);
+    tl.fromTo("#c112 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 76.12);
+    tl.fromTo("#c113 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 76.44);
+    tl.fromTo("#c114 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 77.14);
+    tl.fromTo("#c115 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 77.38);
+    tl.fromTo("#c116 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 80.58);
+    tl.fromTo("#c117 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 80.86);
+    tl.fromTo("#c118 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 81.24);
+    tl.fromTo("#c119 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 81.98);
+    tl.fromTo("#c120 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 82.28);
+    tl.fromTo("#c121 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 82.74);
+    tl.fromTo("#c122 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 82.96);
+    tl.fromTo("#c123 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 83.36);
+    tl.fromTo("#c124 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 83.64);
+    tl.fromTo("#c125 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 84.12);
+    tl.fromTo("#c126 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 84.96);
+    tl.fromTo("#c127 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 85.64);
+    tl.fromTo("#c128 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 86.1);
+    tl.fromTo("#c129 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 86.68);
+    tl.fromTo("#c130 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 87.04);
+    tl.fromTo("#c131 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 87.56);
+    tl.fromTo("#c132 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 87.86);
+    tl.fromTo("#c133 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 88.18);
+    tl.fromTo("#c134 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 88.48);
+    tl.fromTo("#c135 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 89.0);
+    tl.fromTo("#c136 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 89.66);
+    tl.fromTo("#c137 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 90.14);
+    tl.fromTo("#c138 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 90.82);
+    tl.fromTo("#c139 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 91.1);
+    tl.fromTo("#c140 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 91.42);
+    tl.fromTo("#c141 span", { scale: 1.18, opacity: 0.4, filter: "blur(4px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power2.out" }, 91.84);
+    window.__timelines["captions"] = tl;
+  </script>
+</template>
