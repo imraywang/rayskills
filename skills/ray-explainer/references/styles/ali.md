@@ -98,7 +98,7 @@
 
 ## 做一条新片
 
-0. **先剪口播**：`cut_retakes.py scan`，改 `cuts.txt`，再 `apply`，然后对剪好的片子跑 `gate_breaths.py`（见 SKILL.md）。
+0. **先剪口播**：`cut_retakes.py scan`，改 `cuts.txt`，再 `apply`，然后对剪好的片子跑 `gate_breaths.py`（见 [recorded-footage.md](../recorded-footage.md)）。
 1. **建工程**：`cp -R $SK/assets/styles/ali <工程目录>`，把素材放进 `assets/`：
    - `aroll.mp4`：口播，按 1920×1080 或更高。
    - `voice.wav`：去吸气音后的人声。

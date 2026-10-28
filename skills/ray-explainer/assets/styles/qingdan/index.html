@@ -16,8 +16,9 @@
       #pop-win { position: absolute; left: 60px; top: 1210px; width: 960px; height: 760px; border-radius: 44px; overflow: hidden;
                  box-shadow: 0 30px 70px rgba(17,17,17,0.20), 0 4px 14px rgba(17,17,17,0.12); }
       #pop-win video { position: absolute; left: -60px; top: -250px; width: 1080px; height: 960px; }
-      #pop-out { position: absolute; left: 0; top: 960px; width: 1080px; height: 250px; overflow: hidden; }
-      #pop-out video { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }
+      #pop-out { position: absolute; left: 300px; top: 960px; width: 480px; height: 250px; overflow: hidden; }
+      /* 只让头越出窗框：抠像层只留头部那一条，抬起来的手不会跑出窗外 */
+      #pop-out video { position: absolute; left: -300px; top: 0; width: 1080px; height: 960px; }
       /* 全屏真人（编号卡、判断句） */
       #face-a-wrap { position: absolute; inset: 0; transform-origin: 50% 32%; }
       #face-a-wrap video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
@@ -46,6 +47,8 @@
         <video id="pm-p4" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="52.25" data-duration="12.45" data-media-start="52.25" data-track-index="2"></video>
         <video id="pm-recap" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="64.7" data-duration="7.5" data-media-start="64.7" data-track-index="2"></video>
         <video id="pm-cta" class="clip" src="assets/footage/face_pop_matte.webm" muted playsinline data-start="77.35" data-duration="4.12" data-media-start="77.35" data-track-index="2"></video>
+        <!-- 素材结束后的最后几帧：抠像最后一帧的头部，接着越出窗框 -->
+        <img id="end-head" class="clip" src="assets/img/end_head.png" alt="" data-start="81.37" data-duration="0.23" data-track-index="2" style="position:absolute;left:0;top:0;width:480px;height:250px" />
       </div>
       <div id="face-a-wrap" style="z-index:6">
         <video id="fa-n1" class="clip" src="assets/footage/face_full.mp4" muted playsinline data-start="7.6" data-duration="1.3" data-media-start="7.6" data-track-index="3"></video>

@@ -1,63 +1,41 @@
 ---
 name: ray-explainer
-description: 把文章或观点做成知识解说视频（默认竖屏，要求时出横屏；1.5–3 分钟，用 Ray 的复刻音色配音 + 字幕）：真实画面优先（录屏、实拍、截图），近几期主要走 HyperFrames 按内容定制风格（配乐、左下角数字人、发布包），也能用代码逐帧绘制的手绘套路。用于“做成解说视频”“做一期科普视频”“知识科普短片”“用我的声音配音”；Ray 的解说、科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer（本 skill 内部会调 HyperFrames）。只要口播稿转 ray-kb，要封面转 ray-cover；给已录好的整条真人口播加字幕或图卡转 embedded-captions / talking-head-recut（按本 skill 的 IP 规范带风格）；口播要剪成课程片（口播打底 + 全屏画板页 + 截图录屏）或竖屏口播配卡片动效（分屏）、竖屏清单口播（编号卡 + 探头真人）、竖屏观点框架口播（框架梯子 + 打字文档卡），留在本 skill，用风格库（`ali` / `fenping` / `qingdan` / `guandian`）。
+description: 把文章、观点或 Ray 录好的口播做成知识解说视频：默认竖屏 1.5–3 分钟，用 Ray 的复刻音色或他本人的录音，真实画面优先，用 HyperFrames 或手绘套路出片，带配乐、字幕、角落数字人和发布包。也负责把 Ray 的真人口播剪成风格库里的成片：课程片 ali、横屏科普 xiaolin、竖屏分屏 fenping、清单 qingdan、观点框架 guandian。用于“做成解说视频”“做一期科普视频”“用我的声音配音”“这条口播按某某风格做”。Ray 的解说和科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer。只要口播稿转 ray-kb，要封面转 ray-cover；整条真人口播只加字幕或图卡，转 embedded-captions / talking-head-recut。
 ---
 
 # Ray Explainer
 
-把一篇文章压成一条“开头吸引人、看完有收获”的解说片。Claude 同时当导演和程序员：写稿、分镜、给每一幕选画法、写每一帧的绘制代码、看截图返工；浏览器和 FFmpeg 只负责把代码变成像素和文件。
+把一篇文章压成一条开头吸引人、看完有收获的解说片。Claude 同时当导演和程序员：写稿、分镜、给每一幕选画法、写绘制代码、看截图返工。浏览器和 FFmpeg 只负责把代码变成像素和文件。
 
-核心约束：**每一帧只由时间 t 决定**。不读当前时间，不用 `Math.random`（用 `rng(seed)`），渲染时不联网。守住这三条，同一份代码每次都渲染出完全一样的视频，改一处只影响一处。
+核心约束：**每一帧只由时间 t 决定**。不读当前时间，不用 `Math.random`（用 `rng(seed)`），渲染时不联网。这样同一份代码每次都渲染出一样的视频，改一处只影响一处。
+
+脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
+
+## 先选路线
+
+| 素材 | 路线 | 读 |
+|---|---|---|
+| Ray 录好的真人口播，只加字幕或图卡 | 交给 `embedded-captions` / `talking-head-recut`，带上 Ray 的签名层 | [recorded-footage.md](references/recorded-footage.md) |
+| Ray 录好的真人口播，剪成课程片或竖屏短视频 | 风格库：课程片 `ali`；竖屏分屏 `fenping`；「第一个……第二个……」清单 `qingdan`；一套方法、几步框架、几层递进 `guandian` | [styles/README.md](references/styles/README.md)，再读对应的风格文档 |
+| 文章或观点，横屏科普解说 | 走 ①–③ 配音，画面用风格库的 `xiaolin` | [xiaolin.md](references/styles/xiaolin.md) |
+| 文章或观点，要贴合这期内容的风格、有录屏和真实画面（近几期的主要做法） | 走 ①–③ 配音，④–⑥ 换成 HyperFrames 专属风格模式 | [hyperframes.md](references/hyperframes.md) |
+| 文章或观点，讲清一个框架，适合手绘或语法片段 | 完整走下面的 ①–⑨ | 本文 |
+
+不管走哪条路：
+- **真实画面优先**：动态的优先于静态的，真实视频默认全屏，静态图要动起来。见 [real-footage.md](references/real-footage.md)。
+- **Ray 自己录的口播**：先剪掉重说，再去吸气音。见 [recorded-footage.md](references/recorded-footage.md)。
+- **两道确认关口**：稿子关（只看旁白）和分镜关（看每一幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱。用户说「直接做」就两关都跳过；说「稿子我看过了」就只过分镜关。
+- **画幅**：默认竖屏 1080×1920。Ray 要横屏时才出 1920×1080。一个项目只出一种画幅。安全区见 [storyboard.md](references/storyboard.md)。
+- **颜色和签名**：照 [ip-style.md](references/ip-style.md)，黑白灰加一处墨绿。
 
 ## 链路
 
 ```
 素材 ─▶ ① 解说稿 script.json ─▶ ①b 分镜表 storyboard.py【Ray 确认】
-     ─▶ ② 配音 tts.py（默认 Ray 复刻音色；没注册时用 Gemini 预置音色）
-     ─▶ ③ Whisper 校对 qa_tts.py（合格判定 + 逐字时间写入 timeline）
-     ─▶ ③c 原声插入 splice_clips.py【有原声时】
-     ─▶ ③b 数字人主持人 host.py（左下角口型默认带；大机位用户确认后才做）
-     ─▶ ④ 分镜：kit 场景写 scenes.js；语法场景只写 cues
-     ─▶ ⑤ 静帧检查 render.js sheet ─▶ ⑥ 出片 render.js video + 听感检查 audio_check.py ─▶ ⑧ 发布包 publish.py
+     ─▶ ② 配音 tts.py ─▶ ③ Whisper 校对 qa_tts.py（逐字时间写入 timeline）
+     ─▶ ③b 角落主持人 host.py ─▶ ③c 原声插入 splice_clips.py【有原声时】
+     ─▶ ④ 每一幕的画面 ─▶ ⑤ 静帧检查 ─▶ ⑥ 出片和成片检查 ─▶ ⑦ 交付 ─▶ ⑧ 发布包 ─▶ ⑨ 发布回流
 ```
-
-**专属风格模式**（HyperFrames，近几期的主要做法）：要适合这期内容的风格、要有录屏 / 真实画面 / 截图时（按下面「真实画面优先」，多数科普片都是这样），②③ 照旧，④⑤⑥ 换成 HyperFrames 合成，流程、骨架、取材要点和安全区见 [hyperframes.md](references/hyperframes.md)。这个模式自带：按章节分段的进度条顶栏、原声插入（`splice_clips.py`）、本地生成配乐（`gen_bgm.py` / `mix_bgm.py`）、用锚点定位的少量音效。会动的网页（交互图解、WebGL 演示）用 `scripts/record_clip.mjs` 按虚拟时钟录成确定的片段。
-
-**真实画面优先**（Ray 2026-10-15）：观众愿意看的是真实的东西，手绘、代码动画看久了审美疲劳。每一幕先找真实素材，**动态的优先于静态的**：录屏、本机实跑、产品官方演示片段、新闻 / 发布会画面、别人视频里被讨论到的那一段、Ray 自己的视频和后台数据；其次才是真实截图、原文、照片。代码动画只做两件事：把真实素材串起来（转场、标注、计数、对比），以及真实画面拍不到的抽象机制。别人的作品可以作为引用进成片，画面上标「来源 · 日期」。分镜关每幕写 `footage`（用什么真实素材、从哪来、是不是动态），`storyboard.py` 会列出来，整片动态真实素材太少会提醒。**真实视频默认全屏**（Ray 2026-10-15，《Roadster 真能飞》复盘：素材装在小机位窗口里冲击力不够）：科普 / 解说片里的真实视频素材默认用 `.fullshot` 铺满整个画面播放——竖屏原片直接铺满，横屏素材裁成竖屏、跟着主体走（`object-position`）；不装进机位窗口。窗口只留给截图、原帖、静态图和需要并排对比的场合。提问句之后可以用 `splice_clips.py` 插一段带原声的全屏插片，播完切回画板。分镜关每条 `footage` 写 `fullscreen: true/false`。**静态图不能直接当画面**（2026-10-22 起，学 Peter Yang）：照片、截图、文件要动起来，可以慢慢推近、平移、逐行高亮，或用作 AI 视频的首帧。成片检查列出「3 秒以上没有明显变化」的段落要回看；整块画面匀速慢推几个百分点不算动（检查也把它算作没变化），要在讲到那一处时有目的地动。**网页按画面宽度截成长图，再从上往下慢慢移**：`python3 $SK/scripts/capture_page.py <网址> out.png [--landscape]`。页面按画面宽度排版，文字不会在画面边缘被切断；挑完整的一段来移。遇到要登录或有人机验证的页面，改用 Ray 的 Chrome 截。**主体是整台设备或宽画面时整幅横放**（Ray 2026-10-16，宝可梦那期：双手横握 iPhone 的横屏素材被裁成竖屏，手机被切掉，返工）：`footage` 写 `"framing": "band"`，横屏原片按原比例横贯舞台中部，上下用同一段视频虚化压暗垫底（`.bandshot`）；`storyboard.py` 见到手机、掌机、超宽屏一类素材没写 `framing` 会提醒。
-
-**两道确认关口**：稿子关（只看旁白）和分镜关（看每幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱，过了这两关再开始做，可以避免返工。用户说“直接做”时两关都跳过；说“稿子我看过了”时只过分镜关。
-
-**画幅**：默认竖屏 1080×1920（抖音、视频号）。Ray 要横屏时（YouTube、视频号 / 抖音横屏）才出 1920×1080：`new_project.sh <slug> --landscape`，即 `script.json` 顶层 `"aspect": "landscape"`。一个项目只出一种画幅，不同时出两版。横屏只能用语法片段或 HyperFrames 模式（手绘套路是竖屏坐标，`render.js` 会拒绝）；没有进度条，字幕白字黑描边，主持人是只在关键句出现的小圆窗、按幕在左下 / 右下之间换（[host.md](references/host.md)「横屏」）。尺寸、安全区、字幕和主持人版位都在 `assets/canvas.json`，各脚本从那里读。
-
-**整条真人出镜的口播不走本 skill 的链路**（Ray 2026-10-20 定）：Ray 录好的口播视频本身就是成片画面，只要加字幕或图卡时，交给 HyperFrames 的两个通用 skill，原片不剪、不调色——只加字幕（含字幕嵌到人身后、特效字）用 `embedded-captions`，加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut`。用 Ray 的录音给解说片配音、脸只在小圆窗里出现的，仍按「2. 配音」的 `recording` 走本 skill。这两个 skill 不认识 Ray 的风格，调用时要把签名层带过去：颜色、墨绿用法照 [ip-style.md](references/ip-style.md)（黑白灰 + 一处墨绿，不加别的色相；结尾导流卡可用整屏墨绿签名幕）；字体用思源黑体 / 霞鹜文楷；竖屏信息只放 y 200–1680、横屏四周留 5%，数字从 `assets/canvas.json` 取。这两个 skill 是 HyperFrames 上游的，不在 rayskills 里，没装时用 `npx hyperframes skills update embedded-captions talking-head-recut` 装（本机 10-20 已装）。
-
-**例外：口播要剪成课程片、长视频时，用风格库**（Ray 2026-10-21 定）。这种片子以口播打底，中间切到全屏画板页、截图和录屏，人像卡跟着口播同步。这时不交给上面那两个 skill，用 [styles/README.md](references/styles/README.md) 里的风格来做。课程片用 `ali`（[ali.md](references/styles/ali.md)，模板 `assets/styles/ali/`）。竖屏口播要按内容出卡片、文字、动效（全屏真人 / 上卡片下真人 / 全屏卡片三种版式切换）时用 `fenping`（[fenping.md](references/styles/fenping.md)，模板 `assets/styles/fenping/`，Ray 2026-10-26 定），封面只出一张 3:4。竖屏口播是「第一个……第二个……」的清单时用 `qingdan`（[qingdan.md](references/styles/qingdan.md)，模板 `assets/styles/qingdan/`，Ray 2026-10-27 定）：每项先切全屏真人编号卡，再切奶油底三层卡，下方真人的头顶越出窗框。竖屏口播讲一套方法、几步框架或几层递进时用 `guandian`（[guandian.md](references/styles/guandian.md)，模板 `assets/styles/guandian/`，Ray 2026-10-28 定）：框架梯子每讲一层回来点亮、镜头扎进这一格，文档卡跟着口播逐字打出同一个例子在这一层的讲法。
-
-**横屏科普解说片默认用风格库的 `xiaolin`**（Ray 2026-10-21 定）：深色底、新闻画面快切，加玻璃气泡图、盖章、引语卡，见 [xiaolin.md](references/styles/xiaolin.md)，模板 `assets/styles/xiaolin/`。配音照 ②③ 走，拿到 `timeline.json` 以后，画面用这个模板做，不再走专属风格模式的通用骨架。
-
-**Ray 录的口播先剪重说和长停顿，再去吸气音**（2026-10-22 起，剪法学 Peter Yang 的 video-short）：
-
-```bash
-python3 $SK/scripts/cut_retakes.py scan <原片> -o work
-```
-
-1. **扫描**：用 Whisper 拿到逐字时间，用能量找出真正的停顿，写出 `work/transcript_raw.md` 和建议的 `work/cuts.txt`。逐字稿里标好了停顿、整句重说和句内重说。
-2. **默认剪法**：
-   - 重说只留最后完整的那一遍。
-   - 超过 0.6 秒的停顿缩到 0.3 秒。
-   - 切点贴在真实停顿上。
-   - 不变速。
-3. **看稿改剪辑决定**：通读逐字稿，改 `cuts.txt`。标「没找到停顿，未剪」的几处要你决定：可以把那 4 秒单独重转写一遍来定切点，拿不准就问 Ray。
-4. **应用**：`cut_retakes.py apply <原片> work/cuts.txt -o clean.mp4`。它会写出剪后逐字稿；切点处声音还很响的会单独列出，说明可能切进了字里，要挪。
-5. **复核**：重转写一遍剪后的成片，确认没丢字。
-
-10-14 那条 345 秒的录音，自动剪到 273 秒；另有 8 处要人工确认。
-
-之后对 `clean.mp4` 去吸气音。
-
-**Ray 录的口播先去吸气音**（Ray 2026-10-20 定，所有他自己录的口播都要做）：句子之间的吸气声要压掉。动画面之前先跑 `python3 $SK/scripts/gate_breaths.py <原片> -o voice.wav --verify`：按能量、过零率、频谱重心找出句间吸气，压到 −45 dB、两头 20 ms 淡入淡出，停在下一个字起音前 30 ms（不吃「所以 / 先 / 从 / 写」的声母），时间轴不变、不剪画面。成片里把原片 `<video>` 设成 `muted`，另加 `<audio id="voice" src="voice.wav">` 同起同止。`--verify` 会重新转写对比：Whisper 每次跑都有零星差异，只有紧挨 `voice.cuts.json` 里某个时间点的字变了才算剪坏，去那一处听一下。第 1 节课程视频实测：190 秒里 27 处、7.4 秒，没有丢字。
-
-脚本都在本 skill 的 `scripts/` 下，下文用 `$SK` 指代本 skill 目录。
 
 ## 0. 环境自检
 
@@ -69,38 +47,24 @@ $SK/scripts/check_setup.sh
 
 ## 1. 读素材，写解说稿
 
-读完整素材（剪藏、候选选题卡、已有口播稿都算）。库里有 Ray 的已录口播稿时，先读一篇找语感。
+读完整素材（剪藏、候选选题卡、已有口播稿都算）。库里有 Ray 已录过的口播稿时，先读一篇找语感。
 
-**知识库预检（必做，联网找素材之前）。** 视频来自已有母稿（`ray-kb` / `ray-kepu` 写的）时，母稿「素材与来源」里已经有「知识库预检」，直接读它，命中的知识当画面和类比的素材。没有母稿、直接从素材写 `script.json` 时，先跑 `python3 <vault>/50-系统/40-自动化/知识采集/knowledge_search.py <选题对象> <核心判断里的词> <可能的机制或类比>`（人名、产品名加引号；它分长期知识、过往调研、已发布内容三组输出），把输出贴进发布笔记的「素材与来源」，没有相关也照贴（写「无相关」）。知识库里没有这个脚本时，用 `rg -l` 在 `<vault>/20-知识` 正文里搜同样的词。
+**知识库预检**（联网找素材之前必做）：
+- 视频来自已有母稿（`ray-kb` / `ray-kepu` 写的）时，母稿「素材与来源」里已经有「知识库预检」，直接读它。命中的知识可以当画面和类比的素材。
+- 没有母稿时，先跑 `python3 <vault>/50-系统/40-自动化/知识采集/knowledge_search.py <选题对象> <核心判断里的词> <可能的机制或类比>`（人名、产品名加引号）。把输出贴进发布笔记的「素材与来源」，没有相关的也照贴，写「无相关」。
+- 知识库里没有这个脚本时，用 `rg -l` 在 `<vault>/20-知识` 正文里搜同样的词。
 
 ```bash
-$SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explainer/YYYY-MM-DD-<slug>/；横屏加 --landscape
+$SK/scripts/new_project.sh <英文-slug>      # 建在 ~/Movies/ray-explainer/YYYY-MM-DD-<slug>/；横屏加 --landscape
 ```
 
 视频文件不要放进 Obsidian vault：vault 带 git 自动快照，大文件会进历史。
 
-按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`（顶部小标题）、`theme`（全片色板，见 [grammars.md](references/grammars.md)「全片色板」；新项目默认 `"ray-ip"`，即 Ray 的 IP 规范，见 [ip-style.md](references/ip-style.md)：开场和结尾那一幕写 `"sig": true`）、`voice`、`to_confirm`。
+按 [script-rules.md](references/script-rules.md) 写 `script.json`：按场景分组，每个场景 1–4 句，每句是一次配音调用，也是一个画面节拍。顶层写这些字段：
+- `title`、`central_judgment`、`header`（顶部小标题）、`voice`、`to_confirm`。
+- `theme`：全片色板，见 [grammars.md](references/grammars.md)「全片色板」。新项目默认 `"ray-ip"`；开场和结尾那一幕写 `"sig": true`。
 
-### 1b. 分镜关
-
-稿子定了以后，先按 [grammars.md](references/grammars.md) 给**这一期**定一种画法（一期只用一种），再从 [style-refs.md](references/style-refs.md) 挑一张参考卡定风格（参考卡只借版式；Ray 认可过、带模板的整套做法在[风格库](references/styles/README.md)）（Ray 指定了就用他的；他丢来新链接就按那里的方法抽帧建卡），`script.json` 顶层写 `"style_ref"`，再给每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（都不写表示手写 kit）：
-
-- `beat`：这一幕讲什么，一句话
-- `visual`：画面按出现顺序依次是什么，用大白话写
-- `anchors`：哪个词触发哪个画面事件
-
-**题材本身是一个大众 IP 时，第一版分镜就给主题外壳**（Ray 2026-10-16，宝可梦那期：看完分镜才要求「宝可梦元素多一点」，多走一轮）：童年游戏、动漫、电影、知名产品这类题材，在 `script.json` 顶层写 `"design": {"shell": …, "audio": …, "boundary": …}`，把外壳一起贴给 Ray：
-- **外壳**：用这个 IP 的界面语言改造全片骨架——顶栏进度条、章节标记、标签和问句的框、换章转场（宝可梦那期：经验条、道馆徽章、DS 对话框、遭遇闪屏），每幕再挑 1–2 处和原理有关的梗（选御三家 = 多种写法只有一个对、队伍界面 = 多个 Agent 并行）。
-- **声音**：本地生成该 IP 年代感的配乐（8-bit、胶片管弦…），音效自己合成同类短音，不用原曲原音效。
-- **边界**：外壳全部是仿制 UI，颜色守 IP 色板（黑白灰 + 墨绿，原作的红蓝换成墨绿 / 灰）；不画 IP 角色本体、不用游戏 / 官方图片做 UI，角色只出现在作为引用的真实画面里。
-
-```bash
-python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 storyboard.md
-```
-
-把表格原样贴给用户，等确认。用户关心三件事：每一幕画什么、画法对不对、要不要合并、拆分或删掉某一幕。预计时长按每秒约 5.8 字估算，误差在几秒以内。确认后才进入配音；分镜阶段改了旁白，先把 `lines` 改掉，再往下走。
-
-**左下角主持人是 IP 的一部分，大机位默认不加。** 新项目模板带 `"host": {"avatar": "ray", "big": []}`：Ray 的形象全片缩在左下角，嘴型跟着配音换，不调视频模型、不花钱，第 3 步之后跑一次 `host.py` 生成口型即可。大机位（MiniMax H3 生成的手势视频，要花钱）仍然默认不加：贴分镜表时附一句「这条要不要加大机位」，用户明确要加才按 [host.md](references/host.md) 标句子、先给估价、同意后再生成。
+**①b 分镜关**：定画法、挑参考卡、给每幕写 `beat` / `visual` / `anchors` / `footage`，然后跑 `python3 $SK/scripts/storyboard.py <project>`，把表格原样贴给用户等确认。题材本身是大众 IP 时，第一版分镜就要带主题外壳。见 [storyboard.md](references/storyboard.md)。
 
 ## 2. 配音
 
@@ -108,197 +72,62 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表并写入 story
 python3 -I $SK/scripts/tts.py <project>
 ```
 
-**配音前先查念法**：`tts.py` 开头会跑 `scripts/lint_readings.py`（离线、不花钱），把容易念错的写法列出来并停下：字母数字混写（a16z、M3、GPT-4o）、三位以上数字、小数、百分号、`~ × /` 这类符号。改法是正文写读法、顶层 `display` 映射回屏幕写法（`"A 十六 Z": "a16z"`、`"百分之二十三": "23%"`）；确认没问题的加 `--allow-readings`。稿子阶段可以单独跑 `python3 $SK/scripts/lint_readings.py <project>`。2026-10-15 那期 a16z 和 23% 都是配完才发现，各重配了一次。
+- 默认用 Ray 的复刻音色 `"ray"`（MiniMax），语速 1.1。
+- 其他选择：ElevenLabs v4（Ray 目前最认可）、本地 VoxCPM2（`"ray-local"`）、Ray 自己的录音（`recording`）。
+- `tts.py` 开头会拦下容易念错的数字、字母和多音字。正文改成读法，`display` 再映射回屏幕上的写法。
 
-**多音字**：同一步还会拦「数字后面当量词用的多音字」（几十万行 → 行读 háng，MiniMax 念成了 xíng rén，2026-10-16 是 Ray 看片才发现的）：换同音字写进正文（行 → 航），`display` 映射回原字。其余读音和常用音不同的多音字（重制版、长跑、一行代码）只列 `POLY` 提示、不拦；配完音 `check_numbers.py` 把它们切成 `poly_listen.wav`，交付时附上，请 Ray 听几秒。这类不交给 Gemini 听：它按语义纠正，把念错的 xíng 听成了 háng。
+音色、念法、录音配音、复刻音色的细节都在 [voice.md](references/voice.md)。
 
-旁白整体响度统一到 −21 LUFS（Ray 认可的云端版水平，原声片段切在 −17），换哪个音色都一样，不用再手动调；要改就写 `script.json` 的 `"loudness"`。
-
-**选音色**（`script.json` 的 `"voice"`）：
-
-- `voices.json` 里注册过的名字，比如 `"ray"`：Ray 的复刻音色，直接调 MiniMax API 的 `speech-2.8-hd`（`scripts/minimax_api.py`，需要 `MINIMAX_API_KEY`；国内平台 platform.minimax.cn 的 key 另设 `MINIMAX_API_HOST=https://api.minimax.cn`；国内账号默认档每分钟请求数低，偶尔 1002 限流，tts.py 会自动退避重试），每千字约 0.1 美元。`model` 以 `fal-ai/` 开头的旧条目是经 fal 复刻的音色，只能继续走 fal。新项目模板默认就是它，语速 `1.1`（Ray 2026-10-13 定的）。
-- **ElevenLabs 复刻音色**（2026-10-24 起 Ray 最认可的一档：v4 好过 v4 turbo，两者都好过 MiniMax 和 Eleven 旧模型）：voice id `CAxJPGSVBbZB3ztecX9c`，模型 `eleven_v4`（1 字 1 credit；`eleven_v4_turbo` 半价），key 在 `~/.config/hangzhou-film/elevenlabs.env`。不走 `tts.py` 的逐句合成，用 `python3 $SK/scripts/whole_tts.py <project> --eleven CAxJPGSVBbZB3ztecX9c eleven_v4 [--one] [--tag "[...]"]` 整段读，再 `tts.py --allow-readings` 切句、`qa_tts.py` 校对。`--one` 整篇一次请求（单次上限 1 万字，一期 6 分钟约 2,100 字）；不加就按场景一段一请求（Lex 那期）。**v4 不认 `voice_settings.speed`**（0.8–1.2 出来一样长），要快一点就在开头加语气指令 `--tag "[fast-paced, crisp tech news anchor]"`：快约 9%，指令本身不会念出来（Ray 10-25 选的「科技播报」语气）。阿拉伯数字 v4 按数值念得对（382亿、3.28万亿），可以直接写数字，不用汉字读法 + `display`。
-- `"ray-local"`：本地复刻音色，走 VoxCPM2（`mlx-community/VoxCPM2-8bit`，MLX 8bit；2026-10-14 两轮盲听，12 句里赢了 MiniMax 9 句），不花钱，样本也不出本机。`voices.json` 条目写 `"provider": "voxcpm2"`，记录模型目录（模型约 3 GB，可以放外置盘，如 `/Volumes/<盘名>/ai-models/VoxCPM2-8bit`；盘没挂上会直接报错）、参考片段、`cfg` 3.0、`takes` 3。每句合成 3 遍，由 Whisper 挑最贴稿的一遍（VoxCPM2 每次输出不同，常见问题是英文词念坏、句首吞字）。它不能直接调语速，靠后期变速；`native_speed` 1.1 表示原速就相当于 MiniMax 的 1.1，所以模板的 `speed` 1.1 不会再加速。速度约 1.3 倍实时，一期 3 分钟要合 10 分钟上下。运行环境在 `~/.local/share/ray-explainer/voxcpm-env`（`uv venv -p 3.12`，装 `mlx-audio==0.5.9 soundfile mlx-whisper`）。
-- 其他值都当作 Gemini 预置音色：Charon（男、利落，没注册复刻音色时的首选）、Puck（男、活泼）、Kore（女）。
-- `"speed"`：语速，模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速就是全部重配：专属风格模式里重跑 tts → qa_tts → splice_clips → host.py --plan-only → make_beats → build，画面和锚点音效自动跟上。
-
-**用 Ray 自己录的口播当配音**（他先录一遍，Claude 先用 `gate_breaths.py` 压掉句间吸气音、再按句对上画面）：`script.json` 写 `"recording": {"src": "<gate_breaths.py 输出的 voice.wav>", "continuous": true, "takes": {"<幕>.<句>": [[起, 止]]}}`。先用 Whisper（`mlx_whisper` 带词级时间）转写整条，按句定起止，`lines` 改成他实际说的话（只修听错的字），整条连续切开、首尾相接，不加停顿、不裁边；没剪过的原始录音可去掉 `continuous`，每句可拼几段（接口 20 ms 淡入淡出）。之后照常 qa_tts → host.py --plan-only → make_beats → build。出镜：从同一个源按句切竖屏片段，裁肩部以上的方块，在画面左下 / 右下空着的句子里放圆形小窗。
-
-**还没有复刻音色时**：请用户提供 1–3 分钟干净的口播录音（手机录音或已发视频的原片都行），然后：
-
-```bash
-python3 $SK/scripts/clone_voice.py <录音> --name ray              # 只在本地处理：抽人声、降噪、统一响度，先听一下
-python3 $SK/scripts/clone_voice.py <录音> --name ray --upload     # 用户在对话里同意后再上传
-```
-
-声音属于个人生物特征数据，`--upload` 之前必须在对话里得到用户明确同意。复刻是一次性费用（以 MiniMax 价目为准），注册信息写到 `~/.config/ray-explainer/voices.json`，不放进任何仓库。脚本复刻完会立刻合成一句试听：MiniMax 会删除 7 天内没被使用过的复刻音色，这一步就是为了保住它。
-
-**通用规则**：
-
-- **只送正文**。Gemini TTS 会把“用自信的语气说：”这类指令原样念出来，中文、英文都一样。
-- 按服务、模型、音色、语速、文本做缓存，改一句只重做那一句；换音色就是全部重做。
-- 标了 `SLOW` 的句子语速异常，多半是念进了多余内容。Gemini 遇到 429 会自动退避，整片要等几分钟，不要加并发。
-
-## 3. Whisper 校对 + 逐字时间
+## 3. Whisper 校对
 
 ```bash
 python3 $SK/scripts/qa_tts.py <project>
+python3 $SK/scripts/check_numbers.py <project>   # 稿子里有年份、编号时跑：Gemini 按实际读音听写，几美分
 ```
 
-每句转写两遍：普通转写用来比对稿子，判定合不合格；带词级时间戳的那遍只用来对齐时间。后一遍会在句尾静音处产生幻觉，冒出"染染染""请点赞订阅"这类内容，所以不能拿来判定合格。不合格的片段会被改名为 `.bad`，重跑 `tts.py` 就会重新合成。必须 `bad: 0` 才能往下走。
+- 每句转写两遍：普通转写用来比对稿子、判定合不合格；带词级时间戳的那遍只用来对齐时间。后一遍会在句尾静音处冒出「请点赞订阅」这类幻觉，所以不能拿来判定合格。
+- 不合格的片段会被改名为 `.bad`，重跑 `tts.py` 就会重新合成。必须 `bad: 0` 才能往下走。
+- 听到「两千零一十九」这种按数值的读法，就改稿、重配那一句。
+- 对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间。画面的 `at()`、语法 cue 和字幕切换都用它。
 
-稿子里有年份、编号时（按 [script-rules.md](references/script-rules.md) 写成汉字逐位并配 `display`），再跑一遍：
+**③b 主持人**：`python3 $SK/scripts/host.py <project>` 只生成左下角口型，不花钱，直接跑。大机位（MiniMax H3 手势视频，要花钱）默认不加，用户明确要时才写进 `big`，先 `--dry-run` 报价，同意后再生成。Ray 本人对口型出镜（横屏科普片）用 HeyGen。都见 [host.md](references/host.md)。
+
+## 4. 每一幕的画面
+
+一期只用一种画法：语法场景、手绘套路、整期 HyperFrames，三选一。选型见 [grammars.md](references/grammars.md)，写法见 [storyboard.md](references/storyboard.md)「写每一幕」，套路见 [patterns.md](references/patterns.md)，手写 API 见 [kit-api.md](references/kit-api.md)。不要为某一条片子去改 `kit.js` 或已有的套路。
+
+## 5–6. 检查与出片
 
 ```bash
-python3 $SK/scripts/check_numbers.py <project>   # Gemini 按实际读音听写含数字的句子，几美分；多音字切成 poly_listen.wav 给人听
+node $SK/scripts/render.js <project> sheet 18      # 静帧检查（必做），用 Read 看 contact.jpg
+node $SK/scripts/render.js <project> video 30      # 出片，渲完自动跑 qa_video.py
+python3 $SK/scripts/audio_check.py <project>       # 听感检查
+python3 $SK/scripts/phone_export.py <project>      # 成片超过 30 MB 时压手机版
+python3 $SK/scripts/review.py <成片.mp4> --tailnet # 审片页，Ray 在画面上写批注
 ```
 
-看到“两千零一十九”这类数值读法就改稿重配那一句。对齐结果写成每句的 `chars`，也就是每个字开口的绝对时间；kit 的 `at()`、语法 cue 和字幕切换都会用到。
-
-### 3b. 左下角主持人（IP 默认带）与大机位（可选，用户确认后才做）
-
-```bash
-python3 $SK/scripts/host.py <project>             # big 为空：只生成左下角口型，不花钱，直接跑
-python3 $SK/scripts/host.py <project> --dry-run   # big 里写了大机位句子时：先列段落和预计费用，贴给用户等同意
-python3 $SK/scripts/host.py <project>             # 用户同意后：H3 生成大机位 + 角落口型，写 host/plan.json
-```
-
-大机位（开头、金句、结尾，每集约 30 秒）默认用 MiniMax H3 生成带手势、嘴在动的视频（不逐字对口型），约 $0.08/秒；要逐字对口型时 `"model": "pro"` 换 Kling，约 $0.115/秒；其余时间主持人缩在左下角，用同一形象的换嘴型图层，不花钱。形象、选句原则、画面避让见 [host.md](references/host.md)。没有 `host` 字段的片子不受任何影响。
-
-**Ray 本人对口型出镜（横屏科普片）用 HeyGen**：Ray 已训练好的数字分身按配音逐字对口型，做全屏出镜和分屏人像卡，见 [host.md](references/host.md)「HeyGen」，`scripts/heygen_host.py`。
-
-**大机位默认不加。** `big` 为空时 `host.py` 只算角落口型、不花钱，直接跑；只有用户明确要大机位（或被问到时确认要加），才往 `big` 里写句子、`--dry-run` 估价、同意后再生成。
-
-## 4. 分镜：先定这一期的画法，再写每一幕
-
-按 [grammars.md](references/grammars.md) 的选型表，按这期**整体**讲什么挑**一种**画法，每一幕都用它：
-
-- **语法场景**：在 `script.json` 的这一幕里写 `"grammar"` 和 `"cues"`，不用写代码。cue 的时间写成 `{"line": 1, "phrase": "创造新行为"}`，就能精确卡到这个词开口的时刻。
-- **手绘套路场景（kit 模式里优先于手写场景；整片仍先按「真实画面优先」找素材）**：在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](references/patterns.md)。全套路范例：`assets/template/script.patterns.example.json`。
-- **手写场景（最后才用）**：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](references/kit-api.md)，范例是 `assets/template/scenes.example.js`。一个画面如果以后还会再用，就把它做成新套路加进 `patterns.js`。**不要为了某一条片子去改 kit.js 或已有的套路**。
-- **一期只用一种画法**：手绘套路、某一种语法、或整期 HyperFrames，三选一，开场和结尾也用它（开场结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒，确实要混写 `"mix": true` 并说明理由。
-- 横屏（`"aspect": "landscape"`，Ray 2026-10-14 定）：画面基本不被遮挡，四周留 5%。**不放进度条和小标题**；字幕白字黑描边、无底框，居中压底（y 946–1036）；主持人是左下角直径 164 的小圆窗（卡片色底 + 墨绿细圈），**只在关键句出现**：`host.show` 标 3–6 句（写法同 `big`，不花钱），其余时间不在画面上；主画面偏左的那一幕写 `"host_side": "right"` 换到右下（学小Lin说）。贴分镜表时附上选的关键句。语法片段自动让出上 60、下 150（有主持人时下 230）。深色版用 `"theme": "ray-ip-dark"`（深灰 + 墨绿，AI、科技题材优先考虑）。
-- 竖屏安全区：按 1080×1920 出片，所有信息只放在 y 200–1680（上方 200 会被灵动岛和状态栏挡住，下方 240 被平台的作者名、文案、互动栏盖住），这两条带里只放底纹。进度条和小标题在 y 200–290。默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放 y 300–1440，语法片段会自动让开；去掉 `host` 的片子字幕条回到 y 1560–1656，主舞台可用到 y 1520。
-
-## 5. 静帧检查（必做，不能跳过）
-
-```bash
-node $SK/scripts/render.js <project> sheet 18          # 均匀抽 18 帧拼成 contact.jpg
-node $SK/scripts/render.js <project> stills 7,36.3,95  # 指定时刻（全片时间）
-```
-
-用 Read 看 `contact.jpg`，逐项检查：
-
-- 有没有元素重叠、超出画布、压住字幕
-- 有没有空镜：说话的时候画面却是空的
-- 图标、表情、颜色是否符合原意（例如笑脸画成了皱眉、灯泡被填成黑色）
-- 每一幕是否都有东西在动、在出现
-- 开头 3 秒内画面是否已经抓人
-- 语法场景的 cue 是否在对应的话说出来时出现。对不上就调 `phrase` 或 `offset`
-
-内置浏览器面板不执行本地 HTML 里的脚本，预览只能靠 render.js。语法场景启动失败时，渲染会直接报错退出，错误信息里写着是哪一幕、哪个 cue。
-
-## 6. 出片
-
-```bash
-node $SK/scripts/render.js <project> video 30
-```
-
-2.5 分钟的片子约 1 分钟渲染完（HyperFrames 模式约 1:1 实时）。
-
-**出片后先跑成片检查**（2026-10-22 起，学 Peter Yang 的 video-short）：
-
-```bash
-python3 $SK/scripts/qa_video.py <成片.mp4> [--lufs -21]     # 课程片用 --lufs -14
-```
-
-- **硬检查**：有音轨、音画长度一致、响度、峰值、没有黑场。有一项不过就修好再交，脚本会以 1 退出。
-- **硬检查还包括**：中段空画面、蓝紫底占比。
-- **只报告**：3 秒以上没有明显变化的段落。匀速慢推几个百分点也算没变化，它们多半违反「静态图要动起来」，去看一下。
-- **输出的图**，用 Read 看：
-  - `qa/<片名>/contact.jpg`：全片缩略图。
-  - `opening.jpg`：前 3 秒，看开头的钩子到位没有。
-  - `cuts/*.jpg`：每个切点前后各 5 帧，查跳帧、闪帧、切错镜头。
-- **分段从哪来**：先用工程里的 `scenes.json`，没有就用 `timeline.json`，再没有就按镜头检测分。
-
-然后**跑听感检查**，再用 SendUserFile 交付：
-
-```bash
-python3 $SK/scripts/audio_check.py <project> [out.mp4]
-```
-
-它量人声和句间配乐的音量差（低于 −32 dB 等于听不见，高于 −8 dB 抢人声）、每段原声下面的配乐、音效个数（超过 15 个提醒）。只看截图验收会漏掉声音的问题：配乐听不见、音效太密，Ray 看片时一耳朵就听出来。
-
-**运动量检查已并入成片检查**（Ray 2026-10-22 定）：原来从 huashu-art-motion 搬来的 `film_gate.py`，只留下在我们片子上用得上的部分：中段空画面、蓝紫底占比（都在 `qa_video.py` 的硬检查里），以及「3 秒以上没有明显变化的段落」（只报告）。快动帧占比和其余二十来项读数删掉了：15 支片里 12 支亮红灯，没有一次因此改片；我们以真实画面为主，Ray 10-16 说过参考价值不高。`render.js video` 渲完会自动跑 `qa_video.py`，`node render.js <project> gate [文件名.mp4]` 单独跑。
-
-SendUserFile 发到手机 / 网页端的上限是 30 MB，超过只在本机桌面端可见。成片超过 30 MB 时同时压一份手机版一起交付，码率按时长算，保证不超过 28 MB（固定 900k 时 4 分钟的片子压出过 30.4 MB）：
-
-```bash
-python3 $SK/scripts/phone_export.py <project>          # → out_phone.mp4
-```
-
-### 6b. 审片页：Ray 在画面上直接写批注
-
-交付草稿时，同时开审片页（后台跑；Ray 在手机上看就加 `--tailnet`）：
-
-```bash
-python3 $SK/scripts/review.py <成片.mp4> --tailnet        # 第二轮起加 --no-open：页面会在视频更新后自己刷新
-```
-
-- **怎么用**：页面里播放视频，下面是按 `scenes.json` 分好的场景条。Ray 暂停在任意一帧（或边播边写），写批注，点「发送」。
-- **你拿到什么**：脚本打印每条批注，并写进 `review/feedback-<片名>.md`，每条带时间、场景、那时在说的话，以及那一帧的截图。用 Read 看截图，逐条改，重渲，再跑一遍 review.py。
-- **结束**：Ray 点「可以了」才算过。
-- **地址**：把它打印的手机地址（100.x 开头）发给 Ray。本机地址只在这台 Mac 上能打开。
+`qa_video.py` 的硬检查必须全过。逐项要看什么、各项阈值见 [qa.md](references/qa.md)。
 
 ## 7. 交付说明
 
-回复里给出：
-
-- 时长、画幅、音色
-- 内容结构：开头怎么钩住人、主体讲了哪几步、结尾的收获是什么
-- 每一幕用的画法
-- **待确认**：编补的说法、夸张的说法、事实存疑之处、Whisper 相似度在 0.8–0.9 之间的句子（附时间点）
-- **成片检查**：`qa_video.py` 的硬检查全过；「3 秒以上没有明显变化」列出的段落说一句为什么可以这样，或者已经补了画面内的运动
-- 费用：`python3 $SK/scripts/cost.py <project>` 给出配音和数字人大机位的部分；Claude 的 token 从会话记录汇总
-- 能改什么：音色、单句、单幕、换一幕的画法。改稿只需重跑 2→3→5→6；只改画面只需重跑 5→6
+回复里写清楚这些：
+- 时长、画幅、音色。
+- 内容结构：开头怎么钩住人、主体讲了哪几步、结尾的收获是什么。
+- 每一幕用的画法。
+- **待确认**：编补的说法、夸张的说法、事实存疑的地方、Whisper 相似度在 0.8–0.9 之间的句子（附时间点）。
+- **成片检查**：硬检查全过。「3 秒以上没有明显变化」列出的段落，每段说一句为什么可以这样，或者已经补了画面内的运动。
+- 费用：`python3 $SK/scripts/cost.py <project>` 给出配音和大机位的部分；Claude 的 token 从会话记录里汇总。
+- 能改什么：音色、单句、单幕、换一幕的画法。改稿只需重跑 2→3→5→6；只改画面只需重跑 5→6。
 
 不自动发布到任何平台。
 
-## 8. 发布包
+## 8–9. 发布包与回流
 
-用户认可成片后，在 `script.json` 里写 `cover_t`（封面取第几秒那一帧）和 `publish`（`titles` 标题备选、`description` 描述、`tags` 标签，写法遵循 Ray 的写作规则：直接、口语化），然后：
-
-```bash
-python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
-```
-
-- 生成 `cover.jpg`：这一帧不带字幕和进度条
-- 生成 `publish.md`：标题、描述、标签，可以直接复制粘贴
-- 在 vault 的 `10-创作/25-口播草稿/<日期>-<标题>.md` 写一篇笔记：frontmatter 记录视频路径、时长、音色、画法、待确认条数；正文是分镜表、逐字稿和发布文案。视频本身不复制进 vault
-- **视频来自一篇已有的口播母稿**（ray-kb 快速口播等）时，在 `script.json` 写 `"draft": "<母稿在 vault 里的相对路径>"`：脚本不新建笔记，只给母稿加 `video_*` 字段和「发布文案」一节（重跑会替换，不会叠两份），避免和母稿同名撞文件
-- 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`；HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](references/hyperframes.md)
-- 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换才加 `--force`
-- 交付时提醒：平台的「AI 生成内容」声明要勾（复刻音色、数字人），CC 授权图片要在简介署名
-- 封面交给 `ray-cover` 的视频封面流程（Ray 真人照片 + 大标题，黑白灰 + 墨绿 IP）：
-  - 竖屏片默认只出 3:4（`xhs`，风格默认小Lin风A），拷成项目根的 `cover_3x4.png`；9:16 只在 Ray 明确要时出。
-  - 横屏片出 `landscape`（16:9，1920×1080，另出一份 jpg 给 YouTube）。
-  - `cover.jpg`（成片里的一帧）只作备用。
-
-## 9. 发布回流
-
-视频发出去之后（平台链接和数据用知识库的 `platform_sync.py` 从后台对），在正式稿上做回流。视频来自 `ray-kb` / `ray-kepu` 母稿时，规则和那边一样：
-
-**发布回流三问（归档当次做，不留 `pending`）。** 正式稿末尾的「回流」小节（模板里有），每行写链接或「无」：
-
-1. **机制与类比 → 长期知识**：这期有没有能迁移到别的题上的机制、类比、反直觉结论？先用 `knowledge_search.py` 查库里有没有，有就补进旧笔记，没有再新建概念或观点笔记，正文链回本篇正式稿和调研。
-2. **带日期的事实 → 对象档案时间线**：这期查实的关键数字和事件，按事实发生的日期记进人物、公司、产品档案：`python3 <vault>/50-系统/40-自动化/知识采集/entity_timeline.py --from facts.json --write`（先不加 `--write` 预览；新对象在那条里加 `"create": "公司"`）。没有日期的不记。知识库里没有这个脚本时，在档案里手写 `## 时间线`，每行 `- YYYY-MM-DD 事实（来源：链接）`。
-3. **讲法与反馈 → 留在本篇**：哪个开头、类比、画面有效，平台审核或数据上踩了什么坑。
-
-三行都答完，`knowledge_backfill_status` 才写 `complete`（三行都是「无」时写 `not-needed`）。下次同主题开工，知识库预检会把这三样一起找出来。
+用户认可成片后，写 `cover_t` 和 `publish`，然后跑 `python3 $SK/scripts/publish.py <project> --vault <知识库根目录>`。视频来自已有母稿时写 `"draft"`，不新建笔记。封面交给 `ray-cover`，竖屏默认只出 3:4。视频发出后，在正式稿上答完回流三问。都见 [publish.md](references/publish.md)。
 
 ## 边界
 
-- 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或转视频模型。卡通数字人主持人是例外，见 [host.md](references/host.md)。
-- kit 的手写体依赖 macOS 自带的 Hannotate SC；语法片段和字幕用的是随 skill 带的思源黑体和霞鹜文楷，换机器也不会变样。
-- kit / 语法模式没接背景音乐和音效，要加的话用 FFmpeg 在合成时混入，音效时刻从 timeline.json 里取；专属风格模式（HyperFrames）自带配乐、给人声让路和逐幕音效。
-- `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动（横屏走上游原版版式）。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。
+- 写实画面、人脸、动物近景：代码画不好。需要时建议实拍，或者转视频模型。卡通数字人主持人是例外，见 [host.md](references/host.md)。
+- kit 的手写体依赖 macOS 自带的 Hannotate SC。语法片段和字幕用随 skill 带的思源黑体和霞鹜文楷，换机器也不会变样。
+- kit 和语法模式没接背景音乐和音效，要加的话用 FFmpeg 在合成时混入，音效时刻从 `timeline.json` 里取。HyperFrames 模式自带配乐、给人声让路和逐幕音效。
+- `assets/huashu/` 来自 huashu-art-motion（MIT），只带了解说部分，并做了竖屏改动。来源、范围和改动清单见 `assets/huashu/NOTICE.md`。

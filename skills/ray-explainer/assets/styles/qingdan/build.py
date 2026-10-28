@@ -451,6 +451,8 @@ def index():
       </div>
       <div id="pop-out" style="z-index:3">
 {chr(10).join(mattes)}
+        <!-- 素材结束后的最后几帧：抠像最后一帧的头部，接着越出窗框 -->
+        <img id="end-head" class="clip" src="assets/img/end_head.png" alt="" data-start="{num(FOOTAGE_END - 0.1)}" data-duration="{num(round(TOTAL - FOOTAGE_END + 0.1, 2))}" data-track-index="2" style="position:absolute;left:0;top:0;width:480px;height:250px" />
       </div>
       <div id="face-a-wrap" style="z-index:6">
 {chr(10).join(fulls)}

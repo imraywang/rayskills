@@ -71,7 +71,7 @@ out += [f"**预计时长**：约 {int(total // 60)} 分 {int(total % 60):02d} �
         f"**画法分布**：" + "，".join(f"{k} ×{v}" for k, v in dist.items()), f"**音色**：{s.get('voice', 'Charon')}",
         f"**画幅**：" + ("横屏 1920×1080" if s.get("aspect") == "landscape" else "竖屏 1080×1920"),
         *([f"**风格参考**：{s['style_ref']}（references/style-refs.md）"] if s.get("style_ref") else []), ""]
-if s.get("design"):   # IP-themed shell (SKILL.md 1b): show it with the table so Ray confirms it in the same pass
+if s.get("design"):   # IP-themed shell (references/storyboard.md): show it with the table so Ray confirms it in the same pass
     d = s["design"]; lab = {"shell": "外壳", "audio": "声音", "boundary": "边界"}
     out += ["**主题外壳**", *[f"- {lab.get(k, k)}：{v}" for k, v in d.items()], ""]
 n = len(s["scenes"])

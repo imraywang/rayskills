@@ -8,6 +8,7 @@ usage: python3 prep.py <原片.mov> --face-x 1820 [--end 81.45] [--mic-trim 0.07
   footage/face_pop_matte.webm  face_pop 的抠像（hyperframes remove-background，CPU，约 0.25 秒一帧，80 秒素材约 10 分钟）
   footage/voice.wav            gate_breaths.py 压掉句间吸气（时间轴不变）
   img/end_still_pop.jpg        face_pop 最后一帧（窗内那一块），垫在结尾，免得画面比导流卡先结束
+  img/end_head.png             抠像最后一帧的头部那一条（x 300–780，高 250，带透明），垫在窗外，结尾几帧头顶照样越出窗框
   fonts/NotoSansSC-500/700/900.woff  从 skill 的 assets/huashu/lib/fonts 复制（已有就跳过）
   ../words.json                mlx_whisper 逐字时间，build.py 的 CHUNKS 按它对齐
 --face-x 是原片里脸中心的 x 像素：抽一帧加网格量鼻梁。--names 把这期要念的英文工具名喂给 whisper，减少把 Claude 听成 Cloud 这类错。
@@ -67,6 +68,9 @@ run(["mlx_whisper", wav, "--model", "mlx-community/whisper-large-v3-turbo", "--l
      "--initial-prompt", prompt, "--word-timestamps", "True", "--output-format", "json", "--output-dir", ft])
 if not a.no_matte:
     run([*HF, "remove-background", "assets/footage/face_pop.mp4", "-o", "assets/footage/face_pop_matte.webm", "--device", "cpu", "--quality", "best"], cwd=HERE)
+    # 解码要指定 libvpx-vp9，否则 alpha 通道会丢
+    run(["ffmpeg", "-v", "error", "-y", "-c:v", "libvpx-vp9", "-sseof", "-0.3", "-i", f"{ft}/face_pop_matte.webm", "-frames:v", "1", "-update", "1",
+         "-vf", "crop=480:250:300:0", f"{im}/end_head.png"])
 if not a.dry_run:
     d = json.load(open(f"{ft}/_src.json"))
     words = [{"text": w["word"].strip(), "start": round(w["start"], 2), "end": round(w["end"], 2)}
