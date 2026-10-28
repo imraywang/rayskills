@@ -432,8 +432,9 @@ def index():
       #pop-win {{ position: absolute; left: 60px; top: 1210px; width: 960px; height: 760px; border-radius: 44px; overflow: hidden;
                  box-shadow: 0 30px 70px rgba(17,17,17,0.20), 0 4px 14px rgba(17,17,17,0.12); }}
       #pop-win video {{ position: absolute; left: -60px; top: -250px; width: 1080px; height: 960px; }}
-      #pop-out {{ position: absolute; left: 0; top: 960px; width: 1080px; height: 250px; overflow: hidden; }}
-      #pop-out video {{ position: absolute; left: 0; top: 0; width: 1080px; height: 960px; }}
+      #pop-out {{ position: absolute; left: 300px; top: 960px; width: 480px; height: 250px; overflow: hidden; }}
+      /* 只让头越出窗框：抠像层只留头部那一条，抬起来的手不会跑出窗外 */
+      #pop-out video {{ position: absolute; left: -300px; top: 0; width: 1080px; height: 960px; }}
       /* 全屏真人（编号卡、判断句） */
       #face-a-wrap {{ position: absolute; inset: 0; transform-origin: 50% 32%; }}
       #face-a-wrap video {{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }}
