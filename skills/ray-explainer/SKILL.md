@@ -71,6 +71,8 @@ $SK/scripts/check_setup.sh
 
 读完整素材（剪藏、候选选题卡、已有口播稿都算）。库里有 Ray 的已录口播稿时，先读一篇找语感。
 
+**知识库预检（必做，联网找素材之前）。** 视频来自已有母稿（`ray-kb` / `ray-kepu` 写的）时，母稿「素材与来源」里已经有「知识库预检」，直接读它，命中的知识当画面和类比的素材。没有母稿、直接从素材写 `script.json` 时，先跑 `python3 <vault>/50-系统/40-自动化/知识采集/knowledge_search.py <选题对象> <核心判断里的词> <可能的机制或类比>`（人名、产品名加引号），把输出贴进发布笔记的「素材与来源」，没有相关也照贴（写「无相关」）。知识库里没有这个脚本时，用 `rg -l` 在 `<vault>/20-知识` 正文里搜同样的词。
+
 ```bash
 $SK/scripts/new_project.sh <英文-slug>      # 默认建在 ~/Movies/ray-explainer/YYYY-MM-DD-<slug>/；横屏加 --landscape
 ```
