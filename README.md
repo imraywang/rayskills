@@ -7,7 +7,7 @@
 本地知识库 · 长文 · 口播 · 封面 · 解说视频 · 平台草稿
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-8%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录8)
+[![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录9)
 [![Evals](https://img.shields.io/badge/eval%20cases-66-2563eb)](#-实测与验证)
 [![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
 [![Validate](https://img.shields.io/badge/结构校验-8%2F8%20pass-3fb950)](#-实测与验证)
@@ -105,7 +105,7 @@ flowchart TD
 
 完整门控与恢复规则见 [Ray 长文生产管线](skills/ray/references/content-pipeline.md)。
 
-## 🗂 Skill 全目录（8）
+## 🗂 Skill 全目录（9）
 
 | 线 | Skill | 干什么 |
 |---|---|---|
@@ -113,6 +113,7 @@ flowchart TD
 | 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
 | ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；他人文章 → 译介稿 |
 | | `/ray-kb` | 灵感与检索 → 唯一快速口播母稿；定稿长文 → 绑定母稿指纹的完整口播内容包 |
+| | `/ray-kepu` | 一件事、一个原理、一份新数据 → 讲解者视角的科普视频旁白稿（讲清楚、带得走、值得收藏转发） |
 | | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面；视频 → 9:16 / 3:4 竖封面 |
 | | `/ray-explainer` | 文章 / 剪藏 → 代码绘制的解说视频（手绘套路或一种 huashu 解说语法，一期只用一种画法、复刻音色配音、逐字卡点、左下角数字人主持人）；或 HyperFrames 专属风格模式（每期单独设计，真实截图 / 录屏 / 实跑输出） |
 | | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |

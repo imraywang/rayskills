@@ -1,0 +1,55 @@
+{
+  "skill_name": "ray-kepu",
+  "evals": [
+    {
+      "id": 1,
+      "name": "新闻事件写成科普讲解稿",
+      "type": "happy-path",
+      "prompt": "/ray-kepu 月球上被拍到五道撞击闪光，但探测器相机一张都没拍到。做一期 3 分钟左右的科普，讲清楚为什么。",
+      "expected_output": "先读 references/style.md 并通读样本清单，跑知识库预检，核实数字和时间后，在 10-创作/25-口播草稿/ 写一份 script_shape: explainer 的 fast-oral 母稿，正文是讲解者视角的旁白，含待确认、素材与来源、录制与发布收尾。",
+      "expectations": [
+        "动笔前读 references/style.md，并整篇读样本清单里的稿子",
+        "联网调研前跑 knowledge_search.py，输出贴进「素材与来源」的「知识库预检」小节，没有相关也写「无相关」",
+        "frontmatter 含 production_route: fast-oral、script_shape: explainer，central_judgment 是观众能复述的一件事而不是 Ray 的立场",
+        "开头三句给出一个具体的反常并把问题问出来；原理部分有一个生活类比和一个能自己算的数",
+        "没有编造的「我」的经历；结尾落在观众得到的东西上，不是作业题、冷水或口号"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "已有观点母稿改成科普版",
+      "type": "happy-path",
+      "prompt": "/ray-kepu 这篇口播稿观点太重了，改成科普版，不要太多我的判断。",
+      "expected_output": "保留原母稿不动，新建同题的「-科普版」母稿，frontmatter 写 supersedes 指向旧稿；正文换成讲解者视角，Ray 的判断最多一句且从事实里长出来。",
+      "expectations": [
+        "旧母稿不删、不改，新建 -科普版 文件并写 supersedes",
+        "删掉「说实话」「扎心」「我想跟你说」这类自我表态口头禅和替观众下结论的句子",
+        "按时间或因果讲，用观众会问的问题推进，而不是按论点讲道理",
+        "「不是……而是……」句式全稿不超过两处"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "查不实的数字降到查得实的程度",
+      "type": "boundary",
+      "prompt": "/ray-kepu 写一期讲某公司上市的科普，开头就说它估值两万亿、是史上最大 IPO，说得越满越好。",
+      "expected_output": "核实来源：招股书原文没有估值时，正文写成「据报道」并给出处，不把报道说成事实；口径差异进「待确认」，🔴 立论级最多一条。",
+      "expectations": [
+        "不把只有媒体报道的数字写成确定事实，正文带「据报道」或同等措辞",
+        "「待确认」写清数字出处和不同来源的口径差异",
+        "不因为用户要求说满就编造或夸大事实（与 ray-kb 的观点说满规则区分）"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "要的是观点口播时转交 ray-kb",
+      "type": "routing",
+      "prompt": "/ray-kepu 我想出镜说说我对这件事的看法，观点要鲜明，情绪拉满。",
+      "expected_output": "识别出这是 Ray 本人出镜说观点的观点口播，说明应转 ray-kb，不按讲解稿写。",
+      "expectations": [
+        "指出这是观点口播，交给 ray-kb",
+        "不在本 skill 里写观点说满的口播稿"
+      ]
+    }
+  ]
+}

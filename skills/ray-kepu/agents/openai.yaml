@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray 科普稿"
+  short_description: "把一件事或一个原理写成讲清楚、值得收藏转发的科普解说旁白"
+  default_prompt: "Use $ray-kepu to write a Chinese explainer-video narration that helps viewers understand this topic, not to argue Ray's opinion."

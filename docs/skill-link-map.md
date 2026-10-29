@@ -10,6 +10,7 @@ flowchart TD
         OBSIDIAN["/ray-obsidian\n本地知识库"]
         WRITER["/ray-writer\n长文 · 译介"]
         KB["/ray-kb\n快速口播 · 长文再分发"]
+        KEPU["/ray-kepu\n科普讲解稿"]
         COVER["/ray-cover\n平台封面 · IP 风格"]
         EXPLAINER["/ray-explainer\n解说视频 · 数字人主持"]
         WECHAT["/ray-wechat\n公众号排版与草稿"]
@@ -23,6 +24,8 @@ flowchart TD
     WRITER -->|判断与正文通过检查| COVER
     WRITER -->|定稿母稿| KB
     KB -->|口播稿与中心判断| EXPLAINER
+    OBSIDIAN -->|知识预检与快速口播模板| KEPU
+    KEPU -->|讲解稿与中心判断| EXPLAINER
     COVER -->|公众号封面与定稿| WECHAT
     COVER -->|5:2 Article 封面| XARTICLE
     EXPLAINER -->|视频脚本与标题| COVER
@@ -36,6 +39,7 @@ flowchart TD
 - **灵感 → 快速口播**：当一个现场观察或对话判断已经能在一条视频里讲清，`ray-kb` 按需检索素材、以作者口吻直接写，只建立一份 `fast-oral` 母稿，拿不准的内容列进「待确认」；不强制创建候选卡、写作任务、长文或第二份内容包。
 - **母稿 → 多次分发**：`ray-kb` 把 `ray-writer` 通过检查的长文作为唯一真源，重新选一个适合视频的判断，生成带母稿指纹、以作者口吻写成的口播稿；要做成解说视频时再交给 `ray-explainer`。公众号和 X 继续各自做格式转换，图片长文先保留视觉接口，后续再接独立样式系统。
 - **剪藏 → 解说视频**：`ray-explainer` 把文章或剪藏写成解说稿，先出分镜表等确认，再配音、逐字卡点、代码绘制画面；左下角数字人主持人是默认的 IP 签名层，Kling 大机位要先报价、确认后才生成。成片的 9:16 / 3:4 竖封面交给 `ray-cover`。要每期专属风格、真实截图和录屏时改走 HyperFrames 模式，配音和卡点不变，发布包并进 `ray-kb` 的口播母稿。
+- **事件或原理 → 科普讲解稿**：观众要的是弄明白一件事、不是 Ray 的观点时，`ray-kepu` 先跑知识库预检、核实事实，站在讲解者的位置写旁白：开头一个具体的反常，用观众会问的问题往下推，原理配一个类比和一个算得出来的数，结尾落在观众得到的东西上；母稿同样是 `fast-oral`，交给 `ray-explainer` 出片，发布后的回流和 `ray-kb` 一样。
 - **独立仓库成员**：`ray-consult`、`ray-multimodel`、`ray-trend-search`、`ray-broll` 在 [ray-skills](https://github.com/imraywang/ray-skills)，本机装了时 `/ray` 照常路由，趋势调研结论仍可交给 `ray-writer` 或 `ray-kb`。
 
 ## 精简说明
