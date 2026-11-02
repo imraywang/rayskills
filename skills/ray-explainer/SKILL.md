@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章、观点或 Ray 录好的口播做成知识解说视频：默认竖屏 1.5–3 分钟，用 Ray 的复刻音色或他本人的录音，真实画面优先，用 HyperFrames 或手绘套路出片，带配乐、字幕、角落数字人和发布包。也负责把 Ray 的真人口播剪成风格库里的成片：课程片 ali、横屏科普 xiaolin、竖屏分屏 fenping、清单 qingdan、观点框架 guandian。用于“做成解说视频”“做一期科普视频”“用我的声音配音”“这条口播按某某风格做”。Ray 的解说和科普视频优先用本 skill，不直接走通用的 hyperframes 或 faceless-explainer。只要口播稿转 ray-kb，要封面转 ray-cover；整条真人口播只加字幕或图卡，转 embedded-captions / talking-head-recut。
+description: 把文章、观点或录好的口播做成知识解说视频，也把真人口播按风格库剪成片。用于“做成解说视频”“做一期科普视频”“用我的声音配音”“这条口播按某某风格做”，优先于 hyperframes 和 faceless-explainer。只要口播稿转 ray-kb，要封面转 ray-cover；只加字幕或图卡转 embedded-captions / talking-head-recut。
 ---
 
 # Ray Explainer
@@ -25,6 +25,7 @@ description: 把文章、观点或 Ray 录好的口播做成知识解说视频�
 - **真实画面优先**：动态的优先于静态的，真实视频默认全屏，静态图要动起来。见 [real-footage.md](references/real-footage.md)。
 - **Ray 自己录的口播**：先剪掉重说，再去吸气音。见 [recorded-footage.md](references/recorded-footage.md)。
 - **两道确认关口**：稿子关（只看旁白）和分镜关（看每一幕画什么、用什么画法）。两关都在配音和写画面之前，这时改动不花钱。用户说「直接做」就两关都跳过；说「稿子我看过了」就只过分镜关。
+- **时长**：默认 1.5–3 分钟。
 - **画幅**：默认竖屏 1080×1920。Ray 要横屏时才出 1920×1080。一个项目只出一种画幅。安全区见 [storyboard.md](references/storyboard.md)。
 - **颜色和签名**：照 [ip-style.md](references/ip-style.md)，黑白灰加一处墨绿。
 

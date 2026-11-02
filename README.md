@@ -1,16 +1,11 @@
 <div align="center">
 
-# rayskills · builder 实战工具箱
+# rayskills
 
-**8 个从真实业务中沉淀的 AI Skill：默认替你判断下一步，也能把稳定流程连续跑完。**
-
-本地知识库 · 长文 · 口播 · 封面 · 解说视频 · 平台草稿
+**中文 AI Skills：写长文和口播稿，做封面和解说视频，存公众号和 X 草稿。**
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 [![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录9)
-[![Evals](https://img.shields.io/badge/eval%20cases-66-2563eb)](#-实测与验证)
-[![Compare](https://img.shields.io/badge/对照实测-15%2F15%20skill--helps-059669)](docs/eval-report-v1.md)
-[![Validate](https://img.shields.io/badge/结构校验-8%2F8%20pass-3fb950)](#-实测与验证)
 [![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
 
 [GitHub](https://github.com/imraywang/rayskills) · [Gitee（国内镜像）](https://gitee.com/imraywang/rayskills)
@@ -19,13 +14,19 @@
 
 ---
 
-rayskills 是一套给 Claude Code、Codex 等 AI Agent 使用的 builder 工具箱。它不是一堆“应该怎么想”的提示词，而是把真实工作中反复出现、容易犯错的流程，收敛成可以直接执行、可以验证、可以恢复的 Skill。
+rayskills 是 Ray 制作的中文 AI Skills，共 9 个，可以安装到 Claude Code、Codex 和 WorkBuddy。装好后可以让 Agent：
 
-不用先记住 8 个名字。把处境交给 `/ray`：
+- 新建或检查 Obsidian 内容知识库
+- 写中文长文、译介稿、口播稿和科普旁白稿
+- 给文章和视频做封面
+- 把文章或口播做成解说视频
+- 排版后存入公众号和 X Articles 草稿箱，不自动发布
 
-- 下一步还不稳定时，它只选择此刻最该做的一步。
+不确定用哪个时，把处境交给 `/ray`：
+
+- 下一步还不确定时，它只选择此刻最该做的一步。
 - 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
-- 涉及删除、发布、生产修改等高影响动作时，仍然守住确认边界。
+- 涉及删除、发布、生产修改的动作，它会先停下来确认。
 
 ```text
 你：这篇英文文章写得很好，想翻译过来发公众号
@@ -127,9 +128,9 @@ rayskills 把“文档写完”与“Skill 真能防错”分开检查。
 
 | 检查 | 当前结果 | 含义 |
 |---|---:|---|
-| Skill 数量 | **8** | 包含 `/ray` 主路由与 7 个成员 |
-| 场景测试 | **66** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **8 / 8 通过** | 名称、目录、frontmatter 与资源结构有效 |
+| Skill 数量 | **9** | 包含 `/ray` 主路由与 8 个成员 |
+| 场景测试 | **71** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
+| 结构校验 | **9 / 9 通过** | `tools/build.sh` 检查：name 与目录一致，description 不超过 200 字 |
 | 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
 | 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
 | 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
@@ -206,7 +207,7 @@ git clone https://gitee.com/imraywang/rayskills.git
 
 ### 从旧版本升级
 
-装过 v1（21 个 skill）、v2（14 个 skill）或 v3（13 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 8 个成员，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
+装过 v1（21 个 skill）、v2（14 个 skill）或 v3（13 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 9 个 Skill，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
 
 ```bash
 for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps ray-cover-editorial ray-consult ray-multimodel ray-trend-search ray-broll; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all

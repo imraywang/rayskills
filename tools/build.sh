@@ -47,6 +47,9 @@ for dir in "$SKILLS_DIR"/*/; do
     exit 1
   fi
 
+  # 长度校验:description 只写做什么、何时用、转给谁,细节放正文
+  python3 "$ROOT/tools/check_description.py" "$skill_md"
+
   cp -R "$dir" "$DIST/$name"
   python3 "$ROOT/tools/package_workbuddy.py" "$dir" "$WORKBUDDY_DIST/$name.zip"
   echo "ok: $name"
