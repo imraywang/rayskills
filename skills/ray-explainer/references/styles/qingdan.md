@@ -117,8 +117,8 @@
 6. **构建、检查**：
    ```
    python3 build.py
-   npx --yes hyperframes@0.8.181 check --json
-   npx --yes hyperframes@0.8.181 snapshot --describe false --at <每段一个时间点>
+   npx --yes hyperframes@latest check --json
+   npx --yes hyperframes@latest snapshot --describe false --at <每段一个时间点>
    ```
    - 窗和抠像的 `container_overflow`、`escaped_container` 是故意裁的，可以忽略。
    - 编号卡数字和名字的重叠已经标了 `data-layout-allow-overlap`。
@@ -126,7 +126,7 @@
 7. **配乐**：`gen_bgm.py hf --dur <片长+6>`，挑一条，归一后转成 `assets/audio/bgm.m4a`。
 8. **出片**：
    ```
-   npx --yes hyperframes@0.8.181 render -q delivery -o ../raw.mp4
+   npx --yes hyperframes@latest render -q delivery -o ../raw.mp4
    ```
    然后用 loudnorm 统一响度，视频流直接复制。成片超过 30 MB 发不到手机，要给 Ray 手机看就再跑 `phone_export.py`。
 9. **审片**：先跑 `qa_video.py --lufs -16`，再开 `review.py --tailnet`。

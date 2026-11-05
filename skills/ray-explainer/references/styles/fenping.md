@@ -112,8 +112,8 @@
 6. **构建、检查**：
    ```
    python3 build.py && python3 build_scenes.py
-   npx --yes hyperframes@0.8.181 check --json
-   npx --yes hyperframes@0.8.181 snapshot --describe false --at <每段一个时间点>
+   npx --yes hyperframes@latest check --json
+   npx --yes hyperframes@latest snapshot --describe false --at <每段一个时间点>
    ```
    `--describe false` 不能省，否则会把帧发给外部模型。看拼图，至少检查这几点：
    - 卡片有没有压到下巴和嘴。
@@ -123,7 +123,7 @@
 7. **配乐**：`gen_bgm.py` 出 3 条，挑一条，转成 `assets/audio/bgm.m4a`。
 8. **出片**：
    ```
-   npx --yes hyperframes@0.8.181 render -q delivery -o raw.mp4
+   npx --yes hyperframes@latest render -q delivery -o raw.mp4
    ```
    然后用 loudnorm 统一响度，视频流直接复制，再跑 `phone_export.py` 出手机版。
 9. **审片**：先跑 `qa_video.py --lufs -16`，再开 `review.py --tailnet`，读 `../scenes.json`，按 Ray 的批注改。通用的修改改回本文档和模板。

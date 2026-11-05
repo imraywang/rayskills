@@ -17,7 +17,7 @@ usage: python3 prep.py <原片.mov> --face-x 1820 [--end 81.45] [--mic-trim 0.07
 import argparse, json, os, shlex, shutil, subprocess, sys
 
 SK = os.path.expanduser("~/.claude/skills/ray-explainer/scripts")
-HF = ["npx", "--yes", "hyperframes@0.8.181"]
+HF = ["npx", "--yes", "hyperframes@latest"]
 ap = argparse.ArgumentParser()
 ap.add_argument("src")
 ap.add_argument("--face-x", type=float, required=True, help="原片里脸中心 x 像素")

@@ -123,8 +123,8 @@
 6. **构建、检查**：
    ```
    python3 build.py
-   npx --yes hyperframes@0.8.181 check --json
-   npx --yes hyperframes@0.8.181 snapshot --describe false --at <每段一个时间点，再加每层开头 +1.5 秒那一帧>
+   npx --yes hyperframes@latest check --json
+   npx --yes hyperframes@latest snapshot --describe false --at <每段一个时间点，再加每层开头 +1.5 秒那一帧>
    ```
    看拼图时检查：
    - 扎进格子那一帧（每层开头 +1.5 秒）梯子是不是放大虚化了。
@@ -133,7 +133,7 @@
 7. **配乐**：`gen_bgm.py hf --dur <片长+6>`，挑一条，归一后转成 `assets/audio/bgm.m4a`。
 8. **出片**：
    ```
-   npx --yes hyperframes@0.8.181 render -q delivery -o ../raw.mp4
+   npx --yes hyperframes@latest render -q delivery -o ../raw.mp4
    ```
    然后用 loudnorm 统一响度，视频流直接复制。要给 Ray 手机看就再跑 `phone_export.py`。
 9. **审片**：先跑 `qa_video.py --lufs -16`，再开 `review.py --tailnet`。
