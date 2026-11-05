@@ -67,7 +67,7 @@ Determinism (lint enforces most; breaking them breaks the render)
 
 Audit hygiene (`npx hyperframes check` must end with 0 errors)
 - **Mark every decorative layer `data-layout-ignore`** from the start: hex walls, grids, noise, fog rings of characters, code texture inside icons, ambience text, anything that intentionally overflows the canvas or sits under content. Unmarked texture text fails the layout and contrast audits by the dozen.
-- **Never run `npx hyperframes preview` / Studio** in this project: it writes `data-hf-id` attributes into every file in `compositions/`, including other workers' scenes (2026-10-18). Check visuals with `npx hyperframes snapshot --at …` only.
+- **Workers check visuals with `npx hyperframes snapshot --at …`, not `preview` / Studio.** Several workers share this project and a Studio edit writes to the source files.
 - Deliberate text-over-text (a stamp on a bill, a label on a screenshot) gets `data-layout-allow-overlap` on the covering element only.
 - Real content stays readable: ≥24 px, contrast ≥3:1 for large text (and the portrait minimums under Layout).
 
@@ -88,6 +88,14 @@ Layout
 - Source clips: when `BEATS[id].clips` is non-empty, the soundtrack plays the original recording there with no narration. If the clip has video (a talk, a launch, the event itself), that is a full-screen interlude: at `{{clip:cK}}` the real video takes the whole frame above the board, `.fsrc` source + “● 原声” badge at y ≥ 300, no transcript of your own (the caption bar already shows zh + en); at `{{clip:cK:end}}` hard-cut back to the board. Audio-only clips: show a board instead (real waveform, playhead synced to clip start/end, speaker + UTC/date label, transcript typed in sync with `segs`).
 - Every scene keeps a persistent ambience layer drifting slowly over the whole scene, so it never looks empty.
 - Hard cuts between scenes: make the first 0.3 s decisive; end on the final state held (no fade-to-black).
+
+## Before you hand-build
+
+HyperFrames already ships much of what a scene needs. Use it when it serves the beat; the Design truth below and every rule above still win (palette, fonts, on-screen wording, hard cuts between scenes).
+
+- **Named visuals** (chart, map, kinetic title, overlay, camera move, 3D): search first with `npx hyperframes catalog --query "<what the beat does, in English>" --json`, then `npx hyperframes add <name> --json`. It writes editable source into `compositions/`. Don't name your own scene after it, restyle it to this film, and replace every sample number with real data from the brief. Mount a block from inside your scene with the snippet `add` prints, set to this film's size; components merge into your scene file. Never touch `index.html`. List what you installed in your report. Details: `/hyperframes-registry`.
+- **Motion**: pick from `/hyperframes-animation` (rules and blueprints) instead of inventing moves; punch-ins, reframes and camera moves are `/hyperframes-keyframes`.
+- **Other runtimes**: when a beat is truly clearer as 3D, a simulation or a Lottie, Three.js, TypeGPU, Lottie and canvas are allowed inside a scene. Read `hyperframes/references/runtimes.md` and `/hyperframes-animation`; the scene still registers its paused timeline and every frame is still a function of time.
 
 ## Design truth
 

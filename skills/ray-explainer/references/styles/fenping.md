@@ -115,7 +115,7 @@
    npx --yes hyperframes@latest check --json
    npx --yes hyperframes@latest snapshot --describe false --at <每段一个时间点>
    ```
-   `--describe false` 不能省，否则会把帧发给外部模型。看拼图，至少检查这几点：
+   `--describe` 现在默认关闭，这里写明不把帧发给外部模型。看拼图，至少检查这几点：
    - 卡片有没有压到下巴和嘴。
    - 字幕和画面里的字有没有重复。
    - 标签有没有压到线。

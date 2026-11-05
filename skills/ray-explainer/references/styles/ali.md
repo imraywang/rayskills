@@ -126,7 +126,7 @@
    - 截图窗口里推近的位置对不对。
    - 有没有重复的字幕。
 
-   `--describe false` 不能省，否则会把帧发给外部模型。
+   `--describe` 现在默认关闭，这里写明不把帧发给外部模型。
 7. **出片**：
    ```
    npx hyperframes render -q looks -o raw.mp4
