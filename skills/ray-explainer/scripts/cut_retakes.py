@@ -14,6 +14,7 @@ usage:
 cuts.txt: one kept range per line, raw-recording seconds, `12.30-15.90  # what is said`; lines starting with # are
 ignored. scan writes a suspected earlier take as a commented line marked [重说?], so it is dropped unless you restore it.
 Pauses longer than --pause (0.6 s) become --keep (0.3 s): 0.1 s after the last word, the rest before the next word."""
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('numpy')
 import argparse, json, os, re, subprocess, sys, wave
 
 import numpy as np

@@ -12,6 +12,7 @@ usage: python3 whole_tts.py <project> [--speed 1.0] [--eleven <voice_id> <model_
           voice_settings.speed (0.8–1.2 all came out the same length); "[fast-paced, crisp tech news anchor]" read ~9% faster.
 Per-scene reads are cached in raw/scenes/<id>.<hash>.wav; change a line and only that scene is re-read
 (with --one any change re-reads everything: ~1 credit per character on Eleven v4)."""
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('numpy', 'pypinyin', 'mlx_whisper')
 import hashlib, json, os, re, subprocess, sys
 from difflib import SequenceMatcher
 import wave

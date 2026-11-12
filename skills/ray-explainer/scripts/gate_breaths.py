@@ -14,6 +14,7 @@ How a breath is found (tuned on Ray's 2026-10-20 course recording, 27 breaths / 
 Output is 48 kHz stereo WAV, same length as the input. Use it in place of the footage's own sound
 (HyperFrames: make the A-roll <video> muted and add <audio id="voice" src="voice.wav" ...> on the same timing).
 """
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('numpy')
 import argparse, difflib, json, os, subprocess, sys, tempfile, wave
 import numpy as np
 

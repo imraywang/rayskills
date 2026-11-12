@@ -46,6 +46,8 @@ $SK/scripts/check_setup.sh
 
 必须看到 `READY`。缺 `GEMINI_API_KEY` 就向用户要 key，不要换别的服务凑合。输出里会列出已注册的复刻音色。
 
+Python 依赖（`scripts/requirements.txt`）装在独立环境 `~/.local/share/ray-explainer/py-env` 里，自检第一次跑时用 uv 建好。脚本照常用 `python3` 调用：当前 `python3` 缺包时，`scripts/_deps.py` 会自动换到这个环境重跑，所以 Homebrew 升级 Python 之后不用重装。新加的脚本用到第三方包时，把包名加进 `requirements.txt`，并在导入前调 `_deps.need(...)`。
+
 ## 1. 读素材，写解说稿
 
 读完整素材（剪藏、候选选题卡、已有口播稿都算）。库里有 Ray 已录过的口播稿时，先读一篇找语感。
@@ -65,7 +67,7 @@ $SK/scripts/new_project.sh <英文-slug>      # 建在 ~/Movies/ray-explainer/YY
 - `title`、`central_judgment`、`header`（顶部小标题）、`voice`、`to_confirm`。
 - `theme`：全片色板，见 [grammars.md](references/grammars.md)「全片色板」。新项目默认 `"ray-ip"`；开场和结尾那一幕写 `"sig": true`。
 
-**①b 分镜关**：定画法、挑参考卡、给每幕写 `beat` / `visual` / `anchors` / `footage`，然后跑 `python3 $SK/scripts/storyboard.py <project>`，把表格原样贴给用户等确认。题材本身是大众 IP 时，第一版分镜就要带主题外壳。见 [storyboard.md](references/storyboard.md)。
+**①b 分镜关**：新闻、人物、公司这类靠真实画面的题，**先把素材下到手、看过截帧，再写分镜**（Ray 2026-11-12：先写分镜后找素材，三段画面和设想的不一样，三幕返工），做法见 [hyperframes.md](references/hyperframes.md)「取材」。然后定画法、挑参考卡、给每幕写 `beat` / `visual` / `anchors` / `footage`，然后跑 `python3 $SK/scripts/storyboard.py <project>`，把表格原样贴给用户等确认。题材本身是大众 IP 时，第一版分镜就要带主题外壳。见 [storyboard.md](references/storyboard.md)。
 
 ## 2. 配音
 

@@ -12,6 +12,7 @@ usage: python3 qa_tts.py <project_dir>      (run after tts.py)
    Lines whose voiced text still has 3+ Arabic digits get a WARN: TTS reads them as quantities
    (2019 → 两千零一十九); write them in hanzi and add a display entry. check_numbers.py verifies the reading.
 """
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('mlx_whisper')
 import difflib, json, os, re, sys
 import mlx_whisper
 

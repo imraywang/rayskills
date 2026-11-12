@@ -26,6 +26,7 @@ def secs(t):
 
 
 def words(audio, t0=None, t1=None, lang="en"):
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import _deps; _deps.need('mlx_whisper')   # only --words needs Whisper
     import mlx_whisper
     src = audio
     if t0 is not None or t1 is not None:

@@ -8,6 +8,7 @@ of that beat). An evenly spaced sheet skips whole beats: in 2026-10-15 《AI 游
 100 元 / 77 元 overlap and the near-empty opening of the 妙鸭 scene. Read each sheet and look for: an empty
 or unchanged frame next to a new caption, overlapping elements, text under the caption bar or the host.
 """
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('PIL')
 import json, os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFont
 

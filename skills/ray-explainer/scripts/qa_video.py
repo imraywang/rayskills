@@ -23,6 +23,7 @@ Frames, in qa/<video name>/ next to the video:
   opening.jpg   the first 3 s at 6 fps (is the hook already on screen?)
   cuts/*.jpg    10 frames around every scene change (5 before, 5 after): jumps, flashes, a frame of the wrong shot
 Scenes come from the same places as review.py (scenes.json, timeline.json, else scene detection)."""
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('numpy')
 import argparse, glob, json, os, re, subprocess, sys
 
 import numpy as np

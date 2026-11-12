@@ -25,6 +25,7 @@ usage:
   python3 host.py <project>             # 用户同意后再跑：生成 / 复用缓存、抠图、写 plan.json
   python3 host.py <project> --plan-only # 只重算口型和 plan.json（改了稿子重新配音之后用；大机位缓存按音频内容命中）
 """
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('pypinyin', 'PIL', 'numpy')
 import base64, hashlib, json, math, os, random, re, shutil, subprocess, sys, time, urllib.request
 
 PROJ = os.path.abspath(sys.argv[1]); ARGS = sys.argv[2:]

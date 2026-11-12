@@ -1,0 +1,8 @@
+# Third-party Python packages the pipeline scripts import. check_setup.sh installs them into
+# ~/.local/share/ray-explainer/py-env (a uv venv), and scripts/_deps.py re-runs a script there
+# when the python3 on PATH doesn't have them (a Homebrew Python upgrade drops user-site packages).
+mlx-whisper
+pypinyin
+pillow
+numpy
+soundfile

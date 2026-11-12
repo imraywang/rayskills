@@ -7,6 +7,7 @@
   flat.png（大机位视频模型的首帧原图：默认 MiniMax H3，可选 Kling）、base.png（抠掉绿幕的底图）、A E I O U M.png（口型补丁）、B.png（闭眼）、meta.json（补丁位置）
 费用：candidates 出 3 张图，build 出 7 张图，都走 fal 的 nano-banana-pro/edit，按 fal 当前价计。
 """
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import _deps; _deps.need('PIL', 'numpy')
 import json, os, subprocess, sys, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
