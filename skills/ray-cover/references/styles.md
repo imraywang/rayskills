@@ -2,7 +2,7 @@
 
 风格库是 Punk 的 MIT 版（`assets/punk/`，31 个封面风格，目录见 `assets/punk/punk-cover/references/style-catalog.md`）。每期只用一个风格，不混。
 
-## 默认三选一（2026-10-13 Ray 认可的方向）
+## 默认三选一（2026-10-13 定的方向）
 
 | 风格 | style id | 适合 |
 |---|---|---|
@@ -20,4 +20,4 @@
 - 一个短词要视觉化：`semantic-minimal-translation` 语义转译极简
 - 关系、变化、过程：`layered-paper-cut-concept-poster` 立体纸雕概念海报
 
-彩色风格（彩色新构成主义、复古弥散渐变、复古日本科幻动画、方块 / 积木世界）和 IP 冲突，除非 Ray 点名不用；用了也按 `ip.md` 收成黑白灰 + 墨绿。
+彩色风格（彩色新构成主义、复古弥散渐变、复古日本科幻动画、方块 / 积木世界）和作者档案里的品牌色冲突时，除非用户点名不用；用了也按 [作者档案](../author-profile.md) 的颜色收敛。

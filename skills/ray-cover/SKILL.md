@@ -1,79 +1,99 @@
 ---
 name: ray-cover
-description: 给定稿的文章或视频做带中文标题的封面：文章封面分公众号、X、X Article 尺寸出图；视频封面用 Ray 真人照片配大标题，默认 3:4，可出 9:16 和 16:9。能只改局部。用于“做封面”“视频封面”“竖屏封面”“横屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
+description: 给定稿的文章或视频做带中文标题的封面：文章封面分公众号、X、X Article 尺寸出图；视频封面用作者真人照片配大标题，默认 3:4，可出 9:16 和 16:9。能只改局部。用于“做封面”“视频封面”“竖屏封面”“横屏封面”“换个风格再出一版”“封面标题改一下”。不做正文配图和视频画面。
 ---
 
-# Ray Cover
+# ray-cover：文章封面与视频封面
 
-把一篇定稿内容压成一张在信息流里一眼能认出的封面。Claude 负责读内容、写封面文案、选风格、编译每个平台的完整提示词、验收；生成默认走 OpenAI Images API（gpt-image-2.5-sunburst，约 40 秒、$0.07 一张），没有 key 或 `--backend codex` 时由 Codex CLI 调 Image 2。画面和中文由生图模型一次生成，不做无字底图再排字。
+把一篇定稿内容压成一张在信息流里一眼能认出的封面。你负责读内容、写封面文案、选风格、给每个尺寸写完整提示词、验收；画面和中文由生图模型一次生成，不做无字底图再排字。终点是验收过的本地成品，上传平台由别的 skill 接手。
 
-风格库来自 Adrian Punk 的 Punk Skill MIT 版（`assets/punk/`，来源和许可边界见 `assets/punk/NOTICE.md`）。之后的新版是付费商业授权，不拷进来。
+`$SK` 指本 skill 目录，`<vault>` 指知识库根目录，`<p>` 指平台代号。
 
-`$SK` 指本 skill 目录。
+## 先分清做哪种
 
-**视频封面**（抖音、视频号、小红书的竖封面，以及 YouTube、视频号 / 抖音横屏视频的 16:9 横封面）走另一套：真人照片 + 大标题，见 [video-cover.md](references/video-cover.md)。默认只出 3:4（`xhs`）、默认风格小Lin风A；9:16 只在 Ray 明确要时出；各比例的安全区见同一文件。
+| 要做的 | 靠什么抓人 | 怎么走 |
+|---|---|---|
+| 文章封面（公众号 `wechat`、X `x`、X Article `x-article`） | 一个视觉隐喻 + 三层文案 | 下面「文章封面」四步，再走「生成、验收、交付」 |
+| 视频封面（3:4 `xhs`、9:16 `vertical`、16:9 `landscape`） | 人脸 + 大标题 | 照 [video-cover.md](references/video-cover.md) 读稿、写文案、选风格、选照片、写提示词，再走「生成、验收、交付」 |
+| 改一张已经出过的封面 | | 直接看「修改」 |
 
-下面第 5–7 步的生成、验收、交付照常适用；以下几步换成 video-cover.md 里的规则：
-- 第 2 步的文案换成 video-cover.md「文案」。小Lin风A 是超大关键词 + 一行中文 + 一行小英文；其他风格默认只有两行主标题。第 3–4 步的选风格和编译提示词也换成 video-cover.md 里的规则。只删改一行字时用 `scripts/erase_text.py`，不重新生成。
+两种封面的文案、风格和提示词是两套规则，不混用。
 
-## 1. 读内容
+## 读作者档案
 
-读完整正文；有成稿包时同时读一句话判断、核心冲突和传播句；视频封面读这期的口播母稿（vault 的 `40-发布/50-口播视频/`）或 ray-explainer 项目的 `script.json`（`title`、`central_judgment`、`publish`），两处任一即可。判断还没定的内容先交回 `ray-writer`，不用封面替文章拍板。
+动手前读 [author-profile.md](author-profile.md)：品牌色和禁用项、能不能用真人照片、默认风格和尺寸、先看文案还是直接出图，都以它为准。档案是空的或用户明显不是档案里的人时，颜色跟着内容和所选风格走，不套别人的品牌；不用任何人的照片，除非用户这次给了并同意，可以提一句用 [author-profile.template.md](author-profile.template.md) 建自己的档案。
 
-## 2. 写封面文案
+## 文章封面
 
-按 [cover-copy.md](references/cover-copy.md) 写三层：主标题（2–8 字）、副标题（补主标题没说的）、小字（一个硬事实或身份标签）。按内容类型换写法，三层之间不重复，不把文章标题拆开了事。
+### 1. 读内容
 
-默认直接用最合适的一组出图，同时准备 1–2 组备选文案，交付时一起给 Ray。Ray 明确说「先给我看文案」时才停下来等确认。
+读完整正文；有成稿包时一起读一句话判断、核心冲突和传播句。判断还没定的内容交回 `ray-writer`：封面不替文章拍板，判断一变封面就白做。
 
-## 3. 选风格
+### 2. 写封面文案
 
-按 [styles.md](references/styles.md) 挑一个风格。默认在 Anthropic Research、黑白灰先锋几何、纸面击凸压凹三个里按内容选；Ray 点名风格就用他点的；Ray 说「多出几个风格看看」就每个风格各出一版公众号尺寸。
+按 [cover-copy.md](references/cover-copy.md) 写三层：主标题（2–8 字）、副标题（补主标题没说的）、小字（一个硬事实或身份标签）。三层不重复，也不把文章标题拆开了事。
 
-## 4. 编译提示词
+准备一组主用的和 1–2 组备选。直接出图还是先给用户看文案，按档案的「默认做法」；用户说“先给我看文案”时停下来等。
 
-每个平台一份，存到 `<封面目录>/prompts/<platform>.md`（文章：`wechat`、`x`、`x-article`；视频：`vertical`、`xhs`、`landscape`）：
+### 3. 选风格
 
-1. 读选定风格的 `assets/punk/styles/<style-id>/META.md` 和 `STYLE.md`，以及 `assets/punk/punk-cover/references/cover-prompt-blueprint.md`。
-2. 按蓝图编译成一份完整的封面提示词：风格的材质、空间、标题处理、颜色和禁忌落到每个封面决定上，不把 STYLE.md 原文贴在后面。
-3. 把 [ip.md](references/ip.md) 的颜色和禁用约束写进「Color, Material, and Texture」「Negative Constraints」两节。
-4. 写明目标比例和像素、安全区、逐字文案（见 [platform-output.md](references/platform-output.md)）。
-5. 提示词里不写作者名或「xx style」，只描述视觉机制；不贴文章原文。
+按 [styles.md](references/styles.md) 挑一个，一期只用一个。用户点名就用点名的；说“多出几个风格看看”时，每个风格各出一张公众号尺寸。
 
-## 5. 生成
+风格库是 Adrian Punk 的 Punk Skill MIT 版（`assets/punk/`，来源和许可见 `assets/punk/NOTICE.md`）。之后的新版是付费商业授权，用户要用新版风格时说明这一点，不把它拷进来。
 
-封面目录默认是 `<vault>/60-素材/10-图片/10-封面/<YYYY-MM-DD-主题>/`（`<vault>` 来自用户给的路径或 `.ray-obsidian.json`；没有知识库时放用户指定的工作区）。
+### 4. 写提示词
+
+每个平台一份，存到 `<封面目录>/prompts/<p>.md`：
+
+1. 读所选风格的 `assets/punk/styles/<style-id>/META.md` 和 `STYLE.md`，以及 `assets/punk/punk-cover/references/cover-prompt-blueprint.md`。
+2. 按蓝图写成一份完整提示词：把风格的材质、空间、标题处理、颜色和禁忌落到这张封面的每个决定上，不把 STYLE.md 原文贴在后面。
+3. 档案里的颜色和禁用项写进「Color, Material, and Texture」和「Negative Constraints」两节。
+4. 写明目标比例和像素、安全区、逐字文案，见 [platform-output.md](references/platform-output.md)。
+5. 只描述视觉机制，不写作者名或「xx style」，不贴文章原文。
+
+## 生成、验收、交付
+
+### 生成
+
+封面目录默认是 `<vault>/60-素材/10-图片/10-封面/<YYYY-MM-DD-主题>/`；`<vault>` 来自用户给的路径或 `.ray-obsidian.json`，没有知识库时放用户指定的工作区。
 
 ```bash
 python3 $SK/scripts/gen_cover.py <封面目录> --platforms wechat,x,x-article
 ```
 
-脚本对每个平台各出一张图（并行），生成 `raw-<platform>.png`，比例对就等比缩放成 `<platform>-cover.png` 和 420px 缩略图，写 `manifest.json`；比例不对报错，不裁不拉。
+脚本给每个平台各出一张（并行）：生成 `raw-<p>.png`，比例对就等比缩放成 `<p>-cover.png` 和 420px 缩略图，写 `manifest.json`。比例不对会报错，不裁不拉，因为裁出来的构图和安全区都是错的。只出一个平台时 `--platforms wechat`；视频封面的参数见 video-cover.md「生成」。
 
-- **默认 `--backend api`**（`OPENAI_API_KEY` 在环境变量或 `~/.zshenv` 里就自动用）：OpenAI Images API，模型 `gpt-image-2.5-sunburst`，有 `--ref` 走 `/v1/images/edits`、没有走 `/v1/images/generations`，一张约 30–50 秒、约 $0.07。原生尺寸已实测 xhs 1200×1600；别的比例 API 不收时报错，那个平台改用 `--backend codex`。
-- **`--backend codex`**：Codex CLI 调 Image 2，一张约 1–5 分钟。需要 `codex` 已登录且 `image_generation` 开启（`codex features list`）。
+| 后端 | 什么时候用 | 速度和费用 |
+|---|---|---|
+| `--backend api`（默认） | 环境变量或 `~/.zshenv` 里有 `OPENAI_API_KEY` | OpenAI Images API，`gpt-image-2.5-sunburst`，一张约 30–50 秒、约 $0.07 |
+| `--backend codex` | 没有 key，或某个比例 API 不收 | Codex CLI 调 Image 2，一张约 1–5 分钟；要 `codex` 已登录且 `image_generation` 开启（`codex features list`） |
 
-只出一个平台或换风格试一版：`--platforms wechat`。
-
-## 6. 验收
+### 验收
 
 用 Read 看每张成品和缩略图：
 
-- 文案逐字对：缺字、错字、多字（模型自己加的标语或英文）。错字、多字改提示词重跑该平台；模型自加的短标签列给 Ray 判断。
-- 颜色：只有黑白灰加一处墨绿，没有蓝紫、霓虹、别的色相。
-- 主标题在 420px 缩略图上读得清；关键文字不贴边、不被裁。
-- 风格是真的落在画面上，而不是普通封面加一点质感。
+- **文案逐字对**：缺字、错字、多字（模型自己加的标语或英文）。错字和多字改提示词重跑那个平台；模型自加的短标签列给用户判断。
+- **颜色**符合档案，没有档案禁用的色相。
+- **主标题在 420px 缩略图上读得清**；关键文字不贴边、不被裁。
+- **风格真的落在画面上**，不是普通封面加一点质感。
 
-## 7. 交付
+### 交付
 
-用 SendUserFile 发成品，回复里写：用的风格和一句话视觉隐喻、这组文案、1–2 组备选文案、验收发现的问题（模型自加的字、颜色偏差）。Ray 要调整时，分两种：
+用 SendUserFile 发成品。回复里写：用的风格和一句话视觉隐喻、这组文案、1–2 组备选、验收发现的问题（模型自加的字、颜色偏差）。
 
-- **只改局部**（去掉一个小东西、换背景、改一处颜色）：不重新生成，写 `prompts/<p>-edit.md`（「只做一处修改：……其余一切保持完全不变」），跑 `gen_cover.py <封面目录> --platforms <p> --edit`。脚本把旧的 raw / cover / thumb 自动留档成 `-v1`、`-v2`，拿现成的 `raw-<p>.png` 去改，构图和脸都不变（2026-10-16 宝可梦封面去领夹麦，一次成功）。
-- **只换人物**（换一张身份照，构图、文字、道具都不动）：`gen_cover.py <封面目录> --platforms <p> --edit --ref <新照片>`，定稿封面和新照片一起送进编辑接口，写法见 [video-cover.md](references/video-cover.md)「换人物、保留构图」。
-- **重新构图**：先把那几个平台的旧文件（`raw-<p>.png`、`<p>-cover.png`、`<p>-thumb.jpg`、`api-<p>.log` / `codex-<p>.log`、`manifest.json`）改名加 `-v1`、`-v2` 留档、提示词另存 `prompts/<p>-v1.md`，再只改对应平台的提示词重跑；脚本会覆盖同名文件。
+## 修改
+
+用户认可了构图时，能不重新生成就不重新生成：重新生成会把构图和脸一起换掉。
+
+| 要改的 | 做法 |
+|---|---|
+| 一处局部（去掉一个小东西、换背景、改一处颜色） | 写 `prompts/<p>-edit.md`（「只做一处修改：……其余一切保持完全不变」），跑 `gen_cover.py <封面目录> --platforms <p> --edit`。脚本拿现成的 `raw-<p>.png` 去改，并把旧的 raw / cover / thumb 自动留档成 `-v1`、`-v2` |
+| 只换人物（换一张照片，构图、文字、道具不动） | `gen_cover.py <封面目录> --platforms <p> --edit --ref <新照片>`，写法见 video-cover.md「换人物、保留构图」 |
+| 删掉或改短一行字 | 用 `scripts/erase_text.py`，用法和适用范围见 video-cover.md「验收与交付」 |
+| 重新构图 | 先把那个平台的旧文件（`raw-<p>.png`、`<p>-cover.png`、`<p>-thumb.jpg`、`api-<p>.log` 或 `codex-<p>.log`、`manifest.json`）改名加 `-v1`、`-v2` 留档，提示词另存 `prompts/<p>-v1.md`，再改提示词重跑。不先留档的话脚本会覆盖同名文件 |
 
 ## 边界
 
-- 不发布、不上传平台；进公众号草稿交 `ray-wechat`，进 X Articles 后台交 `ray-x-article`（用 5:2 成品）。
-- 文章封面默认不画形象，Ray 要求时按 [ip.md](references/ip.md) 的方式加；视频封面用 Ray 的真人照片（他已同意），用别人的照片先问。
-- 正文配图、视频画面不归这个 skill。
+- 不发布、不上传平台。进公众号草稿交 `ray-wechat`，进 X Articles 后台交 `ray-x-article`（用 5:2 的 `x-article` 成品）。
+- 真人照片只按档案里写明的同意范围用；用别人的照片先问。
+- 正文配图、视频画面不归这里。
