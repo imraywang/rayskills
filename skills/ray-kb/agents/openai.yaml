@@ -1,4 +1,4 @@
 interface:
   display_name: "Ray KB"
   short_description: "从灵感或定稿生成口播，并完成审读与录后学习"
-  default_prompt: "Use $ray-kb to turn this idea or article into a recording-ready Chinese oral script in Ray's own voice."
+  default_prompt: "Use $ray-kb to turn this idea or article into a recording-ready Chinese oral script in the author's own voice."

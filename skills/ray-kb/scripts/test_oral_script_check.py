@@ -36,7 +36,7 @@ class OralScriptCheckTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         return path
 
-    def fast_script(self, spoken: str = SPOKEN, pending: str = "- 【编的经历】第一句的现场：需要 Ray 决定。") -> str:
+    def fast_script(self, spoken: str = SPOKEN) -> str:
         return (
             "---\n"
             "kind: oral-script\n"
@@ -48,7 +48,6 @@ class OralScriptCheckTests(unittest.TestCase):
             "---\n\n"
             "# 测试\n\n"
             f"## 口播正文\n\n{spoken}\n\n"
-            f"## 待确认\n\n{pending}\n\n"
             "## 素材与来源\n\n- [[某条笔记]]\n\n"
             "## 录制与发布收尾\n\n- [ ] 待录制\n"
         )
@@ -67,16 +66,11 @@ class OralScriptCheckTests(unittest.TestCase):
             result, output = self.run_check(str(script))
             self.assertEqual(result, 0, output)
 
-    def test_pending_section_is_required_but_can_be_none(self) -> None:
+
+    def test_old_draft_with_pending_section_still_passes(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
-            ok = self.write(Path(raw), "ok.md", self.fast_script(pending="无"))
-            self.assertEqual(self.run_check(str(ok))[0], 0)
-            missing = self.write(
-                Path(raw), "missing.md", self.fast_script().replace("## 待确认", "## 别的")
-            )
-            result, output = self.run_check(str(missing))
-            self.assertEqual(result, 1)
-            self.assertIn("待确认", output)
+            old = self.fast_script().replace("## 素材与来源", "## 待确认\n\n无\n\n## 素材与来源")
+            self.assertEqual(self.run_check(str(self.write(Path(raw), "old.md", old)))[0], 0)
 
     def test_spoken_text_rejects_lists_and_brackets(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -112,16 +106,6 @@ class OralScriptCheckTests(unittest.TestCase):
             self.assertEqual(result, 1)
             self.assertIn("单独成行", output)
 
-    def test_at_most_one_red_pending_item(self) -> None:
-        one = "- 🔴【拿不准】“立论句”：只抽查了一半。\n- 【数字】“一天三小时”：没核对。"
-        two = one + "\n- 🔴【拿不准】“另一句立论”：没查。"
-        with tempfile.TemporaryDirectory() as raw:
-            ok = self.write(Path(raw), "ok.md", self.fast_script(pending=one))
-            self.assertEqual(self.run_check(str(ok))[0], 0)
-            bad = self.write(Path(raw), "bad.md", self.fast_script(pending=two))
-            result, output = self.run_check(str(bad))
-            self.assertEqual(result, 1)
-            self.assertIn("2 条 🔴", output)
 
     def test_article_repurpose_checks_source_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -135,7 +119,6 @@ class OralScriptCheckTests(unittest.TestCase):
                 "central_judgment: 驻场只有回流成共同能力才不是定制开发\n"
                 "target_duration_seconds: 60\n---\n\n"
                 f"## 逐字稿\n\n{SPOKEN}\n\n"
-                "## 待确认\n\n无\n\n"
                 "## 素材与来源\n\n- https://example.com/source\n"
             )
             script = self.write(root, "article.md", body.replace("{sha}", sha))

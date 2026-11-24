@@ -10,10 +10,10 @@ import sys
 from pathlib import Path
 
 
-# 只检查结构能不能用，不检查风格。风格由 references/voice.md 的表达规则和样本约束。
-ARTICLE_REQUIRED_SECTIONS = ["逐字稿", "待确认", "素材与来源"]
+# 只检查结构能不能用，不检查风格。风格由 author-profile.md 的偏好和样本约束。
+ARTICLE_REQUIRED_SECTIONS = ["逐字稿", "素材与来源"]
 
-FAST_REQUIRED_SECTIONS = ["口播正文", "待确认", "素材与来源", "录制与发布收尾"]
+FAST_REQUIRED_SECTIONS = ["口播正文", "素材与来源", "录制与发布收尾"]
 SOURCE_CLIP_LINE = r"^[ \t]*【原声[：:][^【】\n]+】[ \t]*$"
 
 
@@ -89,7 +89,7 @@ def main() -> int:
     required_sections = FAST_REQUIRED_SECTIONS if fast_oral else ARTICLE_REQUIRED_SECTIONS
     missing = [name for name in required_sections if not section(body, name)]
     if missing:
-        errors.append("缺少章节: " + "、".join(missing) + "（待确认没有内容时写“无”）")
+        errors.append("缺少章节: " + "、".join(missing))
 
     spoken_raw = section(body, "口播正文" if fast_oral else "逐字稿")
     # 叙事型里单独成行的【原声：……】是插入的原始录音，不是 Ray 念的字
@@ -112,11 +112,6 @@ def main() -> int:
                 f"逐字稿约 {count} 个汉字，估算 {fast_seconds:.0f}–{slow_seconds:.0f} 秒，"
                 f"和目标 {target_seconds} 秒差得较多"
             )
-
-    pending = section(body, "待确认")
-    red_items = len(re.findall(r"^\s*[-*+]\s*🔴", pending, re.MULTILINE))
-    if red_items > 1:
-        errors.append(f"待确认里有 {red_items} 条 🔴 立论级，最多一条；中心判断需要换一个能核实的")
 
     if fast_oral and args.source:
         warnings.append("fast-oral 不绑定上游母稿，已忽略 --source")

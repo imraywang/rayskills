@@ -6,11 +6,11 @@
       "name": "新闻事件写成科普讲解稿",
       "type": "happy-path",
       "prompt": "/ray-kepu 月球上被拍到五道撞击闪光，但探测器相机一张都没拍到。做一期 3 分钟左右的科普，讲清楚为什么。",
-      "expected_output": "先读 references/style.md 并通读样本清单，跑知识库预检，核实数字和时间后，在 10-创作/25-口播草稿/ 写一份 script_shape: explainer 的 fast-oral 母稿，正文是讲解者视角的旁白，含待确认、素材与来源、录制与发布收尾。",
+      "expected_output": "先读 author-profile.md 和 references/style.md 并通读样本清单，跑知识库预检，核实数字和时间后，在 10-创作/25-口播草稿/ 写一份 script_shape: explainer 的 fast-oral 母稿，正文是讲解者视角的旁白，含素材与来源、录制与发布收尾。",
       "expectations": [
-        "动笔前读 references/style.md，并整篇读样本清单里的稿子",
+        "动笔前读 author-profile.md 和 references/style.md，并整篇读样本清单里的稿子",
         "联网调研前跑 knowledge_search.py，输出贴进「素材与来源」的「知识库预检」小节，没有相关也写「无相关」",
-        "frontmatter 含 production_route: fast-oral、script_shape: explainer，central_judgment 是观众能复述的一件事而不是 Ray 的立场",
+        "frontmatter 含 production_route: fast-oral、script_shape: explainer，central_judgment 是观众能复述的一件事而不是作者的立场",
         "开头三句给出一个具体的反常并把问题问出来；原理部分有一个生活类比和一个能自己算的数",
         "没有编造的「我」的经历；结尾落在观众得到的东西上，不是作业题、冷水或口号"
       ]
@@ -33,10 +33,10 @@
       "name": "查不实的数字降到查得实的程度",
       "type": "boundary",
       "prompt": "/ray-kepu 写一期讲某公司上市的科普，开头就说它估值两万亿、是史上最大 IPO，说得越满越好。",
-      "expected_output": "核实来源：招股书原文没有估值时，正文写成「据报道」并给出处，不把报道说成事实；口径差异进「待确认」，🔴 立论级最多一条。",
+      "expected_output": "核实来源：招股书原文没有估值时，正文写成「据报道」并给出处，不把报道说成事实；数字出处和口径差异记进「素材与来源」。",
       "expectations": [
         "不把只有媒体报道的数字写成确定事实，正文带「据报道」或同等措辞",
-        "「待确认」写清数字出处和不同来源的口径差异",
+        "「素材与来源」写清数字出处和不同来源的口径差异",
         "不因为用户要求说满就编造或夸大事实（与 ray-kb 的观点说满规则区分）"
       ]
     },

@@ -164,9 +164,9 @@ def inspect(path: Path, explicit_profile: str | None = None) -> dict[str, object
 
     if is_translation:
         check_translation(meta, body, errors, warnings)
-    elif not re.search(r"(?m)^##\s*待确认\s*$", body):
-        add(warnings, "missing-pending", "原创稿文末没有「## 待确认」")
-    elif "待确认" not in meta.get("publish_exclude_sections", ""):
+    elif re.search(r"(?m)^##\s*待确认\s*$", body) and "待确认" not in meta.get(
+        "publish_exclude_sections", ""
+    ):
         add(
             errors,
             "pending-not-excluded",
