@@ -75,7 +75,7 @@ flowchart LR
 | `ray-writer`、`ray-kb`、`ray-kepu` | 身份与读者、表达偏好、允许 AI 补什么、样本清单 |
 | `ray-cover` | 品牌色、禁用项、能不能用真人照片、默认风格和尺寸 |
 
-仓库里带的是 Ray 自己的档案。你自己用时，把同目录的 `author-profile.template.md` 覆盖到 `author-profile.md` 再填。可以只写几条明确知道的，边用边补；没填的项不会被 AI 自动补全。
+仓库里只带空白模板 `author-profile.template.md`。第一次用时把它复制成同目录的 `author-profile.md` 再填；这个文件是你自己的，已经在 `.gitignore` 里，不会被提交。可以只写几条明确知道的，边用边补；没填的项不会被 AI 自动补全。
 
 ## 它守住的边界
 

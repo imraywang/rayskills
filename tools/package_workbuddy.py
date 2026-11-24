@@ -7,7 +7,8 @@ from zipfile import ZIP_DEFLATED, ZipFile
 def should_include(relative):
     if relative.name == ".DS_Store" or relative.suffix == ".pyc":
         return False
-    return "__pycache__" not in relative.parts
+    # author-profile.md is each user's own file and stays on their machine; only the template ships
+    return "__pycache__" not in relative.parts and relative.name != "author-profile.md"
 
 
 def main():

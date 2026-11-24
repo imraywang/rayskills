@@ -21,7 +21,11 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 ## 读作者档案
 
-动手前读 [author-profile.md](author-profile.md)：品牌色和禁用项、能不能用真人照片、默认风格和尺寸、先看文案还是直接出图，都以它为准。档案是空的或用户明显不是档案里的人时，颜色跟着内容和所选风格走，不套别人的品牌；不用任何人的照片，除非用户这次给了并同意，可以提一句用 [author-profile.template.md](author-profile.template.md) 建自己的档案。
+动手前读 [author-profile.md](author-profile.md)：品牌色和禁用项、能不能用真人照片、默认风格和尺寸、先看文案还是直接出图，都以它为准。
+
+**没有 `author-profile.md` 时**（刚装好就是这样，仓库里只带模板）：把同目录的 [author-profile.template.md](author-profile.template.md) 复制成 `author-profile.md`，告诉用户去填。
+
+档案不存在、是空的，或用户明显不是档案里的人时，颜色跟着内容和所选风格走，不套别人的品牌；不用任何人的照片，除非用户这次给了并同意，可以提一句用 [author-profile.template.md](author-profile.template.md) 建自己的档案。
 
 ## 文章封面
 

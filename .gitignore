@@ -4,3 +4,6 @@ node_modules/
 *.local
 __pycache__/
 *.py[cod]
+
+# 作者档案是每个人自己的，只在本机；仓库里只带 author-profile.template.md
+skills/*/author-profile.md
