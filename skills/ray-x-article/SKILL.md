@@ -3,129 +3,138 @@ name: ray-x-article
 description: 把完成的长文和 5:2 封面写进已登录的 X Articles 后台存为草稿，核对预览并把草稿地址回写知识库。用于“放进 X 后台”“存为 X Article 草稿”“推送到 X”。只存草稿：不点 Publish，不重复建同题草稿。
 ---
 
-# Ray X Article
+# ray-x-article：X Articles 草稿
 
-把 X Articles 当成交付后台，而不是内容源。正文始终以本地 Markdown 为准；浏览器只负责创建或更新草稿、上传封面和验证结果。
+把一篇定稿送进 X Articles 的草稿箱。X 后台只是交付的地方，不是内容源：正文永远以本地 Markdown 为准，浏览器只用来建或更新草稿、上传封面、核对结果。终点是验证过的草稿，`Publish` 不在操作范围内。
 
-## 固定边界
+`$SK` 指本 skill 目录。
 
-1. 只处理已经通过 `ray-writer` 检查的完整文章；内容判断不稳定时先退回写作管线。
-2. 封面必须来自 `ray-cover`，X Article 使用 5:2 成品；16:9 的普通 X 分享图不能直接代替。
-3. X 没有公开的 Article 草稿接口。使用当前宿主可用的浏览器或电脑控制能力操作用户已登录的后台，不使用普通 Post API 或 `xurl post`，也不把只会读取网页的工具误当成可操作浏览器。
-4. 本 Skill 的终点固定为已验证草稿，`Publish` 按钮和确认弹窗都不属于操作范围。公开发布必须在草稿验收后进入另一个明确的发布任务。
-5. 创建前检查 Drafts 中是否存在同名文章；优先打开并更新现有草稿，不制造重复项。
-6. 已发布 Article 不属于本 Skill 的修改对象。不得进入 Published 编辑；X 会先取消发布，必须交给另一个明确任务处理。
-7. `kind: translation` 或 `kind: repost` 的译介稿多一道授权门：`source_permission` 不是 `granted` 或 `open-license` 时只做本地交付包，不开浏览器。出处块必须随正文一起进编辑器，原文链接保持可点。契约见 `ray-writer/references/translation.md`。
+## 先判定这一轮能做到哪
 
-## 0. 先判定授权
+只看用户**当前这轮的原话**，选一级。这套判定和 `ray` 主入口、`ray-wechat` 是同一套：
 
-开始浏览器操作前，根据用户当前这轮原话写出内部判定。这张表和判定规则与 `ray` 主入口、`ray-wechat` 完全一致，不在本 Skill 里另作解释：
-
-| 级别 | 可以做什么 | 判定依据 |
+| 级别 | 能做什么 | 什么时候是这一级 |
 |---|---|---|
-| `local_only` | 只做本地交付包，不碰 X 后台 | 用户只说“先看看”“准备交付包”，或整句没有指名平台落点 |
-| `draft_write` | 创建或更新 X Article 草稿，并完整验收 | 本轮原话同时出现**具体平台**和**落点**，例如“保存到 X Articles 草稿箱”“放进 X 后台” |
-| 公开发布 | 不属于内容生产管线 | 这套判定永远不产生它；本 Skill 没有 `publish` 判定 |
+| `local_only` | 只做本地交付包，不开 X 后台 | “先看看”“准备交付包”，或整句没说落到哪个平台的哪里 |
+| `draft_write` | 创建或更新 X Article 草稿，并完整验收 | 原话里同时有平台和落点：“保存到 X Articles 草稿箱”“放进 X 后台” |
+| 公开发布 | 不做 | 这里永远到不了这一级，要另开明确的发布任务 |
 
-判定规则三条：
+三种容易判错的说法：
 
-1. **只指名平台、动词模糊**——“推送到 X”“同步到两个平台”“上架后台”——不直接升为 `draft_write`。先把本地交付包做完，然后用一句话问清楚：“交付包已经好了，要现在写进 X 草稿箱吗？”得到肯定答复再开浏览器。既不擅自写，也不做完就不吭声。
-2. **完全没指名平台落点**——“过稿 OK”“进入下一阶段”“走完整发布流程”——一律 `local_only`，不问也不写。
-3. **用户明确说“发布”“公开”**——仍然只做到草稿并验收，然后说明公开发布超出本 Skill 边界；不得把准备草稿和点击 `Publish` 合并成一次连续操作。
+1. **点了平台、动词含糊**（“推送到 X”“同步到两个平台”“上架后台”）：先把交付包做完，再问一句“交付包已经好了，要现在写进 X 草稿箱吗？”，得到肯定答复才开浏览器。不擅自写，也不做完就不吭声。
+2. **没说平台落点**（“过稿 OK”“进入下一阶段”“走完整发布流程”）：按 `local_only`，不问也不写。
+3. **说了“发布”“公开”**：仍然只做到草稿并验收，然后说明公开发布不在这里做。准备草稿和点 `Publish` 不能连成一次操作。
 
-过去任务里的发布许可、另一个平台的许可、已登录状态、按钮已经可见，都不构成本轮授权。不确定一律降到 `local_only`。
+以前任务里的许可、对公众号的许可、已经登录、按钮就在眼前，都不算这一轮的授权。拿不准就按 `local_only`。开浏览器之前先告诉用户：这次会停在草稿，不会公开发布。
 
-进入浏览器前向用户说明本次会停在草稿、不会公开发布。
+## 写入前必须成立的条件
 
-## 1. 准备交付包
+| 条件 | 不成立时 | 为什么 |
+|---|---|---|
+| 文章是通过 `ray-writer` 检查的定稿 | 判断还在变就退回写作 | 后台里反复改正文，格式和块数都要重验 |
+| 封面是 `ray-cover` 出的 5:2 `x-article` 成品 | 交回 `ray-cover` 出图 | 16:9 的普通 X 分享图传上去会被裁掉标题 |
+| 有一个能控制已登录浏览器、能上传本地文件的工具 | 进编辑器前就停，说明缺什么 | X 没有公开的 Article 草稿接口；普通 Post API、`xurl post`、只能读网页的工具都不算 |
+| 译介稿（`kind: translation` / `repost`）的 `source_permission` 是 `granted` 或 `open-license` | 只做本地交付包，不开浏览器 | 契约见 `ray-writer` 的 translation.md；出处块要随正文一起进编辑器，原文链接保持可点 |
 
-读取完整正文、成稿包和封面清单。运行：
+另外三条始终成立：
 
-```bash
-python3 scripts/prepare_article.py --article <文章.md> --cover <x-article-cover.png> --out <临时交付包.json>
-```
+- **先查重再新建。** Drafts 里有同名文章就打开原草稿更新，不造第二份。
+- **不碰已发布的 Article。** 进 Published 编辑会让 X 先取消发布，那是另一个明确的任务。
+- **不点 `Publish`，也不点它去“看看确认弹窗”。** 弹窗本身已经是发布流程。
 
-脚本负责去掉 frontmatter 和正文首部一级标题、生成纯文本与富文本 HTML、检查标题与正文、确认长文有章节和重点加粗、拒绝连续空行、确认封面接近 5:2、对译介稿验证授权与署名，并输出编辑器应有的块数、`h1`/`h2` 数、加粗数、首尾锚点、表格与插图清单及指纹。有序和无序列表只把内容放进 `<li>`，原始数字或项目符号必须剥离，交给 X 编辑器生成唯一一层列表标记。检查失败就退回 `ray-writer` 或 `ray-cover` 修正，不绕过。
+## 流程
 
-交付包里的数字都是按编辑器语义算的，核对时直接用，不要自己回头去数 Markdown：
+### 1. 准备交付包
 
-- `expected_editor.block_count` 是粘贴 `body_html` 后、插入表格和图片前的块数；列表里每个 `<li>` 单独算一块。`block_count_with_tables` 是插入原生表格后、插图前的块数。
-- 编辑器只有 `Heading`（`h1`）和 `Subheading`（`h2`）两级，Markdown `##` 出 `h1`，`###` 及更深出 `h2`。
-- `start_anchor` / `end_anchor` 取自 HTML 粘贴后页面上真正显示的文字，链接只留锚文本。
-- `tables` 是原生表格清单，含原样 Markdown、行列数、逐格文字和插入位置。`body_html` 不含表格；不要把 `<table>` HTML 或带竖线的 Markdown 直接粘进正文。表格与图片各有 `source_order`，用来合并成原文顺序。
-- `images` 是插图位置清单，正文没有图时是空数组。表格或图片紧邻插图时，清单另给 `after_table_order` 或 `after_image_order`。
-
-## 2. 进入 X Articles
-
-先阅读 [browser-capability.md](references/browser-capability.md)，选择当前宿主中能控制登录态浏览器、上传本地文件并检查可见页面的能力。再阅读 [x-editor-contract.md](references/x-editor-contract.md)，按照已验证的可见文字定位编辑器。
-
-先读取文章 frontmatter：
-
-- `publish_exclude_sections`（若存在）：列出的章节（如 `待确认`）在准备正文时自动剔除，母稿不改。正文带「待确认」而用户本轮没说已经看过时，写入前用一句话提醒一次。
-- 已有 `x_article_draft_url` 时，直接打开该 URL，核对标题后更新原草稿。
-- 状态为 `draft-needs-cover` 时，只补封面并重新验证；不要重写正文或建立第二份草稿。
-- 状态已经是 `draft`、但用户提到过去失败时，以当前后台可见状态为准：先核验原草稿，封面确实缺失才补传，不能按旧叙述直接覆盖。
-- 没有草稿 URL 时才打开 `https://x.com/compose/articles`，并确认页面存在 `Articles`、`Drafts`、`Published`，当前账号已登录且有 `Write` 入口；再检查 Drafts 中是否有同名文章，有则打开原草稿，不新建。
-
-只有完成重复检查后才进入 `Write`。进入编辑页会立即生成空白草稿，因此后续失败时要么保留并记录地址以便恢复，要么确认它仍是纯空白后删除。遇到权限失败、断线或旧草稿恢复时读取 [recovery-runbook.md](references/recovery-runbook.md)。
-
-## 3. 写入草稿
-
-按以下顺序执行：
-
-1. 上传交付包中的 5:2 封面：读页面拿到 file input 元素的引用，用专用文件上传动作把绝对路径交给它，**不要点 `Choose File`**（它弹原生对话框，会卡死）。出现 `Edit media` 后点击 `Apply`，再以封面实际显示和 `Remove photo` 出现作为上传成功信号。
-2. 在 `Add a title` 填入标题，逐字核对。
-3. 把交付包中的 `body_html` 作为 HTML、`body` 作为纯文本同时写入浏览器剪贴板，在正文 textbox 全选后粘贴。这样让编辑器直接生成正常段落、标题、列表、链接和加粗，不插入空白段落。
-4. 粘贴后检查 Markdown 符号没有残留，并把页面块数、空白块数、`h1` 数、`h2` 数与加粗数和交付包的 `expected_editor` 逐项比较。此时块数用 `block_count`，加粗数用 `bold_count_before_tables`。仅当 HTML 粘贴不可用时才退回纯文本，再手工恢复格式。
-5. 抽查每个有序列表的第一项和最后一项：编辑器只显示一层自动编号，列表正文不得再次以 `1.`、`2.` 或 `1、` 开头。
-6. 将 `tables` 和 `images` 按 `source_order` 合并，依照原文顺序逐项插入。用 `after_block`、`after_text` 及相邻表格或图片编号定位。遇到表格，在正文工具栏点 `Insert → Table`；网格里的 `R by C` 表示 **R 行、C 列**，选择清单里的 `row_count by column_count`。打开表格的 `Edit block`，把完整 `markdown` 放入 Markdown 输入框，切到 `Preview`，逐格核对表头、行列数和内容，再点 `Update`。若网格没有所需尺寸，先选可用尺寸，再用 Markdown 编辑并以预览为准；预览无法呈现完整表格时停下处理。遇到图片，用清单中的路径插入，逐张确认位置和内容。
-7. 若表格全部位于图片之前，插完表格、插图之前核对 `block_count_with_tables`。其他交错情形以初始正文块数、表格数量、每张图片位置和最终预览分别验收；不要用插图后的总块数反推原始位置。
-8. 等待页面出现 `Last saved just now` 或等价的已保存状态。
-
-封面上传被拒时，不要继续尝试绕过，也不要创建新草稿。先按 [recovery-runbook.md](references/recovery-runbook.md) 的「封面上传被拒」分清是路径没共享还是点错了控件：前者记录 `draft-needs-cover` 和当前 URL，把封面绝对路径给用户，请用户把该目录共享给本次会话；后者改用正确的上传链路重试。收到确认后从原 URL 只补封面。
-
-填入正文后不要进入 Publish 流程。不要点击第一个 `Publish` 去“看看确认弹窗”；弹窗本身已经属于公开发布流程。
-
-## 4. 验证草稿
-
-完成以下检查：
-
-- 标题与交付包完全一致。
-- 页面词数不为零，粘贴后正文块数与 `expected_editor.block_count` 一致；插入表格后、插图前与 `block_count_with_tables` 一致。核对首尾文字锚点及表格原文。
-- 段落之间没有空白段落；`h1`、`h2` 与加粗数量和交付包一致。
-- `images` 清单里每一张都已插入、位置与 `after_block` 相符、图片能正常显示。
-- `tables` 清单里每张表都为 X 原生表格；预览中逐格核对，确认没有漏行、错列、竖线文本或遗留占位内容。
-- 封面已显示，且没有被裁掉标题或核心隐喻。
-- 打开 `Preview` 后，标题、段落、表格、封面和作者信息都正常。
-
-预览检查完回到编辑页，再确认封面仍在、正文格式未变、保存时间已经更新。若检查不通过，修正后重新验证；不要把问题草稿交给用户自行排查。
-
-## 5. 回写知识库
-
-验证通过后运行：
+读完整正文、成稿包和封面，然后：
 
 ```bash
-python3 scripts/record_draft.py --article <文章.md> --url <草稿地址> --cover <x-article-cover.png> --content-sha256 <交付包中的指纹>
+python3 $SK/scripts/prepare_article.py --article <文章.md> --cover <x-article-cover.png> --out <交付包.json>
 ```
 
-它会在文章 frontmatter 中记录：
+脚本去掉 frontmatter 和正文开头的一级标题，剔除 `publish_exclude_sections` 列出的章节（母稿不改），生成富文本和纯文本两份正文，并检查：标题和正文、长文有没有章节和重点加粗、有没有连续空行、封面是否接近 5:2、译介稿的授权和署名。检查不过就退回 `ray-writer` 或 `ray-cover` 修，不绕过。
 
-- `x_article_status: draft`
-- `x_article_draft_url`
-- `x_article_saved_at`
-- `x_article_cover`
-- `x_article_content_sha256`
+交付包里的数字都是按编辑器的算法算好的，核对时直接用，不要回头去数 Markdown：
 
-这些字段不只是记录：`x_article_status: draft` 加 `x_article_saved_at` 是采集管线（`50-系统/40-自动化/知识采集/knowledge_ingest.py`，30 分钟一轮）发布自动检测的门控。人在平台上点发布后，管线会在保存时间起 72 小时内自动比对自己时间线上的 Article 帖确认发布，然后把草稿的 `x_article_status` 翻成 `published`，写入 `x_article_url`（公开地址）、`x_article_published_at` 和 `published_file`，归档正式稿到 `40-发布/`，并回写成稿包。因此：
+| 字段 | 含义 |
+|---|---|
+| `body_html` / `body` | 富文本和纯文本正文。`body_html` 不含表格 |
+| `expected_editor.block_count` | 粘贴 `body_html` 之后、插表格和图片之前的块数；列表里每个 `<li>` 单独算一块 |
+| `expected_editor.block_count_with_tables` | 插完原生表格、插图之前的块数 |
+| `expected_editor.h1_count` / `h2_count` | 编辑器只有两级标题：Markdown `##` 是 `h1`，`###` 及更深都是 `h2` |
+| `expected_editor.bold_count_before_tables` | 粘贴后、插表格前的加粗数 |
+| `start_anchor` / `end_anchor` | 粘贴后页面上真正显示的首尾文字，链接只留锚文本 |
+| `tables` | 原生表格清单：原样 Markdown、行列数、逐格文字、插入位置 |
+| `images` | 插图清单，没有图时是空数组 |
 
-- 检测按文章标题匹配（精确优先，发布前在编辑器里小幅改标题有相似度兜底）；若发布时大改标题，自动检测可能追不上，届时用知识工作台的「登记发布」表单人工登记。
-- `draft-needs-cover` 不进入自动检测；重新记录为 `draft` 会刷新 `x_article_saved_at`，等于重开 72 小时检测窗口。
-- 超过 72 小时才发布的草稿不再被轮询，同样走「登记发布」表单。
+表格和图片各有 `source_order`，用它合并成原文顺序；紧挨着另一张表或图时，清单另给 `after_table_order` 或 `after_image_order`。
 
-浏览器权限等外部原因导致封面尚未上传时，先使用 `--status draft-needs-cover` 记录可恢复状态；补齐并验证封面后必须重新记录为 `draft`。
+`local_only` 到这里结束。
 
-本地文章仍留在 `10-创作/30-文章草稿/`。本 Skill 不复制或移动到 `40-发布/10-X长文/`，也不把状态改为 `published`。发布后的归档与状态翻转由上面的自动检测完成，检测不确定时由工作台「登记发布」表单人工兜底——都不属于本 Skill 的动作。
+### 2. 找到要写的草稿
 
-## 交付要求
+先读 [browser-capability.md](references/browser-capability.md) 选工具，再读 [x-editor-contract.md](references/x-editor-contract.md) 按已验证的可见文字定位。然后看文章 frontmatter：
 
-向用户提供本地文章、5:2 封面和 X 草稿链接。只说明已经保存并验证、是否存在需要人工复核的格式；最后单独明确“这是草稿，没有公开发布”。如果用户原话包含“发布”，说明本 Skill 已停在草稿，公开发布需要下一步单独处理。
+| frontmatter 的状态 | 怎么做 |
+|---|---|
+| 有 `x_article_draft_url` | 直接打开，核对标题后更新原草稿 |
+| `x_article_status: draft-needs-cover` | 只补封面再验证，不重写正文，不建第二份 |
+| 已是 `draft`，但用户说之前失败过 | 以后台现在看到的为准：先核验原草稿，封面确实缺才补，不按旧说法直接覆盖 |
+| 没有草稿 URL | 打开 `https://x.com/compose/articles`，确认有 `Articles`、`Drafts`、`Published` 和 `Write`、账号已登录；在 Drafts 里查同名文章，有就打开，没有才点 `Write` |
+
+点 `Write` 会立刻生成一份空白草稿。之后如果失败，要么记下地址留着恢复，要么确认它仍是纯空白再删。
+
+### 3. 写入
+
+按这个顺序做：
+
+1. **封面。** 读页面拿到 file input 元素的引用，用专用的文件上传动作把绝对路径交给它。**不要点 `Choose File`**：它弹的是系统原生对话框，浏览器工具看不见也点不动，会卡死。出现 `Edit media` 后点 `Apply`；封面真的显示出来、`Remove photo` 出现，才算传上去。
+2. **标题。** 填进 `Add a title`，逐字核对。
+3. **正文。** 把 `body_html` 当 HTML、`body` 当纯文本同时写进剪贴板，在正文框里全选后粘贴。这样编辑器会直接生成段落、标题、列表、链接和加粗，不会多出空白段落。HTML 粘贴确实用不了时才退回纯文本，再手工恢复格式。
+4. **粘贴后马上核对。** Markdown 符号没有残留；页面的块数、空白块数、`h1`、`h2`、加粗数和 `expected_editor` 逐项一致（块数对 `block_count`，加粗对 `bold_count_before_tables`）。这一步必须在插表格和图片之前做，插完块数就变了。
+5. **有序列表。** 抽查每个列表的第一项和最后一项：只有一层自动编号，正文不再以 `1.`、`2.` 或 `1、` 开头。
+6. **表格和图片。** 把 `tables` 和 `images` 按 `source_order` 合并，照原文顺序一项一项插，用 `after_block`、`after_text` 和相邻编号定位。
+   - 表格：工具栏 `Insert → Table`，网格里的 `R by C` 是 R 行 C 列，按清单的行列数选。打开表格的 `Edit block`，把完整 `markdown` 放进输入框，切到 `Preview` 逐格核对表头、行列和内容，再点 `Update`。网格里没有需要的尺寸时先选一个能选的，再用 Markdown 改，以预览为准；预览显示不全就停下处理。不要把 `<table>` 或带竖线的 Markdown 直接粘进正文，会被压成一个普通段落。
+   - 图片：用清单里的路径插入，逐张确认位置和内容。
+   - 表格全在图片前面时，插完表格、插图之前再核对一次 `block_count_with_tables`。表格和图片交错时，分别按初始块数、表格数量、每张图的位置和最终预览验收，不用插图后的总块数反推。
+7. **等保存。** 页面出现 `Last saved just now` 或等价的已保存状态。
+
+封面上传被拒时不绕过，也不新建草稿，先按 [recovery-runbook.md](references/recovery-runbook.md)「封面上传被拒」分清原因：
+
+- 路径没共享给本次会话：用 `--status draft-needs-cover` 记下状态和草稿 URL，把封面的绝对路径告诉用户，请用户共享那个目录；确认后回原 URL 只补封面。
+- 点错了控件：换成上面的正确上传方式重试。
+
+### 4. 验证
+
+- 标题和交付包完全一致。
+- 页面词数不为零；块数、首尾锚点、`h1`、`h2`、加粗数都对得上；段落之间没有空白段落。
+- `tables` 里每张表都是 X 原生表格，预览里逐格核对，没有漏行、错列、竖线文本或占位内容。
+- `images` 里每张图都插了，位置和 `after_block` 相符，能正常显示。
+- 封面显示出来了，标题和核心隐喻没被裁掉。
+- 打开 `Preview`，标题、段落、表格、封面和作者信息都正常。
+
+看完预览回到编辑页，再确认封面还在、正文格式没变、保存时间更新了。没通过就修好重验，不把有问题的草稿交给用户自己排查。
+
+### 5. 回写知识库
+
+```bash
+python3 $SK/scripts/record_draft.py --article <文章.md> --url <草稿地址> --cover <x-article-cover.png> --content-sha256 <交付包里的指纹>
+```
+
+脚本在文章 frontmatter 里写 `x_article_status: draft`、`x_article_draft_url`、`x_article_saved_at`、`x_article_cover`、`x_article_content_sha256`。封面因为外部原因还没传上时先用 `--status draft-needs-cover` 记，补齐验证后再记成 `draft`。
+
+这几个字段不只是记录。知识库的采集管线（`50-系统/40-自动化/知识采集/knowledge_ingest.py`，30 分钟一轮）靠 `draft` 状态和保存时间来自动发现发布：用户在平台上点了发布之后，管线在保存时间起 72 小时内比对时间线上的 Article 帖，确认后把状态翻成 `published`、写入公开地址、把正式稿归档到 `40-发布/` 并回写成稿包。所以：
+
+- 检测按标题匹配，小改有相似度兜底；发布时大改了标题可能追不上。
+- `draft-needs-cover` 不进检测；重新记成 `draft` 会刷新保存时间，等于重开 72 小时窗口。
+- 追不上或超过 72 小时才发布的，用知识工作台的「登记发布」表单人工登记。
+
+本地文章留在 `10-创作/30-文章草稿/`。这里不移动文件，也不把状态改成 `published`。
+
+## 出问题时
+
+续写旧草稿、权限失败、断线、上传失败、富文本异常，都读 [recovery-runbook.md](references/recovery-runbook.md)，回到同一个草稿 URL 修。登录恢复、文件权限恢复、浏览器重连，只是让原来的草稿任务继续，不会带来发布授权。
+
+## 交付
+
+给用户：本地文章、5:2 封面、X 草稿链接；说明已保存并验证，以及有没有需要人工复核的格式。最后单独说一句：这是草稿，没有公开发布。用户原话里有“发布”时，补一句这里停在草稿，公开发布要单独处理。

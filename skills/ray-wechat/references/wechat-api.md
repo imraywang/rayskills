@@ -35,7 +35,7 @@
 ## 固定出口
 
 - `wechat_images.py` 与 `wechat_draft.py` 默认读取 `~/.wewrite/fixed-egress.json`，先建立加密通道并确认公网地址，再请求微信接口。
-- 当前确认配置使用 `ssh-socks5` 模式，SSH 主机别名为 `zgo-standard`，预期公网地址为 `23.165.40.62`。
+- 配置使用 `ssh-socks5` 模式，要有 `ssh_host`（SSH 主机别名）和 `expected_ip`（预期公网地址）。具体的值只存在本机，不写进这个仓库。
 - 配置缺失、通道失败或实测公网地址不一致时必须停止；不得静默回退到本机动态地址。
 - 只有用户明确要求本次直连时才允许临时设置 `RAY_WECHAT_DIRECT=1`。这只改变网络路径，不改变 `draft_write` 判定，也不跳过写后回读。
 
