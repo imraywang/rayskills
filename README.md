@@ -2,11 +2,11 @@
 
 # rayskills
 
-**中文 AI Skills：写长文和口播稿，做封面和解说视频，存公众号和 X 草稿。**
+**中文 AI Skills：写长文、口播稿和科普稿，做封面和解说视频，存公众号和 X 草稿。**
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
-[![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#-skill-全目录9)
-[![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#-安装)
+[![Skills](https://img.shields.io/badge/skills-9%20个%20含%20%2Fray%20路由-8b5cf6)](#skill-目录)
+[![Agents](https://img.shields.io/badge/Claude%20Code%20·%20Codex%20·%20WorkBuddy-supported-6366f1)](#安装)
 
 [GitHub](https://github.com/imraywang/rayskills) · [Gitee（国内镜像）](https://gitee.com/imraywang/rayskills)
 
@@ -14,270 +14,93 @@
 
 ---
 
-rayskills 是 Ray 制作的中文 AI Skills，共 9 个，可以安装到 Claude Code、Codex 和 WorkBuddy。装好后可以让 Agent：
+rayskills 是 Ray 做的一套中文 AI Skills，共 9 个，装进 Claude Code、Codex 或 WorkBuddy 后，Agent 可以把一个想法一路做成文章、封面、口播稿或解说视频，并存进公众号和 X 的草稿箱。**它只做到草稿，不替你发布。**
 
-- 新建或检查 Obsidian 内容知识库
-- 写中文长文、译介稿、口播稿和科普旁白稿
-- 给文章和视频做封面
-- 把文章或口播稿做成配音解说视频
-- 排版后存入公众号和 X Articles 草稿箱，不自动发布
+## 安装
 
-不确定用哪个时，把处境交给 `/ray`：
+```bash
+npx -y skills add imraywang/rayskills -g --all
+```
 
-- 下一步还不确定时，它只选择此刻最该做的一步。
-- 终点已经明确、阶段之间有正式交接时，它连续执行整条管线。
-- 涉及删除、发布、生产修改的动作，它会先停下来确认。
+国内访问 GitHub 慢时，从 Gitee 镜像拿代码：`git clone https://gitee.com/imraywang/rayskills.git`。从旧版本升级、WorkBuddy 导入，见 [版本与升级](docs/版本与升级.md)。
+
+## 怎么用
+
+不用记名字，把处境交给 `/ray`。下一步还不确定时，它只选此刻最该做的一步；你给了明确的终点，它就连续做完，停在草稿。
 
 ```text
-你：这篇英文文章写得很好，想翻译过来发公众号
-  → /ray-writer 译介模式先过授权与署名两道门
-  → source_permission 没放行就停在本地译文
-  → 拿到许可后再进平台草稿
-
-你：把这个 idea 写成文章，做公众号和 X 封面，再放进两个平台的草稿箱
-  → /ray-writer 完成长文与质量检查
-  → /ray-cover 生成各平台封面
-  → /ray-wechat 确认排版并更新公众号原草稿
-  → /ray-x-article 保存并验证草稿
-  → 停在草稿，不自动发布
-
-你：把这篇定稿继续做成一条口播视频
-  → /ray-kb 重新选择一个视频判断
-  → 以你的口吻生成逐字稿
-  → 要做成解说视频时再交给 /ray-explainer
-
-你：我刚有一个企业 AI 的灵感，查完资料就想直接录
-  → /ray-kb 按需检索素材，以你的口吻直接写
-  → 只建立一份快速口播母稿
-  → 录制后对照实际表达，发布后进入反馈回流
+/ray 把这个 idea 写成文章，做公众号和 X 封面，再放进两个平台的草稿箱
+/ray 这篇英文文章写得很好，想翻译过来发公众号
+/ray 我刚有一个灵感，查完资料就想直接录一条口播
+/ray 把这篇定稿做成 2 分钟竖屏解说视频，用我的声音
 ```
 
-## 🎯 你交给它什么，它替你完成什么
+熟悉之后也可以直接叫某一个，比如 `/ray-writer 把这条剪藏写成一篇公众号长文`。更多例子见 [新手入门](docs/新手入门.md)。
 
-| 你手上的 | rayskills 完成的 | 入口 |
+## Skill 目录
+
+| Skill | 你给它 | 它做出 |
 |---|---|---|
-| 一个空目录或已有 Obsidian 库 | 安全建立资料、知识、候选选题、写作任务、母稿、发布反馈与回流骨架 | `/ray-obsidian` |
-| 一个 idea、剪藏或旧草稿 | 读者收获清楚、用作者自己的口吻、连续自然的中文长文 | `/ray-writer` |
-| 一个能在一条视频讲清的灵感，或一篇定稿长文 | 只建一份快速口播母稿，或从长文里重新挑一个判断改成口播稿；也审读口播稿、对照实际录的稿子 | `/ray-kb` |
-| 一件事、一个原理、一份新数据 | 讲解者视角的科普旁白稿：讲清楚、讲准确，作者的观点不是主角 | `/ray-kepu` |
-| 一篇已经定稿的文章或视频 | 文章：按内容写封面文案、选一种风格，颜色照作者档案的品牌色，分别出公众号、普通 X、X Article 封面；视频：真人照片 + 大标题，默认 3:4，可出 9:16 和 16:9 | `/ray-cover` |
-| 定稿文章、公众号封面与排版偏好 | 手机端富文本预览、原草稿更新、UTF-8 回读验收 | `/ray-wechat` |
-| 一篇文章、一个观点或一份口播稿，想做成解说视频 | 1.5–3 分钟的配音解说片（默认竖屏，可出横屏）：复刻音色配音，Whisper 逐字校对和卡点；画面用 HyperFrames 按这期内容单独设计，真实截图、录屏和实跑输出优先；左下角卡通主持人默认带，大机位先报价再生成；成片过硬检查后出发布包 | `/ray-explainer` |
-| 长文与 5:2 封面 | 查重或恢复原草稿，写入 X Articles，检查预览与保存 | `/ray-x-article` |
-| 别人写的好文章 | 译介模式：授权与署名两道门，全文翻译或编译，不洗稿 | `/ray-writer`（译介模式） |
-| **不知道从哪里开始** | 读取当前处境，替你选下一步或正式管线 | **`/ray`** |
-
-## 🧭 一张图看懂
+| **`/ray`** | 一个处境或一个终点 | 选下一步，或把整条链路连续做完 |
+| `/ray-obsidian` | 一个空目录或已有的 Obsidian 库 | 内容知识库的骨架；已有文件不覆盖、不移动 |
+| `/ray-writer` | idea、剪藏、调研或草稿；别人的文章 | 作者口吻的中文长文；带授权和署名的译介稿 |
+| `/ray-kb` | 一个灵感，或一篇定稿长文 | 能直接开机录的口播稿；也审读口播稿、对照实际录的稿子 |
+| `/ray-kepu` | 一件事、一个原理、一份新数据 | 讲解者视角的科普旁白稿，作者的观点不是主角 |
+| `/ray-cover` | 定稿的文章或视频 | 公众号、X、X Article 封面；真人照片 + 大标题的视频封面 |
+| `/ray-explainer` | 文章、观点或口播稿 | 配音解说视频：复刻音色、逐字卡点，画面每期单独设计，真实画面优先 |
+| `/ray-wechat` | 定稿和公众号封面 | 手机预览，确认后写入公众号草稿并回读核对 |
+| `/ray-x-article` | 定稿和 5:2 封面 | 写入 X Articles 草稿，核对格式、封面和预览 |
 
 ```mermaid
-flowchart TD
-    RAY(["/ray · 主路由与阶段编排"]):::hub
-
-    RAY --> KNOWLEDGE["🗂 本地知识库<br/>obsidian"]
-    RAY --> CONTENT["✍️ 内容 / IP<br/>writer（长文 · 译介） · kb（口播） · kepu（科普稿）<br/>cover · wechat · x-article · explainer"]
-
-    OBSIDIAN["ray-obsidian<br/>资料 · 知识 · 候选 · 写作任务 · 母稿"] --> WRITER["ray-writer<br/>长文 · 译介"]
-    WRITER --> COVER["ray-cover<br/>封面文案 · 风格 · 平台封面"]
-    OBSIDIAN --> KB["ray-kb<br/>快速口播 · 长文再分发"]
+flowchart LR
+    OBSIDIAN[ray-obsidian] --> WRITER[ray-writer]
+    OBSIDIAN --> KB[ray-kb]
+    OBSIDIAN --> KEPU[ray-kepu]
+    WRITER --> COVER[ray-cover]
     WRITER --> KB
-    OBSIDIAN --> KEPU["ray-kepu<br/>科普讲解稿"]
-    KB --> EXPLAINER["ray-explainer<br/>配音解说视频"]
+    KB --> EXPLAINER[ray-explainer]
     KEPU --> EXPLAINER
-    COVER --> WECHAT["ray-wechat<br/>公众号排版 · 草稿回读"]
-    COVER --> XARTICLE["ray-x-article<br/>查重 · 预览 · 草稿"]
-
-    classDef hub fill:#b8553a,stroke:#7a3320,color:#fff,font-weight:bold;
+    COVER --> WECHAT[ray-wechat]
+    COVER --> XARTICLE[ray-x-article]
 ```
 
-更细的交接关系见 [skill 关系图](docs/skill-link-map.md)。
+不随本仓库安装、装了才会被 `/ray` 交过去的：咨询、多模型协作、趋势调研、拼贴 B-roll 在 [ray-skills](https://github.com/imraywang/ray-skills)；真人口播按风格剪片由独立项目 `ray-studio` 负责。成员之间怎么衔接见 [Skill 关系图](docs/skill-link-map.md)。
 
-## 🏭 已跑通的长文生产管线
+## 先填作者档案
 
-这条管线来自一次完整的真实生产过程，不是把三个 Skill 用箭头连起来就算完成。
-
-| 阶段 | 负责什么 | 必须通过的门控 |
-|---|---|---|
-| `ray-obsidian`（按需） | 新建或适配用户自己的本地知识库 | 先预演；已有文件零覆盖、零移动；结构检查为 ready |
-| `ray-writer` | 从 idea、资料或草稿生成中文长文 | 表达先行，以作者口吻说满观点，正文不自保；长文通过格式检查 |
-| `ray-cover` | 按内容写三层封面文案，从 Punk 风格库（MIT 版）选一种风格，颜色照作者档案的品牌色 | 生图模型按公众号、普通 X、5:2 Article 各自生成；逐字与颜色验收，不跨平台裁切复用 |
-| `ray-kb`（按需） | 从灵感直接做一份口播母稿，或把定稿长文改成口播稿 | 表达先行，立论点先核实；快速模式不制造额外任务；长文模式绑定母稿指纹；口播检查通过 |
-| `ray-wechat` | 把定稿与公众号封面送进微信草稿箱 | 先确认手机预览；优先更新原草稿；标题、摘要、封面、全文、署名和 UTF-8 回读通过 |
-| `ray-x-article` | 把本地成稿送进登录中的 X Articles | 优先恢复原草稿；富文本保留标题与加粗；空白段落为零；封面、首尾、预览和保存状态全部核对 |
-
-管线支持中断恢复。例如浏览器暂时不能读取本地封面时，会保留同一草稿并记录 `draft-needs-cover`；权限恢复后只补封面，不重新建稿，也不重复写正文。
-
-完整门控与恢复规则见 [长文生产管线](skills/ray/references/content-pipeline.md)。
-
-## 🗂 Skill 全目录（9）
-
-| 线 | Skill | 干什么 |
-|---|---|---|
-| 🧭 路由 | **`/ray`** | 读取处境，选择下一步；终点明确时编排正式管线 |
-| 🗂 知识库 | `/ray-obsidian` | 新建、检查或增量适配本地 Obsidian 内容知识库 |
-| ✍️ 内容 | `/ray-writer` | idea / 资料 / 草稿 → 中文长文；他人文章 → 译介稿 |
-| | `/ray-kb` | 灵感 → 一份快速口播母稿；定稿长文 → 绑定母稿指纹的口播稿；审读口播稿；对照实际录的稿子 |
-| | `/ray-kepu` | 一件事、一个原理、一份新数据 → 讲解者视角的科普视频旁白稿（讲清楚、带得走、值得收藏转发） |
-| | `/ray-cover` | 定稿文章 → 公众号、普通 X、X Article 封面；视频 → 真人照片 + 大标题的封面（默认 3:4，可出 9:16、16:9） |
-| | `/ray-explainer` | 文章 / 观点 / 口播稿 → 配音解说视频：复刻音色配音、逐字卡点，画面用 HyperFrames 每期单独设计，真实画面优先 |
-| | `/ray-wechat` | 定稿文章与公众号封面 → 已验证的微信公众号草稿 |
-| | `/ray-x-article` | 长文与 5:2 封面 → 已验证的 X Articles 草稿 |
-
-真人口播按风格剪成课程片或短视频，由独立项目 `ray-studio` 负责，不随本仓库分发；`/ray` 在本机装了它时会交过去。
-
-`/ray-post`（公众号热点、选题、写作与发布）仍在独立仓库 [WeWrite](https://github.com/imraywang/wewrite)。`ray-writer` 处理证据型长文，`ray-wechat` 只接收定稿并负责排版与草稿验收；三者不混用。
-
-## 👤 先填作者档案
-
-写作和封面这几个 Skill 把“和具体的人有关的东西”单独放在各自目录的 `author-profile.md` 里：你是谁、读者是谁、话说到多满、允许 AI 补什么、照着哪些样本学。`SKILL.md` 只管怎么判断，不带具体的人。
+写作和封面这几个 Skill，把和具体的人有关的东西单独放在各自目录的 `author-profile.md` 里，`SKILL.md` 只管怎么判断：
 
 | Skill | 档案里放什么 |
 |---|---|
 | `ray-writer`、`ray-kb`、`ray-kepu` | 身份与读者、表达偏好、允许 AI 补什么、样本清单 |
 | `ray-cover` | 品牌色、禁用项、能不能用真人照片、默认风格和尺寸 |
 
-仓库里带的是作者 Ray 自己的档案。你自己用时，把同目录的 `author-profile.template.md` 覆盖到 `author-profile.md` 再填；可以只写几条明确知道的，边用边补。没填的项不会被 AI 自动补全。
+仓库里带的是 Ray 自己的档案。你自己用时，把同目录的 `author-profile.template.md` 覆盖到 `author-profile.md` 再填。可以只写几条明确知道的，边用边补；没填的项不会被 AI 自动补全。
 
-## 📊 实测与验证
+## 它守住的边界
 
-rayskills 把“文档写完”与“Skill 真能防错”分开检查。
-
-| 检查 | 当前结果 | 含义 |
-|---|---:|---|
-| Skill 数量 | **9** | 包含 `/ray` 主路由与 8 个成员 |
-| 场景测试 | **71** | 正常、边界与失败场景均记录在各 Skill 的 `evals/evals.json`，部分 Skill 使用更细分类 |
-| 结构校验 | **9 / 9 通过** | `tools/build.sh` 检查：name 与目录一致，description 不超过 200 字 |
-| 对照实测 | **15 / 15 skill-helps** | v1 基准的 15 个 Skill 均明显优于裸模型（历史口径） |
-| 带 Skill 满足断言 | **100%** | v1 对照实测口径 |
-| 裸模型满足断言 | **35.7%** | v1 对照实测口径 |
-
-v2 做过一轮成熟度精简：删除了 `ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly`，把 `ray-diagnose` + `ray-proposal` 合并为 `ray-consult`、`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`、`ray-thread` 并入 `ray-writer` 的 thread 骨架模式（后已移除）。
-
-v3 按真实使用频率再收敛一轮：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)（按需独立使用的 Skill 集，不依赖 `/ray` 路由）——它们自 v1 以来没有产生真实调用记录，与高频的内容生产管线也没有阶段交接；`ray-consult` 当时经复核保留。方法论没有丢：移出的 Skill 完整保留全部流程与 eval 场景。v1 对照实测报告按当时的成员名单记录，作为历史证据保留，不随精简改写。
-
-v4（2026-10-13）用同样的标准再收敛一轮：`ray-consult`、`ray-multimodel`、`ray-trend-search`、`ray-broll` 移到 [ray-skills](https://github.com/imraywang/ray-skills)。统计 Claude Code 与 Codex 的会话记录，它们近 30 天几乎没有真实调用（解说视频由 `ray-explainer` 接手，拼贴 B-roll 不再是主线）；`/ray` 在本机装了它们时仍会路由过去。老用户升级请看 [从旧版本升级](#从旧版本升级)。
-
-最能体现 Skill 价值的不是文风，而是防住真实损害：
-
-| Skill | 防住的问题 |
+| 边界 | 做法 |
 |---|---|
-| `/ray-obsidian` | 不覆盖、移动或批量改写用户已有笔记 |
-| `/ray-writer` | 不在正文里自保，也不交付没有阅读锚点的长文 |
-| `/ray-writer` 译介模式 | 不把别人的文章洗成自己的原创，授权没落地不进平台草稿 |
-| `/ray-kb` | 不让快速口播变成重流程，也不在逐字稿里自保 |
-| `/ray-wechat` | 不重复建微信草稿、不把中文乱码或接口成功码误判成完成 |
-| `/ray-x-article` | 不重复建稿、不丢富文本格式、不把输入完成当成保存完成 |
-| `/ray-explainer` | 不把语气指令念进配音，不把年份按数值念（2019 不会变成“两千零一十九”），不在画面里编具体金额和名称，不在没看过静帧的情况下出片，不在没报价、没确认时生成数字人 |
+| 不替你发布 | 平台动作只到验证过的草稿。“推送”“走完整流程”不算发布授权，含糊的说法先做本地产物再问一句 |
+| 不动你的东西 | 知识库里已有的文件不覆盖、不移动；草稿优先更新原来那一份，不重复建 |
+| 不把别人的文章当原创 | 译介先过授权和署名，授权没落地只做本地产物 |
+| 不把“接口成功”当完成 | 写入之后回读核对：标题、封面、全文、编码、格式 |
+| 不替你编 | 能不能编补经历和数字由作者档案决定，补了的在交付时点出来 |
 
-完整的 15 项带 / 不带 Skill 记分卡见 [对照实测报告](docs/eval-report-v1.md)（历史成员名单）。
+## 文档
 
-## ✅ 适合 / ❌ 不适合
+- [新手入门](docs/新手入门.md)：第一次怎么用
+- [Skill 关系图](docs/skill-link-map.md)：成员之间的常见衔接
+- [长文生产管线](skills/ray/references/content-pipeline.md)：从写作到平台草稿的交接与恢复
+- [版本与升级](docs/版本与升级.md)：从旧版本升级、版本历史、WorkBuddy 与豆包、实测数据
+- [本地知识库结构](skills/ray-obsidian/references/vault-schema.md)：目录各放什么
 
-**适合：**
+## 许可
 
-- 一个人或小团队同时处理基建、内容、咨询、产品和运营。
-- 想把真实实践沉淀成可复用、可验证流程的 builder。
-- 使用 Claude Code、Codex 等 Agent 完成真实业务，而不只是问答。
-- 需要 Agent 既能主动做完，又能在发布、删除和生产修改前守住边界。
-
-**不适合：**
-
-- 只需要一个领域的超深度专用工具。
-- 纯陪聊、纯灵感或无需验证的一次性问答。
-- 希望 Agent 无条件自动发布、自动删除或绕过确认。
-- 不在这些真实工作流中的通用任务。
-
-## 🚀 安装
-
-安装全部 Skill：
-
-```bash
-npx -y skills add imraywang/rayskills -g --all
-```
-
-国内访问 GitHub 慢时，可以从 Gitee 镜像拿代码（与 GitHub 同步更新）：
-
-```bash
-git clone https://gitee.com/imraywang/rayskills.git
-```
-
-安装后可以从 `/ray` 开始，也可以直接调用具体 Skill：
-
-```text
-/ray 我有个客户想上 AI 客服，不知道该先做什么
-/ray 把这个 idea 走完整条内容管线，做到 X Articles 草稿，不要发布
-/ray-obsidian 在这个本地目录搭一套可以接写作管线的知识库
-/ray-writer 把这条剪藏发展成一篇公众号长文
-/ray-kb 我有一个现场观察，直接做成快速口播
-/ray-kb 把这篇定稿改成一条 2 到 3 分钟的口播视频稿
-/ray-cover 给这篇定稿文章做公众号和 X Article 封面
-/ray-wechat 把定稿排版并更新到已有公众号草稿，先预览再写入
-/ray-x-article 把文章和 5:2 封面保存到 X 后台，不要发布
-/ray-explainer 把这篇剪藏做成 2 分钟竖屏解说视频，用我的声音
-/ray-kepu 把这条新闻讲成一期 3 分钟的科普，不要太多我的判断
-```
-
-第一次使用建议先看 [新手入门](docs/新手入门.md)。
-
-已有 `ray-content-v1` 知识库不需要搬家：`ray-obsidian` 会先预演，再补齐现行结构并保留全部旧目录和文件。
-
-### 从旧版本升级
-
-装过 v1（21 个 skill）、v2（14 个 skill）或 v3（13 个 skill）的用户注意：重新执行 `skills add` 只会新增和刷新现存的 9 个 Skill，**不会删除远端已经不存在的旧 skill**。旧目录会以过期副本留在本地，其中 `ray-diagnose`、`ray-thread` 等还会和现有成员抢触发，建议先清理再更新：
-
-```bash
-for s in ray-tweet ray-idea ray-cleanup ray-weekly ray-thread ray-diagnose ray-proposal ray-vpsinit ray-nodecheck ray-benchmark ray-launch ray-metrics ray-report ray-vps ray-cover-editorial ray-consult ray-multimodel ray-trend-search ray-broll; do npx -y skills remove "$s" -g; done && npx -y skills add imraywang/rayskills -g --all
-```
-
-旧成员去向对照：
-
-| 旧成员 | 去处 |
-|---|---|
-| `ray-diagnose` / `ray-proposal` | v2 合并为 `ray-consult`（诊断段 → 方案段），v4 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
-| `ray-vpsinit` / `ray-nodecheck` | v2 合并为 `ray-vps`，v3 移出到 [ray-skills](https://github.com/imraywang/ray-skills) |
-| `ray-thread` | v2 曾并入 `/ray-writer`，现已移除；方法论保留在 git 历史，需要时直接向 Agent 描述任务即可 |
-| `ray-cover-editorial` | 2026-10-13 并入 `/ray-cover`：固定版画风格停用，封面改为 Punk 风格库 + 作者档案里的品牌色 |
-| `ray-tweet` · `ray-idea` · `ray-cleanup` · `ray-weekly` | v2 已删除，需要时直接向 Agent 描述任务即可 |
-| `ray-benchmark` · `ray-launch` · `ray-metrics` · `ray-report` · `ray-vps` | v3 按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用 |
-| `ray-consult` · `ray-multimodel` · `ray-trend-search` · `ray-broll` | v4（2026-10-13）按使用频率移出到 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留；需要时单独安装 |
-
-### WorkBuddy
-
-运行 `bash tools/build.sh` 后，`dist/workbuddy/` 会生成每个 Skill 的独立 ZIP。进入 WorkBuddy 的技能页，选择“添加技能 → 上传技能”，直接导入所需 ZIP；包内的 `SKILL.md`、参考资料、脚本和模板会一起保留。
-
-`ray-writer` 已在 WorkBuddy 5.2.3 完成真实导入、自动选择和调用验证；`ray-obsidian` 也已完成真实安装识别和独立旧库迁移验证。`ray-wechat` 的本地检查和草稿脚本只依赖 Python 标准库，外部排版器按宿主实际安装状态调用；没有公众号凭证或网络权限时停在本地预览，不冒充已经写入草稿。`ray-x-article` 会选择当前宿主可用的浏览器或电脑控制能力，没有这类能力时会停在本地交付包。
-
-### 豆包
-
-豆包当前没有本地 `SKILL.md` 技能包导入入口，因此不能直接安装 rayskills。纯文字型成员可以人工转成智能体提示词，但脚本、浏览器操作、数据连接和多模型调度不会随提示词迁移；仓库仍以标准 Skill 包为唯一真源，不维护一套容易漂移的豆包副本。
-
-## 🏛 架构与纪律
-
-| 原则 | 做法 |
-|---|---|
-| 单一真源 | monorepo 是 Skill 唯一真源，不维护分叉副本 |
-| 渐进披露 | `SKILL.md` 只留判断和流程骨架，个人内容进 `author-profile.md`，详细规则进 `references/`，重复操作进 `scripts/` |
-| 一条规则只写一处 | 同一条规则不在一个 Skill 里重复；跨 Skill 共用的（平台授权分级）措辞保持一致 |
-| 明确自由度 | 判断型任务保留空间；上传、清理、部署等脆弱流程使用严格顺序和验收门控 |
-| 可恢复 | 中断后优先读取本地状态和已有 URL，续写原任务，不制造重复项 |
-| 可验证 | 每个 Skill 都有场景测试；脚本必须实际运行；高风险结果必须保留可核对证据 |
-| 不越权 | 不自动发布；编补的经历和数据在交付时点出来由作者决定；删除与生产改动遵守确认边界 |
-| 构建门控 | `tools/build.sh` 校验目录名与 Skill 名称，beta Skill 不进入产物 |
-
-`ray-cover` 内置的 Punk 风格库按 MIT 协议保留原版权与许可（见 `skills/ray-cover/assets/punk/NOTICE.md`）；其余 rayskills 内容遵循仓库根目录的 CC BY-NC 4.0。
-
-不再使用的做法归档在 `docs/archive/`，不随 Skill 分发：2026-09-22 之前的写作风格规则，以及 2026-11-23 归档的 `ray-explainer` 手绘画法、语法片段和真人口播旧风格库。
-
-## 📚 文档
-
-- [新手入门](docs/新手入门.md) — 第一次怎么用与完整目录
-- [Skill 关系图](docs/skill-link-map.md) — 成员之间的常见衔接
-- [长文生产管线](skills/ray/references/content-pipeline.md) — Writer → Cover → WeChat / X Article 的交接与恢复
-- [公众号排版契约](skills/ray-wechat/references/layout-contract.md) — 移动端层级、署名策略与外部排版器边界
-- [本地知识库结构](skills/ray-obsidian/references/vault-schema.md) — 资料、知识、创作、发布与回流的目录职责
-- [对照实测报告](docs/eval-report-v1.md) — 15 项带 / 不带 Skill 逐条记分卡
+rayskills 的内容遵循仓库根目录的 CC BY-NC 4.0。`ray-cover` 内置的 Punk 风格库按 MIT 协议保留原版权与许可，见 `skills/ray-cover/assets/punk/NOTICE.md`。不再使用的做法归档在 `docs/archive/`，不随 Skill 分发。
 
 ---
 
 <div align="center">
-<sub>rayskills · AI Builder 实战工具箱 · 作者 <a href="https://x.com/wangray">@wangray</a></sub>
+<sub>rayskills · 作者 <a href="https://x.com/wangray">@wangray</a></sub>
 </div>
