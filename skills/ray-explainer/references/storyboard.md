@@ -4,9 +4,8 @@
 
 稿子定了以后：
 
-1. 按 [grammars.md](grammars.md) 给**这一期**定一种画法，一期只用一种。
-2. 从 [style-refs.md](style-refs.md) 挑一张参考卡定风格。参考卡只借版式；Ray 认可过、带模板的整套做法在[风格库](styles/README.md)里。Ray 指定了就用他指定的；他丢来新链接，就按那里的方法抽帧建卡。`script.json` 顶层写 `"style_ref"`。
-3. 每一幕补三个字段，并用这种画法写好 `grammar` 或 `pattern`（两个都不写，表示手写 kit）：
+1. 从 [style-refs.md](style-refs.md) 挑一张参考卡定这一期的风格。参考卡只借版式。用户指定了就用指定的；丢来新链接，就按那里的方法抽帧建卡。`script.json` 顶层写 `"style_ref"`。
+2. 每一幕补三个字段：
    - `beat`：这一幕讲什么，一句话。
    - `visual`：画面按出现顺序依次是什么，用大白话写。
    - `anchors`：哪个词触发哪个画面事件。
@@ -27,14 +26,7 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表，并写入 st
 
 ## 写每一幕
 
-按 [grammars.md](grammars.md) 的选型表，根据这期**整体**讲什么挑**一种**画法，每一幕都用它：
-
-- **语法场景**：在 `script.json` 的这一幕里写 `"grammar"` 和 `"cues"`，不用写代码。cue 的时间写成 `{"line": 1, "phrase": "创造新行为"}`，能精确卡到这个词开口的时刻。
-- **手绘套路场景**：kit 模式里优先用它。整片仍然要先按真实画面优先找素材。在这一幕写 `"pattern"`、`"data"`、`"cues"`，不用写代码。可用的套路有排行榜、金句、N 宫格与排除法、故事到规律、漏斗、路径、因果互换、清单，见 [patterns.md](patterns.md)。全套路范例是 `assets/template/script.patterns.example.json`。
-- **手写场景**（最后才用）：套路覆盖不到的独特画面，在 `scenes.js` 里写 `S.<sceneId> = (t, sc) => {...}`；同名函数也可以叠画在套路上面补小元素。API 见 [kit-api.md](kit-api.md)，范例是 `assets/template/scenes.example.js`。
-  - 一个画面以后还会再用，就做成新套路加进 `patterns.js`。
-  - 不要为了某一条片子去改 `kit.js` 或已有的套路。
-- **一期只用一种画法**：手绘套路、某一种语法、整期 HyperFrames，三选一，开场和结尾也用它（开场、结尾的记号靠签名幕给）。混用时 `storyboard.py` 和 `render.js` 会提醒；确实要混用，写 `"mix": true` 并说明理由。
+画面一律用 HyperFrames 合成：每一幕是 `hf/compositions/` 下的一个场景文件，整期单独设计一套视觉语言。骨架、节拍、子任务怎么派、怎么检查，见 [hyperframes.md](hyperframes.md)。
 
 ## 画幅与安全区
 
@@ -43,13 +35,12 @@ python3 $SK/scripts/storyboard.py <project>     # 打印分镜表，并写入 st
 **竖屏 1080×1920**（默认）：
 - 所有信息只放在 y 200–1680。上方 200 会被灵动岛和状态栏挡住，下方 240 会被平台的作者名、文案、互动栏盖住，这两条带里只放底纹。
 - 进度条和小标题在 y 200–290。
-- 默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放在 y 300–1440，语法片段会自动让开。
+- 默认带角落主持人：字幕条上移到 y≈1470（`host.py` 的 `caption_y`），主持人从 1560 往下，主画面只放在 y 300–1440。
 - 去掉 `host` 的片子，字幕条回到 y 1560–1656，主舞台可以用到 y 1520。
 
 **横屏 1920×1080**（Ray 要时才出：`new_project.sh <slug> --landscape`，即 `script.json` 顶层写 `"aspect": "landscape"`）：
-- 一个项目只出一种画幅。横屏只能用语法片段或 HyperFrames 模式；手绘套路是竖屏坐标，`render.js` 会拒绝。
+- 一个项目只出一种画幅。
 - 画面基本不被遮挡，四周留 5%。不放进度条和小标题。
 - 字幕白字黑描边、无底框，居中压底（y 946–1036）。
 - 主持人是左下角直径 164 的小圆窗（卡片色底加墨绿细圈），**只在关键句出现**：`host.show` 标 3–6 句（写法同 `big`，不花钱），其余时间不在画面上。主画面偏左的那一幕写 `"host_side": "right"`，换到右下（学的是小Lin说）。贴分镜表时附上选的关键句。
-- 语法片段自动让出上 60、下 150（有主持人时下 230）。
 - 深色版用 `"theme": "ray-ip-dark"`（深灰加墨绿），AI、科技题材优先考虑。

@@ -14,7 +14,7 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 
 - 生成 `cover.jpg`，这一帧不带字幕和进度条。
 - 生成 `publish.md`，标题、描述、标签可以直接复制粘贴。
-- 在 vault 的 `10-创作/25-口播草稿/<日期>-<标题>.md` 写一篇笔记。frontmatter 记录视频路径、时长、音色、画法、待确认条数；正文是分镜表、逐字稿和发布文案。视频本身不复制进 vault。
+- 在 vault 的 `10-创作/25-口播草稿/<日期>-<标题>.md` 写一篇笔记。frontmatter 记录视频路径、时长、音色、画法；正文是分镜表、逐字稿和发布文案。视频本身不复制进 vault。
 - **视频来自一篇已有的口播母稿**（ray-kb 快速口播等）时，在 `script.json` 写 `"draft": "<母稿在 vault 里的相对路径>"`。这样脚本不新建笔记，只给母稿加 `video_*` 字段和「发布文案」一节；重跑会替换，不会叠出两份，也避免和母稿同名撞文件。
 - 成片不叫 `out.mp4` 时，在 `publish` 里写 `"video": "<文件名>"`。HyperFrames 项目（有 `hf/build.py`）的封面用 COVER 版单独渲一帧，见 [hyperframes.md](hyperframes.md)。
 - 用户手动改过这篇笔记的话，脚本会拒绝覆盖；确认要替换时才加 `--force`。

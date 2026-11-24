@@ -3,7 +3,7 @@
 usage: python3 publish.py <project> [--vault <vault root>] [--force] [--cover <image> …]
 
 Reads script.json:
-  title, source, central_judgment, to_confirm[], cover_t (seconds; that frame becomes cover.jpg)
+  title, source, central_judgment, cover_t (seconds; that frame becomes cover.jpg)
   publish: { "titles": ["…", …], "description": "…", "tags": ["AI", …], "video": "out_v3.mp4" (optional, default out.mp4) }
   draft (optional): vault-relative path of the existing 母稿 (e.g. a ray-kb fast-oral note); if it has moved (archived
     after publishing) it is found again by file name (kind: oral-script only) and script.json is updated. When set, nothing new is
@@ -13,9 +13,9 @@ HyperFrames projects (<project>/hf/ with build.py, see references/hyperframes.md
 Covers made with ray-cover (cover_9x16.png / cover_3x4.png / cover_16x9.png copied into the project) are picked up
 automatically, or pass --cover; the first one becomes the note's video_cover. Without any, cover_t picks a frame.
 Writes:
-  <project>/cover.jpg           the frame at cover_t (via render.js), only when there is no ray-cover cover
+  <project>/cover.jpg           the frame at cover_t (HyperFrames snapshot), only when there is no ray-cover cover
   <project>/publish.md          titles / description / tags / cover path, ready to paste
-  <vault>/10-创作/25-口播草稿/<date>-<title>.md   frontmatter + storyboard + script + copy + 待确认 (video stays in the project)
+  <vault>/10-创作/25-口播草稿/<date>-<title>.md   frontmatter + storyboard + script + copy (video stays in the project)
 The vault note is regenerated only if nobody edited it since the last publish.py run (hash kept in
 <project>/.published); otherwise it refuses unless --force. Nothing is posted to any platform.
 """
@@ -51,10 +51,7 @@ if not covers and s.get("cover_t") is not None and HF:
         subprocess.run([sys.executable, "build.py"], cwd=HF, check=True, capture_output=True)   # back to the normal index
         shutil.rmtree(tmp, ignore_errors=True)
 elif not covers and s.get("cover_t") is not None:
-    t = float(s["cover_t"])
-    subprocess.run(["node", os.path.join(SK, "scripts", "render.js"), PROJ, "stills", str(t)], check=True, capture_output=True, env={**os.environ, "RX_CLEAN": "1"})
-    src = os.path.join(PROJ, "stills", "t" + f"{t:.1f}".rjust(5, "0") + ".jpg")   # same name render.js writes
-    cover = os.path.join(PROJ, "cover.jpg"); os.replace(src, cover)
+    print("no hf/ project and no cover_*.png: skipped the cover frame (make one with ray-cover)", file=sys.stderr)
 
 # storyboard (same generator Ray confirmed), without its own H1
 sb = subprocess.run([sys.executable, os.path.join(SK, "scripts", "storyboard.py"), PROJ], capture_output=True, text=True, check=True).stdout
@@ -110,7 +107,7 @@ fm = ["---", "kind: koubo-draft", "status: draft", "form: 解说视频", f"sourc
       f"central_judgment: {q(s.get('central_judgment', ''))}", f"video_project: {q(PROJ)}", f"video_file: {q(video)}",
       f"duration_s: {dur:.0f}", f"voice: {q(s.get('voice', 'Charon'))}",
       f"grammars: {q(sorted({sc.get('grammar') or sc.get('pattern') or 'kit' for sc in s['scenes']}))}",
-      f"to_confirm: {len(s.get('to_confirm') or [])}", "---", ""]
+      "---", ""]
 body = "\n".join(fm + [f"# {s.get('title', '')}", "", sb.strip(), "", *copy])
 stamp = os.path.join(PROJ, ".published")
 if os.path.exists(note) and not a.force:

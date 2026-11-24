@@ -3,25 +3,22 @@
 ## 静帧检查（必做）
 
 ```bash
-node $SK/scripts/render.js <project> sheet 18          # 均匀抽 18 帧，拼成 contact.jpg
-node $SK/scripts/render.js <project> stills 7,36.3,95  # 指定时刻（全片时间）
+cd <project>/hf && npx hyperframes check                 # 必须 0 错误
+python3 $SK/scripts/cap_sheet.py <project>               # 每条字幕抽一帧，拼成对照图；只看几幕加 --scene a,b
 ```
 
-用 Read 看 `contact.jpg`，逐项检查：
-- 有没有元素重叠、超出画布、压住字幕。
-- 有没有空镜，也就是在说话的时候画面却是空的。
+用 Read 逐张看对照图：
+- 有没有元素重叠、超出画布、压住字幕或主持人。
+- 有没有空镜，也就是在说话的时候画面却是空的；新字幕出来了画面有没有跟着变。
 - 图标、表情、颜色是否符合原意，例如笑脸画成了皱眉、灯泡被填成黑色。
 - 每一幕是不是都有东西在动、在出现。
 - 开头 3 秒内画面是否已经抓人。
-- 语法场景的 cue 是否在对应的话说出来时出现。对不上就调 `phrase` 或 `offset`。
 
-内置浏览器面板不执行本地 HTML 里的脚本，所以预览只能靠 `render.js`。语法场景启动失败时，渲染会直接报错退出，错误信息会写明是哪一幕、哪个 cue。
-
-HyperFrames 项目的检查（`check`、`cap_sheet.py`、`snapshot`）见 [hyperframes.md](hyperframes.md)。
+做法的细节（为什么按字幕抽帧、`snapshot` 怎么用）见 [hyperframes.md](hyperframes.md)。
 
 ## 成片检查
 
-`render.js video` 渲完会自动跑；单独跑用 `node render.js <project> gate [文件名.mp4]`，或者：
+渲完之后跑：
 
 ```bash
 python3 $SK/scripts/qa_video.py <成片.mp4> [--lufs -21]     # 课程片用 --lufs -14

@@ -9,11 +9,7 @@
   "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
   "scenes": [
     { "id": "hook", "sig": true, "lines": ["", ""] },
-    { "id": "list", "grammar": "y5_kinetic_type", "lines": [""], "cues": [
-      { "at": 0, "kind": "title", "text": "" },
-      { "at": { "line": 0, "phrase": "" }, "kind": "point", "text": "", "sub": "" }
-    ] }
+    { "id": "body", "lines": [""] }
   ],
-  "chapters": [],
-  "to_confirm": []
+  "chapters": []
 }

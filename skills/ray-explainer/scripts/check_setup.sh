@@ -25,9 +25,7 @@ if [ ! -d "$DEPS/node_modules/puppeteer-core" ]; then
   echo "...  installing puppeteer-core into $DEPS"; mkdir -p "$DEPS"
   (cd "$DEPS" && { [ -f package.json ] || npm init -y >/dev/null; } && npm i --silent --no-audit --no-fund puppeteer-core@23.11.1 >/dev/null) && echo "ok   puppeteer-core" || { echo "MISS puppeteer-core"; ok=0; }
 else echo "ok   puppeteer-core"; fi
-system_profiler SPFontsDataType 2>/dev/null | grep -q "Hannotate SC" && echo "ok   font Hannotate SC" || echo "WARN font Hannotate SC missing — handwritten look falls back to PingFang"
 python3 -c "import fal_client" 2>/dev/null && echo "ok   fal_client" || { echo "WARN fal_client missing — pip3 install fal-client (Kling digital host, fal-cloned voices)"; }
-[ -d "$DIR/../assets/huashu/clips" ] && echo "ok   huashu grammars ($(ls "$DIR/../assets/huashu/clips" | wc -l | tr -d ' '))" || { echo "MISS assets/huashu (explainer grammars)"; ok=0; }
 VOICES="${XDG_CONFIG_HOME:-$HOME/.config}/ray-explainer/voices.json"
 [ -f "$VOICES" ] && echo "ok   voices: $(python3 -c "import json;print(', '.join(json.load(open('$VOICES'))))")" || echo "info no cloned voice yet (scripts/clone_voice.py) — Gemini prebuilt voices only"
 VOX_PY="$HOME/.local/share/ray-explainer/voxcpm-env/bin/python"; VOX_MODEL=$([ -f "$VOICES" ] && python3 -c "import json;print(next((v['model'] for v in json.load(open('$VOICES')).values() if v.get('provider')=='voxcpm2'),''))"); if [ -x "$VOX_PY" ] && [ -n "$VOX_MODEL" ] && [ -d "$VOX_MODEL" ]; then echo "ok   VoxCPM2 local (voice ray-local)"; elif [ -x "$VOX_PY" ]; then echo "info VoxCPM2 env present but model not reachable — external drive unplugged? (only for voice ray-local)"; else echo "info VoxCPM2 not installed — only needed for voice ray-local"; fi

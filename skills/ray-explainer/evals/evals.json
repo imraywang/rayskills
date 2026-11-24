@@ -6,14 +6,15 @@
       "name": "剪藏文章做成解说视频",
       "type": "happy-path",
       "prompt": "/ray-explainer 把 30-资料/40-网页剪藏/2026-09-30-OpenAI Understands Something Important and Rare.md 做成知识科普解说视频，开头要吸引人，看完要有收获。",
-      "expected_output": "先跑 check_setup.sh，建项目到 ~/Movies/ray-explainer；写出分场景的 script.json，前四句完成钩子、问题和反直觉答案，结尾落到观众带得走的收获，编补内容记进 to_confirm；tts.py 只送正文，qa_tts.py 达到 bad: 0；scenes.js 用 kit.js 的 API，关键元素用 at() 对齐短语；看过 contact sheet 并修掉重叠和空镜后出片；交付 MP4、结构说明、待确认清单和费用。",
+      "expected_output": "先跑 check_setup.sh，建项目到 ~/Movies/ray-explainer；写出分场景的 script.json，前四句完成钩子、问题和反直觉答案，结尾落到观众带得走的收获；分镜确认后 tts.py 只送正文，qa_tts.py 达到 bad: 0；按 hyperframes.md 取材、搭 hf/ 骨架、做场景，节拍读 window.BEATS；hyperframes check 0 错误，看过 cap_sheet.py 的对照图并修掉重叠和空镜后出片；交付 MP4、结构说明和费用。",
       "expectations": [
         "进入写稿前运行 check_setup.sh 并看到 READY",
         "TTS 请求里不含任何语气或风格指令",
-        "qa_tts.py 结果 bad: 0 后才写分镜",
-        "至少看过一次 contact.jpg，并在出片前修正发现的问题",
+        "分镜表确认之后才调用 tts.py，qa_tts.py 结果 bad: 0 后才做画面",
+        "画面用 HyperFrames 合成，不手写 scenes.js",
+        "至少看过一次按字幕抽帧的对照图，并在出片前修正发现的问题",
         "out.mp4 不写进 Obsidian vault",
-        "交付说明包含待确认清单和费用"
+        "交付说明包含费用，有编补内容时点出是哪几处"
       ]
     },
     {
@@ -33,25 +34,23 @@
       "name": "要写实画面",
       "type": "boundary",
       "prompt": "/ray-explainer 做一条介绍大熊猫的视频，要真实的熊猫画面。",
-      "expected_output": "说明代码画不出写实动物，近看只是几何形状；建议用实拍素材，或交给视频模型，再用 chatcut 或 hyperframes 剪辑；如果用户接受卡通风格，可以继续用本 skill。",
+      "expected_output": "按真实画面优先去找实拍素材（纪录片片段、动物园或保护机构的官方视频），下载后先看截帧、听音轨，来源记进 credits.json；找不到合适的真实画面时说明缺口，建议用户提供素材或交给视频模型，不用代码画一只熊猫顶替。",
       "expectations": [
-        "明确说出写实画面是本 skill 的边界",
-        "给出可行的替代路线"
+        "先找真实画面，不用代码绘制写实动物",
+        "素材来源和授权记进 credits.json，画面标来源",
+        "找不到时明确说缺什么并给替代路线"
       ]
     },
     {
       "id": 4,
-      "name": "一期一种画法 + 复刻音色",
+      "name": "真人口播按风格剪片转 ray-studio",
       "type": "happy-path",
-      "prompt": "/ray-explainer 用我的复刻音色把这篇剪藏做成解说视频，清单那段用动态文字，讲机制那段用 Kurzgesagt。",
-      "expected_output": "按 grammars.md「一期一种画法」指出动态文字和 Kurzgesagt 不该混在一期里，建议整期选一种（给出理由让用户挑）；用户坚持要混，才在 script.json 顶层写 \"mix\": true 并写明理由。check_setup 确认 voices.json 里有 ray；script.json 设 voice 为 ray，场景写 grammar 和 cues，cue 时间用 {line, phrase}；tts.py 走 MiniMax，qa_tts.py 达到 bad: 0 并写入逐字时间；看过 contact sheet，确认 cue 和旁白对得上、字幕不被遮挡后出片；交付说明列出画法和配音费用。",
+      "prompt": "/ray-explainer 这条我录好的口播，按 fenping 那个风格剪成竖屏短视频。",
+      "expected_output": "说明真人口播按风格剪片这条线已经归 ray-studio，五种风格都在那边；装了就交给 ray-studio，没装就说明去哪装。本 skill 不再用旧风格库做，也不拿 HyperFrames 专属风格硬套一个 fenping。",
       "expectations": [
-        "动手前按一期一种画法提出异议，并建议选一种",
-        "只有用户坚持时才写 \"mix\": true 并附理由，否则全片只用一种画法",
-        "voice 使用已注册的复刻音色，而非 Gemini 预置音色",
-        "语法场景只写 cues，不改 assets/huashu 下的代码",
-        "cue 用 phrase 定位时间",
-        "出片前看过 contact.jpg"
+        "识别出这是真人口播剪片，不是配音解说片",
+        "交给 ray-studio，或说明没装、去哪装",
+        "不在本 skill 里重做一套 fenping"
       ]
     },
     {
@@ -71,11 +70,11 @@
       "name": "分镜关：先给表再动手",
       "type": "happy-path",
       "prompt": "/ray-explainer 把这篇剪藏做成解说视频，稿子你先写。",
-      "expected_output": "先给出逐字稿；稿子确认后补 beat/visual/anchors 和画法（优先 pattern 与 grammar），运行 storyboard.py 贴出分镜表，等用户确认后才调用 tts.py；手写 scenes.js 只用于套路覆盖不到的画面。",
+      "expected_output": "先给出逐字稿；稿子确认后补 beat、visual、anchors 和 footage，运行 storyboard.py 贴出分镜表，等用户确认后才调用 tts.py。",
       "expectations": [
         "分镜表确认之前不调用任何 TTS",
-        "分镜表包含画法、画面、卡点、预计时长",
-        "能用 pattern 或 grammar 的幕不手写代码"
+        "分镜表包含画面、真实素材、卡点、预计时长",
+        "靠真实画面的题先取材再写分镜"
       ]
     },
     {
@@ -110,12 +109,11 @@
       "name": "要横屏版",
       "type": "happy-path",
       "prompt": "/ray-explainer 这期要发 YouTube，做成横屏的，主持人放左下角像 Screen Studio 那样。",
-      "expected_output": "用 new_project.sh --landscape 建项目（script.json 顶层 aspect: landscape），只用语法片段或 HyperFrames 模式，不用手绘套路；主持人是左下角圆角气泡；静帧检查看横屏安全区；封面走 ray-cover 的 landscape（16:9），不出竖屏版。",
+      "expected_output": "用 new_project.sh --landscape 建项目（script.json 顶层 aspect: landscape），hf 骨架按横屏初始化；主持人是左下角小圆窗，只在关键句出现；静帧检查看横屏安全区；封面走 ray-cover 的 landscape（16:9），不出竖屏版。",
       "expectations": [
         "script.json 顶层写了 \"aspect\": \"landscape\"",
-        "没有一幕用手绘套路或 scenes.js",
         "成片 1920×1080，没有进度条，字幕白字黑描边无底框",
-        "主持人圆角气泡按主画面在左下 / 右下之间换（host_side）",
+        "主持人小圆窗按主画面在左下 / 右下之间换（host_side）",
         "封面用 ray-cover --platforms landscape，不同时出竖屏版"
       ]
     }

@@ -1,6 +1,6 @@
-# 专属风格模式（HyperFrames）
+# 画面：每期专属风格（HyperFrames）
 
-默认的 kit / 语法场景适合“讲清一个框架”。当 Ray 说**不要固定风格、要适合这期内容的风格，要有录屏、真实画面、截图**时，用这个模式：配音和逐字时间仍走本 skill 的 ②③（tts.py / qa_tts.py / check_numbers.py），画面换成 HyperFrames 合成，每期单独设计一套视觉语言。
+解说片的画面只有这一种做法：配音和逐字时间走本 skill 的配音与校对两步（tts.py / qa_tts.py / check_numbers.py），画面用 HyperFrames 合成，每期按内容单独设计一套视觉语言，以录屏、真实画面和截图为主。
 
 第一次实战：《三天涨星8万，AI开始逆向一切》（2026-10，`/Volumes/协作/ray-explainer/2026-10-11-rea-reverse-everything/`），风格“逆向工作台”：真实截图像证据钉在反汇编台面上，加本机实跑工具的真实输出和 CC 历史照片。10 幕、222 秒、144 条字幕，4 个子任务并行做场景，约 15 分钟出全部场景。
 

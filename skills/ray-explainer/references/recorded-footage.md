@@ -1,11 +1,11 @@
-# Ray 自己录的口播
+# 作者自己录的口播
 
 ## 走哪条路
 
 | 情况 | 做法 |
 |---|---|
 | 整条真人出镜，只要加字幕或图卡 | 不走本 skill 的链路，交给 HyperFrames 的通用 skill（Ray 2026-10-20 定）。原片不剪、不调色。只加字幕（包括嵌到人身后的字幕、特效字）用 `embedded-captions`；加标题、人名条、数据卡、金句卡、画中画用 `talking-head-recut` |
-| 剪成课程片、长视频，或者剪成竖屏短视频，按内容配卡片和动效 | 用[风格库](styles/README.md)（`ali` / `fenping` / `qingdan` / `guandian`） |
+| 剪成课程片、长视频，或者剪成竖屏短视频，按内容配卡片和动效 | 交给 `ray-studio`。五种风格（`ali`、`fenping`、`qingdan`、`guandian`、`xiaolin`）都在那边，本 skill 不再做这条线 |
 | 拿 Ray 的录音给解说片配音，脸只在小圆窗里出现 | 走本 skill 的配音步骤，`script.json` 写 `recording`，见 [voice.md](voice.md) |
 
 交给 `embedded-captions` 和 `talking-head-recut` 时，要把签名层带过去，因为它们不认识 Ray 的风格：
