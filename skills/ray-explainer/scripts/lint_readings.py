@@ -19,6 +19,7 @@ Also prints POLY warnings (do not block): other polyphones whose in-context read
 human ear — Gemini cannot judge these (2026-10-16 it "heard" the misread xíng as háng: it corrects by meaning).
 """
 import json, os, re, sys
+import _deps; _deps.need("pypinyin", optional=True)   # at import: tts.py and check_numbers.py switch before doing work
 
 RULES = [
     ("mixed", re.compile(r"(?<![A-Za-z0-9])(?=[A-Za-z0-9.\-]*[A-Za-z])(?=[A-Za-z0-9.\-]*\d)[A-Za-z0-9][A-Za-z0-9.\-]*[A-Za-z0-9]")),

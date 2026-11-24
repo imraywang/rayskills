@@ -15,6 +15,7 @@ import re
 import sys
 from pathlib import Path
 
+import _deps; _deps.need("PIL")
 from PIL import Image
 
 

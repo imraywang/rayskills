@@ -27,6 +27,7 @@ reported, never cropped or stretched), writes <platform>-cover.png, a 420px thum
 """
 import base64, glob, json, os, re, shutil, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
+import _deps; _deps.need("PIL", "numpy")
 from PIL import Image
 
 SIZES = {"wechat": (2100, 900), "x": (1600, 900), "x-article": (1600, 640),

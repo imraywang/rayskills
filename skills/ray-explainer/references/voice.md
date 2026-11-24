@@ -52,7 +52,7 @@ python3 $SK/scripts/qa_tts.py <project>                 # 校对
 - 每句合成 3 遍，由 Whisper 挑最贴稿的那一遍。VoxCPM2 每次输出都不一样，常见问题是英文词念坏、句首吞字。
 - 它不能直接调语速，靠后期变速。`native_speed` 1.1 表示原速已经相当于 MiniMax 的 1.1，所以模板里的 `speed` 1.1 不会再加速。
 - 速度约 1.3 倍实时，一期 3 分钟的片子要合成 10 分钟上下。
-- 运行环境在 `~/.local/share/ray-explainer/voxcpm-env`：用 `uv venv -p 3.12` 建，装 `mlx-audio==0.5.9 soundfile mlx-whisper`。
+- 运行环境在 `~/.local/share/ray-explainer/voxcpm-env`：用 `uv venv -p 3.12` 建，装 `mlx-audio==0.5.9 soundfile mlx-whisper pypinyin`。
 
 ## 用 Ray 自己录的口播当配音
 

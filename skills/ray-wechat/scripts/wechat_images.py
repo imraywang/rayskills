@@ -190,6 +190,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    import _deps; _deps.need("PIL", optional=True)   # before any upload: a switch re-runs the script
     try:
         raise SystemExit(main())
     except DraftError as exc:

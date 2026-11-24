@@ -16,11 +16,8 @@ build.py then plays it at BGM_VOL (default 0.35) and carves it under the narrati
 """
 import json, os, subprocess, sys
 
-try:
-    import numpy as np, soundfile as sf
-except ImportError:
-    ACE = os.path.expanduser(os.environ.get("ACESTEP_DIR", "~/projects/ACE-Step-1.5"))
-    os.execvp("uv", ["uv", "run", "--project", ACE, "python", os.path.abspath(__file__), *sys.argv[1:]])
+import _deps; _deps.need("numpy", "soundfile")
+import numpy as np, soundfile as sf
 
 PROJ, SRC = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2])
 cfg = json.load(open(os.path.join(PROJ, "script.json"))).get("bgm") or {}

@@ -1,10 +1,24 @@
 import importlib.util
+import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "prepare_article.py"
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))   # prepare_article imports its neighbour _deps
+
+# prepare_article needs Pillow, which lives only in the pipeline venv. Its own _deps switch re-runs sys.argv[0],
+# which is not a script under `python -m unittest`, so switch here instead: re-run this file with the venv python.
+if importlib.util.find_spec("PIL") is None:
+    import _deps
+    _py = os.path.join(_deps.ENV, "bin", "python")
+    if os.path.exists(_py):
+        os.execv(_py, [_py, os.path.abspath(__file__)])
+    raise unittest.SkipTest(f"Pillow is missing and {_deps.ENV} does not exist: run ray-explainer/scripts/check_setup.sh")
+
+SCRIPT = SCRIPTS / "prepare_article.py"
 SPEC = importlib.util.spec_from_file_location("prepare_article", SCRIPT)
 prepare = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(prepare)
