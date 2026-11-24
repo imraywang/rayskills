@@ -43,14 +43,14 @@
     },
     {
       "id": 4,
-      "name": "真人口播按风格剪片转 ray-studio",
+      "name": "真人口播按风格剪片不在这里做",
       "type": "happy-path",
-      "prompt": "/ray-explainer 这条我录好的口播，按 fenping 那个风格剪成竖屏短视频。",
-      "expected_output": "说明真人口播按风格剪片这条线已经归 ray-studio，五种风格都在那边；装了就交给 ray-studio，没装就说明去哪装。本 skill 不再用旧风格库做，也不拿 HyperFrames 专属风格硬套一个 fenping。",
+      "prompt": "/ray-explainer 这条我录好的口播，按分屏那种风格剪成竖屏短视频。",
+      "expected_output": "说明真人口播按风格剪片不是本 skill 的活，要换专门剪口播的工具；只加字幕或图卡可以交给 embedded-captions / talking-head-recut。不拿解说片的画面风格硬套。",
       "expectations": [
         "识别出这是真人口播剪片，不是配音解说片",
-        "交给 ray-studio，或说明没装、去哪装",
-        "不在本 skill 里重做一套 fenping"
+        "明确说这里不做，并指出只加字幕或图卡时的去处",
+        "不在本 skill 里硬做一套分屏剪辑"
       ]
     },
     {

@@ -45,7 +45,6 @@ description: rayskills 总入口：不确定该用哪个 ray-* skill、只丢来
 | 让几家模型分工、复核、竞赛，或实时查 X / Reddit | `ray-multimodel` | ray-skills |
 | 查一个话题最近 N 天跨平台怎么被讨论，带日期和证据 | `ray-trend-search` | ray-skills |
 | 给口播稿或选题做拼贴 B-roll | `ray-broll` | ray-skills |
-| 把录好的真人口播按风格剪成课程片或短视频；用户点名 `ray-studio` | `ray-studio` | 独立仓库 |
 | 把照片或角色图做成整套动态表情包 | `ray-sticker-shop` | 独立仓库 |
 
 ## 平台动作先分级

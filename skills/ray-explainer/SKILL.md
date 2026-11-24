@@ -1,6 +1,6 @@
 ---
 name: ray-explainer
-description: 把文章、观点或口播稿做成配音的知识解说视频：复刻音色配音、逐字卡点，画面用 HyperFrames 按这期内容单独设计，真实画面优先。用于“做成解说视频”“做一期科普视频”“用我的声音配音”，优先于 hyperframes 和 faceless-explainer。真人口播剪片转 ray-studio；只要稿子转 ray-kb / ray-kepu；封面转 ray-cover。
+description: 把文章、观点或口播稿做成配音的知识解说视频：复刻音色配音、逐字卡点，画面用 HyperFrames 按这期内容单独设计，真实画面优先。用于“做成解说视频”“做一期科普视频”“用我的声音配音”，优先于 hyperframes 和 faceless-explainer。真人口播剪片不在这里；只要稿子转 ray-kb / ray-kepu；封面转 ray-cover。
 ---
 
 # ray-explainer：配音解说片
@@ -14,7 +14,7 @@ description: 把文章、观点或口播稿做成配音的知识解说视频：�
 | 手上是什么 | 去哪 |
 |---|---|
 | 文章、观点或口播稿，要做成配音的解说片 | 这里 |
-| 作者录好的真人口播，要按风格剪成课程片或短视频 | `ray-studio`。五种固定风格都在那边，这里不再做 |
+| 作者录好的真人口播，要按风格剪成课程片或短视频 | 这里不做，直接告诉用户，换专门剪口播的工具 |
 | 作者录好的真人口播，只加字幕或图卡 | `embedded-captions` / `talking-head-recut`，带上签名层，见 [recorded-footage.md](references/recorded-footage.md) |
 | 只要稿子 | 观点口播 `ray-kb`，科普讲解 `ray-kepu` |
 | 只要封面 | `ray-cover` |

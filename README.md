@@ -64,7 +64,7 @@ flowchart LR
     COVER --> XARTICLE[ray-x-article]
 ```
 
-不随本仓库安装、装了才会被 `/ray` 交过去的：咨询、多模型协作、趋势调研、拼贴 B-roll 在 [ray-skills](https://github.com/imraywang/ray-skills)；真人口播按风格剪片由独立项目 `ray-studio` 负责。成员之间怎么衔接见 [Skill 关系图](docs/skill-link-map.md)。
+不随本仓库安装、装了才会被 `/ray` 交过去的：咨询、多模型协作、趋势调研、拼贴 B-roll 在 [ray-skills](https://github.com/imraywang/ray-skills)。成员之间怎么衔接见 [Skill 关系图](docs/skill-link-map.md)。
 
 ## 先填作者档案
 
