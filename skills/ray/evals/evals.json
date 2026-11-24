@@ -59,7 +59,7 @@
       "name": "eval-route-longform-to-oral-video",
       "type": "happy-path",
       "prompt": "/ray 这篇长文已经定稿了，接下来做一次素材多次分发。先给我做成一条 2 到 3 分钟、真人出镜加录屏的口播视频，图片长文以后再说。",
-      "expected_output": "应分发到 ray-kb，从定稿里选一个视频判断，以 Ray 口吻生成带来源指纹的逐字稿和素材与来源；要做成解说视频时才接 ray-explainer，图片长文以后再说。",
+      "expected_output": "应分发到 ray-kb，从定稿里选一个视频判断，以作者口吻生成带来源指纹的逐字稿和素材与来源；要做成解说视频时才接 ray-explainer，图片长文以后再说。",
       "expectations": [
         "分发到 ray-kb",
         "不把任务直接交给只负责画面的 ray-explainer",

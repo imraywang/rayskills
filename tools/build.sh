@@ -51,7 +51,7 @@ for dir in "$SKILLS_DIR"/*/; do
   python3 "$ROOT/tools/check_description.py" "$skill_md"
 
   cp -R "$dir" "$DIST/$name"
-  rm -f "$DIST/$name/author-profile.md"   # 作者档案只在本机，产物里只带模板
+  rm -rf "$DIST/$name/author-profile.md" "$DIST/$name/local"   # 作者档案和 local/ 只在本机，产物里只带模板
   python3 "$ROOT/tools/package_workbuddy.py" "$dir" "$WORKBUDDY_DIST/$name.zip"
   echo "ok: $name"
   count=$((count+1))

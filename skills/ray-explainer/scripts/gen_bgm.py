@@ -51,4 +51,4 @@ for au in res.audios:
     os.replace(au["path"], dst)
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", dst, "-c:a", "aac", "-b:a", "128k", os.path.join(out, "listen", f"{a.name}_{seed}.m4a")], check=True)
     print(dst)
-print(f"{len(res.audios)} tracks, {dur:.0f}s each, {time.time() - t0:.0f}s — send bgm/listen/*.m4a to Ray, then mix_bgm.py <project> bgm/<pick>.wav")
+print(f"{len(res.audios)} tracks, {dur:.0f}s each, {time.time() - t0:.0f}s — send bgm/listen/*.m4a to the user, then mix_bgm.py <project> bgm/<pick>.wav")

@@ -8,7 +8,8 @@ def should_include(relative):
     if relative.name == ".DS_Store" or relative.suffix == ".pyc":
         return False
     # author-profile.md is each user's own file and stays on their machine; only the template ships
-    return "__pycache__" not in relative.parts and relative.name != "author-profile.md"
+    return ("__pycache__" not in relative.parts and relative.name != "author-profile.md"
+            and relative.parts[0] != "local")   # local/ holds the user's own versions of the references
 
 
 def main():

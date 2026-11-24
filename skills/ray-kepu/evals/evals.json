@@ -20,7 +20,7 @@
       "name": "已有观点母稿改成科普版",
       "type": "happy-path",
       "prompt": "/ray-kepu 这篇口播稿观点太重了，改成科普版，不要太多我的判断。",
-      "expected_output": "保留原母稿不动，新建同题的「-科普版」母稿，frontmatter 写 supersedes 指向旧稿；正文换成讲解者视角，Ray 的判断最多一句且从事实里长出来。",
+      "expected_output": "保留原母稿不动，新建同题的「-科普版」母稿，frontmatter 写 supersedes 指向旧稿；正文换成讲解者视角，作者的判断最多一句且从事实里长出来。",
       "expectations": [
         "旧母稿不删、不改，新建 -科普版 文件并写 supersedes",
         "删掉「说实话」「扎心」「我想跟你说」这类自我表态口头禅和替观众下结论的句子",
@@ -45,7 +45,7 @@
       "name": "要的是观点口播时转交 ray-kb",
       "type": "routing",
       "prompt": "/ray-kepu 我想出镜说说我对这件事的看法，观点要鲜明，情绪拉满。",
-      "expected_output": "识别出这是 Ray 本人出镜说观点的观点口播，说明应转 ray-kb，不按讲解稿写。",
+      "expected_output": "识别出这是作者本人出镜说观点的观点口播，说明应转 ray-kb，不按讲解稿写。",
       "expectations": [
         "指出这是观点口播，交给 ray-kb",
         "不在本 skill 里写观点说满的口播稿"

@@ -47,7 +47,7 @@
       "prompt": "/ray-cover 给这期口播视频做封面，用我的照片。",
       "expected_output": "读这期口播母稿或 script.json，按默认的小Lin风A 写三段字（2–4 字超大关键词、一行中号中文、一行小英文）并备 1–2 组备选，从 ~/.config/ray-cover/identity/ 挑一张和上一期不同的照片，按 video-cover.md 的提示词结构写 prompts/xhs.md（浅色纸面、背景铺满题材实物、人物身后一个隐喻物件、3D 挤出关键词），用 gen_cover.py --platforms xhs --ref <照片> 生成 3:4，验收文字、颜色、数字和安全区后交付；不顺手出 9:16。",
       "expectations": [
-        "用 Ray 的真人照片，经 --ref 传入，不用卡通形象",
+        "用作者的真人照片，经 --ref 传入，不用卡通形象",
         "只出 3:4（xhs），没有顺手出 9:16 vertical",
         "风格是小Lin风A：暖米色纸面、超大 3D 关键词、背景铺满题材实物，不用 S3 黑场",
         "画面文字只有关键词、一行中文、一行小英文三段，各出现一次",

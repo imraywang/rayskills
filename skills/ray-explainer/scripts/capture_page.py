@@ -33,7 +33,7 @@ def main():
                         f"--window-size={width},{a.height // 2}", "--virtual-time-budget=8000", f"--screenshot={out}", a.url],
                        capture_output=True, timeout=60)
     except subprocess.TimeoutExpired:
-        sys.exit(f"60 秒内没截到 {a.url}（页面一直在加载）：改用 Ray 的 Chrome 截")
+        sys.exit(f"60 秒内没截到 {a.url}（页面一直在加载）：改用用户已登录的 Chrome 截")
     if not os.path.isfile(out):
         sys.exit(f"Chrome 没截到 {a.url}")
     print(f"{a.url} → {out}（{width * 2}px 宽）。先用 Read 看图，挑一整段，再在画面里从上往下慢慢移。")

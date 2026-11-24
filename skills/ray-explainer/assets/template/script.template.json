@@ -1,15 +1,31 @@
 {
   "title": "",
   "source": "",
-  "header": "一篇读懂 · ",
+  "header": "",
   "theme": "ray-ip",
-  "host": { "avatar": "ray", "big": [] },
-  "voice": "ray",
+  "voice": "Charon",
   "speed": 1.1,
-  "gaps": { "lead": 0.6, "line": 0.32, "scene": 0.8, "tail": 1.6 },
+  "gaps": {
+    "lead": 0.6,
+    "line": 0.32,
+    "scene": 0.8,
+    "tail": 1.6
+  },
   "scenes": [
-    { "id": "hook", "sig": true, "lines": ["", ""] },
-    { "id": "body", "lines": [""] }
+    {
+      "id": "hook",
+      "sig": true,
+      "lines": [
+        "",
+        ""
+      ]
+    },
+    {
+      "id": "body",
+      "lines": [
+        ""
+      ]
+    }
   ],
   "chapters": []
 }

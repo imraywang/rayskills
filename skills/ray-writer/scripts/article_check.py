@@ -103,7 +103,7 @@ def check_translation(
         add(
             warnings,
             "translation-first-person",
-            f"正文有 {first_person} 行出现第一人称，逐处确认说话的是原作者还是 Ray",
+            f"正文有 {first_person} 行出现第一人称，逐处确认说话的是原作者还是译者",
         )
 
 

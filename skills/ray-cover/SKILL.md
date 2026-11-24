@@ -25,6 +25,8 @@ description: 给定稿的文章或视频做带中文标题的封面：文章封�
 
 **没有 `author-profile.md` 时**（刚装好就是这样，仓库里只带模板）：把同目录的 [author-profile.template.md](author-profile.template.md) 复制成 `author-profile.md`，告诉用户去填。
 
+同目录有 `local/` 文件夹时，里面和 `references/` 同名的文件是作者自己的版本，读它，不读公开的那份。
+
 档案不存在、是空的，或用户明显不是档案里的人时，颜色跟着内容和所选风格走，不套别人的品牌；不用任何人的照片，除非用户这次给了并同意，可以提一句用 [author-profile.template.md](author-profile.template.md) 建自己的档案。
 
 ## 文章封面

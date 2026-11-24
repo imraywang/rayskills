@@ -19,12 +19,20 @@ description: 把文章、观点或口播稿做成配音的知识解说视频：�
 | 只要稿子 | 观点口播 `ray-kb`，科普讲解 `ray-kepu` |
 | 只要封面 | `ray-cover` |
 
+## 读作者档案
+
+动手前读 [author-profile.md](author-profile.md)：用哪套色板和签名幕、默认音色和语速、带不带角落主持人、观众是谁、默认画幅，都以它为准。
+
+**没有 `author-profile.md` 时**（刚装好就是这样，仓库里只带模板）：把同目录的 [author-profile.template.md](author-profile.template.md) 复制成 `author-profile.md`，告诉用户去填；这一次用新项目模板的默认值（Gemini 预置音色、不带主持人），不套别人的形象和声音。
+
+同目录有 `local/` 文件夹时，里面和 `references/` 同名的文件是作者自己的版本，读它，不读公开的那份。
+
 ## 贯穿全程的几条
 
 1. **真实画面优先。** 动态的先于静态的，真实视频默认全屏，静态图要动起来；代码动画只用来串素材和画拍不到的抽象机制。观众看久了手绘和代码动画会疲劳。见 [real-footage.md](references/real-footage.md)。
 2. **两道确认关口，都在花钱之前。** 稿子关只看旁白，分镜关看每一幕画什么。这时改动不要钱，配完音、做完画面再改就要重来。用户说“直接做”两关都跳过；说“稿子我看过了”只过分镜关。
 3. **每一帧只由时间决定。** 场景里不读当前时间，不用随机数，渲染时不联网。这样同一份工程每次渲出一样的片子，改一处只影响一处。
-4. **默认值**：时长 1.5–3 分钟；竖屏 1080×1920，用户要横屏才出 1920×1080，一个项目只出一种画幅；颜色和签名照 [ip-style.md](references/ip-style.md)。
+4. **默认值**：时长 1.5–3 分钟；竖屏 1080×1920，用户要横屏才出 1920×1080，一个项目只出一种画幅；颜色和签名照作者档案和 [ip-style.md](references/ip-style.md)。
 5. **视频文件不进知识库。** 知识库带 git 自动快照，大文件会进历史。项目建在 `~/Movies/ray-explainer/` 下。
 
 ## 流程
@@ -57,7 +65,7 @@ Python 依赖装在独立环境 `~/.local/share/ray-explainer/py-env` 里，自�
 $SK/scripts/new_project.sh <英文短名>      # 横屏加 --landscape
 ```
 
-按场景分组，每个场景 1–4 句，一句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`、`voice`、`theme`（新项目默认 `"ray-ip"`），开场和结尾那一幕写 `"sig": true`。
+按场景分组，每个场景 1–4 句，一句是一次配音调用，也是一个画面节拍。顶层写 `title`、`central_judgment`、`header`、`voice`、`theme`，按作者档案填，开场和结尾那一幕写 `"sig": true`。
 
 没过稿子关的，把旁白给用户看过再往下。
 
@@ -81,7 +89,7 @@ python3 $SK/scripts/qa_tts.py <project>
 python3 $SK/scripts/check_numbers.py <project>   # 稿子里有年份、编号时跑
 ```
 
-- 默认用模板里的复刻音色 `"ray"`，语速 1.1。其他音色、整段读、用作者自己的录音当配音，都在 [voice.md](references/voice.md)。
+- 音色和语速用作者档案里写的默认值；档案没写就用模板的。其他音色、整段读、用作者自己的录音当配音，都在 [voice.md](references/voice.md)。
 - `tts.py` 开头会拦下容易念错的数字、字母和多音字。正文改成读法，`display` 再映射回屏幕上的写法。
 - `qa_tts.py` 每句转写两遍：普通转写用来比对稿子、判合不合格；带词级时间戳的那遍只用来对齐时间，它会在句尾静音处冒出“请点赞订阅”这类幻觉，不能拿来判合格。
 - 不合格的片段被改名成 `.bad`，重跑 `tts.py` 就会重新合成。**必须 `bad: 0` 才往下走。**

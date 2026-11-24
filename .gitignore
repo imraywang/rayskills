@@ -7,3 +7,6 @@ __pycache__/
 
 # 作者档案是每个人自己的，只在本机；仓库里只带 author-profile.template.md
 skills/*/author-profile.md
+
+# 本机的个人版本：和 references/ 同名的文件，以及个人素材。不进仓库
+skills/*/local/

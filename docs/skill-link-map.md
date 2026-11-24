@@ -40,7 +40,7 @@ flowchart TD
 - **稿子 → 解说视频**：`ray-explainer` 把文章、观点或口播稿做成配音解说片：过稿子关和分镜关，先取材再写分镜，复刻音色配音、Whisper 逐字校对，画面用 HyperFrames 按这期内容单独设计，真实截图、录屏和实跑输出优先；左下角卡通主持人默认带，大机位先报价、确认后才生成。成片的封面交给 `ray-cover`，发布包并进口播母稿。
 - **真人口播 → 剪片**：作者录好的口播按风格剪成课程片或短视频，由独立项目 `ray-studio` 负责；只加字幕或图卡交给 `embedded-captions` / `talking-head-recut`。`ray-explainer` 不再做这条线。
 - **事件或原理 → 科普讲解稿**：观众要的是弄明白一件事、不是作者的观点时，`ray-kepu` 先跑知识库预检、核实事实，站在讲解者的位置写旁白：开头一个具体的反常，用观众会问的问题往下推，原理配一个类比和一个算得出来的数，结尾落在观众得到的东西上；出处和口径差异记进「素材与来源」。母稿同样是 `fast-oral`，交给 `ray-explainer` 出片，发布后的回流和 `ray-kb` 一样。
-- **作者档案**：`ray-writer`、`ray-kb`、`ray-kepu`、`ray-cover` 各有一份 `author-profile.md`，放身份、读者、表达偏好、样本或品牌色；`SKILL.md` 不带具体的人。
+- **作者档案**：`ray-writer`、`ray-kb`、`ray-kepu`、`ray-cover`、`ray-explainer` 各自读本机的 `author-profile.md`（身份、读者、表达偏好、样本、品牌色、音色）和 `local/` 里的个人版本；这两样都不进仓库，仓库里只带空白模板和通用方法。
 - **独立仓库成员**：`ray-consult`、`ray-multimodel`、`ray-trend-search`、`ray-broll` 在 [ray-skills](https://github.com/imraywang/ray-skills)，本机装了时 `/ray` 照常路由，趋势调研结论仍可交给 `ray-writer` 或 `ray-kb`。
 
 ## 精简说明

@@ -1,10 +1,10 @@
 # 数字人主持人
 
-**角落主持人是 IP 默认，不用问。** `script.template.json` 自带 `"host": { "avatar": "ray", "big": [] }`，全片左下角换嘴型图层，不花钱。只有**大机位**（默认 MiniMax H3）要先 `--dry-run` 报价、Ray 同意才生成；`big` 留空就不生成。删掉 `host` 字段才是不带主持人。
+**角落主持人是 IP 默认，不用问。** `script.template.json` 自带 `"host": { "avatar": "ray", "big": [] }`，全片左下角换嘴型图层，不花钱。只有**大机位**（默认 MiniMax H3）要先 `--dry-run` 报价、作者同意才生成；`big` 留空就不生成。删掉 `host` 字段才是不带主持人。
 
 ## 效果
 
-- **大机位**：主持人大半身站在画面下半部中间，带手势、歪头、表情，嘴在动。默认用 **MiniMax H3** 图生视频：「形象图 + 动作提示词 + 这句的字」生成，不按配音逐字对口型——大机位要的是手势和动作，不要求真的对上嘴型（Ray 2026-10-15）。抠绿幕后叠进画面。用在开头钩子、章节开头一句、结尾一句，每集约 30 秒。要逐字对口型时改 `"model": "pro"`（Kling AI Avatar，用这句配音驱动，贵一些）。
+- **大机位**：主持人大半身站在画面下半部中间，带手势、歪头、表情，嘴在动。默认用 **MiniMax H3** 图生视频：「形象图 + 动作提示词 + 这句的字」生成，不按配音逐字对口型——大机位要的是手势和动作，不要求真的对上嘴型。抠绿幕后叠进画面。用在开头钩子、章节开头一句、结尾一句，每集约 30 秒。要逐字对口型时改 `"model": "pro"`（Kling AI Avatar，用这句配音驱动，贵一些）。
 
   没接入、留作备选的图生视频模型（2026-10-15 调研）：
   - LTX-2 Fast，约 $0.04/秒；
@@ -12,9 +12,9 @@
 
   本机跑不了：LTX-2.3（要 ≥32GB）、Wan 14B、H3 开源版（要 ≥42.5GB）。
 - **角落**：其余时间缩在左下角只露头肩，用同一形象的换嘴型图层：每个字按拼音韵母选口型（A O E I U，b/p/m 先抿嘴），按逐字时间切换，加眨眼和轻微摆动。不花钱。
-- 两者构图逐像素一致，大机位和角落之间缩放过渡，缩到角落后换成图层。段首提前 0.6 秒开始放大，段尾停 0.15 秒再用 0.8 秒缩回角落，都是 power2.inOut。主持人默认在开头从角落下方滑入；如果第一段大机位在 1.0 秒前开始，就改成第 0 帧直接在大机位、0.05 秒起 0.35 秒淡入，不先滑入再立刻放大（2026-10-13 Ray 反馈：开场 3 秒里的出现和缩放太突兀）。HyperFrames 模式（`assets/hf-template/host_build.py`）和手绘 kit 模式（`assets/template/overlay.js`）行为一致。
+- 两者构图逐像素一致，大机位和角落之间缩放过渡，缩到角落后换成图层。段首提前 0.6 秒开始放大，段尾停 0.15 秒再用 0.8 秒缩回角落，都是 power2.inOut。主持人默认在开头从角落下方滑入；如果第一段大机位在 1.0 秒前开始，就改成第 0 帧直接在大机位、0.05 秒起 0.35 秒淡入，不先滑入再立刻放大（2026-10-13 作者反馈：开场 3 秒里的出现和缩放太突兀）。HyperFrames 模式（`assets/hf-template/host_build.py`）和手绘 kit 模式（`assets/template/overlay.js`）行为一致。
 - 字幕压在主持人胸前，位置上移到 y≈1470。
-- 形象是 Ray 的扁平卡通形象，去掉胡子胡青、面部干净；重做形象（`make_avatar.py`）时照此写提示词。
+- 形象是作者的扁平卡通形象，去掉胡子胡青、面部干净；重做形象（`make_avatar.py`）时照此写提示词。
 
 ## 成本
 
@@ -28,7 +28,7 @@
 
 ## 流程
 
-1. **形象**（每个人只做一次，已有就跳过；Ray 的形象已在 `~/.config/ray-explainer/avatars/ray/`）。照片是个人生物特征数据，上传前必须在对话里得到本人同意：
+1. **形象**（每个人只做一次，已有就跳过；作者的形象已在 `~/.config/ray-explainer/avatars/ray/`）。照片是个人生物特征数据，上传前必须在对话里得到本人同意：
    ```bash
    python3 $SK/scripts/make_avatar.py candidates <照片> --name <名字>   # 3 版扁平卡通，给用户挑
    python3 $SK/scripts/make_avatar.py build --name <名字> --pick <0|1|2> # 口型 / 眨眼图层，看 work/layers.jpg 检查接缝
@@ -52,27 +52,27 @@
 
    H3 的细节：首帧是 flat.png 左右各补 17% 绿边（3:4），手摊开不会碰边；帧保留这圈边，`plan.json` 段落带 `pad`，`host_build.py` 按它往外画，形象和角落图层照样逐像素对齐。超过 15 秒的段落分几截接力生成，下一截的首帧取上一截用到的最后一帧。H3 自带的音轨直接丢掉。接口是国内 `api.minimax.cn` 的 `/v2/video_generation`（`content` 数组格式，和 v1 的海螺接口不同），5 秒片约 2.5 分钟出。
 
-## HeyGen：Ray 本人的数字分身（2026-10-25 起，横屏科普片出镜用）
+## HeyGen：作者本人的数字分身（2026-10-25 起，横屏科普片出镜用）
 
-H3 大机位是「像 Ray 的人在做手势」，不对口型；HeyGen 的 Digital Twin 是 Ray 本人训练的分身，用已有配音逐字对口型，能做全屏出镜和人像卡。《国内 AI 产业链》那期第一次用，Ray 认可。
+H3 大机位是「像作者的人在做手势」，不对口型；HeyGen 的 Digital Twin 是作者本人训练的分身，用已有配音逐字对口型，能做全屏出镜和人像卡。《国内 AI 产业链》那期第一次用，作者认可。
 
-- **前提**：`heygen` CLI（官方安装脚本 `https://static.heygen.ai/cli/install.sh`，装到 `~/.local/bin`，脚本自带校验和），Ray 自己 `heygen auth login --oauth` 登录（订阅里的 premium credits，Creator 档每月 600）。账号里的头像组「Ray」：Digital Twin look `ce23779e68024ae2bec3482eba810404`（原房间背景有红台灯，不合 IP 色）；按 prompt 生成的新 look「Ray - dark finance studio」`91d5d799b91ac3b46da41d991cb544db`（深灰演播室 + 墨绿灯带 + 黑毛衣，`heygen_host.py` 默认用它）。
-- **生成**：`python3 $SK/scripts/heygen_host.py <project> --lines h0=hook.5 c1=st1_ipo.3-st1_ipo.5 … --matte h0`。每段从 `narration.wav` 按 timeline 切出那几句的音频，上传后用 `engine avatar_v` + 动作提示词生成 1080p 16:9，存 `host/<名>.mp4`，起止秒数写进 `host/plan.json`（页面里 `data-media-start` = 镜头开始时刻 − 这段的起点）。先 `--dry-run` 报秒数，Ray 同意再跑。
-- **一定要写眨眼**：不写 `motion_prompt` 时全程不眨眼，Ray 一眼看出来了。提示词写明「每 2–4 秒自然眨眼、轻微点头、手不入画」；`avatar_iv` + `expressiveness: high` 眨得更勤，但 Ray 选了 `avatar_v` 那版。
-- **换场景**：`heygen avatar create -d look.json`（`type: prompt`，`avatar_id` 填 Twin look、`avatar_group_id` 填「Ray」组），提示词写场景和服装、限定黑白灰 + 墨绿、不要文字，1 credit。生成的屏幕上偶尔有糊掉的英文和小红绿点，放在小窗里看不出。
+- **前提**：`heygen` CLI（官方安装脚本 `https://static.heygen.ai/cli/install.sh`，装到 `~/.local/bin`，脚本自带校验和），作者自己 `heygen auth login --oauth` 登录（订阅里的 premium credits，Creator 档每月 600）。账号里的头像组「作者」：Digital Twin look `ce23779e68024ae2bec3482eba810404`（原房间背景有红台灯，不合 IP 色）；按 prompt 生成的新 look「作者 - dark finance studio」`91d5d799b91ac3b46da41d991cb544db`（深灰演播室 + 墨绿灯带 + 黑毛衣，`heygen_host.py` 默认用它）。
+- **生成**：`python3 $SK/scripts/heygen_host.py <project> --lines h0=hook.5 c1=st1_ipo.3-st1_ipo.5 … --matte h0`。每段从 `narration.wav` 按 timeline 切出那几句的音频，上传后用 `engine avatar_v` + 动作提示词生成 1080p 16:9，存 `host/<名>.mp4`，起止秒数写进 `host/plan.json`（页面里 `data-media-start` = 镜头开始时刻 − 这段的起点）。先 `--dry-run` 报秒数，作者同意再跑。
+- **一定要写眨眼**：不写 `motion_prompt` 时全程不眨眼，作者一眼看出来了。提示词写明「每 2–4 秒自然眨眼、轻微点头、手不入画」；`avatar_iv` + `expressiveness: high` 眨得更勤，但作者选了 `avatar_v` 那版。
+- **换场景**：`heygen avatar create -d look.json`（`type: prompt`，`avatar_id` 填 Twin look、`avatar_group_id` 填「作者」组），提示词写场景和服装、限定黑白灰 + 墨绿、不要文字，1 credit。生成的屏幕上偶尔有糊掉的英文和小红绿点，放在小窗里看不出。
 - **人身后的大字**：`heygen background-removal create`（`layers: ["foreground"]`）出带透明通道的 webm，1 credit；叠放顺序 画面 → 字 → 抠图，抠图 `<video>` 的 DOM 位置要在字后面。
 - **费用**：约 0.8–1 credit / 秒（12 秒 10 credits）。一期 6 句全屏 + 4 段人像卡共约 100 秒、约 85 credits。
-- **怎么用在画面里**：开场一句、两三句关键句全屏出镜（`SHOTS` 里当普通镜头）；讲数字、对比的段落用 ali 式分屏，人像卡是同一段视频。**人像卡露肩膀以上**：源片缩到 1000×563 放进 350×470 的卡（`left:-325px; top:-12px`）；Ray 10-25 说卡里人太大、圆窗里脸也太大，以后两种都按「肩膀以上、头顶留白」取景。
+- **怎么用在画面里**：开场一句、两三句关键句全屏出镜（`SHOTS` 里当普通镜头）；讲数字、对比的段落用 ali 式分屏，人像卡是同一段视频。**人像卡露肩膀以上**：源片缩到 1000×563 放进 350×470 的卡（`left:-325px; top:-12px`）；作者 10-25 说卡里人太大、圆窗里脸也太大，以后两种都按「肩膀以上、头顶留白」取景。
 - **发布**：出镜是 AI 生成的数字人，平台的「AI 生成内容」要勾，简介写「出镜为本人授权的数字人」。
 
 ## 横屏：只在关键句出现的小圆窗
 
-`script.json` 写 `"aspect": "landscape"` 时（Ray 2026-10-14 定，参考小Lin说）：
+`script.json` 写 `"aspect": "landscape"` 时：
 
-- **样式**（圆里的脸别放太大，取到肩膀以上，Ray 2026-10-25）：左下角直径 164 的小圆窗（x 56、y 860），底色是画面的卡片色（`ray-ip` 白、`ray-ip-dark` 深灰 #2A2C2C），一圈 2 像素墨绿细圈（深色版提亮成 #0B6B69），不加投影；形象裁成头肩，照样换嘴型、眨眼。
+- **样式**（圆里的脸别放太大，取到肩膀以上）：左下角直径 164 的小圆窗（x 56、y 860），底色是画面的卡片色（`ray-ip` 白、`ray-ip-dark` 深灰 #2A2C2C），一圈 2 像素墨绿细圈（深色版提亮成 #0B6B69），不加投影；形象裁成头肩，照样换嘴型、眨眼。
 - **只在关键句出现**：`host` 里写 `"show": [{"scene": "hook", "line": 0}, …]`，写法和 `big` 一样、不花钱；大机位句子自动算在内。开口前 0.3 秒弹出，说完停 0.15 秒再 0.3 秒淡出；同一幕相邻、或间隔不到 1.2 秒的句子合成一段。其余时间画面上没有主持人。`show` 和 `big` 都空 → 全片不出现（`host.py` 会提醒）。选句和大机位同一个原则：直接对观众说话、有情绪的句子（钩子、定义、金句、结尾提问），一集 3–6 句。
 - **大机位**：同一个圆放大到直径 420（x 56、y 604），露出头肩和部分手势。`big[].pos` 横屏写 `{"x", "y", "w", "h"}`。
-- **换边**（学小Lin说）：主画面在哪边，小圆窗就去另一边。那一幕写 `"host_side": "right"`，从这一幕开头起换到右下；之后写 `"left"` 换回来；不写沿用上一幕；第一幕写 `"right"` 就从右下开场。
+- **换边**：主画面在哪边，小圆窗就去另一边。那一幕写 `"host_side": "right"`，从这一幕开头起换到右下；之后写 `"left"` 换回来；不写沿用上一幕；第一幕写 `"right"` 就从右下开场。
 - 版位都在 `assets/canvas.json` 的 `landscape.host`。改了 `show` / `host_side` / `theme` 要重跑 `host.py --plan-only`（HyperFrames 再跑 `host_build.py`）。
 - 有主持人时内容区只到 y 850（`safe_host_bottom` 230），小圆窗和字幕在底部那一条，主画面不会被它盖住；大机位那几句例外，主画面避开它那一侧。
 

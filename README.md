@@ -68,14 +68,17 @@ flowchart LR
 
 ## 先填作者档案
 
-写作和封面这几个 Skill，把和具体的人有关的东西单独放在各自目录的 `author-profile.md` 里，`SKILL.md` 只管怎么判断：
+写作、封面和解说片这几个 Skill，把和具体的人有关的东西单独放在各自目录的 `author-profile.md` 里，`SKILL.md` 只管怎么判断：
 
 | Skill | 档案里放什么 |
 |---|---|
 | `ray-writer`、`ray-kb`、`ray-kepu` | 身份与读者、表达偏好、允许 AI 补什么、样本清单 |
 | `ray-cover` | 品牌色、禁用项、能不能用真人照片、默认风格和尺寸 |
+| `ray-explainer` | 签名层的色板、默认音色、角落主持人、观众和默认画幅 |
 
-仓库里只带空白模板 `author-profile.template.md`。第一次用时把它复制成同目录的 `author-profile.md` 再填；这个文件是你自己的，已经在 `.gitignore` 里，不会被提交。可以只写几条明确知道的，边用边补；没填的项不会被 AI 自动补全。
+仓库里只带空白模板 `author-profile.template.md`。第一次用时把它复制成同目录的 `author-profile.md` 再填；这个文件是你自己的，已经在 `.gitignore` 里，不会被提交。
+
+公开的 `SKILL.md` 和 `references/` 里只有通用的方法，不带任何人的口味。想让某份参考文件按你自己的习惯来，在该 Skill 目录下建一个 `local/` 文件夹，放一份同名文件，Agent 会优先读它；`local/` 同样不进 git。可以只写几条明确知道的，边用边补；没填的项不会被 AI 自动补全。
 
 ## 它守住的边界
 

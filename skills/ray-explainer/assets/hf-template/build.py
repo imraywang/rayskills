@@ -248,7 +248,7 @@ doc = f'''<!doctype html>
 '''
 open(os.path.join(HERE, "index.html"), "w").write(doc)
 print(f"index.html: {len(slots)} scenes, {len(caps)} captions, {len(sfx)} sfx, {len(CHAPS)} chapters, total {TOTAL}s" + (" [COVER]" if COVER else ""))
-if len(sfx) > 15: print(f"WARN: {len(sfx)} 个音效偏多（Ray 偏好全片十几个，只标关键节点）")
+if len(sfx) > 15: print(f"WARN: {len(sfx)} 个音效偏多（全片十几个为宜，只标关键节点）")
 
 # 配乐给人声让路（hyperframes-audio 的 carve）；每次重建都重新刻，因为上面整页重写了 index.html
 CARVE = os.path.expanduser("~/.claude/skills/hyperframes-audio/scripts/carve.mjs")

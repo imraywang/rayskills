@@ -13,20 +13,20 @@ python3 -I $SK/scripts/tts.py <project>
 
 改法：正文写读法，顶层 `display` 再映射回屏幕上的写法，例如 `"A 十六 Z": "a16z"`、`"百分之二十三": "23%"`。确认没问题的，加 `--allow-readings` 放行。写稿阶段就可以单独跑一遍：`python3 $SK/scripts/lint_readings.py <project>`。2026-10-15 那期，a16z 和 23% 都是配完音才发现念错，各重配了一次。
 
-**多音字**：同一步还会拦下「数字后面当量词用的多音字」。例如「几十万行」里的「行」应该读 háng，MiniMax 念成了 xíng（2026-10-16 是 Ray 看片才发现的）。
+**多音字**：同一步还会拦下「数字后面当量词用的多音字」。例如「几十万行」里的「行」应该读 háng，MiniMax 念成了 xíng（2026-10-16 是作者看片才发现的）。
 - 改法：正文换成同音字（行 → 航），`display` 映射回原字。
-- 其余读音和常用音不同的多音字（重制版、长跑、一行代码）只列 `POLY` 提示，不拦。配完音后，`check_numbers.py` 会把它们切成 `poly_listen.wav`，交付时附上，请 Ray 听几秒。
+- 其余读音和常用音不同的多音字（重制版、长跑、一行代码）只列 `POLY` 提示，不拦。配完音后，`check_numbers.py` 会把它们切成 `poly_listen.wav`，交付时附上，请作者听几秒。
 - 这类不交给 Gemini 听：它会按语义纠正，把念错的 xíng 听成 háng。
 
-**响度**：旁白整体统一到 −21 LUFS（Ray 认可的云端版水平），原声片段切在 −17。换哪个音色都一样，不用手动调；要改就写 `script.json` 的 `"loudness"`。
+**响度**：旁白整体统一到 −21 LUFS，原声片段切在 −17。换哪个音色都一样，不用手动调；要改就写 `script.json` 的 `"loudness"`。
 
 ## 选音色（`script.json` 的 `"voice"`）
 
 | 值 | 是什么 | 要点 |
 |---|---|---|
-| `voices.json` 里注册过的名字，例如 `"ray"` | Ray 的复刻音色，直接调 MiniMax API 的 `speech-2.8-hd`（`scripts/minimax_api.py`） | 新项目模板的默认值，语速 1.1（Ray 2026-10-13 定）。需要 `MINIMAX_API_KEY`；国内平台的 key 另设 `MINIMAX_API_HOST=https://api.minimax.cn`。国内账号偶尔报 1002 限流，`tts.py` 会自动退避重试。每千字约 0.1 美元。`model` 以 `fal-ai/` 开头的旧条目只能继续走 fal |
-| ElevenLabs 复刻音色 | voice id `CAxJPGSVBbZB3ztecX9c`，模型 `eleven_v4`（1 字 1 credit；`eleven_v4_turbo` 半价） | 2026-10-24 起 Ray 最认可的一档。key 在 `~/.config/hangzhou-film/elevenlabs.env`。用法见下面「ElevenLabs 整段读」 |
-| `"ray-local"` | 本地复刻音色，走 VoxCPM2（`mlx-community/VoxCPM2-8bit`） | 不花钱，样本不出本机。2026-10-14 两轮盲听，12 句里赢了 MiniMax 9 句。细节见下面「VoxCPM2」 |
+| `voices.json` 里注册过的名字 | 作者的复刻音色，直接调 MiniMax API 的 `speech-2.8-hd`（`scripts/minimax_api.py`） | 新项目模板的默认值，语速 1.1。需要 `MINIMAX_API_KEY`；国内平台的 key 另设 `MINIMAX_API_HOST=https://api.minimax.cn`。国内账号偶尔报 1002 限流，`tts.py` 会自动退避重试。每千字约 0.1 美元。`model` 以 `fal-ai/` 开头的旧条目只能继续走 fal |
+| ElevenLabs 复刻音色 | 在 ElevenLabs 上复刻的音色，按 voice id 调用 | 不走逐句合成，整段读完再切句，用法见下面「ElevenLabs 整段读」。voice id 和 key 的位置记在作者档案里 |
+| 本地复刻音色 | `voices.json` 里 `"provider": "voxcpm2"` 的条目 | 不花钱，样本不出本机。细节见下面「VoxCPM2」 |
 | 其他值 | Gemini 预置音色 | Charon（男声、利落，没注册复刻音色时首选）、Puck（男声、活泼）、Kore（女声） |
 
 **语速 `"speed"`**：模板默认 1.1。MiniMax 支持 0.5–2；Gemini 只能用 1.0。改语速等于全部重配：专属风格模式里要依次重跑 tts → qa_tts → splice_clips → `host.py --plan-only` → make_beats → build，画面和锚点音效会自动跟上。
@@ -36,13 +36,13 @@ python3 -I $SK/scripts/tts.py <project>
 ElevenLabs 不走 `tts.py` 的逐句合成，而是整段读完再切句：
 
 ```bash
-python3 $SK/scripts/whole_tts.py <project> --eleven CAxJPGSVBbZB3ztecX9c eleven_v4 [--one] [--tag "[...]"]
+python3 $SK/scripts/whole_tts.py <project> --eleven <voice id> eleven_v4 [--one] [--tag "[...]"]
 python3 $SK/scripts/tts.py <project> --allow-readings   # 切句
 python3 $SK/scripts/qa_tts.py <project>                 # 校对
 ```
 
 - `--one`：整篇一次请求，单次上限 1 万字（一期 6 分钟约 2,100 字）。不加就按场景分段请求。
-- v4 不认 `voice_settings.speed`，0.8–1.2 出来一样长。想快一点，就在开头加语气指令 `--tag "[fast-paced, crisp tech news anchor]"`：大约快 9%，指令本身不会被念出来（这是 Ray 10-25 选的「科技播报」语气）。
+- v4 不认 `voice_settings.speed`，0.8–1.2 出来一样长。想快一点，就在开头加语气指令 `--tag "[fast-paced, crisp tech news anchor]"`：大约快 9%，指令本身不会被念出来（这是作者 10-25 选的「科技播报」语气）。
 - v4 念阿拉伯数字能按数值念对（382亿、3.28万亿），可以直接写数字，不用汉字读法加 `display`。
 
 ### VoxCPM2
@@ -54,9 +54,9 @@ python3 $SK/scripts/qa_tts.py <project>                 # 校对
 - 速度约 1.3 倍实时，一期 3 分钟的片子要合成 10 分钟上下。
 - 运行环境在 `~/.local/share/ray-explainer/voxcpm-env`：用 `uv venv -p 3.12` 建，装 `mlx-audio==0.5.9 soundfile mlx-whisper pypinyin`。
 
-## 用 Ray 自己录的口播当配音
+## 用作者自己录的口播当配音
 
-Ray 先录一遍；按 [recorded-footage.md](recorded-footage.md) 用 `gate_breaths.py` 压掉句间吸气，再按句对上画面。
+作者先录一遍；按 [recorded-footage.md](recorded-footage.md) 用 `gate_breaths.py` 压掉句间吸气，再按句对上画面。
 
 `script.json` 写：
 

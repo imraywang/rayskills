@@ -66,7 +66,7 @@ if s.get("design"):   # IP-themed shell (references/storyboard.md): show it with
 n = len(s["scenes"])
 out += [f"**真实素材**：{real_n}/{n} 幕有真实素材，其中 {motion_n} 幕是动态的（录屏 / 视频 / 实跑）", ""]
 if motion_n * 2 < n:   # Ray 2026-10-15: audiences tire of drawn animation; most scenes should carry moving real footage
-    out += [f"**⚠ 动态真实素材太少**：不到一半的幕有录屏、视频或实跑画面。先按 hyperframes.md「取材」补，缺的列出来问 Ray 要。", ""]
+    out += [f"**⚠ 动态真实素材太少**：不到一半的幕有录屏、视频或实跑画面。先按 hyperframes.md「取材」补，缺的列出来问用户要。", ""]
 if windowed:   # Ray 2026-10-15: real video in a small camera window lacks impact; full screen is the default
     out += ["**⚠ 这些动态素材装在窗口里**（真实视频默认全屏 `fullscreen: true`；只有需要并排对比时才进窗口，确认后保留）：" + "；".join(windowed), ""]
 if cropped:   # Ray 2026-10-16: a cover-cropped clip of a landscape iPhone in hands lost the phone

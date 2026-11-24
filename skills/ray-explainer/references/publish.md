@@ -4,7 +4,7 @@
 
 用户认可成片后，在 `script.json` 里写两样东西：
 - `cover_t`：封面取第几秒的那一帧。
-- `publish`：`titles`（标题备选）、`description`（描述）、`tags`（标签）。写法遵循 Ray 的写作规则：直接、口语化。
+- `publish`：`titles`（标题备选）、`description`（描述）、`tags`（标签）。写法遵循作者的写作规则：直接、口语化。
 
 然后：
 
@@ -23,8 +23,8 @@ python3 $SK/scripts/publish.py <project> --vault <知识库根目录>
 - 平台的「AI 生成内容」声明要勾选（用了复刻音色、数字人）。
 - 用了 CC 授权图片的，要在简介里署名。
 
-**封面**交给 `ray-cover` 的视频封面流程（Ray 真人照片加大标题，黑白灰加墨绿 IP）：
-- 竖屏片默认只出 3:4（`xhs`，风格默认小Lin风A），拷成项目根目录的 `cover_3x4.png`。9:16 只在 Ray 明确要时才出。
+**封面**交给 `ray-cover` 的视频封面流程（真人照片加大标题，颜色照作者档案）：
+- 竖屏片默认只出 3:4（`xhs`），拷成项目根目录的 `cover_3x4.png`。9:16 只在作者明确要时才出。
 - 横屏片出 `landscape`（16:9，1920×1080），另出一份 jpg 给 YouTube。
 - `cover.jpg`（成片里的一帧）只作备用。
 
