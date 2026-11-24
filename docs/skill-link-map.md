@@ -11,8 +11,8 @@ flowchart TD
         WRITER["/ray-writer\n长文 · 译介"]
         KB["/ray-kb\n快速口播 · 长文再分发"]
         KEPU["/ray-kepu\n科普讲解稿"]
-        COVER["/ray-cover\n平台封面 · IP 风格"]
-        EXPLAINER["/ray-explainer\n解说视频 · 数字人主持"]
+        COVER["/ray-cover\n文章封面 · 视频封面"]
+        EXPLAINER["/ray-explainer\n配音解说视频"]
         WECHAT["/ray-wechat\n公众号排版与草稿"]
         XARTICLE["/ray-x-article\nX 后台草稿"]
     end
@@ -20,7 +20,7 @@ flowchart TD
 
     %% 常见衔接
     OBSIDIAN -->|知识库根目录与模板| WRITER
-    OBSIDIAN -->|本地知识与快速口播模板| KB
+    OBSIDIAN -->|知识预检与快速口播模板| KB
     WRITER -->|判断与正文通过检查| COVER
     WRITER -->|定稿母稿| KB
     KB -->|口播稿与中心判断| EXPLAINER
@@ -29,20 +29,23 @@ flowchart TD
     COVER -->|公众号封面与定稿| WECHAT
     COVER -->|5:2 Article 封面| XARTICLE
     EXPLAINER -->|视频脚本与标题| COVER
-    OBSIDIAN -->|剪藏与知识| EXPLAINER
 ```
 
 ## 衔接逻辑
 
-- **知识库 → 长文 → 封面 → 平台草稿**：没有兼容知识库时，`ray-obsidian` 先安全建立资料、知识、成稿包、草稿和发布结构；`ray-writer` 完成事实、情绪、二级标题、重点加粗和段落检查；`ray-cover` 从核心判断出发，选一种 Punk 风格并套 Ray 的 IP，由 Codex 调 Image 2 按公众号、普通 X、5:2 Article 各自尺寸直出，逐字与颜色验收；`ray-wechat` 负责公众号排版、预览确认、原草稿更新和 UTF-8 回读；`ray-x-article` 负责 X 草稿续写或查重、富文本写入、封面裁切、预览和保存。用户明确要求完整管线时连续执行，线上写入与发布仍由用户确认。
+- **知识库 → 长文 → 封面 → 平台草稿**：没有兼容知识库时，`ray-obsidian` 先安全建立资料、知识、成稿包、草稿和发布结构；`ray-writer` 读作者档案和样本，写完后检查自保话、二级标题、重点加粗和段落；`ray-cover` 从核心判断出发，选一种 Punk 风格，颜色照作者档案的品牌色，按公众号、普通 X、5:2 Article 各自尺寸直出，逐字与颜色验收；`ray-wechat` 负责公众号排版、预览确认、原草稿更新和 UTF-8 回读；`ray-x-article` 负责 X 草稿续写或查重、富文本写入、封面裁切、预览和保存。用户明确要求完整管线时连续执行，线上写入与发布仍由用户确认。
 - **译介支线**：内容主体属于别人的文章，`ray-writer` 译介模式先过授权与署名两道门；`source_permission` 没放行时 `ray-wechat` 与 `ray-x-article` 都只做本地产物。
-- **灵感 → 快速口播**：当一个现场观察或对话判断已经能在一条视频里讲清，`ray-kb` 按需检索素材、以作者口吻直接写，只建立一份 `fast-oral` 母稿；不强制创建候选卡、写作任务、长文或第二份内容包。
+- **灵感 → 快速口播**：当一个现场观察或对话判断已经能在一条视频里讲清，`ray-kb` 先做知识库预检、核实立论点，以作者口吻直接写，只建立一份 `fast-oral` 母稿；不强制创建候选卡、写作任务、长文或第二份内容包。
 - **母稿 → 多次分发**：`ray-kb` 把 `ray-writer` 通过检查的长文作为唯一真源，重新选一个适合视频的判断，生成带母稿指纹、以作者口吻写成的口播稿；要做成解说视频时再交给 `ray-explainer`。公众号和 X 继续各自做格式转换，图片长文先保留视觉接口，后续再接独立样式系统。
-- **剪藏 → 解说视频**：`ray-explainer` 把文章或剪藏写成解说稿，先出分镜表等确认，再配音、逐字卡点、代码绘制画面；左下角数字人主持人是默认的 IP 签名层，Kling 大机位要先报价、确认后才生成。成片的 9:16 / 3:4 竖封面交给 `ray-cover`。要每期专属风格、真实截图和录屏时改走 HyperFrames 模式，配音和卡点不变，发布包并进 `ray-kb` 的口播母稿。
-- **事件或原理 → 科普讲解稿**：观众要的是弄明白一件事、不是 Ray 的观点时，`ray-kepu` 先跑知识库预检、核实事实，站在讲解者的位置写旁白：开头一个具体的反常，用观众会问的问题往下推，原理配一个类比和一个算得出来的数，结尾落在观众得到的东西上；母稿同样是 `fast-oral`，交给 `ray-explainer` 出片，发布后的回流和 `ray-kb` 一样。
+- **稿子 → 解说视频**：`ray-explainer` 把文章、观点或口播稿做成配音解说片：过稿子关和分镜关，先取材再写分镜，复刻音色配音、Whisper 逐字校对，画面用 HyperFrames 按这期内容单独设计，真实截图、录屏和实跑输出优先；左下角卡通主持人默认带，大机位先报价、确认后才生成。成片的封面交给 `ray-cover`，发布包并进口播母稿。
+- **真人口播 → 剪片**：作者录好的口播按风格剪成课程片或短视频，由独立项目 `ray-studio` 负责；只加字幕或图卡交给 `embedded-captions` / `talking-head-recut`。`ray-explainer` 不再做这条线。
+- **事件或原理 → 科普讲解稿**：观众要的是弄明白一件事、不是作者的观点时，`ray-kepu` 先跑知识库预检、核实事实，站在讲解者的位置写旁白：开头一个具体的反常，用观众会问的问题往下推，原理配一个类比和一个算得出来的数，结尾落在观众得到的东西上；出处和口径差异记进「素材与来源」。母稿同样是 `fast-oral`，交给 `ray-explainer` 出片，发布后的回流和 `ray-kb` 一样。
+- **作者档案**：`ray-writer`、`ray-kb`、`ray-kepu`、`ray-cover` 各有一份 `author-profile.md`，放身份、读者、表达偏好、样本或品牌色；`SKILL.md` 不带具体的人。
 - **独立仓库成员**：`ray-consult`、`ray-multimodel`、`ray-trend-search`、`ray-broll` 在 [ray-skills](https://github.com/imraywang/ray-skills)，本机装了时 `/ray` 照常路由，趋势调研结论仍可交给 `ray-writer` 或 `ray-kb`。
 
 ## 精简说明
+
+- **2026-11-23**：全部 `SKILL.md` 重写，写作类拆成判断、作者档案、参考三层；去掉文末的「待确认」清单；`ray-explainer` 只保留 HyperFrames 一种画法，手绘画法、语法片段和真人口播旧风格库归档到 `docs/archive/`。
 
 - **v2** 按成熟度精简：`ray-diagnose` + `ray-proposal` 合并为 `ray-consult`，`ray-vpsinit` + `ray-nodecheck` 合并为 `ray-vps`，`ray-thread` 并入 `ray-writer` 的 thread 骨架模式（后已移除）；`ray-tweet`、`ray-idea`、`ray-cleanup`、`ray-weekly` 删除。
 - **v3** 按使用频率收敛：`ray-benchmark`、`ray-launch`、`ray-metrics`、`ray-report`、`ray-vps` 移出到独立仓库 [ray-skills](https://github.com/imraywang/ray-skills)，完整保留、按需独立使用；`ray-consult` 当时经复核保留。
